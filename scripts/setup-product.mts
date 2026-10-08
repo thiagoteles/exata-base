@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import process from "node:process";
 import { createInterface } from "node:readline/promises";
 import { parseArgs } from "node:util";
@@ -12,6 +13,14 @@ import {
   readCurrent,
   validateProduct,
 } from "./setup-product/apply";
+import { askServices } from "./setup-product/ask-services";
+import {
+  parseEnvFile,
+  renderEnvFile,
+  type Values,
+  validateIntegrations,
+  withGeneratedSecrets,
+} from "./setup-product/integrations";
 import { parseSeeds } from "./tokens/generate";
 
 /*
@@ -19,6 +28,12 @@ import { parseSeeds } from "./tokens/generate";
  * for, how it should sound, and its brand color. It asks, showing what is there now, and writes
  * the answers where they live. Run it again any time to correct a value. For a script or an agent,
  * pass the answers as flags and `--yes`; nothing is asked.
+ *
+ * It also asks which outside services the product uses (sign-in, payments, e-mail, files,
+ * analytics), checks each key's shape, and keeps the answers in a file of their own that git
+ * ignores. That file is not the one Next reads in development: inside the compose a non-empty
+ * local env file sends the dev server into a reload loop. The file is meant to be copied into the
+ * hosting panel, so no secret is ever written to a tracked file.
  */
 
 const files = {
@@ -28,6 +43,7 @@ const files = {
   design: "DESIGN.md",
   colors: "colors.json",
 } as const;
+const integrationsFile = ".env.integrations";
 
 const { values: flags } = parseArgs({
   options: {
@@ -38,6 +54,7 @@ const { values: flags } = parseArgs({
     surfaces: { type: "string" },
     hue: { type: "string" },
     chroma: { type: "string" },
+    set: { type: "string", multiple: true },
     yes: { type: "boolean", default: false },
     "no-check": { type: "boolean", default: false },
   },
@@ -98,9 +115,29 @@ const hue = Number(await ask(prompt, "Brand hue, 0 to 360", flags.hue, String(co
 const chroma = Number(
   await ask(prompt, "Brand chroma, 0.04 to 0.2", flags.chroma, String(colors.brand.chroma)),
 );
+
+const stored: Values = existsSync(integrationsFile) ? parseEnvFile(read(integrationsFile)) : {};
+const services: Values = { ...stored };
+for (const pair of flags.set ?? []) {
+  const at = pair.indexOf("=");
+  if (at > 0) {
+    services[pair.slice(0, at)] = pair.slice(at + 1);
+  } else {
+    process.stderr.write(`--set wants NAME=value, got "${pair}"\n`);
+    process.exit(1);
+  }
+}
+
+if (prompt !== null) {
+  await askServices(prompt, (text) => process.stdout.write(text), services);
+}
 prompt?.close();
 
-const problems = validateProduct(input);
+const serviceProblems =
+  Object.keys(flags.set ?? []).length > 0 || Object.keys(services).length > 0
+    ? validateIntegrations(services)
+    : [];
+const problems = [...validateProduct(input), ...serviceProblems];
 let seeds: ReturnType<typeof parseSeeds> | null = null;
 try {
   seeds = parseSeeds({ brand: { hue, chroma }, neutral: colors.neutral });
@@ -122,6 +159,11 @@ writeFileSync(
   `${JSON.stringify({ brand: seeds.brand, neutral: seeds.neutral }, null, 2)}\n`,
 );
 
+if (Object.keys(services).length > 0) {
+  const complete = withGeneratedSecrets(services, () => randomBytes(32).toString("hex"));
+  writeFileSync(integrationsFile, renderEnvFile(complete));
+}
+
 // The palette, both themes, the e-mail colors and the DESIGN.md tables follow the seeds.
 run("pnpm", ["tokens"]);
 run("pnpm", ["exec", "biome", "format", "--write", ...Object.values(files)]);
@@ -134,4 +176,8 @@ Done. Still yours to write:
 - the home page copy (home.* in ${files.catalog}), still a placeholder
 - the terms and privacy text (terms.*, privacy.*), written for a generic product
 - production variables: see the README, section "Variables"
-`);
+${
+  Object.keys(services).length > 0
+    ? `- the services you answered are in ${integrationsFile} (ignored by git): copy its lines into the hosting panel, and point each webhook as the README says\n`
+    : ""
+}`);

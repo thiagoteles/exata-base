@@ -10,12 +10,14 @@ docker compose up
 
 Open http://localhost:3300. Sign in as the seeded admin, `admin@app.local` with the password `admin-local`. Mail the app sends appears at http://localhost:8030. No `.env` file is needed: every local value is set in `docker-compose.yml`.
 
+Do not put anything in `.env.local` while using the compose. The app runs in dev mode on a mounted folder, and a non-empty `.env.local` sends it into a reload loop: every page recompiles on each request, the CPU stays at 100% and the browser tests time out. To try a provider (Stripe, Clerk, Google) keep its keys in a file that is not named `.env.local`, and pass them to the compose with an extra file: `docker compose -f docker-compose.yml -f extra.yml up -d --force-recreate app`, where `extra.yml` sets `services.app.environment`. Run the Clerk suite with the keys exported in your shell instead (see Checks).
+
 Node 24 and pnpm are needed only outside Docker (`nvm use`, then `pnpm install`).
 
 ## Make it yours
 
 1. **Start.** `docker compose up`, as above.
-2. **Say what the product is.** `pnpm setup:product` asks for the name, one sentence about it, who it is for, its tone, the surfaces it uses and the brand color (hue and chroma). It writes them where they live (the text catalog, `package.json`, this README, `DESIGN.md`, `colors.json`), regenerates the palette for both themes and the e-mail colors, and runs `pnpm check`. Run it again any time to correct a value; pass the answers as flags with `--yes` to skip the questions (the flags are `--name`, `--description`, `--audience`, `--tone`, `--surfaces`, `--hue`, `--chroma` and `--no-check`). It does not touch secrets: production variables are in [Variables](#variables).
+2. **Say what the product is.** `pnpm setup:product` asks for the name, one sentence about it, who it is for, its tone, the surfaces it uses and the brand color (hue and chroma). It writes them where they live (the text catalog, `package.json`, this README, `DESIGN.md`, `colors.json`), regenerates the palette for both themes and the e-mail colors, and runs `pnpm check`. Run it again any time to correct a value; pass the answers as flags with `--yes` to skip the questions (the flags are `--name`, `--description`, `--audience`, `--tone`, `--surfaces`, `--hue`, `--chroma` and `--no-check`). It then asks which outside services the product uses (Clerk or its own sign-in, Google sign-in, Stripe, Mailtrap, Google Cloud files and logs, Umami), checks the shape of every key (prefixes, groups that must be filled together, at least one Stripe price) and keeps the answers in `.env.integrations`, a file git ignores. It generates the secrets you should not invent (`CRON_SECRET`, `BETTER_AUTH_SECRET`, `FILE_URL_SECRET`). Copy that file's lines into the hosting panel; nothing secret is written to a tracked file, and the file is deliberately not `.env.local` (see Start). From flags, pass each value with `--set NAME=value`, repeated. The variables themselves are in [Variables](#variables).
 3. **Add a language.** The product ships in Brazilian Portuguese only, and `messages/pt-BR.json` is the type of the catalog. To add English: create `messages/en-US.json` with exactly the keys of `pt-BR.json`, add `"en-US"` to the list in `lib/i18n/locales.ts`, and add `export const instant = false;` to `app/layout.tsx` (with several languages the language comes from the request, so the document renders per request and the build must be told). `pnpm check` compares every catalog with `pt-BR.json` (missing key, extra key, changed `{argument}`) and fails if the layout and the list disagree, naming the fix. Then:
    - Portuguese stays at the clean address; English lives under `/en`. The language is chosen by the prefix, then the saved choice, then the browser's `Accept-Language`, then Portuguese. A page load with no prefix and another language chosen is redirected to its prefix.
    - A switcher appears in the footer and on the account page. The choice is saved in a cookie and, when signed in, in the person's options, so it follows them to another browser.
@@ -51,6 +53,8 @@ Useful facts:
 | `pnpm test:integration` | The rules against a real Postgres (needs Docker) |
 | `pnpm test:e2e` | The browser suite against the running compose (two workers), with accessibility checks in both themes |
 | `pnpm test:clerk` | The Clerk mode, with development keys (see `e2e/clerk`) |
+
+The Clerk suite needs a server started with `AUTH_PROVIDER=clerk` and these variables exported in the shell that runs it: `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` and `E2E_CLERK_USER_EMAIL`, the e-mail of a user that already exists in that development instance. Use keys from a development instance only.
 
 The GitHub workflow in `.github/workflows/ci.yml` is present and turned off. To turn it on, replace its `workflow_dispatch` trigger with `push` and `pull_request`.
 

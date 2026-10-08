@@ -13,8 +13,10 @@ test("a person signed in through Clerk reaches the account page, with a row of t
 test("a visitor is sent to sign-in and comes back to the page they asked for", async ({
   browser,
 }) => {
+  // The project's saved session is applied to every new context, so a visitor starts empty on purpose.
   const context = await browser.newContext({
     baseURL: appUrl,
+    storageState: { cookies: [], origins: [] },
   });
   const page = await context.newPage();
   await page.goto("/account");

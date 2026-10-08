@@ -25,7 +25,7 @@ fi
 
 echo "Notification channel for ${ALERT_EMAIL}"
 channel="$(gcloud beta monitoring channels list --project "$GCP_PROJECT" \
-  --filter "type=email AND labels.email_address=${ALERT_EMAIL}" --format "value(name)" | head -n 1)"
+  --filter "type=\"email\" AND labels.email_address=\"${ALERT_EMAIL}\"" --format "value(name)" | head -n 1)"
 if [ -z "$channel" ]; then
   channel="$(gcloud beta monitoring channels create --project "$GCP_PROJECT" \
     --display-name "App alerts" --type email \
@@ -38,7 +38,7 @@ existing="$(gcloud alpha monitoring policies list --project "$GCP_PROJECT" \
   --filter "displayName=\"${policy_name}\"" --format "value(name)" | head -n 1)"
 if [ -n "$existing" ]; then
   gcloud alpha monitoring policies update "$existing" --project "$GCP_PROJECT" \
-    --policy-from-file "$here/alert-policy.json" --notification-channels "$channel"
+    --policy-from-file "$here/alert-policy.json" --set-notification-channels "$channel"
 else
   gcloud alpha monitoring policies create --project "$GCP_PROJECT" \
     --policy-from-file "$here/alert-policy.json" --notification-channels "$channel"

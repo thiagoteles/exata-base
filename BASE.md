@@ -100,12 +100,13 @@ As fases 0 a 12 do plano foram feitas e provadas (cada uma foi um commit `feat:`
 - **Clerk** (instância de desenvolvimento): `pnpm test:clerk` passa, com o login pelo token de teste e a linha do usuário criada na primeira visita.
 - **Stripe** (chaves de teste): checkout comprado à mão no navegador, com `stripe listen --forward-to localhost:3300/api/webhooks/stripe` e o plano virando Mensal pelo webhook. Preços, os três checkouts, portal, cancelar no fim do período, reembolso e cancelamento imediato foram provados pelo adaptador contra a API.
 - **Google Cloud** (Storage e Logging): arquivo enviado e aberto por link assinado, adulterar o link dá 403, e as linhas de log do app chegam ao Cloud Logging.
+- **`pnpm gcp:alerts`** (2026-10-08): rodou contra um projeto de verdade e criou a métrica `app_errors`, o canal de e-mail e a política "App errors". Precisa dos componentes `beta` e `alpha` do `gcloud` (`gcloud components install beta alpha`). A primeira execução expôs dois defeitos que só aparecem quando o recurso já existe (filtro do canal sem aspas e `--notification-channels` no `update`, que lá se chama `--set-notification-channels`); com a correção, repetir o comando atualiza sem duplicar.
 - **`create-next-app --example`**: o produto novo nasce sem `origin`, o `BASE.md` sai num commit próprio como o `AGENTS.md` manda, e `docker compose up` sobe sem `.env`.
 
 **Só o dono pode fazer:**
-1. Rodar `pnpm gcp:alerts` contra o Google Cloud (a sintaxe e os JSON foram conferidos, o script nunca rodou contra o GCP).
-2. Ligar o workflow `.github/workflows/ci.yml` (hoje só `workflow_dispatch`) e ver o primeiro resultado.
-3. Construir e subir a imagem de produção (`docker-compose.production.yml`) com um banco de verdade. Nunca foi exercitada de ponta a ponta.
+1. Ligar o workflow `.github/workflows/ci.yml` (hoje só `workflow_dispatch`) e ver o primeiro resultado.
+2. Construir e subir a imagem de produção (`docker-compose.production.yml`) com um banco de verdade. Nunca foi exercitada de ponta a ponta.
+3. Provar o alarme de ponta a ponta: gerar um erro no app com o Cloud Logging ligado e ver o e-mail chegar. O `pnpm gcp:alerts` cria os recursos, mas o disparo nunca foi observado.
 
 **Já feito:** a `main` foi enviada ao GitHub e, depois, o histórico dela foi reescrito para um único commit (veja a seção 8). Os commits antigos, com os documentos de trabalho, deixaram de existir no branch publicado; o bundle guarda tudo.
 

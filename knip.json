@@ -8,5 +8,5 @@
     "e2e/clerk/*.ts"
   ],
   "project": ["**/*.{ts,tsx,mts,css}"],
-  "ignoreDependencies": ["sharp"]
+  "ignoreDependencies": ["sharp", "lefthook"]
 }

@@ -145,6 +145,16 @@ test("the upload takes a PDF, refuses the wrong type and a file that is too big"
   const redirect = await request.get(href ?? "", { maxRedirects: 0 });
   expect(redirect.status()).toBe(302);
   const signed = new URL(redirect.headers()["location"] ?? "");
+  if (signed.hostname.endsWith("googleapis.com")) {
+    // With Cloud Storage on, Google signs the link and enforces the expiry itself.
+    expect(signed.searchParams.get("X-Goog-Signature")).toBeTruthy();
+    expect(signed.searchParams.get("X-Goog-Expires")).toBeTruthy();
+    expect((await request.get(signed.toString())).status()).toBe(200);
+    const altered = new URL(signed);
+    altered.searchParams.set("X-Goog-Expires", "86400");
+    expect((await request.get(altered.toString())).status()).toBe(403);
+    return;
+  }
   expect(signed.pathname.startsWith("/storage/files/")).toBe(true);
   expect(signed.searchParams.get("signature")).toBeTruthy();
   expect(signed.searchParams.get("expires")).toBeTruthy();

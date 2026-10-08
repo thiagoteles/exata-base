@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
+import { accountIsFree, BILLING_ON, billingIsOff, PLAN_PAID } from "./environment";
 
 /*
  * The compose runs with billing off, which is the state of a fresh product: no price on sale, no
@@ -39,7 +40,9 @@ for (const theme of themes) {
 
 test("with billing off the plans page says nothing is on sale and the footer hides the link", async ({
   page,
+  request,
 }) => {
+  test.skip(!(await billingIsOff(request)), BILLING_ON);
   await open(page, "/plans", "light", "Planos");
   await expect(page.getByText("Os planos ainda não estão à venda.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Assinar" })).toHaveCount(0);
@@ -49,6 +52,7 @@ test("with billing off the plans page says nothing is on sale and the footer hid
 test("a free account sees its plan, and no portal or cancellation without a subscription", async ({
   page,
 }) => {
+  test.skip(!(await accountIsFree(page)), PLAN_PAID);
   await open(page, "/account/plan", "light", "Meu plano");
   const record = page.getByRole("term").filter({ hasText: "Plano" }).first();
   await expect(record).toBeVisible();
@@ -66,6 +70,7 @@ test("a free account sees its plan, and no portal or cancellation without a subs
 test("the catalog's paid block stays shut for the free plan and points to the plans", async ({
   page,
 }) => {
+  test.skip(!(await accountIsFree(page)), PLAN_PAID);
   await open(page, "/catalog", "light", "Catálogo");
   const block = page.locator("section", {
     has: page.getByRole("heading", { name: "Plano pago" }),
@@ -75,6 +80,7 @@ test("the catalog's paid block stays shut for the free plan and points to the pl
 });
 
 test("the payment webhook accepts nothing while billing is off", async ({ request }) => {
+  test.skip(!(await billingIsOff(request)), BILLING_ON);
   const response = await request.post("/api/webhooks/stripe", {
     data: "{}",
     headers: { "stripe-signature": "t=1,v1=00" },

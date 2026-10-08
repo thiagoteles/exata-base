@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
+import { accountIsFree, PLAN_PAID } from "./environment";
 import { messageSentTo } from "./mail";
 
 /*
@@ -86,6 +87,8 @@ test("the admin invites someone, the invite arrives by e-mail, and the link open
 test("the user list searches, opens a record, and an admin cannot delete themselves", async ({
   page,
 }) => {
+  // The courtesy button belongs to an account without a plan.
+  test.skip(!(await accountIsFree(page)), PLAN_PAID);
   await open(page, "/admin/users", "light", "Usuários");
   await page.getByRole("searchbox", { name: "Buscar usuário" }).fill("admin@app.local");
   await expect(page).toHaveURL(/q=admin/);

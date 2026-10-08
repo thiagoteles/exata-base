@@ -71,6 +71,8 @@ Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `n
 - `pnpm test:integration`: regras contra Postgres real (testcontainers). Webhooks do Stripe com eventos assinados à mão (HMAC igual ao do Stripe) lidos pelo adaptador real.
 - `pnpm test:e2e`: Playwright contra o compose já de pé, com axe (WCAG 2.0/2.1/2.2 A e AA) nos dois temas. `pnpm test:clerk`: modo Clerk, com chaves de desenvolvimento (a suíte pula sem elas).
 - **Receita de prova em cópia limpa** (usada em cada fase): copiar o repo para uma pasta temporária com `git archive HEAD | tar -x -C pasta` (ou `git ls-files -co --exclude-standard`), `docker compose -p <nome> up -d` nela, esperar `/health`, rodar o Playwright do repo, depois `docker compose -p <nome> down -v` e apagar a pasta pelo caminho literal.
+- **A suíte e2e é escrita para o compose limpo:** sem provedor de pagamento, arquivos em disco e o admin no plano gratuito. Quem liga chaves ou compra um plano à mão muda o estado, e o banco o guarda. Por isso os testes que dependem desse estado (`e2e/environment.ts`: `billingIsOff`, `accountIsFree`) perguntam antes e pulam dizendo o motivo, e o teste de upload também prova o link assinado do Google. O `auth.setup.ts` aquece, uma por vez, todas as páginas que a suíte abre: o servidor de desenvolvimento compila no primeiro acesso, e sem isso a primeira rodada depois de recriar o container estoura o timeout de 15 s. Página nova que entrar nos testes entra na lista `PAGES`.
+- **Provar com chaves sem quebrar o compose:** nunca em `.env.local` (laço de recarga). Use um arquivo de override fora do repositório, `docker compose -f docker-compose.yml -f <arquivo>.yml up -d --force-recreate app`, com as variáveis em `services.app.environment`. Para o Clerk, exporte `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` e `E2E_CLERK_USER_EMAIL` (um usuário que exista na instância) no shell e rode `pnpm test:clerk` com o app em `AUTH_PROVIDER=clerk`. Para o webhook do Stripe, `stripe listen --api-key <chave de teste> --forward-to localhost:3300/api/webhooks/stripe` (a porta do container é publicada); o segredo `whsec_` vem de `stripe listen --print-secret` e é estável para a mesma chave.
 - **Máquina carregada:** com outro projeto pesando a máquina, a suíte com 6 processos travou no navegador mesmo com o servidor respondendo ao `curl`. O `playwright.config.ts` já fixa `workers: 2`. Servidor de desenvolvimento do compose degrada depois de muitas execuções: reinicie o container do app.
 
 ## 5. Armadilhas já pagas
@@ -86,18 +88,24 @@ Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `n
 - A imagem `node:24-alpine` traz o `wget` do BusyBox, sem `--method`. A chamada diária é `wget -qO- --header="Authorization: Bearer $CRON_SECRET" --post-data='' http://127.0.0.1:3000/events`.
 - Log pino: um campo `message` no objeto colide com o `message` da linha. O relatório do navegador sai como `errorMessage`.
 - A busca ignora acento e caixa: `contains()` em `lib/db/search.ts` usa a extensão `unaccent`, criada por migration. Toda busca nova com `ILIKE` deve usar essa função.
+- `docker compose up --force-recreate` mantém os volumes anônimos, inclusive o cache do `.next`. Para uma compilação realmente fria, acrescente `-V`. O preço aparece com espaço sem quebra (`R$ 29,00`): uma busca por texto precisa aceitá-lo.
+- Com Clerk ligado, ou com a Stripe ligada, o servidor de desenvolvimento escreve no log erros do validador `instant` do Next (`Could not validate instant ...` no `RootLayout`, ou `Math.random()` vindo do SDK da Stripe na página do plano). As páginas respondem 200 e as suítes passam; é ruído de validação do modo de desenvolvimento, não falha do produto.
 - Hook de commit precisa de Node 24 no shell (`nvm use 24`), senão o `pnpm` recusa o engine.
 
 ## 6. Estado
 
-As fases 0 a 12 do plano foram feitas e provadas (cada uma foi um commit `feat:`/`chore:` ... `for phase N`, hoje só no bundle da seção 8). Último estado provado: `pnpm check` limpo com 190 testes de unidade, 102 de integração, 69 de 69 no Playwright em cópia limpa (74 de 74 com inglês ligado).
+As fases 0 a 12 do plano foram feitas e provadas (cada uma foi um commit `feat:`/`chore:` ... `for phase N`, hoje só no bundle da seção 8). Último estado provado, em 2026-10-08, num produto criado do zero com `create-next-app --example` contra o repositório público: `pnpm check` limpo com 215 testes de unidade, 102 de integração, 69 de 69 no Playwright no compose limpo (5 pulados: idioma e Clerk), 67 de 67 com Stripe e Cloud Storage ligados (7 pulados, os que só valem sem provedor), e 3 de 3 em `pnpm test:clerk`.
+
+**Provado com chaves de verdade (2026-10-08):**
+- **Clerk** (instância de desenvolvimento): `pnpm test:clerk` passa, com o login pelo token de teste e a linha do usuário criada na primeira visita.
+- **Stripe** (chaves de teste): checkout comprado à mão no navegador, com `stripe listen --forward-to localhost:3300/api/webhooks/stripe` e o plano virando Mensal pelo webhook. Preços, os três checkouts, portal, cancelar no fim do período, reembolso e cancelamento imediato foram provados pelo adaptador contra a API.
+- **Google Cloud** (Storage e Logging): arquivo enviado e aberto por link assinado, adulterar o link dá 403, e as linhas de log do app chegam ao Cloud Logging.
+- **`create-next-app --example`**: o produto novo nasce sem `origin`, o `BASE.md` sai num commit próprio como o `AGENTS.md` manda, e `docker compose up` sobe sem `.env`.
 
 **Só o dono pode fazer:**
-1. Rodar `pnpm test:clerk` com chaves de desenvolvimento do Clerk.
-2. Testar o checkout e o portal do Stripe com chaves de teste (webhook em `/api/webhooks/stripe` com os seis eventos da tabela do README).
-3. Rodar `pnpm gcp:alerts` contra o Google Cloud (a sintaxe e os JSON foram conferidos, o script nunca rodou contra o GCP).
-4. Ligar o workflow `.github/workflows/ci.yml` (hoje só `workflow_dispatch`) e ver o primeiro resultado.
-5. **Depois de tudo acima testado:** fazer o primeiro `create-next-app --example` contra o repositório público, numa pasta nova, seguido de `docker compose up`, e conferir que o agente apaga o `BASE.md` como o `AGENTS.md` manda. Ainda não foi feito, de propósito.
+1. Rodar `pnpm gcp:alerts` contra o Google Cloud (a sintaxe e os JSON foram conferidos, o script nunca rodou contra o GCP).
+2. Ligar o workflow `.github/workflows/ci.yml` (hoje só `workflow_dispatch`) e ver o primeiro resultado.
+3. Construir e subir a imagem de produção (`docker-compose.production.yml`) com um banco de verdade. Nunca foi exercitada de ponta a ponta.
 
 **Já feito:** a `main` foi enviada ao GitHub e, depois, o histórico dela foi reescrito para um único commit (veja a seção 8). Os commits antigos, com os documentos de trabalho, deixaram de existir no branch publicado; o bundle guarda tudo.
 

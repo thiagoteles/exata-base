@@ -1,0 +1,46 @@
+# Production on Coolify (or any Docker host). The image is built from the Dockerfile with no build
+# argument; every value below is read when the container starts. Only the app is here: the database
+# is a Postgres resource of its own (in Coolify, one with scheduled backups), reached through
+# DATABASE_URL. Coolify's proxy owns the public port and the certificate, so nothing is published.
+# Set the variables in Coolify's panel, not in this file. The README says what each one does.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      TZ: America/Sao_Paulo
+      APP_URL: ${APP_URL:?Set APP_URL to the public address of the product}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL to the Postgres connection string}
+      AUTH_PROVIDER: ${AUTH_PROVIDER:-clerk}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-}
+      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY:-}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:-}
+      CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      MAILTRAP_TOKEN: ${MAILTRAP_TOKEN:-}
+      MAILTRAP_INBOX: ${MAILTRAP_INBOX:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:-}
+      CRON_SECRET: ${CRON_SECRET:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_MONTHLY: ${STRIPE_PRICE_MONTHLY:-}
+      STRIPE_PRICE_YEARLY: ${STRIPE_PRICE_YEARLY:-}
+      STRIPE_PRICE_LIFETIME: ${STRIPE_PRICE_LIFETIME:-}
+      GCP_CREDENTIALS: ${GCP_CREDENTIALS:-}
+      GCP_PROJECT: ${GCP_PROJECT:-}
+      GCS_BUCKET: ${GCS_BUCKET:-}
+      UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
+      UMAMI_SCRIPT_URL: ${UMAMI_SCRIPT_URL:-}
+      STORAGE_DIR: /data/files
+      FILE_URL_SECRET: ${FILE_URL_SECRET:-}
+      UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-10}
+    volumes:
+      # Files live here when there is no Cloud Storage bucket.
+      - app-files:/data/files
+
+volumes:
+  app-files:

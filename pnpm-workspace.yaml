@@ -1,0 +1,18 @@
+engineStrict: true
+saveExact: true
+# Refuse versions published less than a week ago (minutes).
+minimumReleaseAge: 10080
+# Next is pinned to an exact version on purpose; its upgrades are deliberate.
+minimumReleaseAgeExclude:
+  - next
+  - "@next/*"
+onlyBuiltDependencies:
+  - sharp
+  - lefthook
+ignoredBuiltDependencies:
+  - "@parcel/watcher"
+  - "@swc/core"
+  - cpu-features
+  - esbuild
+  - protobufjs
+  - ssh2

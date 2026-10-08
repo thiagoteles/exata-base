@@ -1,0 +1,24 @@
+import type { NextRequest } from "next/server";
+import { applyPaymentEvent } from "@/lib/billing/service";
+import { db } from "@/lib/db/client";
+import { logger } from "@/lib/ports/log";
+import { paymentGateway } from "@/lib/ports/payment";
+
+/** The payment provider's events. The signature is checked on the raw body before anything is read. */
+export async function POST(request: NextRequest) {
+  const gateway = await paymentGateway();
+  if (gateway === null) {
+    // Billing is off: the route exists but accepts nothing.
+    return new Response(null, { status: 404 });
+  }
+  const body = await request.text();
+  let event: ReturnType<typeof gateway.readEvent>;
+  try {
+    event = gateway.readEvent(body, request.headers.get("stripe-signature") ?? "");
+  } catch (error) {
+    logger.warn("payment webhook refused: invalid signature", { error });
+    return new Response(null, { status: 400 });
+  }
+  const result = await applyPaymentEvent(db, event, gateway.cancelSubscription);
+  return Response.json({ result });
+}

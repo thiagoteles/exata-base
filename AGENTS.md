@@ -1,0 +1,52 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+## This repository
+
+**First task in a product: remove `BASE.md`.** `BASE.md` is the working memory of the base this project was created from. It ships with the base on purpose, and it must not stay in a product. Before any other work, compare `git remote get-url origin` with the repository address written in `BASE.md` (section 2). If they differ, or there is no `origin`, this is a product: run `git rm BASE.md`, commit that alone (`chore: remove the base notes`), and do not mention the file again. If they are the same, you are in the base itself: leave the file alone and keep it up to date as the base evolves.
+
+A Next.js product with a typed, closed foundation: strict TypeScript, Biome with import boundaries, a closed design system, one text catalog, ports for everything that leaves the process. Read `DESIGN.md` before any visual work. If its Product block still says "TO FILL IN", run `pnpm setup:product` (it asks for the answers; to run it for the person, ask them first and pass the answers as flags with `--yes`) before any visual work.
+
+### Where things go
+
+| Folder | What lives there |
+|---|---|
+| `app/` | Routes only. Groups: `(public)` the site, `(auth)` sign-in screens, `(app)` the signed-in shell. A page is thin: it guards (`requirePageRole`), reads through a service, composes a feature. `app/api/` holds webhooks and browser reports, `app/events/` the daily call |
+| `features/<area>/` | The screens and actions of one area (client forms, lists, record pages, `actions.ts`, `schema.ts`). A feature never imports another feature |
+| `lib/<area>/` | The rules of one area, against the database only, tested with an integration test. Services take the database and the actor as arguments |
+| `lib/ports/<port>/` | Everything that leaves the process: `auth`, `email`, `storage`, `log`, `cep`, `payment`. Vendor SDKs are imported only in `adapters/` |
+| `lib/db/schema/` | One file per area. Migrations are generated into `lib/db/migrations`, never edited |
+| `components/ui/` | Primitives. The only place that imports Radix |
+| `components/patterns/` | Lists, record grids, page header, save bar. Components receive data by props and never import the database or a port |
+| `components/shell/` | The public and signed-in shells |
+| `emails/` | E-mail components and their builders |
+| `messages/pt-BR.json` | Every sentence a person reads. The file is the type of the catalog |
+| `ops/`, `scripts/` | Alarm definitions for Google Cloud, the token generator, repository checks |
+
+### Rules that do not bend
+
+- **Text is a key in `messages/pt-BR.json`**, in screens, e-mails, errors and metadata. No sentence in JSX. No em dash in interface text. Another language is a second catalog with the same keys and a line in `lib/i18n/locales.ts`; `pnpm check` compares them (see the README).
+- **Colors and sizes are tokens.** `colors.json` holds two seeds; `pnpm tokens` regenerates the palette, `DESIGN.md` and the e-mail palette. No stock Tailwind color or hand-written value.
+- **Roles.** Pages use `requirePageRole(role, path)`, actions use `actionFor(role)`, routes use `requireRole`. Reads that depend on who is looking take the viewer as an argument.
+- **Deleting an account** is declared per table: `ownedBy()` deletes with the person, `authoredBy()` keeps the row and an author e-mail column.
+- **Money is integer cents. Instants are `timestamptz`. Code that reads the clock gets it as a parameter** and pages call `connection()` before reading it, or Next refuses to prerender.
+- **Environment variables** are read only in `lib/env.ts`. There is no `NEXT_PUBLIC_` variable.
+- **Comments** explain why, never name a file.
+
+### Commands
+
+- `docker compose up` starts the app on http://localhost:3300 with Postgres and a mail catcher on http://localhost:8030. The seeded admin is `admin@app.local` with the password `admin-local`.
+- `pnpm check` is typecheck, lint, tokens, migrations, unused code and unit tests. It runs on every commit.
+- `pnpm test:integration` runs the rules against a real Postgres. `pnpm test:e2e` runs the browser suite against the running compose.
+- `pnpm db:generate` writes a migration after a schema change.
+
+### Skills
+
+Recipes live in `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `new-text-key`, `new-email`, `new-daily-operation`, `new-payment-event`. Follow the recipe, then copy the pattern of the area it points to.

@@ -1,0 +1,22 @@
+{
+  "displayName": "App errors",
+  "documentation": {
+    "content": "The app logged an error. Open Logs Explorer and filter by severity ERROR on the app log.",
+    "mimeType": "text/markdown"
+  },
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "Any error in five minutes",
+      "conditionThreshold": {
+        "filter": "metric.type=\"logging.googleapis.com/user/app_errors\" AND resource.type=\"global\"",
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "0s",
+        "aggregations": [{ "alignmentPeriod": "300s", "perSeriesAligner": "ALIGN_SUM" }],
+        "trigger": { "count": 1 }
+      }
+    }
+  ],
+  "alertStrategy": { "autoClose": "1800s" }
+}

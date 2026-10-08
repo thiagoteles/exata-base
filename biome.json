@@ -1,0 +1,826 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "files": {
+    "includes": ["**", "!**/*.md"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "error",
+        "useLiteralKeys": "off",
+        "noExcessiveLinesPerFunction": {
+          "level": "error",
+          "options": {
+            "maxLines": 90,
+            "skipBlankLines": true,
+            "skipIifes": true
+          }
+        }
+      },
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "noUnusedFunctionParameters": "error",
+        "noNodejsModules": "off",
+        "useJsonImportAttributes": "off",
+        "useImportExtensions": "off",
+        "noUnresolvedImports": "off"
+      },
+      "performance": {
+        "noBarrelFile": "error",
+        "noReExportAll": "error",
+        "noJsxPropsBind": "off"
+      },
+      "style": {
+        "noProcessEnv": "error",
+        "noNonNullAssertion": "error",
+        "useImportType": "error",
+        "noDefaultExport": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"],
+            "requireAscii": true
+          }
+        },
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "patterns": [
+              {
+                "group": ["@clerk/**"],
+                "message": "Clerk is imported only by the auth port adapters."
+              },
+              {
+                "group": ["better-auth", "better-auth/**"],
+                "message": "better-auth is imported only by the auth port adapters."
+              },
+              {
+                "group": ["stripe"],
+                "message": "Stripe is imported only by the payment port adapter."
+              },
+              {
+                "group": ["@google-cloud/**"],
+                "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+              },
+              {
+                "group": ["nodemailer"],
+                "message": "nodemailer is imported only by the email port adapter."
+              },
+              {
+                "group": ["radix-ui", "@radix-ui/**"],
+                "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+              },
+              {
+                "group": ["@/lib/ports/*/adapters/**"],
+                "message": "Adapters are loaded by their port. Import the port, not the adapter."
+              },
+              {
+                "group": ["zod", "zod/**"],
+                "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+              }
+            ]
+          }
+        },
+        "useConsistentTypeDefinitions": {
+          "level": "error",
+          "options": {
+            "style": "type"
+          }
+        },
+        "noMagicNumbers": "off",
+        "noTernary": "off",
+        "useExportsLast": "off",
+        "useNamingConvention": "off",
+        "noImplicitBoolean": "off"
+      },
+      "suspicious": {
+        "noConsole": "error",
+        "noExplicitAny": "error",
+        "noImportCycles": "error"
+      },
+      "nursery": {
+        "noFloatingPromises": "error",
+        "noMisusedPromises": "error",
+        "useExhaustiveSwitchCases": "error"
+      },
+      "preset": "all"
+    },
+    "domains": {
+      "next": "all",
+      "react": "all",
+      "project": "all",
+      "test": "all",
+      "playwright": "all",
+      "drizzle": "all",
+      "tailwind": "all",
+      "qwik": "none",
+      "solid": "none",
+      "vue": "none",
+      "svelte": "none",
+      "astro": "none",
+      "reactNative": "none",
+      "turborepo": "none"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["lib/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/lib/ports/*/adapters/**"],
+                    "message": "Adapters are loaded by their port. Import the port, not the adapter."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib is the lowest layer: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/ports/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib is the lowest layer: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/ports/auth/adapters/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib is the lowest layer: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/ports/payment/adapters/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib is the lowest layer: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/ports/log/adapters/**", "lib/ports/storage/adapters/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib is the lowest layer: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/ports/email/adapters/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib is the lowest layer: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["components/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/lib/ports/*/adapters/**"],
+                    "message": "Adapters are loaded by their port. Import the port, not the adapter."
+                  },
+                  {
+                    "group": [
+                      "@/lib/db",
+                      "@/lib/db/**",
+                      "@/lib/ports/**",
+                      "@/features/**",
+                      "@/app/**",
+                      "drizzle-orm",
+                      "drizzle-orm/**"
+                    ],
+                    "message": "Components receive data by props. They do not import the database, a port, a feature or a route."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["components/ui/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["@/lib/ports/*/adapters/**"],
+                    "message": "Adapters are loaded by their port. Import the port, not the adapter."
+                  },
+                  {
+                    "group": [
+                      "@/lib/db",
+                      "@/lib/db/**",
+                      "@/lib/ports/**",
+                      "@/features/**",
+                      "@/app/**",
+                      "drizzle-orm",
+                      "drizzle-orm/**"
+                    ],
+                    "message": "Components receive data by props. They do not import the database, a port, a feature or a route."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["features/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/lib/ports/*/adapters/**"],
+                    "message": "Adapters are loaded by their port. Import the port, not the adapter."
+                  },
+                  {
+                    "group": ["@/features/**", "@/app/**"],
+                    "message": "A feature does not import another feature or a route. Move shared code to lib or components and import the rest with relative paths."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["e2e/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/lib/ports/*/adapters/**"],
+                    "message": "Adapters are loaded by their port. Import the port, not the adapter."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/env.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noProcessEnv": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["app/**", "emails/**", "*.config.ts", "*.config.mts", "lib/i18n/request.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["components/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "error"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/validation.ts", "lib/env.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/lib/ports/*/adapters/**"],
+                    "message": "Adapters are loaded by their port. Import the port, not the adapter."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib is the lowest layer: it does not import app, components or features."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["instrumentation.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noProcessEnv": "off"
+          },
+          "correctness": {
+            "noProcessGlobal": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "e2e/**", "tests/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off"
+          },
+          "style": {
+            "noJsxLiterals": "off",
+            "useComponentExportOnlyModules": "off"
+          },
+          "performance": {
+            "noAwaitInLoops": "off",
+            "useTopLevelRegex": "off"
+          },
+          "security": {
+            "noSecrets": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["tests/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["app/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useComponentExportOnlyModules": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["e2e/**", "playwright*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noProcessEnv": "off"
+          },
+          "suspicious": {
+            "noSkippedTests": "off"
+          }
+        }
+      }
+    }
+  ]
+}

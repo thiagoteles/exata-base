@@ -1,0 +1,67 @@
+import { createHmac } from "node:crypto";
+
+/*
+ * Stripe events built by hand and signed the way Stripe signs them: an HMAC-SHA256 of
+ * "timestamp.body" with the endpoint secret. Nothing here reaches the network.
+ */
+
+export const webhookSecret = "whsec_test_secret_for_local_events";
+
+type Payload = Record<string, unknown>;
+
+function event(id: string, type: string, object: Payload): Payload {
+  return { id, object: "event", type, api_version: "2025-01-01", data: { object } };
+}
+
+export function sign(payload: Payload, secret: string = webhookSecret) {
+  const body = JSON.stringify(payload);
+  const timestamp = Math.floor(Date.now() / 1000);
+  const digest = createHmac("sha256", secret).update(`${timestamp}.${body}`).digest("hex");
+  return { body, signature: `t=${timestamp},v1=${digest}` };
+}
+
+export const checkoutCompleted = (
+  id: string,
+  session: {
+    userId: string;
+    interval: string;
+    customer?: string;
+    subscription?: string;
+    paymentStatus?: string;
+  },
+  type = "checkout.session.completed",
+) =>
+  event(id, type, {
+    id: `cs_${id}`,
+    object: "checkout.session",
+    client_reference_id: session.userId,
+    metadata: { interval: session.interval },
+    customer: session.customer ?? "cus_1",
+    subscription: session.subscription ?? null,
+    payment_status: session.paymentStatus ?? "paid",
+  });
+
+export const invoiceEvent = (
+  id: string,
+  type: string,
+  subscription: string,
+  periodEndSeconds = 1_900_000_000,
+) =>
+  event(id, type, {
+    id: `in_${id}`,
+    object: "invoice",
+    lines: { object: "list", data: [{ period: { start: 1_897_000_000, end: periodEndSeconds } }] },
+    parent: { type: "subscription_details", subscription_details: { subscription } },
+  });
+
+export const subscriptionDeleted = (id: string, subscription: string) =>
+  event(id, "customer.subscription.deleted", { id: subscription, object: "subscription" });
+
+export const chargeRefunded = (id: string, customer: string, fullyRefunded: boolean) =>
+  event(id, "charge.refunded", {
+    id: `ch_${id}`,
+    object: "charge",
+    customer,
+    refunded: fullyRefunded,
+    amount_refunded: fullyRefunded ? 1000 : 300,
+  });

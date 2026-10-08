@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "scripts/*.{ts,mts}",
+    "lib/i18n/request.ts",
+    "**/*.type-test.ts",
+    "e2e/*.setup.ts",
+    "e2e/clerk/*.ts"
+  ],
+  "project": ["**/*.{ts,tsx,mts,css}"],
+  "ignoreDependencies": ["sharp"]
+}

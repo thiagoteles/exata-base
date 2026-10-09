@@ -16,7 +16,12 @@ export function billingFixture(db: Database) {
   ) {
     const { body, signature } = sign(payload);
     const outcome = await applyPaymentEvent(db, gateway.readEvent(body, signature), cancel);
-    return { result: outcome.status, newPayment: outcome.newPayment, cancel };
+    return {
+      result: outcome.status,
+      newPayment: outcome.newPayment,
+      effects: outcome.effects,
+      cancel,
+    };
   }
 
   async function subscriber(email = "ana@example.com", interval = "monthly") {

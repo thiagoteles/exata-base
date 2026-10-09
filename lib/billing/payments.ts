@@ -63,17 +63,20 @@ export async function recordPayment(
       };
 }
 
+/** What a refund added to a payment: how much, in which currency, and whose it was. */
+export type NewRefund = { payerId: string | null; cents: number; currency: string };
+
 export async function recordRefund(
   tx: Transaction,
   event: Extract<PaymentEvent, { kind: "charge_refunded" }>,
-): Promise<void> {
+): Promise<NewRefund | null> {
   const [payment] = await tx
     .select()
     .from(payments)
     .where(eq(payments.providerPaymentId, event.paymentId))
     .for("update");
   if (payment === undefined) {
-    return;
+    return null;
   }
   const refundedCents = Math.min(event.refundedCents, payment.amountCents);
   await tx
@@ -83,6 +86,8 @@ export async function recordRefund(
       status: refundedCents >= payment.amountCents ? "refunded" : "partially_refunded",
     })
     .where(eq(payments.id, payment.id));
+  const added = refundedCents - payment.refundedCents;
+  return added > 0 ? { payerId: payment.payerId, cents: added, currency: payment.currency } : null;
 }
 
 /** Ties the payments of a provider customer that arrived before the checkout to the person. */

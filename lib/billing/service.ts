@@ -12,7 +12,13 @@ import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
 import { DomainError } from "@/lib/errors";
 import type { Interval, PaymentEvent } from "@/lib/ports/payment/types";
-import { linkPayments, type NewPayment, recordPayment, recordRefund } from "./payments";
+import {
+  linkPayments,
+  type NewPayment,
+  type NewRefund,
+  recordPayment,
+  recordRefund,
+} from "./payments";
 
 /*
  * The billing rules, against the database only. Money moves in the payment provider; this module
@@ -79,6 +85,14 @@ export const freePlan = {
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
+/** When the paid period ends, if the purchase already says: the trial's end, or a year after a year bought once. */
+function periodEndOf(event: Extract<PaymentEvent, { kind: "checkout_paid" }>): Date | null {
+  if (event.trialEndsAt !== null) {
+    return event.trialEndsAt;
+  }
+  return isFixedTerm(event.interval) ? oneYearAfter(event.paidAt) : null;
+}
+
 async function applyCheckout(
   tx: Transaction,
   event: Extract<PaymentEvent, { kind: "checkout_paid" }>,
@@ -93,11 +107,12 @@ async function applyCheckout(
     return;
   }
   const replaced = event.interval === "lifetime" ? current.providerSubscriptionId : null;
+  const trialing = event.trialEndsAt !== null;
   await tx
     .update(plans)
     .set({
       tier: catalog.paidTier,
-      status: "active",
+      status: trialing ? "trialing" : "active",
       billingInterval: event.interval,
       provider: event.provider,
       priceKey: `${catalog.paidTier}.${event.interval}`,
@@ -106,8 +121,10 @@ async function applyCheckout(
       cancelAtPeriodEnd: false,
       // A subscription has no end yet: the first invoice that follows says when the period ends. A year
       // bought once ends a year after it was paid, which is known now.
-      currentPeriodEnd: isFixedTerm(event.interval) ? oneYearAfter(event.paidAt) : null,
+      currentPeriodEnd: periodEndOf(event),
       expiryWarnedAt: null,
+      // A trial is spent the moment it starts, so it can never be started again.
+      ...(trialing ? { trialUsedAt: event.paidAt } : {}),
       ...noCourtesy,
     })
     .where(eq(plans.userId, event.userId));
@@ -151,15 +168,44 @@ async function applyRefund(
   }
 }
 
+/** What a delivery caused that the caller does once it is committed: events to count, an e-mail to send. */
+export type Effects = {
+  newPayment: NewPayment | null;
+  trialStarted: { userId: string; interval: string } | null;
+  refund: NewRefund | null;
+  trialEnding: { userId: string; email: string; name: string; endsAt: Date } | null;
+};
+
+const none: Effects = { newPayment: null, trialStarted: null, refund: null, trialEnding: null };
+
+/** Who is to be told their trial is about to end: the person whose plan is still trialing on that subscription. */
+async function trialEndingOf(
+  tx: Transaction,
+  event: Extract<PaymentEvent, { kind: "trial_ending" }>,
+): Promise<Effects["trialEnding"]> {
+  const [person] = await tx
+    .select({ userId: users.id, email: users.email, name: users.name })
+    .from(plans)
+    .innerJoin(users, eq(users.id, plans.userId))
+    .where(
+      and(eq(plans.providerSubscriptionId, event.subscriptionId), eq(plans.status, "trialing")),
+    );
+  return person === undefined ? null : { ...person, endsAt: event.endsAt };
+}
+
 async function applyEvent(
   tx: Transaction,
   event: PaymentEvent,
   cancel: CancelSubscription,
-): Promise<NewPayment | null> {
+): Promise<Effects> {
   switch (event.kind) {
     case "checkout_paid":
       await applyCheckout(tx, event, cancel);
-      return null;
+      return {
+        ...none,
+        trialStarted:
+          event.trialEndsAt === null ? null : { userId: event.userId, interval: event.interval },
+      };
     case "checkout_pending":
       // Only an account with nothing paid waits: a person who already has a plan keeps it, and the
       // payment that arrives later replaces it as any purchase does.
@@ -171,7 +217,7 @@ async function applyEvent(
           priceKey: `${catalog.paidTier}.${event.interval}`,
         })
         .where(and(eq(plans.userId, event.userId), eq(plans.tier, "free")));
-      return null;
+      return none;
     case "checkout_failed":
       // What was waiting is not coming: the account is an ordinary free one again.
       await tx
@@ -180,7 +226,7 @@ async function applyEvent(
         .where(
           and(eq(plans.userId, event.userId), eq(plans.tier, "free"), eq(plans.status, "pending")),
         );
-      return null;
+      return none;
     case "invoice_paid":
       await tx
         .update(plans)
@@ -189,29 +235,32 @@ async function applyEvent(
           ...(event.periodEnd === null ? {} : { currentPeriodEnd: event.periodEnd }),
         })
         .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
-      return null;
+      return none;
     case "invoice_failed":
       await tx
         .update(plans)
         .set({ status: "past_due" })
         .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
-      return null;
+      return none;
     case "subscription_deleted":
       // A subscription replaced by the lifetime plan no longer matches any row, so it is ignored.
       await tx
         .update(plans)
         .set(freePlan)
         .where(eq(plans.providerSubscriptionId, event.subscriptionId));
-      return null;
+      return none;
     case "payment_succeeded":
-      return recordPayment(tx, event);
-    case "charge_refunded":
-      await recordRefund(tx, event);
+      return { ...none, newPayment: await recordPayment(tx, event) };
+    case "charge_refunded": {
+      const refund = await recordRefund(tx, event);
       await applyRefund(tx, event, cancel);
-      return null;
+      return { ...none, refund };
+    }
+    case "trial_ending":
+      return { ...none, trialEnding: await trialEndingOf(tx, event) };
     case "prices_changed":
     case "ignored":
-      return null;
+      return none;
     default:
       return event satisfies never;
   }
@@ -227,7 +276,7 @@ export function applyPaymentEvent(
   db: Database,
   event: PaymentEvent,
   cancel: CancelSubscription,
-): Promise<{ status: "applied" | "duplicate"; newPayment: NewPayment | null }> {
+): Promise<{ status: "applied" | "duplicate"; newPayment: NewPayment | null; effects: Effects }> {
   return db.transaction(async (tx) => {
     const locked = await tx
       .insert(paymentEvents)
@@ -235,9 +284,10 @@ export function applyPaymentEvent(
       .onConflictDoNothing()
       .returning({ id: paymentEvents.id });
     if (locked.length === 0) {
-      return { status: "duplicate", newPayment: null };
+      return { status: "duplicate", newPayment: null, effects: none };
     }
-    return { status: "applied", newPayment: await applyEvent(tx, event, cancel) };
+    const effects = await applyEvent(tx, event, cancel);
+    return { status: "applied", newPayment: effects.newPayment, effects };
   });
 }
 

@@ -31,3 +31,16 @@ export function trialStanding(input: {
   const daysLeft = remaining <= 0 ? 0 : Math.min(Math.ceil(remaining / DAY_MS), totalDays);
   return { state: stateFor(daysLeft), daysLeft, daysUsed: totalDays - daysLeft, totalDays };
 }
+
+/**
+ * How many days of trial a purchase gets: the catalog's, for a way of buying that can have one, and
+ * only for an account that never had one. Zero means none.
+ */
+export function trialDaysFor(input: {
+  trial: { days: number; intervals: readonly string[] };
+  interval: string;
+  trialUsedAt: Date | null;
+}): number {
+  const { trial, interval, trialUsedAt } = input;
+  return trialUsedAt === null && trial.intervals.includes(interval) ? Math.max(trial.days, 0) : 0;
+}

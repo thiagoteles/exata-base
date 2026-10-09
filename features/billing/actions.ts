@@ -2,6 +2,7 @@
 
 import { catalog } from "@/domain/billing/catalog";
 import { chooseCurrency, currenciesToOffer } from "@/domain/billing/currency";
+import { trialDaysFor } from "@/domain/billing/trial";
 import { actionFor } from "@/lib/actions/client";
 import { canBuy, changeCancellation, readPlan } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
@@ -33,12 +34,19 @@ export const startCheckout = actionFor("member")
     if (!canBuy(plan, parsedInput.interval)) {
       throw new DomainError(409, "alreadyPaid");
     }
+    // A trial is offered once per account, and only for a subscription.
+    const trialDays = trialDaysFor({
+      trial: catalog.trial,
+      interval: parsedInput.interval,
+      trialUsedAt: plan?.trialUsedAt ?? null,
+    });
     const url = await gateway.createCheckout({
       userId: ctx.user.id,
       email: ctx.user.email,
       customerId: plan?.providerCustomerId ?? null,
       interval: parsedInput.interval,
       priceId: price.priceId,
+      ...(trialDays > 0 ? { trialDays } : {}),
       ...(currency === undefined || currency === price.currency ? {} : { currency }),
       successUrl: `${env.APP_URL}/account/plan?checkout=success`,
       cancelUrl: `${env.APP_URL}${publicHref("/plans")}`,

@@ -65,6 +65,14 @@
       "ignore": "Se você não pediu a troca, sua senha continua a mesma e pode ignorar esta mensagem."
     },
     "greetingWithoutName": "Olá.",
+    "trialEnding": {
+      "subject": "Seu teste gratuito termina em {date}",
+      "preview": "Seu teste gratuito termina em {date}.",
+      "greeting": "Olá, {name}",
+      "body": "Seu teste gratuito termina em {date}. A partir daí a primeira cobrança do plano acontece no cartão que você cadastrou. Se quiser mudar ou cancelar, é só abrir o seu plano.",
+      "action": "Abrir meu plano",
+      "ignore": "Se está tudo certo, não precisa fazer nada."
+    },
     "planExpiring": {
       "subject": "Seu plano termina em {date}",
       "preview": "Seu plano de um ano termina em {date}.",
@@ -919,6 +927,8 @@
     },
     "awaiting": "Aguardando pagamento",
     "buy": "Assinar",
+    "buyTrial": "{days, plural, one {Começar # dia grátis} other {Começar # dias grátis}}",
+    "trialNote": "{days, plural, one {# dia grátis} other {# dias grátis}} antes da primeira cobrança.",
     "buyOnce": "Comprar um ano",
     "buyLifetime": "Comprar",
     "current": "Seu plano",
@@ -948,6 +958,7 @@
     "statuses": {
       "free": "Gratuito",
       "pending": "Aguardando pagamento",
+      "trialing": "Em teste",
       "active": "Ativo",
       "pastDue": "Pagamento pendente",
       "endsSoon": "Termina no fim do período",
@@ -978,6 +989,11 @@
     },
     "canceled": "Cancelamento agendado.",
     "pending": "Seu pagamento ainda não foi confirmado. Pagamentos por Pix e boleto podem levar alguns minutos, e o plano começa assim que o dinheiro chega. Se o código expirar, é só tentar de novo.",
+    "trial": {
+      "title": "Teste gratuito",
+      "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para a primeira cobrança.",
+      "bar": "Dias do teste já usados"
+    },
     "validUntil": "Vale até",
     "renewsOn": "Renova em",
     "endsOn": "Acesso até"

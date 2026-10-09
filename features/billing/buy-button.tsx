@@ -13,22 +13,32 @@ type Props = {
   interval: Interval;
   /** The currency the plans page showed, so the charge matches the price on screen. */
   currency?: string;
+  /** Free days this purchase starts with, for the label: the button says what it begins. */
+  trialDays?: number;
   /** The purchase ends a subscription the person already has, so it asks first. */
   replacesSubscription?: boolean;
 };
 
 /** Opens the provider's checkout. The browser leaves the site, so success is never shown here. */
-export function BuyButton({ interval, currency, replacesSubscription = false }: Props) {
+export function BuyButton({
+  interval,
+  currency,
+  trialDays = 0,
+  replacesSubscription = false,
+}: Props) {
   const t = useTranslations("plans");
   const describe = useErrorText();
   const notify = useToast();
   const [pending, setPending] = useState(false);
-  const label = {
-    lifetime: t("buyLifetime"),
-    yearly_once: t("buyOnce"),
-    monthly: t("buy"),
-    yearly: t("buy"),
-  }[interval];
+  const label =
+    trialDays > 0
+      ? t("buyTrial", { days: trialDays })
+      : {
+          lifetime: t("buyLifetime"),
+          yearly_once: t("buyOnce"),
+          monthly: t("buy"),
+          yearly: t("buy"),
+        }[interval];
 
   const buy = async () => {
     setPending(true);

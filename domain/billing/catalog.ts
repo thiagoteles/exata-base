@@ -46,12 +46,18 @@ export const catalog = {
    * the provider). Start with the default alone; add a code when the prices have it.
    */
   currencies: { default: "brl", offered: ["brl"] },
+  /**
+   * A free trial before the first charge: how many days, and for which ways of buying (only a
+   * subscription can have one). `days: 0` turns it off. Each account gets one, ever.
+   */
+  trial: { days: 14, intervals: ["monthly", "yearly"] },
   /** The tier the checkout sells and a courtesy grants, until prices name their own tier. */
   paidTier: "paid",
 } as const satisfies {
   tiers: { free: TierDefinition } & Record<string, TierDefinition>;
   prices: Readonly<Record<string, string>>;
   currencies: { default: string; offered: readonly string[] };
+  trial: { days: number; intervals: readonly string[] };
   paidTier: string;
 };
 

@@ -80,3 +80,36 @@ describe("a trial's standing, in general", () => {
     );
   });
 });
+
+describe("whether a purchase gets a trial", () => {
+  const trial = { days: 14, intervals: ["monthly", "yearly"] };
+  const never: Date | null = null;
+  const before = new Date("2026-01-01T00:00:00Z");
+
+  it("gives the catalog's days to a subscription of an account that never had one", async () => {
+    const { trialDaysFor } = await import("./trial");
+    expect(trialDaysFor({ trial, interval: "monthly", trialUsedAt: never })).toBe(14);
+    expect(trialDaysFor({ trial, interval: "yearly", trialUsedAt: never })).toBe(14);
+  });
+
+  it("gives none to a one-off payment, to an account that already had its trial, or when it is off", async () => {
+    const { trialDaysFor } = await import("./trial");
+    expect(trialDaysFor({ trial, interval: "lifetime", trialUsedAt: never })).toBe(0);
+    expect(trialDaysFor({ trial, interval: "yearly_once", trialUsedAt: never })).toBe(0);
+    expect(trialDaysFor({ trial, interval: "monthly", trialUsedAt: before })).toBe(0);
+    expect(
+      trialDaysFor({
+        trial: { days: 0, intervals: ["monthly"] },
+        interval: "monthly",
+        trialUsedAt: never,
+      }),
+    ).toBe(0);
+    expect(
+      trialDaysFor({
+        trial: { days: -3, intervals: ["monthly"] },
+        interval: "monthly",
+        trialUsedAt: never,
+      }),
+    ).toBe(0);
+  });
+});

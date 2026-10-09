@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
 import { PageHeader } from "@/components/patterns/page-header";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
+import { TrialNotice } from "@/components/patterns/trial-notice";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
+import { catalog } from "@/domain/billing/catalog";
 import { isPaidTier } from "@/domain/billing/entitlements";
 import { isFixedTerm } from "@/domain/billing/term";
+import { trialStanding } from "@/domain/billing/trial";
+import { currentInstant } from "@/domain/clock";
 import { CancellationControl, PortalButton } from "@/features/billing/plan-controls";
 import { planState, planStateTone } from "@/features/billing/presentation";
 import { isCourtesy, type Plan, readPlan, subscriptionOf } from "@/lib/billing/service";
@@ -53,6 +58,9 @@ async function PlanContent({ searchParams }: Props) {
             <p className="text-body text-ink">{t("confirming")}</p>
           </Panel>
         ) : null}
+        {state === "trialing" && plan?.currentPeriodEnd ? (
+          <TrialSection endsAt={plan.currentPeriodEnd} />
+        ) : null}
         {state === "pending" ? (
           <Panel tone="info" role="status">
             <p className="max-w-[60ch] text-body text-ink">{t("pending")}</p>
@@ -76,6 +84,21 @@ function dateLabel(plan: Plan) {
     return "validUntil";
   }
   return plan.cancelAtPeriodEnd ? "endsOn" : "renewsOn";
+}
+
+/** The trial in progress: the days left in words and a bar of the days used, with the clock read once here. */
+async function TrialSection({ endsAt }: { endsAt: Date }) {
+  await connection();
+  const t = await getTranslations("plan.trial");
+  const standing = trialStanding({ endsAt, totalDays: catalog.trial.days, now: currentInstant() });
+  return (
+    <TrialNotice
+      standing={standing}
+      title={t("title")}
+      summary={t("summary", { days: standing.daysLeft })}
+      barLabel={t("bar")}
+    />
+  );
 }
 
 async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: string }) {

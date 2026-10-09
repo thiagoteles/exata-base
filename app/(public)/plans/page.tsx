@@ -13,6 +13,7 @@ import { buttonClasses } from "@/components/ui/styles";
 import { catalog } from "@/domain/billing/catalog";
 import { chooseCurrency, currenciesToOffer, priceIn } from "@/domain/billing/currency";
 import { featuresOfTier, isPaidTier } from "@/domain/billing/entitlements";
+import { trialDaysFor } from "@/domain/billing/trial";
 import { BuyButton } from "@/features/billing/buy-button";
 import { CurrencySwitch } from "@/features/billing/currency-switch";
 import { canBuy, readPlan, subscriptionOf } from "@/lib/billing/service";
@@ -75,6 +76,10 @@ export default async function PlansPage() {
   );
 }
 
+/** The free days this person would get for this way of buying: none after the first trial they ever had. */
+const trialDaysOf = (plan: Awaited<ReturnType<typeof readPlan>>, interval: Interval) =>
+  trialDaysFor({ trial: catalog.trial, interval, trialUsedAt: plan?.trialUsedAt ?? null });
+
 type ActionContext = {
   interval: Interval;
   user: Awaited<ReturnType<typeof getCurrentUser>>;
@@ -83,8 +88,23 @@ type ActionContext = {
   t: Awaited<ReturnType<typeof getTranslations<"plans">>>;
 };
 
+/** The line under a price: what a purchase replaces, or the free days it starts with. */
+function noteFor(input: {
+  interval: Interval;
+  plan: Awaited<ReturnType<typeof readPlan>>;
+  trialDays: number;
+  t: ActionContext["t"];
+}) {
+  const { interval, plan, trialDays, t } = input;
+  if (interval === "lifetime" && subscriptionOf(plan) !== null) {
+    return t("replaces.note");
+  }
+  return trialDays > 0 ? t("trialNote", { days: trialDays }) : undefined;
+}
+
 /** What a person can do about one way of buying: sign in, see it is theirs, wait for it, or buy it. */
 function intervalAction({ interval, user, plan, currency, t }: ActionContext) {
+  const trialDays = trialDaysOf(plan, interval);
   if (user === null) {
     return (
       <Link
@@ -108,6 +128,7 @@ function intervalAction({ interval, user, plan, currency, t }: ActionContext) {
     <BuyButton
       interval={interval}
       currency={currency}
+      trialDays={trialDays}
       replacesSubscription={interval === "lifetime" && subscriptionOf(plan) !== null}
     />
   );
@@ -157,8 +178,8 @@ async function Offers() {
       if (price === undefined) {
         return [];
       }
-      const note =
-        interval === "lifetime" && subscriptionOf(plan) !== null ? t("replaces.note") : undefined;
+      const trialDays = trialDaysOf(plan, interval);
+      const note = noteFor({ interval, plan, trialDays, t });
       return [
         {
           id: interval,

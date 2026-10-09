@@ -38,6 +38,8 @@ export const checkoutCompleted = (
     customer?: string;
     subscription?: string;
     paymentStatus?: string;
+    /** Free days the checkout asked for, as the app writes them into the session. */
+    trialDays?: number;
   },
   type = "checkout.session.completed",
 ) =>
@@ -45,7 +47,10 @@ export const checkoutCompleted = (
     id: `cs_${id}`,
     object: "checkout.session",
     client_reference_id: session.userId,
-    metadata: { interval: session.interval },
+    metadata: {
+      interval: session.interval,
+      ...(session.trialDays === undefined ? {} : { trial_days: String(session.trialDays) }),
+    },
     customer: session.customer ?? "cus_1",
     subscription: session.subscription ?? null,
     payment_status: session.paymentStatus ?? "paid",
@@ -117,4 +122,11 @@ export const checkoutFailed = (
     client_reference_id: userId,
     metadata: { interval: "yearly_once" },
     payment_status: "unpaid",
+  });
+
+export const trialWillEnd = (id: string, subscription: string, trialEndSeconds: number) =>
+  event(id, "customer.subscription.trial_will_end", {
+    id: subscription,
+    object: "subscription",
+    trial_end: trialEndSeconds,
   });

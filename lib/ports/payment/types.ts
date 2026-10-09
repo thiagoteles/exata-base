@@ -16,11 +16,15 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
       interval: Interval;
       /** When the provider confirmed the checkout, which is when a fixed term starts. */
       paidAt: Date;
+      /** When the free trial this purchase started ends, or null when there is none. */
+      trialEndsAt: Date | null;
     }
   /** The checkout was completed but the money has not arrived (Pix, a bank slip): nothing is granted yet. */
   | { kind: "checkout_pending"; userId: string; interval: Interval }
   /** A pending payment will not arrive: the code expired, or the bank refused it. */
   | { kind: "checkout_failed"; userId: string }
+  /** The trial of a subscription is about to end and the first charge is near. */
+  | { kind: "trial_ending"; subscriptionId: string; endsAt: Date }
   | { kind: "invoice_paid"; subscriptionId: string; periodEnd: Date | null }
   | { kind: "invoice_failed"; subscriptionId: string }
   | { kind: "subscription_deleted"; subscriptionId: string }
@@ -52,6 +56,8 @@ type CheckoutRequest = {
   customerId: string | null;
   interval: Interval;
   priceId: string;
+  /** Free days before the first charge, for a subscription. Absent or zero means none. */
+  trialDays?: number;
   /** The currency to charge in, when the price carries it. Absent means the price's own. */
   currency?: string;
   successUrl: string;

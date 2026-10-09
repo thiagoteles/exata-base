@@ -12,6 +12,7 @@ import type { Interval, PaymentEvent, PaymentGateway } from "../types";
 type Options = { secretKey: string; webhookSecret: string };
 
 const MS_PER_SECOND = 1000;
+const SECONDS_PER_DAY = 86_400;
 const PIX_MENTION = /pix/i;
 /** How long a Pix code can be paid after the checkout opens. */
 const PIX_EXPIRES_AFTER_SECONDS = 3600;
@@ -21,6 +22,39 @@ const isInterval = (value: unknown): value is Interval =>
 
 const idOf = (value: string | { id: string } | null | undefined): string | null =>
   typeof value === "string" ? value : (value?.id ?? null);
+
+/** The end of the trial this checkout started: the days we asked for, counted from the confirmation. */
+function trialEndOf(session: Stripe.Checkout.Session, createdSeconds: number): Date | null {
+  const days = Number(session.metadata?.["trial_days"] ?? 0);
+  return Number.isFinite(days) && days > 0
+    ? new Date((createdSeconds + days * SECONDS_PER_DAY) * MS_PER_SECOND)
+    : null;
+}
+
+type CheckoutRequestShape = Parameters<PaymentGateway["createCheckout"]>[0];
+
+/** What a purchase asks of Stripe: a payment for a one-off plan, a subscription (with its trial) for the rest. */
+function checkoutParams(request: CheckoutRequestShape) {
+  const oneOff = request.interval === "lifetime" || request.interval === "yearly_once";
+  const trialDays = oneOff ? 0 : (request.trialDays ?? 0);
+  const params = {
+    mode: oneOff ? "payment" : "subscription",
+    line_items: [{ price: request.priceId, quantity: 1 }],
+    ...(request.currency === undefined ? {} : { currency: request.currency }),
+    client_reference_id: request.userId,
+    metadata: {
+      interval: request.interval,
+      ...(trialDays > 0 ? { trial_days: String(trialDays) } : {}),
+    },
+    ...(trialDays > 0 ? { subscription_data: { trial_period_days: trialDays } } : {}),
+    success_url: request.successUrl,
+    cancel_url: request.cancelUrl,
+    ...(request.customerId === null
+      ? { customer_email: request.email, ...(oneOff ? { customer_creation: "always" } : {}) }
+      : { customer: request.customerId }),
+  } satisfies Stripe.Checkout.SessionCreateParams;
+  return { params, oneOff };
+}
 
 function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): PaymentEvent {
   const base = { id: event.id, type: event.type, provider: "stripe" as const };
@@ -42,6 +76,7 @@ function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): P
     subscriptionId: idOf(session.subscription),
     interval,
     paidAt: new Date(event.created * MS_PER_SECOND),
+    trialEndsAt: trialEndOf(session, event.created),
   };
 }
 
@@ -95,6 +130,17 @@ function toPaymentEvent(event: Stripe.Event): PaymentEvent {
         ? { ...base, kind: "ignored" }
         : { ...base, kind: "checkout_failed", userId };
     }
+    case "customer.subscription.trial_will_end": {
+      const { trial_end: trialEnd, id } = event.data.object;
+      return trialEnd === null
+        ? { ...base, kind: "ignored" }
+        : {
+            ...base,
+            kind: "trial_ending",
+            subscriptionId: id,
+            endsAt: new Date(trialEnd * MS_PER_SECOND),
+          };
+    }
     case "invoice.payment_succeeded":
       return invoiceEvent(event, event.data.object, "invoice_paid");
     case "invoice.payment_failed":
@@ -132,27 +178,14 @@ export function createStripeGateway({ secretKey, webhookSecret }: Options): Paym
       toPaymentEvent(stripe.webhooks.constructEvent(body, signature, webhookSecret)),
 
     async createCheckout(request) {
-      // A lifetime plan and a year bought once are one-off payments; the rest are subscriptions.
-      const oneOff = request.interval === "lifetime" || request.interval === "yearly_once";
-      const base = {
-        mode: oneOff ? "payment" : "subscription",
-        line_items: [{ price: request.priceId, quantity: 1 }],
-        ...(request.currency === undefined ? {} : { currency: request.currency }),
-        client_reference_id: request.userId,
-        metadata: { interval: request.interval },
-        success_url: request.successUrl,
-        cancel_url: request.cancelUrl,
-        ...(request.customerId === null
-          ? { customer_email: request.email, ...(oneOff ? { customer_creation: "always" } : {}) }
-          : { customer: request.customerId }),
-      } satisfies Stripe.Checkout.SessionCreateParams;
+      const { params, oneOff } = checkoutParams(request);
       // Which methods a checkout offers (card, Pix) is set in the provider's dashboard. A Pix code
       // that is not paid in time stops being valid, and for how long is ours to say. An account that
       // has Pix off refuses that option, and the checkout then goes on without it.
       const session = oneOff
         ? await stripe.checkout.sessions
             .create({
-              ...base,
+              ...params,
               payment_method_options: { pix: { expires_after_seconds: PIX_EXPIRES_AFTER_SECONDS } },
             })
             .catch((error: unknown) => {
@@ -160,11 +193,11 @@ export function createStripeGateway({ secretKey, webhookSecret }: Options): Paym
                 error instanceof Stripe.errors.StripeInvalidRequestError &&
                 PIX_MENTION.test(error.message)
               ) {
-                return stripe.checkout.sessions.create(base);
+                return stripe.checkout.sessions.create(params);
               }
               throw error;
             })
-        : await stripe.checkout.sessions.create(base);
+        : await stripe.checkout.sessions.create(params);
       if (session.url === null) {
         throw new Error("the checkout session has no address");
       }

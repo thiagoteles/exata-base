@@ -21,6 +21,10 @@ export type AnalyticsEvents = EventCatalog<{
   activated: Record<string, never>;
   paywall_viewed: { source: string };
   checkout_started: { interval: string };
+  /** A free trial began: the plan is on and the first charge is days away. */
+  trial_started: { interval: string };
+  /** Money went back to a customer, in cents of the currency it was paid in. */
+  refund_issued: { cents: number; currency: string };
   /** `revenue` (in units, not cents) and `currency` are the names Umami's revenue report reads. */
   payment_confirmed: { method: string; cents: number; revenue: number; currency: string };
   /** LCP, INP or CLS from a sample of page loads. Milliseconds, except CLS, which has no unit. */

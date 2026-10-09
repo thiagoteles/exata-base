@@ -1,9 +1,18 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { parse } from "yaml";
+import { createTranslator } from "next-intl";
+import { parse, YAMLParseError } from "yaml";
 import { frontmatterSchema } from "../lib/content/frontmatter";
-import { z } from "../lib/validation";
+import {
+  badSlug,
+  emDash,
+  frontmatterProblems,
+  invalidYaml,
+  missingBlock,
+  type Translate,
+} from "../lib/content/problems";
+import messages from "../messages/pt-BR.json";
 
 /*
  * `pnpm content` reads every article, checks its frontmatter and its text, and writes the index the
@@ -19,6 +28,14 @@ const forbidden = /—|&mdash;|&#8212;|&#x2014;/giu;
 const slugShape = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const frontmatterBlock = /^---\n([\s\S]*?)\n---\n/;
 
+// What this prints is for a person writing an article, so it is read from the catalog like any text.
+const translator = createTranslator({ locale: "pt-BR", messages });
+const t: Translate = (key, values) =>
+  (translator as unknown as (key: string, values?: Record<string, string | number>) => string)(
+    key,
+    values,
+  );
+
 const problems: string[] = [];
 const files = readdirSync(folder)
   .filter((file) => file.endsWith(".mdx"))
@@ -29,18 +46,30 @@ const articles = files.flatMap((file) => {
   const text = readFileSync(path.join(folder, file), "utf8");
   for (const [index, line] of text.split("\n").entries()) {
     for (const match of line.matchAll(forbidden)) {
-      problems.push(`${where}:${index + 1}:${(match.index ?? 0) + 1}: em dash in content`);
+      problems.push(emDash(where, index + 1, (match.index ?? 0) + 1, t));
     }
   }
   const slug = file.slice(0, -".mdx".length);
   if (!slugShape.test(slug)) {
-    problems.push(`${where}: the file name must be lowercase words joined by hyphens`);
+    problems.push(badSlug(where, t));
     return [];
   }
   const block = frontmatterBlock.exec(text)?.[1];
-  const parsed = frontmatterSchema.safeParse(block === undefined ? undefined : parse(block));
+  if (block === undefined) {
+    problems.push(missingBlock(where, t));
+    return [];
+  }
+  let data: unknown;
+  try {
+    data = parse(block);
+  } catch (error) {
+    const detail = error instanceof YAMLParseError ? error.message.split("\n")[0] : String(error);
+    problems.push(invalidYaml(where, detail ?? "", t));
+    return [];
+  }
+  const parsed = frontmatterSchema.safeParse(data);
   if (!parsed.success) {
-    problems.push(`${where}: invalid frontmatter\n${z.prettifyError(parsed.error)}`);
+    problems.push(...frontmatterProblems(where, parsed.error, t));
     return [];
   }
   return [{ slug, ...parsed.data }];

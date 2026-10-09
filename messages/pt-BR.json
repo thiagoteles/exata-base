@@ -1203,6 +1203,23 @@
     "trail": "Você está aqui",
     "home": "Início"
   },
+  "contentCheck": {
+    "field": "{file}: campo {field}: {problem}",
+    "fieldNames": {
+      "title": "título",
+      "description": "descrição",
+      "publishedAt": "data de publicação",
+      "updatedAt": "data de atualização",
+      "author": "autor"
+    },
+    "isoDate": "escreva a data no formato aaaa-mm-dd, como 2026-10-09, e que ela exista.",
+    "unknownField": "esse campo não existe. Os aceitos são: {accepted}.",
+    "notFields": "{file}: o bloco de abertura deve ser uma lista de campos, um por linha, como `título: texto`.",
+    "missingBlock": "{file}: falta o bloco de abertura. O arquivo começa com uma linha de três hifens, os campos e outra linha de três hifens.",
+    "yaml": "{file}: o bloco de abertura não é um YAML válido: {detail}",
+    "emDash": "{file}:{line}:{column}: travessão no texto. Use vírgula, ponto ou hífen.",
+    "slug": "{file}: o nome do arquivo deve ser palavras minúsculas ligadas por hífen."
+  },
   "onboarding": {
     "title": "Primeiros passos",
     "subtitle": "Três coisas para deixar a conta do seu jeito.",

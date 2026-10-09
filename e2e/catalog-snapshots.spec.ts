@@ -21,7 +21,7 @@ const densities = ["medium", "comfortable", "large"] as const;
 const densityRepresentatives = ["buttons", "fields", "list", "record"];
 
 async function open(page: Page, theme: "light" | "dark") {
-  await page.context().addCookies([{ name: "theme", value: theme, url: "http://localhost:3300" }]);
+  await page.context().addCookies([{ name: "theme", value: theme, url: "http://localhost:47300" }]);
   await page.goto("/catalog");
   await expect(page.getByRole("heading", { level: 1, name: "Catálogo" })).toBeVisible();
   await page.waitForLoadState("networkidle");

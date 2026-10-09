@@ -44,7 +44,7 @@ for (const theme of themes) {
   }) => {
     await page
       .context()
-      .addCookies([{ name: "theme", value: theme, url: "http://localhost:3300" }]);
+      .addCookies([{ name: "theme", value: theme, url: "http://localhost:47300" }]);
     await page.goto("/account");
     await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
     const results = await new AxeBuilder({ page })

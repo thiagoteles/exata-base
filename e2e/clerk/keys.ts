@@ -11,4 +11,4 @@ export const hasClerkKeys = Boolean(
   clerkKeys.publishableKey && clerkKeys.secretKey && clerkKeys.userEmail,
 );
 
-export const appUrl = process.env["APP_URL"] ?? "http://localhost:3300";
+export const appUrl = process.env["APP_URL"] ?? "http://localhost:47300";

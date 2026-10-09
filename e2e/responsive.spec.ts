@@ -5,7 +5,7 @@ test("on a phone the list becomes two-line blocks and nothing scrolls sideways",
 }) => {
   await page
     .context()
-    .addCookies([{ name: "theme", value: "light", url: "http://localhost:3300" }]);
+    .addCookies([{ name: "theme", value: "light", url: "http://localhost:47300" }]);
   await page.goto("/catalog");
   await expect(page.getByRole("heading", { level: 1, name: "Catálogo" })).toBeVisible();
   const overflow = await page.evaluate(

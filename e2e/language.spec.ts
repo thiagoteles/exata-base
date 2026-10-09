@@ -58,7 +58,7 @@ test("a signed-in person reads English under /en and the sidebar still knows whe
 }) => {
   await page
     .context()
-    .addCookies([{ name: "NEXT_LOCALE", value: "en-US", url: "http://localhost:3300" }]);
+    .addCookies([{ name: "NEXT_LOCALE", value: "en-US", url: "http://localhost:47300" }]);
   await page.goto("/en/account");
   await expect(page.getByRole("heading", { level: 1, name: /^EN Minha conta/ })).toBeVisible();
   const current = page
@@ -72,7 +72,7 @@ test("an invite goes out in the language the admin is using", async ({ page }) =
   const email = `convidada-${Date.now()}@example.com`;
   await page
     .context()
-    .addCookies([{ name: "NEXT_LOCALE", value: "en-US", url: "http://localhost:3300" }]);
+    .addCookies([{ name: "NEXT_LOCALE", value: "en-US", url: "http://localhost:47300" }]);
   await page.goto("/en/admin/invites");
   await page.waitForLoadState("networkidle");
   await page.getByLabel(/E-mail de quem vai receber/).fill(email);

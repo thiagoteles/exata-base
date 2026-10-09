@@ -17,7 +17,7 @@ import { presetNames } from "./tokens/preset";
 
 const update = process.argv.includes("--update");
 const only = process.argv.find((argument) => argument.startsWith("--preset="))?.split("=")[1];
-const HEALTH_URL = "http://localhost:3300/health";
+const HEALTH_URL = "http://localhost:47300/health";
 const START_TIMEOUT_MS = 300_000;
 
 const original = readFileSync("design.json", "utf8");

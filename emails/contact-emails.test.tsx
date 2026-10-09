@@ -9,7 +9,7 @@ describe("contact e-mails", () => {
       email: "ana@example.com",
       subjectLabel: "Suporte",
       body: "Não consigo baixar meus dados.",
-      url: "http://localhost:3300/staff/contacts/abc",
+      url: "http://localhost:47300/staff/contacts/abc",
     });
     const { html, text } = await renderEmail(element);
     expect(subject).toBe("Nova mensagem de contato: Suporte");
@@ -21,7 +21,7 @@ describe("contact e-mails", () => {
     ]) {
       expect(text).toContain(part);
     }
-    expect(html).toContain('href="http://localhost:3300/staff/contacts/abc"');
+    expect(html).toContain('href="http://localhost:47300/staff/contacts/abc"');
   });
 
   it("answers the person by name, with the answer first and their own message quoted below", async () => {

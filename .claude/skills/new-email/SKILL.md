@@ -39,4 +39,4 @@ Also:
   escaping, as in `emails/contact-emails.test.tsx`.
 - The recipient list for the team is `CONTACT_EMAIL` in `lib/env.ts`; a new address variable goes
   there with its default and its production rule.
-- In the compose the message appears in Mailpit at http://localhost:8030.
+- In the compose the message appears in Mailpit at http://localhost:47030.

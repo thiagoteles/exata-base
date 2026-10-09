@@ -21,7 +21,7 @@ test("a new account has a link of its own, and nobody has used it", async ({ pag
     .first()
     .textContent();
   link = shown?.trim() ?? "";
-  expect(link).toMatch(/^http:\/\/localhost:3300\/\?ref=[a-z0-9]{12}$/);
+  expect(link).toMatch(/^http:\/\/localhost:47300\/\?ref=[a-z0-9]{12}$/);
 });
 
 test("someone who arrives by the link is remembered, and counted once they sign up", async ({

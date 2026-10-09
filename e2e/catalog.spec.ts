@@ -4,7 +4,7 @@ import { expect, type Page, test } from "@playwright/test";
 const themes = ["light", "dark"] as const;
 
 async function openCatalog(page: Page, theme: (typeof themes)[number]) {
-  await page.context().addCookies([{ name: "theme", value: theme, url: "http://localhost:3300" }]);
+  await page.context().addCookies([{ name: "theme", value: theme, url: "http://localhost:47300" }]);
   await page.goto("/catalog");
   await expect(page.getByRole("heading", { level: 1, name: "Catálogo" })).toBeVisible();
   // A click before hydration finds the button but not its handler.
@@ -37,7 +37,9 @@ test("a waiting indicator shows once its delay has passed", async ({ page }) => 
 });
 
 test("the theme from the cookie is applied before the first paint", async ({ page }) => {
-  await page.context().addCookies([{ name: "theme", value: "dark", url: "http://localhost:3300" }]);
+  await page
+    .context()
+    .addCookies([{ name: "theme", value: "dark", url: "http://localhost:47300" }]);
   await page.addInitScript(() => {
     new MutationObserver(() => undefined).observe(document, { childList: true, subtree: true });
   });

@@ -1,6 +1,6 @@
 /* The compose's mail catcher. Tests read the messages the app sent, as a person would read their inbox. */
 
-const MAILPIT = "http://localhost:8030/api/v1";
+const MAILPIT = "http://localhost:47030/api/v1";
 const POLL_MS = 500;
 const POLL_TRIES = 30;
 const verifyLink = /href="([^"]*(?:verify-email|reset-password)[^"]*)"/;

@@ -52,9 +52,9 @@ const gcpCredentials = z
 const server = {
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   AUTH_PROVIDER: z.enum(["clerk", "local"]).default("clerk"),
-  APP_URL: z.url().default("http://localhost:3300"),
+  APP_URL: z.url().default("http://localhost:47300"),
   // biome-ignore lint/security/noSecrets: the local compose credentials are public by design
-  DATABASE_URL: z.url().default("postgres://app:app@localhost:5440/app"),
+  DATABASE_URL: z.url().default("postgres://app:app@localhost:47440/app"),
   ADMIN_EMAILS: csv.pipe(z.array(z.email())).default([]),
   // Which proxy writes the client address: Traefik (Coolify) appends it to X-Forwarded-For,
   // Cloudflare sends CF-Connecting-IP. Only that value is trusted, never one the caller wrote.

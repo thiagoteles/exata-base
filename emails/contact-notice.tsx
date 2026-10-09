@@ -7,6 +7,6 @@ export default function ContactNoticePreview() {
     email: "ana@example.com",
     subjectLabel: "Suporte",
     body: "Não consigo baixar meus dados.",
-    url: "http://localhost:3300/staff/contacts/1",
+    url: "http://localhost:47300/staff/contacts/1",
   }).element;
 }

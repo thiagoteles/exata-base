@@ -53,7 +53,7 @@ const PAGES = [
 setup("sign in as the seeded admin", async ({ request }) => {
   setup.setTimeout(WARM_UP_TOTAL_MS);
   const response = await request.post("/api/auth/sign-in/email", {
-    headers: { origin: "http://localhost:3300" },
+    headers: { origin: "http://localhost:47300" },
     data: { email: "admin@app.local", password: "admin-local" },
   });
   expect(response.ok()).toBe(true);

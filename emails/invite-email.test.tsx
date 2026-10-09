@@ -7,12 +7,12 @@ describe("invite e-mail", () => {
     const { subject, element } = inviteMessage({
       inviterEmail: "admin@example.com",
       role: "staff",
-      url: "http://localhost:3300/sign-up?invite=abc",
+      url: "http://localhost:47300/sign-up?invite=abc",
     });
     const { html, text } = await renderEmail(element);
     expect(subject).toBe("Você foi convidado");
     expect(text).toContain("admin@example.com");
     expect(text).toContain("equipe");
-    expect(html).toContain('href="http://localhost:3300/sign-up?invite=abc"');
+    expect(html).toContain('href="http://localhost:47300/sign-up?invite=abc"');
   });
 });

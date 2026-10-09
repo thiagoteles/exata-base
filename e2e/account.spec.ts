@@ -210,8 +210,8 @@ test("a way back that leaves the site is ignored after signing in", async ({ pag
   await page.getByLabel("E-mail").fill(email);
   await page.getByLabel("Senha").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL((url) => url.origin === "http://localhost:3300" && url.pathname === "/");
-  expect(new URL(page.url()).host).toBe("localhost:3300");
+  await page.waitForURL((url) => url.origin === "http://localhost:47300" && url.pathname === "/");
+  expect(new URL(page.url()).host).toBe("localhost:47300");
 });
 
 test("deleting the account asks first, signs the person out and closes the door for good", async ({

@@ -19,7 +19,7 @@ function setup() {
   return createDiskStorage({
     directory,
     secret: "s".repeat(32),
-    baseUrl: "http://localhost:3300",
+    baseUrl: "http://localhost:47300",
     now: () => clock,
   });
 }

@@ -28,7 +28,7 @@ for (const theme of themes) {
     test(`${path} has no accessibility violations in the ${theme} theme`, async ({ page }) => {
       await page
         .context()
-        .addCookies([{ name: "theme", value: theme, url: "http://localhost:3300" }]);
+        .addCookies([{ name: "theme", value: theme, url: "http://localhost:47300" }]);
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
       expect(await violations(page)).toEqual([]);
@@ -64,7 +64,7 @@ test("search engines are told to stay out of everything outside production", asy
 test("the sitemap lists the public pages and nothing behind sign-in", async ({ request }) => {
   const sitemap = await (await request.get("/sitemap.xml")).text();
   for (const path of ["/", "/privacidade", "/termos"]) {
-    expect(sitemap).toContain(`<loc>http://localhost:3300${path}</loc>`);
+    expect(sitemap).toContain(`<loc>http://localhost:47300${path}</loc>`);
   }
   expect(sitemap).not.toMatch(/\/(account|admin|staff|catalog)/);
 });
@@ -87,11 +87,11 @@ test("the share image, the icons and the manifest exist, with an absolute image 
   await page.goto("/privacidade");
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     "content",
-    /^http:\/\/localhost:3300\/opengraph-image/,
+    /^http:\/\/localhost:47300\/opengraph-image/,
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "http://localhost:3300/privacidade",
+    "http://localhost:47300/privacidade",
   );
 });
 
@@ -156,7 +156,7 @@ test("the home page describes the organization and its questions to search engin
     "WebSite",
   ]);
   expect(data.find((item) => item["@type"] === "Organization")?.["url"]).toBe(
-    "http://localhost:3300/",
+    "http://localhost:47300/",
   );
   // What the page shows is what it declares: every question is on screen, and opens to its answer.
   const faq = data.find((item) => item["@type"] === "FAQPage") as unknown as {

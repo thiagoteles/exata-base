@@ -18,7 +18,7 @@ function localAuth() {
   const signedUp: string[] = [];
   const auth = createLocalAuth({
     db,
-    appUrl: "http://localhost:3300",
+    appUrl: "http://localhost:47300",
     secret: "test-secret-with-enough-length-0123456789",
     adminEmails: ["boss@example.com"],
     sendVerificationEmail: capture,

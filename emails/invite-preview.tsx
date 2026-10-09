@@ -5,6 +5,6 @@ export default function InvitePreview() {
   return inviteMessage({
     inviterEmail: "admin@example.com",
     role: "staff",
-    url: "http://localhost:3300/sign-up?invite=token",
+    url: "http://localhost:47300/sign-up?invite=token",
   }).element;
 }

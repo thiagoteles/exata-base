@@ -11,7 +11,7 @@ set -euo pipefail
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 name="$(basename "$repo" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9\n' '-')-verify"
 copy="$(mktemp -d)"
-image_port=3399
+image_port=47399
 
 cleanup() {
   docker rm -f "${name}-app" "${name}-db" > /dev/null 2>&1 || true
@@ -35,7 +35,7 @@ wait_for() {
   return 1
 }
 
-for port in 3300 5440 8030 "$image_port"; do
+for port in 47300 47440 47030 "$image_port"; do
   if lsof -iTCP:"$port" -sTCP:LISTEN > /dev/null 2>&1; then
     echo "Port $port is in use. Stop the local compose (docker compose down) and try again." >&2
     exit 1
@@ -103,7 +103,7 @@ docker image rm "${name}:local" > /dev/null
 echo "== Browser suite on a clean compose"
 git ls-files -z --cached --others --exclude-standard | tar --null -T - -cf - | tar -xf - -C "$copy"
 (cd "$copy" && docker compose -p "$name" up -d)
-wait_for "http://localhost:3300/health" 600
+wait_for "http://localhost:47300/health" 600
 if ! pnpm test:e2e; then
   # The clean compose is removed when this ends, so what the server said has to be shown now.
   echo "== The app's last lines in the clean compose" >&2

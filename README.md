@@ -8,7 +8,7 @@ TO FILL IN: one sentence on what the product does and who it is for.
 docker compose up
 ```
 
-Open http://localhost:3300. Sign in as the seeded admin, `admin@app.local` with the password `admin-local`. Mail the app sends appears at http://localhost:8030. No `.env` file is needed: every local value is set in `docker-compose.yml`.
+Open http://localhost:47300. Sign in as the seeded admin, `admin@app.local` with the password `admin-local`. Mail the app sends appears at http://localhost:47030. No `.env` file is needed: every local value is set in `docker-compose.yml`.
 
 Do not put anything in `.env.local` while using the compose. The app runs in dev mode on a mounted folder, and a non-empty `.env.local` sends it into a reload loop: every page recompiles on each request, the CPU stays at 100% and the browser tests time out. To try a provider (Stripe, Clerk, Google) keep its keys in a file that is not named `.env.local`, and pass them to the compose with an extra file: `docker compose -f docker-compose.yml -f extra.yml up -d --force-recreate app`, where `extra.yml` sets `services.app.environment`. Run the Clerk suite with the keys exported in your shell instead (see Checks).
 

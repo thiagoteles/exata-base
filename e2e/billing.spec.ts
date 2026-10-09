@@ -11,7 +11,7 @@ import { accountIsFree, BILLING_ON, billingIsOff, PLAN_PAID } from "./environmen
 const themes = ["light", "dark"] as const;
 
 async function open(page: Page, path: string, theme: (typeof themes)[number], heading: string) {
-  await page.context().addCookies([{ name: "theme", value: theme, url: "http://localhost:3300" }]);
+  await page.context().addCookies([{ name: "theme", value: theme, url: "http://localhost:47300" }]);
   await page.goto(path);
   await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
   await page.waitForLoadState("networkidle");

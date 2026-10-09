@@ -10,6 +10,22 @@ const variants = {
 
 export type ButtonVariant = keyof typeof variants;
 
+/*
+ * The two axes every primitive that varies shares, so the same word means the same thing
+ * everywhere: `size` is the footprint of the control, `tone` is whether it speaks neutrally or is
+ * the one that warns. A primitive takes only the values it can honor.
+ */
+export type Size = "sm" | "md";
+export type Tone = "neutral" | "danger";
+
+/** The mark that says a box or a dot is chosen, by tone. */
+export const chosenClasses: Record<Tone, string> = {
+  neutral:
+    "data-[state=checked]:border-action data-[state=checked]:bg-action data-[state=checked]:text-on-action",
+  danger:
+    "data-[state=checked]:border-danger data-[state=checked]:bg-danger data-[state=checked]:text-on-action",
+};
+
 export const buttonClasses = (variant: ButtonVariant) =>
   cn(
     "inline-flex h-control items-center justify-center gap-2 rounded-control px-4.5 text-button font-semibold pointer-coarse:h-control-coarse",

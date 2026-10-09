@@ -6,6 +6,7 @@ import { ListSkeleton } from "@/components/patterns/list-states";
 import { AccentDemo } from "@/features/catalog/accent-demo";
 import { ButtonsDemo } from "@/features/catalog/buttons-demo";
 import { CatalogHeader } from "@/features/catalog/catalog-header";
+import { ChoicesDemo } from "@/features/catalog/choices-demo";
 import { FieldsDemo } from "@/features/catalog/fields-demo";
 import { FilesList } from "@/features/catalog/files-list";
 import { LayersDemo } from "@/features/catalog/layers-demo";
@@ -61,6 +62,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection title={t("palettes.title")}>
           <PaletteDemo />
+        </CatalogSection>
+        <CatalogSection title={t("choices.title")}>
+          <ChoicesDemo />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

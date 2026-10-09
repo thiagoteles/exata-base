@@ -167,6 +167,21 @@
         "epsilon": "Quinta categoria"
       }
     },
+    "choices": {
+      "title": "Caixas e opções",
+      "all": "Todos os assuntos",
+      "topics": { "billing": "Cobrança", "product": "Produto", "security": "Segurança" },
+      "sure": "Entendo que isto não tem volta",
+      "sureHelp": "A caixa de tom perigoso marca o que pede cuidado.",
+      "plan": {
+        "legend": "Forma de cobrança",
+        "monthly": "Mensal",
+        "monthlyHelp": "Cobrado todo mês, cancela quando quiser.",
+        "yearly": "Anual",
+        "lifetime": "Vitalício"
+      },
+      "compact": { "legend": "Tamanho compacto", "a": "Primeira opção", "b": "Segunda opção" }
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",

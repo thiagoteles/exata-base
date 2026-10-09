@@ -3,12 +3,17 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { publicHref } from "@/lib/i18n/public-paths";
 
-/** The plans link shows only when something is on sale, and the language choice only when there is one to make. */
+/**
+ * The plans link shows only when something is on sale, and the language choice only when there is
+ * one to make. The theme choice is the visitor's own and is always there.
+ */
 export function PublicFooter({
   showPlans,
+  themeSwitcher = null,
   languageSwitcher = null,
 }: {
   showPlans: boolean;
+  themeSwitcher?: ReactNode;
   languageSwitcher?: ReactNode;
 }) {
   const t = useTranslations();
@@ -35,7 +40,12 @@ export function PublicFooter({
             {t("nav.terms")}
           </Link>
         </nav>
-        {languageSwitcher}
+        {themeSwitcher === null && languageSwitcher === null ? null : (
+          <div className="flex flex-wrap items-center gap-3">
+            {themeSwitcher}
+            {languageSwitcher}
+          </div>
+        )}
       </div>
     </footer>
   );

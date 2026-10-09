@@ -1,8 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { afterSignIn } from "@/lib/accounts/sign-in-complete";
+import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
 import { requireUser } from "@/lib/ports/auth";
+import { savePreference } from "@/lib/preferences/service";
 import { signInRedirect } from "@/lib/routes";
 import { ONE_YEAR_SECONDS } from "@/lib/theme";
 import { timedRoute } from "@/lib/timed-route";
@@ -16,7 +18,14 @@ export const GET = timedRoute("/auth/complete", async (request: NextRequest) => 
   const next = request.nextUrl.searchParams.get("next");
   try {
     const user = await requireUser();
-    const { location, cookies } = afterSignIn(user.options, next);
+    const browser = Object.fromEntries(
+      request.cookies.getAll().map(({ name, value }) => [name, value]),
+    );
+    const { location, cookies, save } = afterSignIn(user.options, browser, next);
+    for (const { key, value } of save) {
+      // biome-ignore lint/performance/noAwaitInLoops: a few preferences, saved one after the other
+      await savePreference(db, user.id, key, value);
+    }
     const response = NextResponse.redirect(new URL(location, env.APP_URL));
     for (const { name, value } of cookies) {
       if (value === null) {

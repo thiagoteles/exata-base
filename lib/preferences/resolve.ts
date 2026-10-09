@@ -1,5 +1,5 @@
+import { DomainError } from "@/lib/errors";
 import {
-  type PreferenceDefinition,
   type PreferenceKey,
   type Preferences,
   type PreferenceValue,
@@ -8,12 +8,42 @@ import {
 } from "./definitions";
 
 /*
- * Reading what is stored, with no database. A stored value that is absent or no longer valid (an
- * option removed, a value from an older version) is the same as one never chosen: the fallback.
+ * Reading what is stored or carried, with no database. A value that is absent or no longer valid
+ * (an option removed, a value from an older version, a cookie edited by hand) is the same as one
+ * never chosen: the fallback.
  */
 
 export type Stored = Readonly<Record<string, unknown>>;
 export type CookieChange = { name: string; value: string | null };
+export type Carried = { key: PreferenceKey; value: unknown };
+
+export type CookieSpec = {
+  name: string;
+  encode: (value: unknown) => string | null;
+  decode: (raw: string) => unknown;
+};
+
+function decodeJson(raw: string): unknown {
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The cookie a preference travels in: the one it declares, or `pref-<key>` holding JSON. */
+export function specFor(key: string, declared: CookieSpec | undefined): CookieSpec {
+  return (
+    declared ?? {
+      name: `pref-${key}`,
+      encode: (value) => JSON.stringify(value),
+      decode: decodeJson,
+    }
+  );
+}
+
+const cookieSpec = (key: PreferenceKey): CookieSpec =>
+  specFor(key, (preferences[key] as { cookie?: CookieSpec }).cookie);
 
 /** The saved value of one preference, or undefined when none was saved or it does not parse. */
 export function savedPreference<K extends PreferenceKey>(
@@ -33,23 +63,49 @@ export function resolvePreferences(stored: Stored): Preferences {
   ) as Preferences;
 }
 
-/** The cookie a value implies, or null for a preference the page does not need before it paints. */
+/** A value from outside, checked against the registry. One that does not fit is a 400. */
+export function parsePreference<K extends PreferenceKey>(
+  key: K,
+  value: unknown,
+): PreferenceValue<K> {
+  const parsed = preferences[key].schema.safeParse(value);
+  if (!parsed.success) {
+    throw new DomainError(400);
+  }
+  return parsed.data as PreferenceValue<K>;
+}
+
+/** The cookie that carries a value: set, or cleared when the value is the one the page assumes. */
 export function cookieFor<K extends PreferenceKey>(
   key: K,
   value: PreferenceValue<K>,
-): CookieChange | null {
-  const { cookie } = preferences[key] as unknown as PreferenceDefinition<PreferenceValue<K>>;
-  return cookie === undefined ? null : { name: cookie.name, value: cookie.value(value) };
+): CookieChange {
+  const spec = cookieSpec(key);
+  return { name: spec.name, value: spec.encode(value) };
 }
 
 /**
- * The cookies that carry what a person saved to a new browser. Only what they actually saved: a
- * preference they never chose leaves the browser's own cookie alone.
+ * What signing in does with preferences. What the person saved wins and goes to the browser as
+ * cookies, so a new browser looks like the old one. What they never saved but this browser already
+ * holds (a visitor's choices before the account existed) is to be saved to the account.
  */
-export function cookiesForSaved(stored: Stored): CookieChange[] {
-  return preferenceKeys.flatMap((key) => {
-    const value = savedPreference(stored, key);
-    const change = value === undefined ? null : cookieFor(key, value);
-    return change === null ? [] : [change];
-  });
+export function carryAtSignIn(
+  stored: Stored,
+  browser: Readonly<Record<string, string>>,
+): { save: Carried[]; cookies: CookieChange[] } {
+  const save: Carried[] = [];
+  const cookies: CookieChange[] = [];
+  for (const key of preferenceKeys) {
+    const saved = savedPreference(stored, key);
+    const spec = cookieSpec(key);
+    const raw = Object.hasOwn(browser, spec.name) ? browser[spec.name] : undefined;
+    const held =
+      raw === undefined ? undefined : preferences[key].schema.safeParse(spec.decode(raw));
+    if (saved !== undefined) {
+      cookies.push(cookieFor(key, saved));
+    } else if (held?.success) {
+      save.push({ key, value: held.data });
+    }
+  }
+  return { save, cookies };
 }

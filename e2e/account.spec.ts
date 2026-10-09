@@ -36,6 +36,38 @@ test("sign up asks for the e-mail to be confirmed, and the link signs the person
   await expect(page.getByText(email, { exact: true }).first()).toBeVisible();
 });
 
+test("a theme chosen as a visitor is kept, and signing in saves it to the account", async ({
+  page,
+}) => {
+  // The footer of a public page lets anyone choose; the choice is the browser's own until sign-in.
+  await page.goto("/");
+  const chosen = page.waitForResponse(
+    (response) => response.request().method() === "POST" && response.url().endsWith("/"),
+  );
+  await page.getByRole("radio", { name: "Escuro" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await chosen;
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("radio", { name: "Escuro" })).toBeChecked();
+
+  // Signing in finds nothing saved in the account, so what this browser held is saved to it.
+  await signIn(page);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("radio", { name: "Escuro" })).toBeChecked();
+  await page.context().clearCookies({ name: "theme" });
+  await page.goto("/auth/complete?next=%2Faccount");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+
+  // Back to the system's own, so the next step starts from the same place as before.
+  const forgotten = page.waitForResponse(
+    (response) => response.request().method() === "POST" && response.url().endsWith("/account"),
+  );
+  await page.getByRole("radio", { name: "Do sistema" }).click();
+  await forgotten;
+  await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.+/);
+});
+
 test("the theme is applied at once, kept on reload, and saved in the account", async ({ page }) => {
   await signIn(page);
   // The theme is applied in the browser at once and saved by an action; reloading before the

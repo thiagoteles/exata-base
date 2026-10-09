@@ -1,14 +1,8 @@
 import { eq, sql } from "drizzle-orm";
 import type { Database } from "@/lib/db/database";
 import { type UserOptions, users } from "@/lib/db/schema/users";
-import { DomainError } from "@/lib/errors";
-import {
-  type PreferenceKey,
-  type Preferences,
-  type PreferenceValue,
-  preferences,
-} from "./definitions";
-import { resolvePreferences, savedPreference } from "./resolve";
+import type { PreferenceKey, Preferences, PreferenceValue } from "./definitions";
+import { parsePreference, resolvePreferences, savedPreference } from "./resolve";
 
 /*
  * A person's preferences live in one jsonb column, so a new preference never needs a new column.
@@ -33,17 +27,14 @@ export async function savePreference<K extends PreferenceKey>(
   key: K,
   value: unknown,
 ): Promise<PreferenceValue<K>> {
-  const parsed = preferences[key].schema.safeParse(value);
-  if (!parsed.success) {
-    throw new DomainError(400);
-  }
+  const checked = parsePreference(key, value);
   await db
     .update(users)
     .set({
-      options: sql`jsonb_set(${users.options}, array[${key}]::text[], ${JSON.stringify(parsed.data)}::jsonb)`,
+      options: sql`jsonb_set(${users.options}, array[${key}]::text[], ${JSON.stringify(checked)}::jsonb)`,
     })
     .where(eq(users.id, userId));
-  return parsed.data as PreferenceValue<K>;
+  return checked;
 }
 
 /** The language saved in the account of an e-mail address, or null (no account, or none chosen). */

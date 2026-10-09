@@ -60,3 +60,14 @@ describe("plan limits", () => {
     expect(entitlementsOf(plan({ status: "canceled" }), now).limits.exports?.limit).toBe(5);
   });
 });
+
+describe("the lookup keys prices are found by", () => {
+  it("name a price for each way of buying the sold tier, and none for what is not sold", async () => {
+    const { catalog, lookupKeyOf } = await import("./catalog");
+    for (const interval of ["monthly", "yearly", "lifetime"]) {
+      expect(lookupKeyOf(catalog.paidTier, interval)).toBe(`${catalog.paidTier}_${interval}`);
+    }
+    expect(lookupKeyOf("free", "monthly")).toBeUndefined();
+    expect(lookupKeyOf("paid", "weekly")).toBeUndefined();
+  });
+});

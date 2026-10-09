@@ -7,7 +7,7 @@ import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
 import { publicHref } from "@/lib/i18n/public-paths";
 import { sendEvent } from "@/lib/ports/analytics";
-import { priceIds, requireGateway } from "@/lib/ports/payment";
+import { readPrices, requireGateway } from "@/lib/ports/payment";
 import { cancellationSchema, checkoutSchema } from "./schema";
 
 /** Opens the provider's checkout for one plan and returns the address to send the person to. */
@@ -16,8 +16,8 @@ export const startCheckout = actionFor("member")
   .metadata({ name: "startCheckout" })
   .action(async ({ parsedInput, ctx }) => {
     const gateway = await requireGateway();
-    const priceId = priceIds[parsedInput.interval];
-    if (priceId === undefined) {
+    const price = (await readPrices())[parsedInput.interval];
+    if (price === undefined) {
       throw new DomainError(404, "planUnavailable");
     }
     const plan = await readPlan(db, ctx.user.id);
@@ -29,7 +29,7 @@ export const startCheckout = actionFor("member")
       email: ctx.user.email,
       customerId: plan?.providerCustomerId ?? null,
       interval: parsedInput.interval,
-      priceId,
+      priceId: price.priceId,
       successUrl: `${env.APP_URL}/account/plan?checkout=success`,
       cancelUrl: `${env.APP_URL}${publicHref("/plans")}`,
     });

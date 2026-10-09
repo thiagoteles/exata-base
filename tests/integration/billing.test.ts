@@ -2,10 +2,16 @@ import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
 import { entitlementsFor, readPlan } from "@/lib/billing/service";
 import { paymentEvents, plans } from "@/lib/db/schema/billing";
-import { billingFixture } from "./billing-fixture";
+import { billingFixture, gateway } from "./billing-fixture";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
-import { checkoutCompleted, invoiceEvent, subscriptionDeleted } from "./stripe-events";
+import {
+  checkoutCompleted,
+  invoiceEvent,
+  priceChanged,
+  sign,
+  subscriptionDeleted,
+} from "./stripe-events";
 
 const db = testDatabase();
 const premium = async (userId: string) =>
@@ -200,5 +206,14 @@ describe("the lifetime plan over a subscription", () => {
       courtesyGrantedByEmail: null,
       courtesyReason: null,
     });
+  });
+});
+
+describe("a price that changes at the provider", () => {
+  it("is read as a change of prices, whatever its kind", () => {
+    for (const type of ["price.created", "price.updated", "price.deleted"] as const) {
+      const { body, signature } = sign(priceChanged(`evt_${type}`, type));
+      expect(gateway.readEvent(body, signature)).toMatchObject({ kind: "prices_changed", type });
+    }
   });
 });

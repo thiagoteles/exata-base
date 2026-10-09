@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import { applyPaymentEvent } from "@/lib/billing/service";
+import { cacheTags } from "@/lib/cache-tags";
 import { db } from "@/lib/db/client";
 import { sendEvent } from "@/lib/ports/analytics";
 import { logger } from "@/lib/ports/log";
@@ -20,6 +22,11 @@ export const POST = timedRoute("/api/webhooks/stripe", async (request: NextReque
   } catch (error) {
     logger.warn("payment webhook refused: invalid signature", { error });
     return new Response(null, { status: 400 });
+  }
+  if (event.kind === "prices_changed") {
+    // The prices on the plans page are cached by tag; a change at the provider expires them now.
+    revalidateTag(cacheTags.prices(), "max");
+    return Response.json({ result: "applied" });
   }
   const { status, newPayment } = await applyPaymentEvent(db, event, gateway.cancelSubscription);
   // A payment counts in the funnel once, when it is first recorded, and only when it has an account.

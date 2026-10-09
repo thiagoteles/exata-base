@@ -87,3 +87,8 @@ export const chargeSucceeded = (
     receipt_email: null,
     payment_method_details: { type: charge.method ?? "card" },
   });
+
+export const priceChanged = (
+  id: string,
+  type: "price.created" | "price.updated" | "price.deleted",
+) => event(id, type, { id: "price_1", object: "price", lookup_key: "paid_monthly" });

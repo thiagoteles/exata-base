@@ -180,6 +180,7 @@ async function applyEvent(
       await recordRefund(tx, event);
       await applyRefund(tx, event, cancel);
       return null;
+    case "prices_changed":
     case "ignored":
       return null;
     default:

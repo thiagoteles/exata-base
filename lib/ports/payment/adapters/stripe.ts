@@ -103,6 +103,10 @@ function toPaymentEvent(event: Stripe.Event): PaymentEvent {
             refundedCents: event.data.object.amount_refunded,
           };
     }
+    case "price.created":
+    case "price.updated":
+    case "price.deleted":
+      return { ...base, kind: "prices_changed" };
     default:
       return { ...base, kind: "ignored" };
   }
@@ -168,12 +172,26 @@ export function createStripeGateway({ secretKey, webhookSecret }: Options): Paym
       await stripe.refunds.create({ charge: charge.id }, { idempotencyKey });
     },
 
-    async readPrices(priceIds) {
-      const prices = await Promise.all(priceIds.map((id) => stripe.prices.retrieve(id)));
-      return prices.flatMap((price) =>
-        price.unit_amount === null
+    async readPrices(lookupKeys) {
+      if (lookupKeys.length === 0) {
+        return [];
+      }
+      const prices = await stripe.prices.list({
+        lookup_keys: [...lookupKeys],
+        active: true,
+        limit: lookupKeys.length,
+      });
+      return prices.data.flatMap((price) =>
+        price.unit_amount === null || price.lookup_key === null
           ? []
-          : [{ priceId: price.id, cents: price.unit_amount, currency: price.currency }],
+          : [
+              {
+                priceId: price.id,
+                lookupKey: price.lookup_key,
+                cents: price.unit_amount,
+                currency: price.currency,
+              },
+            ],
       );
     },
   };

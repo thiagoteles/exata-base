@@ -35,6 +35,8 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
       fullyRefunded: boolean;
       refundedCents: number;
     }
+  /** A price was created, changed or removed at the provider: what the app cached of prices is stale. */
+  | { kind: "prices_changed" }
   | { kind: "ignored" }
 );
 
@@ -48,7 +50,7 @@ type CheckoutRequest = {
   cancelUrl: string;
 };
 
-export type PriceTag = { priceId: string; cents: number; currency: string };
+export type PriceTag = { priceId: string; lookupKey: string; cents: number; currency: string };
 
 /** The shape every payment provider implements. */
 export type PaymentGateway = {
@@ -61,5 +63,6 @@ export type PaymentGateway = {
   cancelSubscription: (subscriptionId: string) => Promise<void>;
   /** Refunds the customer's latest paid charge in full. The key makes a repeated request one refund. */
   refundLastPayment: (customerId: string, idempotencyKey: string) => Promise<void>;
-  readPrices: (priceIds: readonly string[]) => Promise<PriceTag[]>;
+  /** The active prices that carry these lookup keys. A key with no price is simply absent. */
+  readPrices: (lookupKeys: readonly string[]) => Promise<PriceTag[]>;
 };

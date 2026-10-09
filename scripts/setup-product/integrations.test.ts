@@ -9,7 +9,6 @@ import {
 const stripe = {
   STRIPE_SECRET_KEY: "sk_test_abc",
   STRIPE_WEBHOOK_SECRET: "whsec_abc",
-  STRIPE_PRICE_MONTHLY: "price_1",
 };
 
 describe("validating the integrations", () => {
@@ -17,7 +16,7 @@ describe("validating the integrations", () => {
     expect(validateIntegrations({})).toEqual([]);
   });
 
-  it("accepts a complete Stripe group with one price", () => {
+  it("accepts a complete Stripe group, which asks for no price: prices are found by lookup key", () => {
     expect(validateIntegrations(stripe)).toEqual([]);
   });
 
@@ -29,11 +28,6 @@ describe("validating the integrations", () => {
   it("asks for the rest of a half filled group", () => {
     const problems = validateIntegrations({ STRIPE_SECRET_KEY: "sk_test_abc" });
     expect(problems).toContain("STRIPE_WEBHOOK_SECRET is needed together with STRIPE_SECRET_KEY");
-  });
-
-  it("asks for at least one Stripe price", () => {
-    const { STRIPE_PRICE_MONTHLY: _price, ...withoutPrice } = stripe;
-    expect(validateIntegrations(withoutPrice).join(" ")).toContain("at least one of");
   });
 
   it("lets the Clerk webhook secret wait for the first deploy", () => {
@@ -121,7 +115,7 @@ describe("the file", () => {
   it("writes a stable order, skips blanks, and reads back what it wrote", () => {
     const text = renderEnvFile({ ...stripe, APP_URL: "https://example.com", ADMIN_EMAILS: " " });
     expect(text).toBe(
-      "APP_URL=https://example.com\nSTRIPE_SECRET_KEY=sk_test_abc\nSTRIPE_WEBHOOK_SECRET=whsec_abc\nSTRIPE_PRICE_MONTHLY=price_1\n",
+      "APP_URL=https://example.com\nSTRIPE_SECRET_KEY=sk_test_abc\nSTRIPE_WEBHOOK_SECRET=whsec_abc\n",
     );
     expect(parseEnvFile(text)).toMatchObject(stripe);
   });

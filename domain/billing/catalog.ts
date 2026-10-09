@@ -28,9 +28,26 @@ export const catalog = {
       limits: { exports: { limit: 50, windowSeconds: DAY } },
     },
   },
+  /**
+   * How each way of buying a tier is found at the payment provider: `<tier>.<interval>` names a
+   * price by its lookup key, so a price can be replaced in the provider's dashboard without a deploy
+   * and without an id copied into the environment. Only what is listed here, and exists at the
+   * provider, is offered.
+   */
+  prices: {
+    "paid.monthly": "paid_monthly",
+    "paid.yearly": "paid_yearly",
+    "paid.lifetime": "paid_lifetime",
+  },
   /** The tier the checkout sells and a courtesy grants, until prices name their own tier. */
   paidTier: "paid",
 } as const satisfies {
   tiers: { free: TierDefinition } & Record<string, TierDefinition>;
+  prices: Readonly<Record<string, string>>;
   paidTier: string;
 };
+
+/** The lookup key a tier is sold under for an interval, or undefined when it is not sold that way. */
+export function lookupKeyOf(tier: string, interval: string): string | undefined {
+  return (catalog.prices as Readonly<Record<string, string>>)[`${tier}.${interval}`];
+}

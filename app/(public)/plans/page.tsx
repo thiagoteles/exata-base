@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
       path: "/plans",
     })),
     // With no price on sale there is nothing here for a search engine to list.
-    ...(offeredIntervals().length === 0 ? { robots: { index: false } } : {}),
+    ...((await offeredIntervals()).length === 0 ? { robots: { index: false } } : {}),
   };
 }
 
@@ -68,11 +68,14 @@ export default async function PlansPage() {
 
 async function Offers() {
   const t = await getTranslations("plans");
-  const intervals = offeredIntervals();
+  const [intervals, prices, user] = await Promise.all([
+    offeredIntervals(),
+    readPrices(),
+    getCurrentUser(),
+  ]);
   if (intervals.length === 0) {
     return <p className="text-body text-ink-muted">{t("none")}</p>;
   }
-  const [prices, user] = await Promise.all([readPrices(), getCurrentUser()]);
   const plan = user === null ? null : await readPlan(db, user.id);
   const shown = intervals.filter((interval) => prices[interval] !== undefined);
   if (shown.length === 0) {

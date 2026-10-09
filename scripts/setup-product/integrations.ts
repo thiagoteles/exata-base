@@ -35,8 +35,6 @@ export type Integration = {
   question: string;
   note?: string;
   fields: readonly Field[];
-  /** At least one of these fields must be filled (a service sold in several variants). */
-  oneOf?: readonly string[];
 };
 
 export const integrations: readonly Integration[] = [
@@ -66,7 +64,7 @@ export const integrations: readonly Integration[] = [
   {
     id: "stripe",
     question: "Payments through Stripe",
-    note: "Create one price in Stripe for each plan you sell, and fill only those.",
+    note: "Prices are not asked for: each price is found in Stripe by its lookup key (paid_monthly, paid_yearly, paid_lifetime, from the plan catalog). Create the ones you sell.",
     fields: [
       { name: "STRIPE_SECRET_KEY", label: "Stripe secret key", check: startsWith("sk_") },
       {
@@ -74,26 +72,7 @@ export const integrations: readonly Integration[] = [
         label: "Stripe webhook secret",
         check: startsWith("whsec_"),
       },
-      {
-        name: "STRIPE_PRICE_MONTHLY",
-        label: "Monthly price id",
-        check: startsWith("price_"),
-        optional: true,
-      },
-      {
-        name: "STRIPE_PRICE_YEARLY",
-        label: "Yearly price id",
-        check: startsWith("price_"),
-        optional: true,
-      },
-      {
-        name: "STRIPE_PRICE_LIFETIME",
-        label: "Lifetime price id",
-        check: startsWith("price_"),
-        optional: true,
-      },
     ],
-    oneOf: ["STRIPE_PRICE_MONTHLY", "STRIPE_PRICE_YEARLY", "STRIPE_PRICE_LIFETIME"],
   },
   {
     id: "email",
@@ -209,16 +188,11 @@ function groupProblems(values: Values): string[] {
     if (present.length === 0) {
       return [];
     }
-    const missing = integration.fields
+    return integration.fields
       .filter((field) => field.optional !== true && !filled(values, field.name))
       .map(
         (field) => `${field.name} is needed together with ${present.map((p) => p.name).join(", ")}`,
       );
-    const { oneOf } = integration;
-    const lacksOne = oneOf !== undefined && !oneOf.some((name) => filled(values, name));
-    return lacksOne
-      ? [...missing, `${integration.id}: fill at least one of ${oneOf.join(", ")}`]
-      : missing;
   });
 }
 

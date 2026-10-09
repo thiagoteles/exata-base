@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { catalog, lookupKeyOf } from "@/domain/billing/catalog";
 import { cacheTags } from "@/lib/cache-tags";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
@@ -10,20 +11,11 @@ import type { Interval, PaymentGateway, PriceTag } from "./types";
  * routes see this module, never the provider's SDK.
  */
 
-export const priceIds: Readonly<Record<Interval, string | undefined>> = {
-  monthly: env.STRIPE_PRICE_MONTHLY,
-  yearly: env.STRIPE_PRICE_YEARLY,
-  lifetime: env.STRIPE_PRICE_LIFETIME,
-};
-
 const intervalOrder: readonly Interval[] = ["monthly", "yearly", "lifetime"];
 
-/** The intervals that can be bought right now: the provider is on and the price is set. */
-export function offeredIntervals(): Interval[] {
-  if (env.STRIPE_SECRET_KEY === undefined) {
-    return [];
-  }
-  return intervalOrder.filter((interval) => priceIds[interval] !== undefined);
+/** Whether billing is set up at all: the provider's keys are there. Prices are read from it separately. */
+export function billingConfigured(): boolean {
+  return env.STRIPE_SECRET_KEY !== undefined && env.STRIPE_WEBHOOK_SECRET !== undefined;
 }
 
 let gateway: Promise<PaymentGateway | null> | undefined;
@@ -54,22 +46,36 @@ export async function requireGateway(): Promise<PaymentGateway> {
   return current;
 }
 
-/** What each offered plan costs, read from the provider and kept for an hour. */
+/**
+ * What each way of buying the sold tier costs, read from the provider by the lookup keys the plan
+ * catalog declares, and kept for an hour. An interval whose key has no active price at the provider
+ * is not in the answer, so it is not offered. The webhook expires this when a price changes.
+ */
 export async function readPrices(): Promise<Partial<Record<Interval, PriceTag>>> {
   "use cache";
   cacheLife("hours");
   cacheTag(cacheTags.prices());
   const current = await paymentGateway();
-  const wanted = offeredIntervals();
-  if (current === null || wanted.length === 0) {
+  if (current === null) {
     return {};
   }
-  const ids = wanted.map((interval) => priceIds[interval] ?? "");
-  const tags = await current.readPrices(ids);
+  const keys = Object.fromEntries(
+    intervalOrder.flatMap((interval) => {
+      const key = lookupKeyOf(catalog.paidTier, interval);
+      return key === undefined ? [] : [[interval, key] as const];
+    }),
+  );
+  const tags = await current.readPrices(Object.values(keys));
   return Object.fromEntries(
-    wanted.flatMap((interval) => {
-      const tag = tags.find((candidate) => candidate.priceId === priceIds[interval]);
+    intervalOrder.flatMap((interval) => {
+      const tag = tags.find((candidate) => candidate.lookupKey === keys[interval]);
       return tag === undefined ? [] : [[interval, tag] as const];
     }),
   );
+}
+
+/** The ways of buying the sold tier that exist right now, in the order they are shown. */
+export async function offeredIntervals(): Promise<Interval[]> {
+  const prices = await readPrices();
+  return intervalOrder.filter((interval) => prices[interval] !== undefined);
 }

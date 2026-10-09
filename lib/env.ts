@@ -79,9 +79,6 @@ const server = {
 
   STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
-  STRIPE_PRICE_MONTHLY: z.string().startsWith("price_").optional(),
-  STRIPE_PRICE_YEARLY: z.string().startsWith("price_").optional(),
-  STRIPE_PRICE_LIFETIME: z.string().startsWith("price_").optional(),
 
   GCP_CREDENTIALS: gcpCredentials.optional(),
   GCP_PROJECT: z.string().min(1).optional(),

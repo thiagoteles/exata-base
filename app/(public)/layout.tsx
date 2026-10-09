@@ -5,7 +5,7 @@ import { PublicHeader } from "@/components/shell/public-header";
 import { ThemePicker } from "@/features/account/theme-picker";
 import { LanguageSwitcher } from "@/features/language/language-switcher";
 import { isMultilingual } from "@/lib/i18n/locales";
-import { offeredIntervals } from "@/lib/ports/payment";
+import { billingConfigured } from "@/lib/ports/payment";
 import { HeaderActions, SignedOutActions } from "./header-actions";
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
@@ -20,7 +20,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       />
       <div className="flex-1">{children}</div>
       <PublicFooter
-        showPlans={offeredIntervals().length > 0}
+        showPlans={billingConfigured()}
         themeSwitcher={<ThemePicker />}
         languageSwitcher={isMultilingual ? <LanguageSwitcher /> : null}
       />

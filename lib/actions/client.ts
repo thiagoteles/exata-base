@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { createSafeActionClient } from "next-safe-action";
-import type { Feature } from "@/domain/billing/entitlements";
+import type { Feature, LimitName } from "@/domain/billing/entitlements";
 import type { Role } from "@/lib/accounts/roles";
-import { assertFeature } from "@/lib/billing/guard";
+import { assertFeature, enforcePlanLimit } from "@/lib/billing/guard";
 import { type ErrorBody, errorBody } from "@/lib/errors";
 import { requireRole } from "@/lib/ports/auth";
 import { logger } from "@/lib/ports/log";
@@ -80,12 +80,13 @@ export function limitedPublicAction(rateLimit: RateLimit) {
 
 /**
  * The action client for a minimum role. The signed-in user arrives as `ctx.user`. With
- * `feature`, the plan must grant it; with `rateLimit`, each person is counted by id. Both run
- * after the role check, so a refused visitor never reaches the plan or spends the limit.
+ * `feature`, the plan must grant it; with `rateLimit`, each person is counted by id; with `limit`,
+ * the plan's allowance of that limit is spent (its size and window are in the plan catalog). All
+ * run after the role check, so a refused visitor never reaches the plan or spends anything.
  */
 export function actionFor(
   minimum: Role,
-  options: { feature?: Feature; rateLimit?: RateLimit } = {},
+  options: { feature?: Feature; rateLimit?: RateLimit; limit?: LimitName } = {},
 ) {
   return action.use(async ({ next }) => {
     const user = await requireRole(minimum);
@@ -94,6 +95,9 @@ export function actionFor(
     }
     if (options.rateLimit !== undefined) {
       await enforceRateLimit(options.rateLimit, `user:${user.id}`);
+    }
+    if (options.limit !== undefined) {
+      await enforcePlanLimit(user.id, options.limit);
     }
     return next({ ctx: { user } });
   });

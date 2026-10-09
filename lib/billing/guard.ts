@@ -1,9 +1,10 @@
 import { connection } from "next/server";
-import type { Feature } from "@/domain/billing/entitlements";
+import type { Feature, LimitName } from "@/domain/billing/entitlements";
 import { currentInstant } from "@/domain/clock";
 import { db } from "@/lib/db/client";
 import { DomainError } from "@/lib/errors";
 import { requireUser } from "@/lib/ports/auth";
+import { consumeLimit } from "./limits";
 import { entitlementsFor } from "./service";
 
 /*
@@ -48,5 +49,17 @@ export async function hasFeature(feature: Feature): Promise<boolean> {
       return false;
     }
     throw error;
+  }
+}
+
+/**
+ * Spends one use of a plan limit and throws the 429 when the plan's allowance for the window is
+ * gone. A page, a route or an action calls it where the thing being metered happens.
+ */
+export async function enforcePlanLimit(holderId: string, name: LimitName): Promise<void> {
+  await connection();
+  const decision = await consumeLimit(db, { kind: "user", id: holderId }, name, currentInstant());
+  if (!decision.allowed) {
+    throw new DomainError(429);
   }
 }

@@ -4,7 +4,12 @@ import { z } from "@/lib/validation";
 
 const session = vi.hoisted(() => ({ role: null as null | "member" | "staff" | "admin" }));
 const limits = vi.hoisted(() => ({ over: false, subjects: [] as string[] }));
-const plan = vi.hoisted(() => ({ granted: true, asked: [] as string[] }));
+const plan = vi.hoisted(() => ({
+  granted: true,
+  asked: [] as string[],
+  spent: [] as string[],
+  over: false,
+}));
 const logged = vi.hoisted(() => [] as { level: string; message: string; fields: unknown }[]);
 
 vi.mock("@/lib/ports/log", () => {
@@ -51,6 +56,10 @@ vi.mock("@/lib/rate-limit/guard", async () => {
 vi.mock("@/lib/billing/guard", async () => {
   const { DomainError: Refusal } = await import("@/lib/errors");
   return {
+    enforcePlanLimit: (holderId: string, name: string) => {
+      plan.spent.push(`${holderId}:${name}`);
+      return plan.over ? Promise.reject(new Refusal(429)) : Promise.resolve();
+    },
     assertFeature: (holderId: string, feature: string) => {
       plan.asked.push(`${holderId}:${feature}`);
       return plan.granted
@@ -70,6 +79,9 @@ const limited = actionFor("member", {
   rateLimit: { name: "test", limit: 1, windowSeconds: 60 },
 })
   .metadata({ name: "limited" })
+  .action(() => Promise.resolve({ done: true }));
+const metered = actionFor("member", { limit: "exports" })
+  .metadata({ name: "metered" })
   .action(() => Promise.resolve({ done: true }));
 const visitorForm = limitedPublicAction({ name: "form", limit: 1, windowSeconds: 60 })
   .metadata({ name: "visitorForm" })
@@ -92,6 +104,8 @@ beforeEach(() => {
   limits.subjects.length = 0;
   plan.granted = true;
   plan.asked.length = 0;
+  plan.spent.length = 0;
+  plan.over = false;
   logged.length = 0;
 });
 
@@ -177,5 +191,15 @@ describe("server actions", () => {
       { action: "staffEcho", ms: expect.any(Number), status: 400 },
       { action: "staffEcho", ms: expect.any(Number), status: 401 },
     ]);
+  });
+
+  it("spend the plan's allowance after the role check, and answer 429 when it is gone", async () => {
+    expect((await metered())?.serverError).toMatchObject({ status: 401 });
+    expect(plan.spent).toEqual([]);
+    session.role = "member";
+    expect((await metered())?.data).toEqual({ done: true });
+    expect(plan.spent).toEqual(["u1:exports"]);
+    plan.over = true;
+    expect((await metered())?.serverError).toMatchObject({ status: 429 });
   });
 });

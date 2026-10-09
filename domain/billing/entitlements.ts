@@ -1,4 +1,4 @@
-import { catalog } from "./catalog";
+import { catalog, type LimitRule } from "./catalog";
 
 /*
  * What a holder may do, from the plan alone. A plan grants its tier while it is active, on trial
@@ -9,7 +9,8 @@ import { catalog } from "./catalog";
 type Tiers = typeof catalog.tiers;
 export type Tier = keyof Tiers;
 export type Feature = Tiers[Tier]["features"][number];
-type LimitName = keyof Tiers[Tier]["limits"];
+/** Every limit any tier names. A limit only some tiers name is unlimited for the others. */
+export type LimitName = { [T in Tier]: keyof Tiers[T]["limits"] }[Tier];
 
 export const tierNames = Object.keys(catalog.tiers) as [Tier, ...Tier[]];
 
@@ -25,7 +26,7 @@ export type PlanState = {
 export type Entitlements = {
   tier: Tier;
   features: ReadonlySet<Feature>;
-  limits: Readonly<Partial<Record<LimitName, number>>>;
+  limits: Readonly<Partial<Record<LimitName, LimitRule>>>;
 };
 
 /** A tier other than free: one that was bought or given. */

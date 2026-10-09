@@ -188,6 +188,16 @@ test("the data export is a ZIP with the person's own data", async ({ page }) => 
   expect(data.user.map((row) => row.email)).toEqual([email]);
 });
 
+test("a free plan allows five exports a day, and the next one is refused", async ({ page }) => {
+  await signIn(page);
+  // One went above; four are left.
+  for (let use = 0; use < 4; use += 1) {
+    expect((await page.request.get("/account/export")).status()).toBe(200);
+  }
+  const refused = await page.request.get("/account/export");
+  expect(refused.status()).toBe(429);
+});
+
 test("signing out ends the session, and a wrong password is refused with a clear message", async ({
   page,
 }) => {

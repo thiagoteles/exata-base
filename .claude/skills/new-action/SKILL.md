@@ -32,7 +32,10 @@ Rules:
    pattern matches the folder), and calls
    `enforceRateLimit` from `lib/rate-limit/guard.ts`. An action for paying customers takes
    `actionFor(role, { feature })` with a feature from `domain/billing/catalog.ts`; without it the
-   plan refuses with 403 and `paidPlanRequired`.
+   plan refuses with 403 and `paidPlanRequired`. What a plan allows in a window (so many a day) is
+   `actionFor(role, { limit: "name" })` with a `limits` entry of the tier in the same catalog; a
+   route or page calls `enforcePlanLimit(user.id, "name")` from `lib/billing/guard.ts`. Both answer
+   429 when the allowance is gone.
 3. **The schema is declared once** in `features/<area>/schema.ts`, with `z` from
    `@/lib/validation`, and the form in the browser uses the same one. Messages are catalog keys.
 4. **The action stays thin.** The rule lives in `lib/<area>/service.ts`, which is tested against a

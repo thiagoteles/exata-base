@@ -5,16 +5,28 @@
  * from this list, so renaming or removing a tier needs a migration.
  */
 
+/** How much of one thing a tier allows in a window of time, such as five exports a day. */
+export type LimitRule = { limit: number; windowSeconds: number };
+
 export type TierDefinition = {
   extends?: string;
   features: readonly string[];
-  limits: Readonly<Record<string, number>>;
+  limits: Readonly<Record<string, LimitRule>>;
 };
+
+const DAY = 86_400;
 
 export const catalog = {
   tiers: {
-    free: { features: [], limits: {} },
-    paid: { extends: "free", features: ["premium"], limits: {} },
+    // `exports` is the neutral example: how many times a day a person may download their data. A
+    // product replaces it with what it meters (reports, messages, jobs); a tier that does not name a
+    // limit inherits the one it extends, and a limit no tier names is unlimited.
+    free: { features: [], limits: { exports: { limit: 5, windowSeconds: DAY } } },
+    paid: {
+      extends: "free",
+      features: ["premium"],
+      limits: { exports: { limit: 50, windowSeconds: DAY } },
+    },
   },
   /** The tier the checkout sells and a courtesy grants, until prices name their own tier. */
   paidTier: "paid",

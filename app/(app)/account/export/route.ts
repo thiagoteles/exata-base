@@ -1,5 +1,6 @@
 import { currentInstant } from "@/domain/clock";
 import { exportAccount } from "@/lib/accounts/export";
+import { enforcePlanLimit } from "@/lib/billing/guard";
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
 import { withErrorResponse } from "@/lib/http";
@@ -14,6 +15,8 @@ const slash = /\//g;
 export const GET = timedRoute("/account/export", () =>
   withErrorResponse(async () => {
     const user = await requireUser();
+    // A download of everything is the neutral example of a metered thing: the plan says how many a day.
+    await enforcePlanLimit(user.id, "exports");
     const now = currentInstant();
     const zip = await exportAccount(db, await fileStorage(), user.id, now);
     const date = formatInstantDate(now).replace(slash, "-");

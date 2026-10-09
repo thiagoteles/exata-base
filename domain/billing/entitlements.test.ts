@@ -46,3 +46,17 @@ describe("featuresOfTier", () => {
     expect(featuresOfTier("paid").has("premium")).toBe(true);
   });
 });
+
+describe("plan limits", () => {
+  it("give each tier its own allowance and window, the paid tier's over the one it extends", () => {
+    expect(entitlementsOf(null, now).limits.exports).toEqual({ limit: 5, windowSeconds: 86_400 });
+    expect(entitlementsOf(plan(), now).limits.exports).toEqual({
+      limit: 50,
+      windowSeconds: 86_400,
+    });
+  });
+
+  it("fall back to the free allowance when a plan no longer counts", () => {
+    expect(entitlementsOf(plan({ status: "canceled" }), now).limits.exports?.limit).toBe(5);
+  });
+});

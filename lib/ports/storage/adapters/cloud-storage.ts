@@ -55,10 +55,7 @@ export function googleBucket(
 
 const MILLISECONDS = 1000;
 
-export function createCloudStorage(
-  bucket: BucketClient,
-  now: () => number = Date.now,
-): FileStorage {
+export function createCloudStorage(bucket: BucketClient, now: () => number): FileStorage {
   return {
     async put(key, file: StoredFile) {
       assertSafeKey(key);

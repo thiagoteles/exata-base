@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import type { ReactElement } from "react";
+import { currentInstant } from "@/domain/clock";
 import { upsertClerkUser } from "@/lib/accounts/clerk-sync";
 import { savedLocaleOfEmail } from "@/lib/accounts/options";
 import { hasRole, type Role } from "@/lib/accounts/roles";
@@ -35,7 +36,9 @@ async function sendAccountEmail(to: string, build: (t: EmailTranslator) => Accou
 async function loadAdapter(): Promise<AuthAdapter> {
   if (env.AUTH_PROVIDER === "clerk") {
     const { clerkAdapter } = await import("./adapters/clerk");
-    return clerkAdapter((profile) => upsertClerkUser(db, profile, env.ADMIN_EMAILS));
+    return clerkAdapter((profile) =>
+      upsertClerkUser(db, profile, env.ADMIN_EMAILS, currentInstant()),
+    );
   }
   const [{ localAdapter }, auth] = await Promise.all([import("./adapters/local"), localAuth()]);
   return localAdapter(auth);

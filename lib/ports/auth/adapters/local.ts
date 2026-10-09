@@ -5,6 +5,7 @@ import { hashPassword } from "better-auth/crypto";
 import { nextCookies, toNextJsHandler } from "better-auth/next-js";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { currentInstant } from "@/domain/clock";
 import { applyConfirmedEmail } from "@/lib/accounts/confirmation";
 import type { Database } from "@/lib/db/database";
 import { accounts, sessions, verifications } from "@/lib/db/schema/auth";
@@ -53,7 +54,8 @@ export function createLocalAuth(options: LocalAuthOptions) {
       autoSignInAfterVerification: true,
       sendVerificationEmail: ({ user, url }) =>
         options.sendVerificationEmail({ to: user.email, name: user.name, url }),
-      afterEmailVerification: (user) => applyConfirmedEmail(db, user.id, adminEmails),
+      afterEmailVerification: (user) =>
+        applyConfirmedEmail(db, user.id, adminEmails, currentInstant()),
     },
     ...(options.google === undefined ? {} : { socialProviders: { google: options.google } }),
     databaseHooks: {
@@ -62,7 +64,7 @@ export function createLocalAuth(options: LocalAuthOptions) {
           // A provider such as Google delivers a verified e-mail, so confirmation is immediate.
           after: async (user) => {
             if (user.emailVerified) {
-              await applyConfirmedEmail(db, user.id, adminEmails);
+              await applyConfirmedEmail(db, user.id, adminEmails, currentInstant());
             }
           },
         },

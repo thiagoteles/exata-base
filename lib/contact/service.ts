@@ -164,7 +164,7 @@ type Reply = {
   body: string;
   /** Sends the reply e-mail; resolves to false when it was not sent. */
   send: (message: ContactRow, body: string) => Promise<boolean>;
-  now?: Date;
+  now: Date;
 };
 
 /**
@@ -172,14 +172,7 @@ type Reply = {
  * answering at the same moment cannot both send: the second waits, finds a reply, and is refused.
  * If the e-mail is not sent, nothing is recorded and the message stays unanswered.
  */
-export async function replyToContact({
-  db,
-  actor,
-  id,
-  body,
-  send,
-  now = new Date(),
-}: Reply): Promise<void> {
+export async function replyToContact({ db, actor, id, body, send, now }: Reply): Promise<void> {
   await db.transaction(async (tx) => {
     const [message] = await tx
       .select()

@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { timestamp, uuid } from "drizzle-orm/pg-core";
 
 /*
@@ -13,6 +14,7 @@ export const updatedAt = () =>
   timestamp({ withTimezone: true })
     .notNull()
     .defaultNow()
-    .$onUpdate(() => new Date());
+    // The database clock, so an update never depends on the server reading the time.
+    .$onUpdate(() => sql`now()`);
 
 export const instant = () => timestamp({ withTimezone: true });

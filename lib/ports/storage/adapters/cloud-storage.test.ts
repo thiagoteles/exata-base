@@ -56,7 +56,9 @@ describe("Cloud Storage", () => {
 
   it("refuses an unsafe key before calling Google", async () => {
     const { bucket, calls } = fakeBucket();
-    await expect(createCloudStorage(bucket).remove("../x")).rejects.toThrow("Unsafe storage key");
+    await expect(createCloudStorage(bucket, () => 0).remove("../x")).rejects.toThrow(
+      "Unsafe storage key",
+    );
     expect(calls).toEqual([]);
   });
 });

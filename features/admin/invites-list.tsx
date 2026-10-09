@@ -12,6 +12,7 @@ import {
 } from "@/components/patterns/list-controls";
 import { ListEmpty } from "@/components/patterns/list-states";
 import { Stamp } from "@/components/ui/stamp";
+import { currentInstant } from "@/domain/clock";
 import type { AdminViewer } from "@/lib/admin/guard";
 import { type InviteRow, inviteStatuses, queryInvites } from "@/lib/admin/invites";
 import { formatInstantDate } from "@/lib/date";
@@ -40,7 +41,7 @@ export async function InvitesList({
   const params = await searchParamsCache.parse(searchParams);
   // The clock decides who is expired, so it is read at request time, never while prerendering.
   await connection();
-  const { rows, window } = await queryInvites(db, viewer, params, new Date());
+  const { rows, window } = await queryInvites(db, viewer, params, currentInstant());
 
   const columns: Column<InviteRow>[] = [
     { key: "email", header: t("email"), kind: "title", width: "2fr", cell: (row) => row.email },

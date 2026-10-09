@@ -1,3 +1,4 @@
+import { currentInstant } from "@/domain/clock";
 import { exportAccount } from "@/lib/accounts/export";
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
@@ -12,8 +13,9 @@ const slash = /\//g;
 export function GET() {
   return withErrorResponse(async () => {
     const user = await requireUser();
-    const zip = await exportAccount(db, await fileStorage(), user.id);
-    const date = formatInstantDate(new Date()).replace(slash, "-");
+    const now = currentInstant();
+    const zip = await exportAccount(db, await fileStorage(), user.id, now);
+    const date = formatInstantDate(now).replace(slash, "-");
     return new Response(zip.slice().buffer, {
       headers: {
         "content-type": "application/zip",

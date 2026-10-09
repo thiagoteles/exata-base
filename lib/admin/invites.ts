@@ -88,7 +88,10 @@ export async function inviteByEmail(
   db: Database,
   actor: Actor,
   input: { email: string; role: Role },
-  send: (invite: { token: string; expiresAt: Date }) => Promise<boolean>,
+  {
+    send,
+    now,
+  }: { send: (invite: { token: string; expiresAt: Date }) => Promise<boolean>; now: Date },
 ): Promise<void> {
   const [existing] = await db
     .select({ id: users.id })
@@ -97,9 +100,9 @@ export async function inviteByEmail(
   if (existing !== undefined) {
     throw new DomainError(409, "emailTaken");
   }
-  const invite = await createInvite(db, actor, input);
+  const invite = await createInvite(db, actor, input, now);
   if (!(await send(invite))) {
-    await revokeInvite(db, actor, invite.id);
+    await revokeInvite(db, actor, invite.id, now);
     throw new DomainError(409, "emailNotSent");
   }
 }

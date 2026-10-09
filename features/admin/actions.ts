@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { currentInstant } from "@/domain/clock";
 import { accountDeletionSteps } from "@/lib/accounts/deletion-steps";
 import { revokeInvite } from "@/lib/accounts/invites";
 import { changeRole } from "@/lib/accounts/role-change";
@@ -58,21 +59,23 @@ export const inviteUser = actionFor("admin")
   .inputSchema(inviteSchema)
   .action(async ({ parsedInput, ctx }) => {
     const actor = actorOf(ctx.user);
-    await inviteByEmail(db, actor, parsedInput, async (invite) =>
-      sendInvite({
-        to: parsedInput.email,
-        inviterEmail: actor.email,
-        role: parsedInput.role,
-        token: invite.token,
-        locale: await requestLocale(),
-      }),
-    );
+    await inviteByEmail(db, actor, parsedInput, {
+      send: async (invite) =>
+        sendInvite({
+          to: parsedInput.email,
+          inviterEmail: actor.email,
+          role: parsedInput.role,
+          token: invite.token,
+          locale: await requestLocale(),
+        }),
+      now: currentInstant(),
+    });
     return { invited: true };
   });
 
 export const withdrawInvite = actionFor("admin")
   .inputSchema(userIdSchema)
   .action(async ({ parsedInput, ctx }) => {
-    await revokeInvite(db, actorOf(ctx.user), parsedInput.id);
+    await revokeInvite(db, actorOf(ctx.user), parsedInput.id, currentInstant());
     return { revoked: true };
   });

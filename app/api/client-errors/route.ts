@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { currentEpochMs } from "@/domain/clock";
 import {
   browserKey,
   clientErrorSchema,
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
   }
   const address = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
   const browser = browserKey(address, request.headers.get("user-agent") ?? "");
-  if (deduper.firstTime(fingerprint(browser, report.data))) {
+  if (deduper.firstTime(fingerprint(browser, report.data), currentEpochMs())) {
     // The report's own `message` would collide with the log line's, so it is logged as `errorMessage`.
     const { message, ...rest } = report.data;
     logger.error("browser error", { ...rest, errorMessage: message });

@@ -84,7 +84,7 @@ describe("inviting an address", () => {
   it("stores the invite, hands the token to the sender and audits it", async () => {
     const { actor } = await admin();
     const send = vi.fn(() => Promise.resolve(true));
-    await inviteByEmail(db, actor, { email: "New@Example.com", role: "staff" }, send);
+    await inviteByEmail(db, actor, { email: "New@Example.com", role: "staff" }, { send, now });
     expect(send).toHaveBeenCalledOnce();
     const [stored] = await db.select().from(invites);
     expect(stored).toMatchObject({ email: "new@example.com", role: "staff", revokedAt: null });
@@ -96,8 +96,11 @@ describe("inviting an address", () => {
   it("withdraws the invite when the e-mail was not sent, so the list shows nothing nobody got", async () => {
     const { actor } = await admin();
     await expect(
-      inviteByEmail(db, actor, { email: "new@example.com", role: "staff" }, () =>
-        Promise.resolve(false),
+      inviteByEmail(
+        db,
+        actor,
+        { email: "new@example.com", role: "staff" },
+        { send: () => Promise.resolve(false), now },
       ),
     ).rejects.toMatchObject({ status: 409, key: "emailNotSent" });
     const [stored] = await db.select().from(invites);
@@ -109,7 +112,7 @@ describe("inviting an address", () => {
     await createUser(db, "ana@example.com");
     const send = vi.fn(() => Promise.resolve(true));
     await expect(
-      inviteByEmail(db, actor, { email: "ANA@example.com", role: "staff" }, send),
+      inviteByEmail(db, actor, { email: "ANA@example.com", role: "staff" }, { send, now }),
     ).rejects.toMatchObject({ status: 409, key: "emailTaken" });
     expect(send).not.toHaveBeenCalled();
   });

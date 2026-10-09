@@ -41,7 +41,7 @@ export function fingerprint(browser: string, report: ClientErrorReport): string 
 export function createDeduper(windowMs: number = DEDUPE_WINDOW_MS) {
   const seen = new Map<string, number>();
   return {
-    firstTime(key: string, now: number = Date.now()): boolean {
+    firstTime(key: string, now: number): boolean {
       for (const [stored, at] of seen) {
         if (now - at >= windowMs) {
           seen.delete(stored);

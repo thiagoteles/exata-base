@@ -14,6 +14,7 @@ export async function upsertClerkUser(
   db: Database,
   profile: ClerkProfile,
   adminEmails: readonly string[],
+  now: Date,
 ): Promise<string> {
   const email = profile.email.toLowerCase();
   const fields = { email, name: profile.name, image: profile.image, emailVerified: true };
@@ -35,6 +36,6 @@ export async function upsertClerkUser(
   if (created === undefined) {
     throw new Error("Clerk user was not stored");
   }
-  await applyConfirmedEmail(db, created.id, adminEmails);
+  await applyConfirmedEmail(db, created.id, adminEmails, now);
   return created.id;
 }

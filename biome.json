@@ -160,6 +160,20 @@
   },
   "overrides": [
     {
+      "includes": [
+        "app/**",
+        "domain/**",
+        "lib/**",
+        "features/**",
+        "components/**",
+        "proxy.ts",
+        "!**/*.test.ts",
+        "!**/*.test.tsx",
+        "!domain/clock.ts"
+      ],
+      "plugins": ["./biome-plugins/no-ambient-clock.grit"]
+    },
+    {
       "includes": ["lib/**"],
       "linter": {
         "rules": {
@@ -198,7 +212,7 @@
                   },
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
-                    "message": "lib is the lowest layer: it does not import app, components or features."
+                    "message": "lib sits above domain only: it does not import app, components or features."
                   },
                   {
                     "group": ["zod", "zod/**"],
@@ -246,7 +260,7 @@
                   },
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
-                    "message": "lib is the lowest layer: it does not import app, components or features."
+                    "message": "lib sits above domain only: it does not import app, components or features."
                   },
                   {
                     "group": ["zod", "zod/**"],
@@ -286,7 +300,7 @@
                   },
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
-                    "message": "lib is the lowest layer: it does not import app, components or features."
+                    "message": "lib sits above domain only: it does not import app, components or features."
                   },
                   {
                     "group": ["zod", "zod/**"],
@@ -330,7 +344,7 @@
                   },
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
-                    "message": "lib is the lowest layer: it does not import app, components or features."
+                    "message": "lib sits above domain only: it does not import app, components or features."
                   },
                   {
                     "group": ["zod", "zod/**"],
@@ -374,7 +388,7 @@
                   },
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
-                    "message": "lib is the lowest layer: it does not import app, components or features."
+                    "message": "lib sits above domain only: it does not import app, components or features."
                   },
                   {
                     "group": ["zod", "zod/**"],
@@ -418,7 +432,7 @@
                   },
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
-                    "message": "lib is the lowest layer: it does not import app, components or features."
+                    "message": "lib sits above domain only: it does not import app, components or features."
                   },
                   {
                     "group": ["zod", "zod/**"],
@@ -600,6 +614,74 @@
       }
     },
     {
+      "includes": ["domain/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "error"
+          },
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": [
+                      "@/lib",
+                      "@/lib/**",
+                      "@/components/**",
+                      "@/features/**",
+                      "@/app/**",
+                      "drizzle-orm",
+                      "drizzle-orm/**"
+                    ],
+                    "message": "domain is the lowest layer: pure rules that import nothing from lib, components, features or app."
+                  },
+                  {
+                    "group": [
+                      "react",
+                      "react/**",
+                      "react-dom",
+                      "react-dom/**",
+                      "next",
+                      "next/**",
+                      "radix-ui",
+                      "@radix-ui/**"
+                    ],
+                    "message": "domain is pure: no React, Next or UI. Rendering lives in components."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "domain receives values already validated. Validate at the edge, in lib or features."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["e2e/**"],
       "linter": {
         "rules": {
@@ -712,7 +794,7 @@
                   },
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
-                    "message": "lib is the lowest layer: it does not import app, components or features."
+                    "message": "lib sits above domain only: it does not import app, components or features."
                   }
                 ]
               }

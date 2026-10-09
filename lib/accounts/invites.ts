@@ -24,7 +24,7 @@ export function createInvite(
   db: Database,
   actor: Actor,
   input: { email: string; role: Role },
-  now: Date = new Date(),
+  now: Date,
 ): Promise<{ id: string; token: string; expiresAt: Date }> {
   const token = randomBytes(TOKEN_BYTES).toString("base64url");
   const expiresAt = new Date(now.getTime() + INVITE_LIFETIME_DAYS * DAY_MS);
@@ -53,12 +53,7 @@ export function createInvite(
   });
 }
 
-export async function revokeInvite(
-  db: Database,
-  actor: Actor,
-  inviteId: string,
-  now: Date = new Date(),
-) {
+export async function revokeInvite(db: Database, actor: Actor, inviteId: string, now: Date) {
   await db.transaction(async (tx) => {
     const [revoked] = await tx
       .update(invites)

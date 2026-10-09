@@ -1,6 +1,7 @@
 "use server";
 
 import { getTranslations } from "next-intl/server";
+import { currentInstant } from "@/domain/clock";
 import { savedLocaleOfUser } from "@/lib/accounts/options";
 import { actionFor, publicAction } from "@/lib/actions/client";
 import { notifyTeam, sendReply } from "@/lib/contact/mailer";
@@ -62,6 +63,7 @@ export const answerContact = actionFor("staff")
           chooseLocale(saved, chooseLocale(message.locale, defaultLocale)),
         );
       },
+      now: currentInstant(),
     });
     return { answered: true };
   });

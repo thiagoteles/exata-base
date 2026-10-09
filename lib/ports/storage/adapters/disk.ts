@@ -8,7 +8,7 @@ import { assertSafeKey, type FileStorage, type StoredFile } from "../types";
  * URL points at the app's own download route, which checks the signature and the expiry.
  */
 
-type Options = { directory: string; secret: string; baseUrl: string; now?: () => number };
+type Options = { directory: string; secret: string; baseUrl: string; now: () => number };
 
 const DOWNLOAD_PATH = "/storage";
 const MILLISECONDS = 1000;
@@ -19,7 +19,7 @@ function sign(secret: string, key: string, expires: number, downloadName: string
     .digest("base64url");
 }
 
-export function createDiskStorage({ directory, secret, baseUrl, now = Date.now }: Options) {
+export function createDiskStorage({ directory, secret, baseUrl, now }: Options) {
   const root = path.resolve(directory);
   const filePath = (key: string) => path.join(root, key);
   const metaPath = (key: string) => `${filePath(key)}.meta.json`;

@@ -22,6 +22,7 @@ beforeAll(async () => {
     directory,
     secret: "s".repeat(32),
     baseUrl: "http://localhost",
+    now: Date.now,
   }));
 });
 

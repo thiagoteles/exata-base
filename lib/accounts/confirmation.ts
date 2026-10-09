@@ -13,7 +13,7 @@ export async function applyConfirmedEmail(
   db: Database,
   userId: string,
   adminEmails: readonly string[],
-  now: Date = new Date(),
+  now: Date,
 ): Promise<void> {
   await db.transaction(async (tx) => {
     const [user] = await tx.select().from(users).where(eq(users.id, userId)).for("update");

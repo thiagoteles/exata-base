@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { currentInstant } from "@/domain/clock";
 import { processClerkEvent } from "@/lib/accounts/clerk-webhook";
 import { accountDeletionSteps } from "@/lib/accounts/deletion-steps";
 import { db } from "@/lib/db/client";
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
   const result = await processClerkEvent(db, event, {
     adminEmails: env.ADMIN_EMAILS,
     deletion: accountDeletionSteps,
+    now: currentInstant(),
   });
   return Response.json({ result });
 }

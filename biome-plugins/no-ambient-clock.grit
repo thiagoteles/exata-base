@@ -1,0 +1,13 @@
+language js
+
+or {
+  `new Date()` as $hit where {
+    register_diagnostic(span=$hit, message="new Date() reads the ambient clock. Receive the instant as a parameter (now: Date); an entry point reads it once with currentInstant() from @/domain/clock.", severity="error")
+  },
+  `Date.now` as $hit where {
+    register_diagnostic(span=$hit, message="Date.now reads the ambient clock. Receive the instant as a parameter; an entry point reads it once with currentEpochMs() from @/domain/clock.", severity="error")
+  },
+  `Math.random` as $hit where {
+    register_diagnostic(span=$hit, message="Math.random is ambient randomness. Receive a random source as a parameter, so a test can seed it.", severity="error")
+  }
+}

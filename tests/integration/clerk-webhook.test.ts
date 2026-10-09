@@ -22,7 +22,7 @@ const deletion: DeletionSteps = {
   deleteProviderUser: () => Promise.reject(new Error("must not be called")),
   logger: recordingLogger(),
 };
-const deps = { adminEmails: [], deletion };
+const deps = { adminEmails: [], deletion, now: new Date() };
 const profile = { clerkId: "user_1", email: "ana@example.com", name: "Ana", image: null };
 
 describe("Clerk webhook", () => {

@@ -18,11 +18,11 @@ const roleOf = async (id: string) =>
 describe("promotion on a confirmed e-mail", () => {
   it("makes an ADMIN_EMAILS address admin, and never demotes", async () => {
     const boss = await createUser(db, "boss@example.com");
-    await applyConfirmedEmail(db, boss.id, ["boss@example.com"]);
+    await applyConfirmedEmail(db, boss.id, ["boss@example.com"], new Date());
     expect(await roleOf(boss.id)).toBe("admin");
 
     const other = await createUser(db, "other@example.com", "staff");
-    await applyConfirmedEmail(db, other.id, []);
+    await applyConfirmedEmail(db, other.id, [], new Date());
     expect(await roleOf(other.id)).toBe("staff");
   });
 
@@ -32,15 +32,25 @@ describe("promotion on a confirmed e-mail", () => {
     const past = new Date(Date.now() - 30 * 86_400_000);
 
     await createInvite(db, actor, { email: "Late@Example.com", role: "staff" }, past);
-    const revoked = await createInvite(db, actor, { email: "gone@example.com", role: "staff" });
-    await revokeInvite(db, actor, revoked.id);
-    const valid = await createInvite(db, actor, { email: "new@example.com", role: "staff" });
+    const revoked = await createInvite(
+      db,
+      actor,
+      { email: "gone@example.com", role: "staff" },
+      new Date(),
+    );
+    await revokeInvite(db, actor, revoked.id, new Date());
+    const valid = await createInvite(
+      db,
+      actor,
+      { email: "new@example.com", role: "staff" },
+      new Date(),
+    );
 
     const late = await createUser(db, "late@example.com");
     const gone = await createUser(db, "gone@example.com");
     const fresh = await createUser(db, "new@example.com");
     for (const user of [late, gone, fresh]) {
-      await applyConfirmedEmail(db, user.id, []);
+      await applyConfirmedEmail(db, user.id, [], new Date());
     }
 
     expect([await roleOf(late.id), await roleOf(gone.id), await roleOf(fresh.id)]).toEqual([
@@ -59,6 +69,7 @@ describe("promotion on a confirmed e-mail", () => {
       db,
       { id: admin.id, email: admin.email },
       { email: "x@example.com", role: "member" },
+      new Date(),
     );
     const stored = JSON.stringify(await db.select().from(invites));
     expect(stored).not.toContain(token);
@@ -73,10 +84,13 @@ describe("Clerk sync", () => {
   const profile = { clerkId: "user_1", email: "Ana@Example.com", name: "Ana", image: null };
 
   it("creates the row once, however many times it runs, and promotes on creation", async () => {
-    const first = await upsertClerkUser(db, profile, ["ana@example.com"]);
-    const second = await upsertClerkUser(db, { ...profile, name: "Ana Maria" }, [
-      "ana@example.com",
-    ]);
+    const first = await upsertClerkUser(db, profile, ["ana@example.com"], new Date());
+    const second = await upsertClerkUser(
+      db,
+      { ...profile, name: "Ana Maria" },
+      ["ana@example.com"],
+      new Date(),
+    );
     expect(second).toBe(first);
     const rows = await db.select().from(users);
     expect(rows).toHaveLength(1);
@@ -90,7 +104,7 @@ describe("Clerk sync", () => {
 
   it("links an existing row with the same e-mail instead of duplicating it", async () => {
     const seeded = await createUser(db, "ana@example.com", "admin");
-    expect(await upsertClerkUser(db, profile, [])).toBe(seeded.id);
+    expect(await upsertClerkUser(db, profile, [], new Date())).toBe(seeded.id);
     expect((await db.select().from(users))[0]?.clerkId).toBe("user_1");
   });
 });

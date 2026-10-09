@@ -1,3 +1,4 @@
+import { currentEpochMs } from "@/domain/clock";
 import { env } from "@/lib/env";
 import { createDiskStorage } from "./adapters/disk";
 import type { FileStorage } from "./types";
@@ -12,6 +13,7 @@ const disk = createDiskStorage({
   directory: env.STORAGE_DIR,
   secret: env.FILE_URL_SECRET,
   baseUrl: env.APP_URL,
+  now: currentEpochMs,
 });
 
 async function loadStorage(): Promise<FileStorage> {
@@ -21,7 +23,10 @@ async function loadStorage(): Promise<FileStorage> {
     env.GCS_BUCKET !== undefined
   ) {
     const { createCloudStorage, googleBucket } = await import("./adapters/cloud-storage");
-    return createCloudStorage(googleBucket(env.GCP_CREDENTIALS, env.GCP_PROJECT, env.GCS_BUCKET));
+    return createCloudStorage(
+      googleBucket(env.GCP_CREDENTIALS, env.GCP_PROJECT, env.GCS_BUCKET),
+      currentEpochMs,
+    );
   }
   return disk.storage;
 }

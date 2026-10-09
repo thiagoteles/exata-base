@@ -45,10 +45,10 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 
 **Decisão:** pasta nova `domain/<área>/`, abaixo de `lib`. Fica descartado colocar em `lib/<área>/`, porque mistura com os serviços que usam o banco e um componente cliente pode puxar código de servidor. Fica descartado também um pacote separado no workspace, que é exagero para um único consumidor.
 
-- [ ] Override no `biome.json`: `domain/**` não importa nada de `@/` (nem `lib`, `ports`, `db`, `app`, `components` ou `features`), nem React.
-- [ ] Ajustar a mensagem "lib is the lowest layer". `lib` e componentes podem importar `domain`, e o contrário não.
-- [ ] Linha nova na tabela "Where things go" do `AGENTS.md`.
-- [ ] Relógio e aleatoriedade sempre como parâmetro (`now` e um gerador com semente).
+- [x] Override no `biome.json`: `domain/**` não importa nada de `@/` (nem `lib`, `ports`, `db`, `app`, `components` ou `features`), nem React, Next, zod, Drizzle ou módulos do Node.
+- [x] Ajustar a mensagem "lib is the lowest layer". `lib` e componentes podem importar `domain`, e o contrário não.
+- [x] Linha nova na tabela "Where things go" do `AGENTS.md`.
+- [x] Relógio e aleatoriedade sempre como parâmetro (`now` e um gerador com semente). O módulo de aleatoriedade com semente entra com o primeiro consumidor (o knip recusa código sem uso).
 - [ ] Onde cada coisa vai:
   - cálculo puro em `domain/`;
   - figuras SVG e bolas, que são React, numa família nova em `components/` (por exemplo `components/figures`);
@@ -646,13 +646,13 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 2. Relógio e aleatoriedade
 
-- [ ] Plugin GritQL do Biome barrando `new Date()` sem argumento, `Date.now()` e `Math.random()` em `domain/`, `lib/`, `features/` e `components/`.
-- [ ] Exceções: o módulo de relógio e o de aleatoriedade com semente, ambos em `domain/`.
+- [x] Plugin GritQL do Biome barrando `new Date()` sem argumento, `Date.now()` e `Math.random()` em `domain/`, `lib/`, `features/`, `components/`, `app/` e `proxy.ts`.
+- [x] Exceção: `domain/clock.ts` (`currentInstant`, `currentEpochMs`). As portas de entrada leem o relógio uma vez por ele e passam o instante adiante.
 - [x] **Provado no Biome 2.5.15:** pega as três chamadas, aponta linha e coluna e não custa tempo mensurável no lint. `Date.now` passado como valor também é recusado.
   - Escopo por `plugins` dentro de um `overrides` (com `!` para os testes e as duas exceções). O `includes` por plugin na lista do topo não casa globs de pasta.
   - Não pega `globalThis.Date.now()`, `Date["now"]()` nem desestruturação. Aceitável.
-  - `biome-ignore lint/plugin` silencia a regra: uma conferência do repositório recusa esse comentário.
-- [ ] 11 violações hoje em 9 arquivos, quase todas `now = new Date()` como padrão de parâmetro em `lib/accounts`, `lib/contact`, `lib/client-errors` e nos adapters de storage: tirar o padrão e passar o relógio de quem chama. O `$onUpdate` de `lib/db/columns.ts` passa a usar o `now()` do banco.
+  - `biome-ignore lint/plugin` silencia a regra: um teste de unidade recusa esse comentário em qualquer arquivo versionado. Feito.
+- [x] 11 violações em 9 arquivos, quase todas `now = new Date()` como padrão de parâmetro em `lib/accounts`, `lib/contact`, `lib/client-errors` e nos adapters de storage: tirar o padrão e passar o relógio de quem chama. O `$onUpdate` de `lib/db/columns.ts` passa a usar o `now()` do banco.
 
 ### 3. Convenções do banco
 

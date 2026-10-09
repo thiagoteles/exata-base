@@ -24,6 +24,7 @@ beforeAll(async () => {
     directory,
     secret: "s".repeat(32),
     baseUrl: "http://localhost",
+    now: Date.now,
   }));
 });
 
@@ -106,7 +107,7 @@ describe("account export", () => {
   it("contains nothing of another person", async () => {
     await memberWithData();
     const other = await createUser(db, "caio@example.com");
-    const zip = unzipSync(await exportAccount(db, storage, other.id));
+    const zip = unzipSync(await exportAccount(db, storage, other.id, new Date()));
     const data = JSON.parse(new TextDecoder().decode(zip["data.json"])) as Record<
       string,
       unknown[]

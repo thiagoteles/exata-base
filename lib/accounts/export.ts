@@ -20,7 +20,7 @@ export async function exportAccount(
   db: Database,
   storage: FileStorage,
   userId: string,
-  now: Date = new Date(),
+  now: Date,
 ): Promise<Uint8Array> {
   const tables = await Promise.all(
     exportedData.map(

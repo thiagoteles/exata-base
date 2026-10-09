@@ -221,6 +221,7 @@ describe("working a message", () => {
         id: row.id,
         body: "Oi",
         send: () => Promise.resolve(false),
+        now: new Date(),
       }),
     ).rejects.toThrow("not sent");
     const [stored] = await db.select().from(contactMessages).where(eq(contactMessages.id, row.id));
@@ -239,8 +240,8 @@ describe("working a message", () => {
       return true;
     };
     const results = await Promise.allSettled([
-      replyToContact({ db, actor, id: row.id, body: "Primeira", send }),
-      replyToContact({ db, actor, id: row.id, body: "Segunda", send }),
+      replyToContact({ db, actor, id: row.id, body: "Primeira", send, now: new Date() }),
+      replyToContact({ db, actor, id: row.id, body: "Segunda", send, now: new Date() }),
     ]);
     expect(sent).toBe(1);
     expect(results.map((result) => result.status).sort()).toEqual(["fulfilled", "rejected"]);
@@ -255,6 +256,7 @@ describe("working a message", () => {
       id: row.id,
       body: "Oi",
       send: () => Promise.resolve(true),
+      now: new Date(),
     });
     await db.delete(users).where(eq(users.id, staff.id));
     const [stored] = await db.select().from(contactMessages).where(eq(contactMessages.id, row.id));

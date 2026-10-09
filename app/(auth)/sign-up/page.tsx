@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { currentInstant } from "@/domain/clock";
 import { SignUpForm } from "@/features/auth/sign-up-form";
 import { findPendingInvite } from "@/lib/accounts/invites";
 import { db } from "@/lib/db/client";
@@ -36,7 +37,7 @@ async function SignUpScreen({ searchParams }: Params) {
   const token = firstParam(query["invite"]);
   // Whether an invite has lapsed depends on the clock, which is read at request time only.
   await connection();
-  const invite = token === undefined ? null : await findPendingInvite(db, token, new Date());
+  const invite = token === undefined ? null : await findPendingInvite(db, token, currentInstant());
   if (env.AUTH_PROVIDER === "clerk") {
     return <HostedAuthScreen screen="sign-up" next="/account" email={invite?.email} />;
   }

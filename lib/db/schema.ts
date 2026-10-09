@@ -17,6 +17,7 @@ import { files } from "./schema/files";
 import { invites } from "./schema/invites";
 import { jobRuns } from "./schema/operations";
 import { rateLimits } from "./schema/rate-limits";
+import { referrals } from "./schema/referrals";
 import { userRole, users } from "./schema/users";
 
 /** Every table and enum. A new table is added here and in the personal data registry. */
@@ -42,6 +43,7 @@ export const schema = {
   files,
   rateLimits,
   jobRuns,
+  referrals,
   staffAuditLog,
   accountDeletions,
   deletionRequester,

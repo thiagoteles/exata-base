@@ -9,12 +9,15 @@ import { buttonClasses } from "@/components/ui/styles";
 import { AccessibilityPreferences } from "@/features/account/accessibility-preferences";
 import { DeleteAccount } from "@/features/account/delete-account";
 import { EmailPreferencesPanel } from "@/features/account/email-preferences";
+import { ReferralLink } from "@/features/account/referral-link";
 import { ThemePicker } from "@/features/account/theme-picker";
 import { LanguageSwitcher } from "@/features/language/language-switcher";
 import { db } from "@/lib/db/client";
+import { env } from "@/lib/env";
 import { isMultilingual } from "@/lib/i18n/locales";
 import { requirePageRole } from "@/lib/page-guard";
 import { readPreferences } from "@/lib/preferences/service";
+import { referralSummary } from "@/lib/referral/service";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
@@ -35,7 +38,10 @@ async function AccountContent() {
   const t = await getTranslations("account");
   const user = await requirePageRole("member", "/account");
   // Read fresh: the cached current user can be minutes behind a theme the person just chose.
-  const preferences = await readPreferences(db, user.id);
+  const [preferences, referral] = await Promise.all([
+    readPreferences(db, user.id),
+    referralSummary(db, user.id),
+  ]);
   return (
     <>
       <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
@@ -69,6 +75,13 @@ async function AccountContent() {
             }}
           />
           <p className="max-w-[52ch] text-body-small text-ink-muted">{t("accessibility.help")}</p>
+        </Panel>
+
+        <Panel className="flex flex-col gap-4">
+          <h2 className="text-block-title text-ink">{t("referral.title")}</h2>
+          <p className="max-w-[52ch] text-body-small text-ink-muted">{t("referral.help")}</p>
+          <ReferralLink url={`${env.APP_URL}/?ref=${referral.code}`} />
+          <p className="text-body text-ink">{t("referral.count", { count: referral.invited })}</p>
         </Panel>
 
         <Panel className="flex flex-col gap-4">

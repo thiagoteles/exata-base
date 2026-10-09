@@ -1,5 +1,6 @@
 import { type NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { currentInstant } from "@/domain/clock";
+import { readReferralCode } from "@/domain/referral/rules";
 import { accessRecord } from "@/lib/access-log";
 import { env } from "@/lib/env";
 import { isMultilingual, LOCALE_HEADER } from "@/lib/i18n/locales";
@@ -8,6 +9,7 @@ import { internalPathOf, publicPathOf } from "@/lib/i18n/public-paths";
 import { isMissingPage } from "@/lib/known-pages";
 import { authProxy } from "@/lib/ports/auth/proxy";
 import { logger } from "@/lib/ports/log";
+import { REFERRAL_COOKIE, referralCookieOptions } from "@/lib/referral/cookie";
 import { REQUEST_ID_HEADER, requestIdFrom } from "@/lib/request-id";
 import { buildCsp } from "@/lib/security/csp";
 import { cspSources } from "@/lib/security/sources";
@@ -79,6 +81,11 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
       : NextResponse.next({ request: { headers } });
     response.headers.set(REQUEST_ID_HEADER, requestId);
     response.headers.set("Content-Security-Policy-Report-Only", reportOnlyPolicy);
+    // A visitor who arrives by an inviter's link is remembered until they sign up.
+    const invitedBy = isPageLoad ? readReferralCode(request.nextUrl.searchParams.get("ref")) : null;
+    if (invitedBy !== null) {
+      response.cookies.set(REFERRAL_COOKIE, invitedBy, referralCookieOptions);
+    }
     return decision === null ? response : rememberLocale(response, decision.locale);
   });
 }

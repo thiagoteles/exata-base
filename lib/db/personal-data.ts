@@ -3,6 +3,7 @@ import { accounts, sessions } from "./schema/auth";
 import { payments, plans } from "./schema/billing";
 import { contactMessages } from "./schema/contact";
 import { files } from "./schema/files";
+import { referrals } from "./schema/referrals";
 import { users } from "./schema/users";
 
 /*
@@ -25,4 +26,5 @@ export const exportedData: readonly Exported[] = [
 export const notExportedData: readonly NotExported[] = [
   { table: sessions, reason: "short-lived sign-in sessions, deleted with the account" },
   { table: accounts, reason: "credentials and provider tokens, never handed out" },
+  { table: referrals, reason: "records who invited the person, which names someone else" },
 ];

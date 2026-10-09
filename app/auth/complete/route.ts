@@ -1,10 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { currentInstant } from "@/domain/clock";
 import { afterSignIn } from "@/lib/accounts/sign-in-complete";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
 import { requireUser } from "@/lib/ports/auth";
+import { logger } from "@/lib/ports/log";
 import { savePreference } from "@/lib/preferences/service";
+import { REFERRAL_COOKIE } from "@/lib/referral/cookie";
+import { recordReferral } from "@/lib/referral/service";
 import { signInRedirect } from "@/lib/routes";
 import { ONE_YEAR_SECONDS } from "@/lib/theme";
 import { timedRoute } from "@/lib/timed-route";
@@ -27,6 +31,17 @@ export const GET = timedRoute("/auth/complete", async (request: NextRequest) => 
       await savePreference(db, user.id, key, value);
     }
     const response = NextResponse.redirect(new URL(location, env.APP_URL));
+    // The inviter's link, if this browser arrived by one, is weighed now and then forgotten. It
+    // never stops a sign-in: whatever goes wrong is logged and the person goes on.
+    const invitedBy = request.cookies.get(REFERRAL_COOKIE)?.value;
+    if (invitedBy !== undefined) {
+      await recordReferral(db, {
+        referredId: user.id,
+        rawCode: invitedBy,
+        now: currentInstant(),
+      }).catch((error: unknown) => logger.warn("referral not recorded", { error }));
+      response.cookies.delete(REFERRAL_COOKIE);
+    }
     for (const { name, value } of cookies) {
       if (value === null) {
         response.cookies.delete(name);

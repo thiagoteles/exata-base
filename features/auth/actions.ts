@@ -1,12 +1,18 @@
 "use server";
 
+import { cookies } from "next/headers";
+import { currentInstant } from "@/domain/clock";
 import { publicAction } from "@/lib/actions/client";
+import { db } from "@/lib/db/client";
 import {
   requestPasswordReset,
   resetPassword,
   signInWithPassword,
   signUpWithPassword,
 } from "@/lib/ports/auth";
+import { logger } from "@/lib/ports/log";
+import { REFERRAL_COOKIE } from "@/lib/referral/cookie";
+import { recordReferralForEmail } from "@/lib/referral/service";
 import { safeReturnPath } from "@/lib/routes";
 import { z } from "@/lib/validation";
 import { forgotPasswordSchema, resetPasswordSchema, signInSchema, signUpSchema } from "./schemas";
@@ -26,6 +32,15 @@ export const signUp = publicAction
   .metadata({ name: "signUp" })
   .action(async ({ parsedInput }) => {
     await signUpWithPassword(parsedInput);
+    // The confirmation link may be opened on another device, where the inviter's link was never
+    // followed, so the invitation is recorded here, in the browser that arrived by it.
+    const jar = await cookies();
+    await recordReferralForEmail(db, {
+      email: parsedInput.email,
+      rawCode: jar.get(REFERRAL_COOKIE)?.value,
+      now: currentInstant(),
+    }).catch((error: unknown) => logger.warn("referral not recorded", { error }));
+    jar.delete(REFERRAL_COOKIE);
     return { email: parsedInput.email };
   });
 

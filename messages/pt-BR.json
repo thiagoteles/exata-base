@@ -525,6 +525,14 @@
       "always": "Mensagens sobre a sua conta e os seus pagamentos, como o link de confirmação e os recibos, são sempre enviadas.",
       "failed": "Não foi possível salvar a sua escolha de e-mails."
     },
+    "referral": {
+      "title": "Convide pessoas",
+      "help": "Quem criar uma conta pelo seu link fica registrado como indicado por você.",
+      "linkLabel": "Seu link",
+      "copy": "Copiar link",
+      "copied": "Link copiado.",
+      "count": "{count, plural, =0 {Ninguém criou conta pelo seu link ainda.} one {# pessoa criou conta pelo seu link.} other {# pessoas criaram conta pelo seu link.}}"
+    },
     "data": {
       "title": "Seus dados",
       "body": "Baixe um arquivo com tudo o que guardamos sobre você: seus dados e os arquivos que você enviou.",

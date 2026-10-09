@@ -75,9 +75,11 @@ test("the data export is a ZIP with the person's own data", async ({ page }) => 
   const zip = unzipSync(new Uint8Array(readFileSync(path)));
   const data = JSON.parse(new TextDecoder().decode(zip["data.json"])) as {
     user: { email: string }[];
+    payments: unknown[];
     version: number;
   };
-  expect(data.version).toBe(1);
+  expect(data.version).toBe(2);
+  expect(data.payments).toEqual([]);
   expect(data.user.map((row) => row.email)).toEqual([email]);
 });
 

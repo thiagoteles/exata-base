@@ -265,9 +265,9 @@ A documentação do Stripe diz que uma conta Stripe brasileira aceita Pix **só 
 
 ### 7. Checkout, paywall e conversão
 
-- [ ] Tabela `checkout_sessions` (aberto, pago, expirado) com a origem e a variante do paywall.
+- [ ] Tabela `checkout_sessions` (aberto, pago, expirado) com a origem do paywall.
 - [ ] Operação diária de e-mail de checkout abandonado.
-- [ ] Eventos de paywall e checkout (exibição, clique, conversão) e A/B de variante.
+- [ ] Eventos de paywall e checkout (exibição, clique, conversão).
 
 ### 8. Cupons e créditos
 
@@ -314,7 +314,7 @@ A documentação do Stripe diz que uma conta Stripe brasileira aceita Pix **só 
   - ~~não há envio pelo servidor~~ (port `analytics`);
   - ~~não há funil padrão~~ (declarado e emitido);
   - não há números de negócio;
-  - não há experimentos.
+  - ~~não há experimentos~~ (decidido: fora da base).
 
 ### 1. Error Reporting do GCP no lugar do Sentry
 
@@ -408,20 +408,18 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 12. Experimentos
 
-- [ ] `variantOf(experiment, subjectId)` determinístico por hash, em `domain/`, sem tabela.
-- [ ] A exposição registrada como evento.
-- [ ] Visitante anônimo com um cookie próprio de id aleatório, declarado na política de privacidade.
-- [ ] Atende o A/B do paywall da cobrança.
+**Decisão:** fora da base. Os produtos não fazem testes A/B com pessoas, então não há `variantOf`, evento de exposição nem cookie de visitante.
 
 ### LGPD
 
-- [ ] Umami continua sem cookie, recebendo só o id interno.
-- [ ] Pixels de anúncio (Meta, Google Ads) ficam fora da base, porque exigiriam consentimento e um banner.
+- [x] Umami continua sem cookie, recebendo só o id interno (o catálogo recusa propriedade com nome de dado pessoal).
+- [x] Pixels de anúncio (Meta, Google Ads) ficam fora da base, porque exigiriam consentimento e um banner.
 
 ### Decisões
 
 - Error Reporting do GCP como substituto do Sentry.
 - Sem tradução de source maps.
+- Sem experimentos A/B.
 - Log de acesso do Marco Civil na base, opcional por flag.
 
 ### Ordem
@@ -431,7 +429,7 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 3. Log de acesso do Marco Civil, atrás da flag.
 4. Catálogo tipado de eventos, port do servidor e funil padrão.
 5. Página "Números" e painel "Saúde".
-6. Web Vitals e experimentos.
+6. Web Vitals.
 
 ## SEO
 

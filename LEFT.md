@@ -726,15 +726,15 @@ Hoje não há nenhum cabeçalho de segurança.
 
 Hoje há o backup agendado do Coolify. A restauração nunca foi provada, e não há backup dos arquivos enviados.
 
-- [ ] Roteiro de restauração no README, com os passos testados.
-- [ ] Script de ensaio:
+- [x] Roteiro de restauração no README, com os passos testados.
+- [x] Script de ensaio (`pnpm restore:drill`, provado com um dump real e recusando um dump vazio):
   - restaura o último dump num Postgres descartável;
   - roda as migrações e contagens de sanidade;
   - roda uma vez por mês, no CI ou à mão.
-- [ ] Versionamento ou *soft delete* no bucket GCS dos arquivos.
-- [ ] **Decisão:** backup diário, com a retenção escolhida pelo produto (padrão de 7 dias). Perde no máximo um dia.
-- [ ] O `setup:product` pergunta a retenção e escreve o valor no README (configuração do backup agendado do Coolify) e na política de privacidade.
-- [ ] LGPD: depois de qualquer restauração, um script reaplica as exclusões registradas na auditoria desde a data do dump.
+- [x] Versionamento ou *soft delete* no bucket GCS dos arquivos (comando no README; aplicar é do operador).
+- [x] **Decisão:** backup diário, com a retenção escolhida pelo produto (padrão de 7 dias). Perde no máximo um dia.
+- [ ] O `setup:product` pergunta a retenção e escreve o valor no README e na política de privacidade. Hoje o README diz o padrão de 7 dias e a configuração é feita à mão no Coolify.
+- [x] LGPD: depois de qualquer restauração, `pnpm restore:reapply` reaplica as exclusões feitas desde o backup. A trilha do banco restaurado não as tem, então cada exclusão também vai para o log (`account deleted`), de onde os ids podem ser tirados se o banco antigo se perdeu.
 
 ### 4. Estratégia de testes do domínio
 

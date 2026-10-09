@@ -100,6 +100,17 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `GOOGLE_SITE_VERIFICATION` | no | The token of Search Console's meta tag method; shown on the home page |
 | `UPLOAD_MAX_MB`, `UPLOAD_TYPES` | no | Upload limit (10) and accepted types |
 
+## Backup and restore
+
+The database is backed up by the hosting platform: in Coolify, a scheduled backup of the Postgres resource, once a day. Keep it for the period your privacy policy promises (7 days unless the product says otherwise): a longer one keeps deleted people's data longer. Files are not in that backup; on Cloud Storage, turn on soft delete for the bucket (`gcloud storage buckets update gs://BUCKET --soft-delete-duration=7d`).
+
+**Drill, once a month.** `pnpm restore:drill path/to/backup.dmp` restores the file into a throwaway Postgres, applies the migrations it lacks and counts every table; it fails when the copy has no users. It reads the custom format Coolify writes and plain SQL, gzipped or not.
+
+**Restoring for real.**
+1. Restore the backup into a new Postgres resource and point the app's `DATABASE_URL` at it. The app migrates it on start.
+2. Accounts deleted after the backup was taken are back. List their former ids: from the failed database, `select former_user_id from account_deletions where created_at > '<backup time>'`; if it is gone, from Cloud Logging, the lines whose message is `account deleted` (`jsonPayload.formerUserId`).
+3. Put one id per line in a file and run `APP_URL=... CRON_SECRET=... pnpm restore:reapply ids.txt`. The app deletes each again with its usual steps and records it in the deletion trail as the restore.
+
 ## Daily operations
 
 `/events` runs every operation in `lib/daily/registry.ts`, one at a time. One failing is logged and does not stop the others. Each operation is idempotent, so running the call twice is safe. The first one deletes invites that were never accepted and expired more than 30 days ago; the second deletes the rate limit counters of windows that already ended. A new one is a new entry in the registry (see the `new-daily-operation` skill), never a new route.

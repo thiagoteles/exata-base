@@ -63,6 +63,10 @@ export async function deleteAccount(
     return owned.map(({ key }) => key);
   });
 
+  // Kept outside the database too: a backup restored to an earlier day would lose the trail of
+  // deletions made since, and this line is what lets them be reapplied.
+  steps.logger.info("account deleted", { formerUserId: user.id, requestedBy: request.requestedBy });
+
   const storage = await steps.storage();
   await Promise.all(
     storageKeys.map((key) =>

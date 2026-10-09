@@ -160,6 +160,27 @@ async function applyEvent(
     case "checkout_paid":
       await applyCheckout(tx, event, cancel);
       return null;
+    case "checkout_pending":
+      // Only an account with nothing paid waits: a person who already has a plan keeps it, and the
+      // payment that arrives later replaces it as any purchase does.
+      await tx
+        .update(plans)
+        .set({
+          status: "pending",
+          provider: event.provider,
+          priceKey: `${catalog.paidTier}.${event.interval}`,
+        })
+        .where(and(eq(plans.userId, event.userId), eq(plans.tier, "free")));
+      return null;
+    case "checkout_failed":
+      // What was waiting is not coming: the account is an ordinary free one again.
+      await tx
+        .update(plans)
+        .set({ status: "active", provider: null, priceKey: null })
+        .where(
+          and(eq(plans.userId, event.userId), eq(plans.tier, "free"), eq(plans.status, "pending")),
+        );
+      return null;
     case "invoice_paid":
       await tx
         .update(plans)

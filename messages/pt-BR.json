@@ -917,6 +917,7 @@
       "yearly_once": "Anual avulso",
       "lifetime": "Vitalício"
     },
+    "awaiting": "Aguardando pagamento",
     "buy": "Assinar",
     "buyOnce": "Comprar um ano",
     "buyLifetime": "Comprar",
@@ -946,6 +947,7 @@
     },
     "statuses": {
       "free": "Gratuito",
+      "pending": "Aguardando pagamento",
       "active": "Ativo",
       "pastDue": "Pagamento pendente",
       "endsSoon": "Termina no fim do período",
@@ -975,6 +977,7 @@
       "done": "Assinatura mantida."
     },
     "canceled": "Cancelamento agendado.",
+    "pending": "Seu pagamento ainda não foi confirmado. Pagamentos por Pix e boleto podem levar alguns minutos, e o plano começa assim que o dinheiro chega. Se o código expirar, é só tentar de novo.",
     "validUntil": "Vale até",
     "renewsOn": "Renova em",
     "endsOn": "Acesso até"

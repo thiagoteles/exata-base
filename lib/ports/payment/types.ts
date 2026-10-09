@@ -17,6 +17,10 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
       /** When the provider confirmed the checkout, which is when a fixed term starts. */
       paidAt: Date;
     }
+  /** The checkout was completed but the money has not arrived (Pix, a bank slip): nothing is granted yet. */
+  | { kind: "checkout_pending"; userId: string; interval: Interval }
+  /** A pending payment will not arrive: the code expired, or the bank refused it. */
+  | { kind: "checkout_failed"; userId: string }
   | { kind: "invoice_paid"; subscriptionId: string; periodEnd: Date | null }
   | { kind: "invoice_failed"; subscriptionId: string }
   | { kind: "subscription_deleted"; subscriptionId: string }

@@ -75,6 +75,44 @@ export default async function PlansPage() {
   );
 }
 
+type ActionContext = {
+  interval: Interval;
+  user: Awaited<ReturnType<typeof getCurrentUser>>;
+  plan: Awaited<ReturnType<typeof readPlan>>;
+  currency: string;
+  t: Awaited<ReturnType<typeof getTranslations<"plans">>>;
+};
+
+/** What a person can do about one way of buying: sign in, see it is theirs, wait for it, or buy it. */
+function intervalAction({ interval, user, plan, currency, t }: ActionContext) {
+  if (user === null) {
+    return (
+      <Link
+        href={signInRedirect(publicHref("/plans"), "") as never}
+        className={buttonClasses("primary")}
+      >
+        {t("signIn")}
+      </Link>
+    );
+  }
+  if (plan !== null && isPaidTier(plan.tier) && plan.billingInterval === interval) {
+    return <Stamp tone="success">{t("current")}</Stamp>;
+  }
+  if (plan?.status === "pending" && plan.priceKey === `${catalog.paidTier}.${interval}`) {
+    return <Stamp tone="info">{t("awaiting")}</Stamp>;
+  }
+  if (!canBuy(plan, interval)) {
+    return null;
+  }
+  return (
+    <BuyButton
+      interval={interval}
+      currency={currency}
+      replacesSubscription={interval === "lifetime" && subscriptionOf(plan) !== null}
+    />
+  );
+}
+
 async function Offers() {
   const t = await getTranslations("plans");
   const [intervals, prices, user] = await Promise.all([
@@ -101,32 +139,6 @@ async function Offers() {
   if (shown.length === 0) {
     return <p className="text-body text-ink-muted">{t("none")}</p>;
   }
-
-  const action = (interval: Interval) => {
-    if (user === null) {
-      return (
-        <Link
-          href={signInRedirect(publicHref("/plans"), "") as never}
-          className={buttonClasses("primary")}
-        >
-          {t("signIn")}
-        </Link>
-      );
-    }
-    if (plan !== null && isPaidTier(plan.tier) && plan.billingInterval === interval) {
-      return <Stamp tone="success">{t("current")}</Stamp>;
-    }
-    if (!canBuy(plan, interval)) {
-      return null;
-    }
-    return (
-      <BuyButton
-        interval={interval}
-        currency={currency}
-        replacesSubscription={interval === "lifetime" && subscriptionOf(plan) !== null}
-      />
-    );
-  };
 
   const inCurrency = (price: PriceTag) => priceIn(price, currency);
   const freeHas = featuresOfTier("free");
@@ -156,7 +168,7 @@ async function Offers() {
           highlighted: interval === highlighted,
           ...(note === undefined ? {} : { note }),
           has: features.map((feature) => paidHas.has(feature)),
-          action: action(interval),
+          action: intervalAction({ interval, user, plan, currency, t }),
         },
       ];
     }),

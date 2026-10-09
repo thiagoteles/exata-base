@@ -53,6 +53,11 @@ async function PlanContent({ searchParams }: Props) {
             <p className="text-body text-ink">{t("confirming")}</p>
           </Panel>
         ) : null}
+        {state === "pending" ? (
+          <Panel tone="info" role="status">
+            <p className="max-w-[60ch] text-body text-ink">{t("pending")}</p>
+          </Panel>
+        ) : null}
         {state === "pastDue" ? (
           <Panel role="alert" className="border-warning-ink">
             <p className="max-w-[60ch] text-body text-ink">{t("pastDue")}</p>

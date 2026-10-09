@@ -7,6 +7,7 @@ import { testDatabase } from "./database";
 import { createUser } from "./factories";
 import {
   checkoutCompleted,
+  checkoutFailed,
   invoiceEvent,
   priceChanged,
   sign,
@@ -215,5 +216,84 @@ describe("a price that changes at the provider", () => {
       const { body, signature } = sign(priceChanged(`evt_${type}`, type));
       expect(gateway.readEvent(body, signature)).toMatchObject({ kind: "prices_changed", type });
     }
+  });
+});
+
+describe("a payment that has not arrived yet", () => {
+  async function waiting(email: string) {
+    const person = await createUser(db, email);
+    await deliver(
+      checkoutCompleted(`evt_wait_${person.id}`, {
+        userId: person.id,
+        interval: "yearly_once",
+        paymentStatus: "unpaid",
+      }),
+    );
+    return person;
+  }
+
+  it("is recorded as waiting, grants nothing, and remembers what is being bought", async () => {
+    const ana = await waiting("ana@example.com");
+    expect(await readPlan(db, ana.id)).toMatchObject({
+      tier: "free",
+      status: "pending",
+      priceKey: "paid.yearly_once",
+      billingInterval: null,
+    });
+    const now = new Date();
+    expect((await entitlementsFor(db, { kind: "user", id: ana.id }, now)).tier).toBe("free");
+  });
+
+  it("becomes the plan when the money arrives", async () => {
+    const ana = await waiting("ana@example.com");
+    await deliver(
+      checkoutCompleted(
+        "evt_ok",
+        { userId: ana.id, interval: "yearly_once" },
+        "checkout.session.async_payment_succeeded",
+      ),
+    );
+    expect(await readPlan(db, ana.id)).toMatchObject({
+      tier: "paid",
+      status: "active",
+      billingInterval: "yearly_once",
+    });
+  });
+
+  it("goes back to an ordinary free account when the payment fails or the session runs out", async () => {
+    for (const type of [
+      "checkout.session.async_payment_failed",
+      "checkout.session.expired",
+    ] as const) {
+      const person = await waiting(`${type}@example.com`);
+      await deliver(checkoutFailed(`evt_fail_${type}`, person.id, type));
+      expect(await readPlan(db, person.id)).toMatchObject({
+        tier: "free",
+        status: "active",
+        priceKey: null,
+        provider: null,
+      });
+    }
+  });
+
+  it("never takes anything from a person who already has a plan", async () => {
+    const paying = await subscriber("paga@example.com");
+    await deliver(
+      checkoutCompleted("evt_wait_paid", {
+        userId: paying.id,
+        interval: "yearly_once",
+        paymentStatus: "unpaid",
+      }),
+    );
+    expect(await readPlan(db, paying.id)).toMatchObject({ tier: "paid", status: "active" });
+    await deliver(checkoutFailed("evt_fail_paid", paying.id));
+    expect(await readPlan(db, paying.id)).toMatchObject({ tier: "paid", status: "active" });
+  });
+
+  it("is told only once when the same failure is delivered twice", async () => {
+    const ana = await waiting("ana@example.com");
+    await deliver(checkoutFailed("evt_same", ana.id));
+    const again = await deliver(checkoutFailed("evt_same", ana.id));
+    expect(again.result).toBe("duplicate");
   });
 });

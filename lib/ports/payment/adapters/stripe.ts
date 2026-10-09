@@ -26,11 +26,13 @@ function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): P
   const base = { id: event.id, type: event.type, provider: "stripe" as const };
   const interval = session.metadata?.["interval"];
   const userId = session.client_reference_id;
-  // An asynchronous payment (such as a bank slip) completes the session before the money arrives;
-  // the matching succeeded event is the one that grants the plan.
-  const waiting = session.payment_status === "unpaid";
-  if (waiting || userId === null || !isInterval(interval)) {
+  if (userId === null || !isInterval(interval)) {
     return { ...base, kind: "ignored" };
+  }
+  // An asynchronous payment (Pix, a bank slip) completes the session before the money arrives. It is
+  // recorded as waiting; the matching succeeded event is the one that grants the plan.
+  if (session.payment_status === "unpaid") {
+    return { ...base, kind: "checkout_pending", userId, interval };
   }
   return {
     ...base,
@@ -86,6 +88,13 @@ function toPaymentEvent(event: Stripe.Event): PaymentEvent {
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded":
       return checkoutEvent(event, event.data.object);
+    case "checkout.session.async_payment_failed":
+    case "checkout.session.expired": {
+      const userId = event.data.object.client_reference_id;
+      return userId === null
+        ? { ...base, kind: "ignored" }
+        : { ...base, kind: "checkout_failed", userId };
+    }
     case "invoice.payment_succeeded":
       return invoiceEvent(event, event.data.object, "invoice_paid");
     case "invoice.payment_failed":

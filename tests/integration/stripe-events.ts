@@ -102,3 +102,19 @@ export const priceChanged = (
   id: string,
   type: "price.created" | "price.updated" | "price.deleted",
 ) => event(id, type, { id: "price_1", object: "price", lookup_key: "paid_monthly" });
+
+/** The session ended without payment: the Pix code expired or the bank refused it, or it timed out. */
+export const checkoutFailed = (
+  id: string,
+  userId: string,
+  type:
+    | "checkout.session.async_payment_failed"
+    | "checkout.session.expired" = "checkout.session.async_payment_failed",
+) =>
+  event(id, type, {
+    id: `cs_${id}`,
+    object: "checkout.session",
+    client_reference_id: userId,
+    metadata: { interval: "yearly_once" },
+    payment_status: "unpaid",
+  });

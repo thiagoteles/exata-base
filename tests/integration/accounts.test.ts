@@ -171,14 +171,26 @@ describe("preferences in the options column", () => {
 
   it("reads every preference as a valid value: the saved one, or the fallback when it is missing or stale", async () => {
     const user = await createUser(db, "ana@example.com");
-    expect(await readPreferences(db, user.id)).toEqual({ theme: "system", locale: "pt-BR" });
+    expect(await readPreferences(db, user.id)).toEqual({
+      theme: "system",
+      timeZone: "America/Sao_Paulo",
+      locale: "pt-BR",
+    });
     await db
       .update(users)
       .set({ options: { theme: "sepia", locale: "xx-XX", removedOption: true } })
       .where(eq(users.id, user.id));
-    expect(await readPreferences(db, user.id)).toEqual({ theme: "system", locale: "pt-BR" });
+    expect(await readPreferences(db, user.id)).toEqual({
+      theme: "system",
+      timeZone: "America/Sao_Paulo",
+      locale: "pt-BR",
+    });
     await savePreference(db, user.id, "theme", "dark");
-    expect(await readPreferences(db, user.id)).toEqual({ theme: "dark", locale: "pt-BR" });
+    expect(await readPreferences(db, user.id)).toEqual({
+      theme: "dark",
+      timeZone: "America/Sao_Paulo",
+      locale: "pt-BR",
+    });
   });
 
   it("changes only the person it is asked to change", async () => {

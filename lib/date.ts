@@ -1,8 +1,10 @@
+import { dateInZone as calendarDate } from "@/domain/calendar";
 import { timeZone } from "@/lib/i18n/locales";
 
 /*
  * Two kinds of time. A calendar date (a birthday, a due date) is an ISO `YYYY-MM-DD` string with
- * no time zone. An instant is a Date stored as timestamptz and shown in America/Sao_Paulo.
+ * no time zone. An instant is a Date stored as timestamptz and shown in a time zone: the person's
+ * when the screen is theirs, America/Sao_Paulo otherwise.
  * Both are written `dd/mm/aaaa` on screen.
  */
 
@@ -37,19 +39,17 @@ export function formatDate(value: IsoDate): string {
   return `${day}/${month}/${year}`;
 }
 
-const saoPauloDay = new Intl.DateTimeFormat("en-CA", {
-  timeZone,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-/** The calendar date an instant falls on in America/Sao_Paulo. */
-export function dateInSaoPaulo(instant: Date): IsoDate {
-  return saoPauloDay.format(instant) as IsoDate;
+/** The calendar date an instant falls on in a time zone, the product's own unless one is given. */
+function dateInZone(instant: Date, zone: string = timeZone): IsoDate {
+  return calendarDate(instant, zone) as IsoDate;
 }
 
-/** An instant written as `dd/mm/aaaa` in America/Sao_Paulo. */
-export function formatInstantDate(instant: Date): string {
-  return formatDate(dateInSaoPaulo(instant));
+/** The calendar date an instant falls on in America/Sao_Paulo, the product's own zone. */
+export function dateInSaoPaulo(instant: Date): IsoDate {
+  return dateInZone(instant, timeZone);
+}
+
+/** An instant written as `dd/mm/aaaa`, in the person's time zone when the screen knows it. */
+export function formatInstantDate(instant: Date, zone: string = timeZone): string {
+  return formatDate(dateInZone(instant, zone));
 }

@@ -6,6 +6,7 @@ import { ListSkeleton } from "@/components/patterns/list-states";
 import { PageHeader } from "@/components/patterns/page-header";
 import { ContactList } from "@/features/contact/contact-list";
 import { requirePageRole } from "@/lib/page-guard";
+import { resolvePreferences } from "@/lib/preferences/resolve";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("inbox");
@@ -30,7 +31,12 @@ async function Inbox({ searchParams }: Props) {
   return (
     <>
       <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
-      <ContactList viewer={user} scope="all" searchParams={searchParams} />
+      <ContactList
+        viewer={user}
+        scope="all"
+        timeZone={resolvePreferences(user.options).timeZone}
+        searchParams={searchParams}
+      />
     </>
   );
 }

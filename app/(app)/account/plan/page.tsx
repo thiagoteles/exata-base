@@ -17,6 +17,7 @@ import { db } from "@/lib/db/client";
 import { publicHref } from "@/lib/i18n/public-paths";
 import { requirePageRole } from "@/lib/page-guard";
 import { paymentGateway } from "@/lib/ports/payment";
+import { resolvePreferences } from "@/lib/preferences/resolve";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("plan");
@@ -56,14 +57,14 @@ async function PlanContent({ searchParams }: Props) {
             <p className="max-w-[60ch] text-body text-ink">{t("pastDue")}</p>
           </Panel>
         ) : null}
-        <PlanRecord plan={plan} />
+        <PlanRecord plan={plan} timeZone={resolvePreferences(user.options).timeZone} />
         <PlanActions plan={plan} />
       </div>
     </>
   );
 }
 
-async function PlanRecord({ plan }: { plan: Plan | null }) {
+async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: string }) {
   const t = await getTranslations("plan");
   const state = planState(plan);
   const paid = plan !== null && isPaidTier(plan.tier);
@@ -83,7 +84,7 @@ async function PlanRecord({ plan }: { plan: Plan | null }) {
       {plan?.currentPeriodEnd ? (
         <RecordCell label={t(plan.cancelAtPeriodEnd ? "endsOn" : "renewsOn")}>
           <span className="font-mono text-data tabular-nums">
-            {formatInstantDate(plan.currentPeriodEnd)}
+            {formatInstantDate(plan.currentPeriodEnd, timeZone)}
           </span>
         </RecordCell>
       ) : null}

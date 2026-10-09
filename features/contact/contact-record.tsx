@@ -16,9 +16,12 @@ import { StatusControl } from "./status-control";
 export async function ContactRecord({
   message,
   canManage,
+  timeZone,
 }: {
   message: ContactRow;
   canManage: boolean;
+  /** The reader's own, so the dates are the days they lived. */
+  timeZone: string;
 }) {
   const [t, contact] = await Promise.all([getTranslations("record"), getTranslations("contact")]);
   const answered = message.replyBody !== null;
@@ -39,7 +42,7 @@ export async function ContactRecord({
         <RecordCell label={t("subject")}>{contact(`subjects.${message.subject}`)}</RecordCell>
         <RecordCell label={t("received")}>
           <span className="font-mono text-data tabular-nums">
-            {formatInstantDate(message.createdAt)}
+            {formatInstantDate(message.createdAt, timeZone)}
           </span>
         </RecordCell>
         <RecordCell label={t("message")} wide>
@@ -55,7 +58,7 @@ export async function ContactRecord({
             <p className="text-body-small text-ink-muted">
               {t("answeredBy", {
                 name: message.answeredByEmail ?? t("unknownPerson"),
-                date: formatInstantDate(message.answeredAt),
+                date: formatInstantDate(message.answeredAt, timeZone),
               })}
             </p>
           </>

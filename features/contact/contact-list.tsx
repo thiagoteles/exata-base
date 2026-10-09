@@ -47,11 +47,13 @@ type ContactListProps = {
   viewer: Viewer;
   /** `all` is the team's inbox; `mine` is the messages the viewer wrote. */
   scope: Scope;
+  /** The reader's own, so the dates are the days they lived. */
+  timeZone: string;
   searchParams: Promise<SearchParams>;
 };
 
 /** The contact list for either audience: the same table, filtered by who is looking. */
-export async function ContactList({ viewer, scope, searchParams }: ContactListProps) {
+export async function ContactList({ viewer, scope, timeZone, searchParams }: ContactListProps) {
   const [t, tContact, tMine] = await Promise.all([
     getTranslations("inbox"),
     getTranslations("contact"),
@@ -90,7 +92,7 @@ export async function ContactList({ viewer, scope, searchParams }: ContactListPr
       key: "date",
       header: t("date"),
       numeric: true,
-      cell: (row) => formatInstantDate(row.createdAt),
+      cell: (row) => formatInstantDate(row.createdAt, timeZone),
     },
   ];
 

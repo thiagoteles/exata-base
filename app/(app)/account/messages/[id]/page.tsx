@@ -8,6 +8,7 @@ import { ContactRecord } from "@/features/contact/contact-record";
 import { getContact } from "@/lib/contact/service";
 import { db } from "@/lib/db/client";
 import { requirePageRole } from "@/lib/page-guard";
+import { resolvePreferences } from "@/lib/preferences/resolve";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("myMessages");
@@ -36,7 +37,11 @@ async function Record({ params }: Pick<PageProps<"/account/messages/[id]">, "par
   return (
     <>
       <PageHeader title={t("title")} />
-      <ContactRecord message={message} canManage={false} />
+      <ContactRecord
+        message={message}
+        canManage={false}
+        timeZone={resolvePreferences(user.options).timeZone}
+      />
     </>
   );
 }

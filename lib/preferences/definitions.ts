@@ -1,4 +1,5 @@
-import { defaultLocale, LOCALE_COOKIE, locales } from "@/lib/i18n/locales";
+import { isTimeZone } from "@/domain/calendar";
+import { defaultLocale, LOCALE_COOKIE, locales, timeZone } from "@/lib/i18n/locales";
 import { THEME_COOKIE, themes } from "@/lib/theme";
 import { z } from "@/lib/validation";
 
@@ -32,6 +33,11 @@ export const preferences = {
       encode: (value) => (value === "system" ? null : value),
       decode: (raw) => raw,
     },
+  }),
+  // Reported by the browser at sign-in and when it changes; a person who travels follows the clock.
+  timeZone: definePreference<string>({
+    schema: z.string().refine(isTimeZone),
+    fallback: timeZone,
   }),
   locale: definePreference<(typeof locales)[number]>({
     schema: z.enum(locales),

@@ -52,4 +52,11 @@ describe("instants in America/Sao_Paulo", () => {
   it("show late evening in São Paulo as that same day", () => {
     expect(formatInstantDate(new Date("2025-01-01T02:30:00Z"))).toBe("31/12/2024");
   });
+
+  it("show the day of the person's own zone when the screen knows it", () => {
+    const instant = new Date("2025-01-01T02:30:00Z");
+    expect(formatInstantDate(instant, "Asia/Tokyo")).toBe("01/01/2025");
+    expect(formatInstantDate(instant, "America/Sao_Paulo")).toBe("31/12/2024");
+    expect(formatInstantDate(instant, "UTC")).toBe("01/01/2025");
+  });
 });

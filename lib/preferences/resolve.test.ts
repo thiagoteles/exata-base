@@ -27,10 +27,15 @@ describe("the preference registry", () => {
 
 describe("resolving what is stored", () => {
   it("uses the saved value, the fallback when there is none, and the fallback for a stale one", () => {
-    expect(resolvePreferences({})).toEqual({ theme: "system", locale: "pt-BR" });
-    expect(resolvePreferences({ theme: "dark" }).theme).toBe("dark");
-    expect(resolvePreferences({ theme: "sepia", locale: 3 })).toEqual({
+    expect(resolvePreferences({})).toEqual({
       theme: "system",
+      timeZone: "America/Sao_Paulo",
+      locale: "pt-BR",
+    });
+    expect(resolvePreferences({ theme: "dark" }).theme).toBe("dark");
+    expect(resolvePreferences({ theme: "sepia", locale: 3, timeZone: "Mars/Base" })).toEqual({
+      theme: "system",
+      timeZone: "America/Sao_Paulo",
       locale: "pt-BR",
     });
     expect(savedPreference({ theme: "sepia" }, "theme")).toBeUndefined();
@@ -47,6 +52,14 @@ describe("resolving what is stored", () => {
     expect(cookieFor("theme", "dark")).toEqual({ name: "theme", value: "dark" });
     expect(cookieFor("theme", "system")).toEqual({ name: "theme", value: null });
     expect(cookieFor("locale", "pt-BR")).toEqual({ name: "NEXT_LOCALE", value: "pt-BR" });
+  });
+
+  it("takes the person's time zone only if it is one, and falls back to the product's", () => {
+    expect(resolvePreferences({ timeZone: "Asia/Tokyo" }).timeZone).toBe("Asia/Tokyo");
+    expect(resolvePreferences({ timeZone: "Asia/Nowhere" }).timeZone).toBe("America/Sao_Paulo");
+    expect(parsePreference("timeZone", "UTC")).toBe("UTC");
+    expect(() => parsePreference("timeZone", "../etc/passwd")).toThrow();
+    expect(() => parsePreference("timeZone", 3)).toThrow();
   });
 
   it("checks a value from outside, and refuses one that does not fit", () => {

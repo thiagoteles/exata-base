@@ -4,10 +4,12 @@ import { BottomBar } from "@/components/shell/bottom-bar";
 import type { ShellGroup, ShellItem } from "@/components/shell/nav-types";
 import { Sidebar } from "@/components/shell/sidebar";
 import { UserMenu } from "@/components/shell/user-menu";
+import { ReportTimeZone } from "@/features/account/report-time-zone";
 import { env } from "@/lib/env";
 import { groupNav, type NavItem, splitForBar, visibleNav } from "@/lib/navigation";
 import { getCurrentUser } from "@/lib/ports/auth";
 import { SignOutControl } from "@/lib/ports/auth/screens";
+import { resolvePreferences } from "@/lib/preferences/resolve";
 
 /*
  * The parts of the shell that depend on who is signed in. Each reads the session, so each sits
@@ -69,6 +71,7 @@ export async function UserMenuSlot() {
   }
   return (
     <>
+      <ReportTimeZone saved={resolvePreferences(user.options).timeZone} />
       {env.UMAMI_WEBSITE_ID === undefined ? null : <IdentifyAccount accountId={user.id} />}
       <UserMenu
         name={user.name}

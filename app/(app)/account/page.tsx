@@ -44,6 +44,9 @@ async function AccountContent() {
           </RecordCell>
           <RecordCell label={t("profile.email")}>{user.email}</RecordCell>
           <RecordCell label={t("profile.role")}>{t(`roles.${user.role}`)}</RecordCell>
+          <RecordCell label={t("profile.timeZone")}>
+            <span className="font-mono text-data">{preferences.timeZone}</span>
+          </RecordCell>
         </RecordGrid>
 
         <Panel className="flex flex-col gap-4">

@@ -26,6 +26,8 @@ export default defineConfig({
     baseURL: "http://localhost:3300",
     // The product speaks Portuguese; the browser asks for it like a person in Brazil would.
     locale: "pt-BR",
+    // The product's own zone, so no test reports a time zone unless it means to.
+    timezoneId: "America/Sao_Paulo",
     trace: "retain-on-failure",
   },
   projects: [

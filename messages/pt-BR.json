@@ -470,6 +470,7 @@
       "name": "Nome",
       "email": "E-mail",
       "role": "Papel",
+      "timeZone": "Fuso horário",
       "noName": "Não informado"
     },
     "roles": {

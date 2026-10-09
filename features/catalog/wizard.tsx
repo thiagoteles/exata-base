@@ -5,6 +5,7 @@ import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Button } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
+import { Stepper } from "@/components/ui/stepper";
 import { formatDate, type IsoDate } from "@/lib/date";
 import { maskCep, maskCpf } from "@/lib/masks";
 import { formatBRL, toCents } from "@/lib/money";
@@ -15,23 +16,15 @@ import { AddressStep, DataStep, ValueStep } from "./wizard-steps";
 function Steps({ index }: { index: number }) {
   const t = useTranslations("catalog.wizard");
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <p className="font-mono text-data text-ink-muted">
         {t("step", { current: index + 1, total: stepNames.length })}
       </p>
-      <ol className="mt-2 flex flex-wrap gap-x-6 gap-y-1">
-        {stepNames.map((name, position) => (
-          <li
-            key={name}
-            aria-current={position === index ? "step" : undefined}
-            className={
-              position === index ? "text-block-title text-ink" : "text-body text-ink-muted"
-            }
-          >
-            {t(`steps.${name}`)}
-          </li>
-        ))}
-      </ol>
+      <Stepper
+        label={t("stepsLabel")}
+        steps={stepNames.map((name) => t(`steps.${name}`))}
+        current={index}
+      />
     </div>
   );
 }

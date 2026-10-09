@@ -100,7 +100,14 @@
     "search": "Buscar",
     "noOptions": "Nenhuma opção encontrada.",
     "choose": "Escolha uma opção",
-    "back": "Voltar"
+    "back": "Voltar",
+    "datePicker": {
+      "placeholder": "dd/mm/aaaa",
+      "open": "Abrir calendário",
+      "previousMonth": "Mês anterior",
+      "nextMonth": "Próximo mês"
+    },
+    "stepper": { "done": "concluída", "current": "etapa atual", "upcoming": "a fazer" }
   },
   "patterns": {
     "header": {
@@ -230,6 +237,20 @@
       "rangeText": "De R$ {from, number} até R$ {until, number}",
       "loading": "Carregando o perfil"
     },
+    "composition": {
+      "title": "Etapas, etiquetas e datas",
+      "stepsLabel": "Etapas do cadastro",
+      "stepsCompact": "Etapas, tamanho pequeno",
+      "steps": { "data": "Dados", "address": "Endereço", "review": "Revisão" },
+      "tags": "Assuntos escolhidos",
+      "tagNames": { "billing": "Cobrança", "product": "Produto", "security": "Segurança" },
+      "remove": "Remover {name}",
+      "noTags": "Nenhum assunto escolhido.",
+      "due": "Vencimento",
+      "dueHelp": "Digite ou escolha no calendário.",
+      "window": "Retirada, a partir de hoje",
+      "windowHelp": "A semana começa na segunda e dias passados não valem."
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",
@@ -336,6 +357,7 @@
     },
     "wizard": {
       "title": "Assistente",
+      "stepsLabel": "Etapas do cadastro",
       "step": "Passo {current, number} de {total, number}",
       "steps": {
         "data": "Dados",

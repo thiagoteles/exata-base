@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import type { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
+import { currentInstant } from "@/domain/clock";
 import { AccentDemo } from "@/features/catalog/accent-demo";
 import { ButtonsDemo } from "@/features/catalog/buttons-demo";
 import { CatalogHeader } from "@/features/catalog/catalog-header";
 import { ChoicesDemo } from "@/features/catalog/choices-demo";
+import { CompositionDemo } from "@/features/catalog/composition-demo";
 import { FieldsDemo } from "@/features/catalog/fields-demo";
 import { FilesList } from "@/features/catalog/files-list";
 import { LayersDemo } from "@/features/catalog/layers-demo";
@@ -22,6 +25,7 @@ import { StatesDemo } from "@/features/catalog/states-demo";
 import { StructureDemo } from "@/features/catalog/structure-demo";
 import { UploadDemo } from "@/features/catalog/upload-demo";
 import { Wizard } from "@/features/catalog/wizard";
+import { dateInSaoPaulo } from "@/lib/date";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { listFiles } from "@/lib/files/service";
@@ -53,6 +57,7 @@ export default function CatalogPage({ searchParams }: { searchParams: Promise<Se
 
 async function CatalogContent({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const t = await getTranslations("catalog");
+  await connection();
   const user = await requirePageRole("staff", "/catalog");
   const files = await listFiles(db, user.id);
   return (
@@ -73,6 +78,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection title={t("measures.title")}>
           <MeasuresDemo />
+        </CatalogSection>
+        <CatalogSection title={t("composition.title")}>
+          <CompositionDemo today={dateInSaoPaulo(currentInstant())} />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

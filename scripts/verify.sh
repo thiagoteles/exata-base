@@ -43,6 +43,12 @@ for port in 3300 5440 8030 "$image_port"; do
 done
 
 cd "$repo"
+# A file in public/ that the proxy could swallow: the proxy matcher names the extensions it skips,
+# so a type it does not name (audio, JSON) is the one worth proving reaches the browser.
+probe_files=("public/verify-probe.wav" "public/verify-probe.json")
+printf 'RIFF' > "${probe_files[0]}"
+printf '{ "probe": true }\n' > "${probe_files[1]}"
+trap 'rm -f "${probe_files[@]}"; cleanup' EXIT
 echo "== Checks"
 pnpm check
 echo "== Integration"
@@ -83,6 +89,13 @@ if [ "$moved" != "301 http://localhost:${image_port}/termos" ]; then
   echo "The route address did not move to the public one: $moved" >&2
   exit 1
 fi
+for probe in verify-probe.wav verify-probe.json; do
+  served="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://localhost:${image_port}/${probe}")"
+  if [ "$served" != "200 " ]; then
+    echo "A file in public/ did not reach the browser: ${probe} answered ${served}." >&2
+    exit 1
+  fi
+done
 docker rm -f "${name}-app" "${name}-db" > /dev/null
 docker network rm "${name}-net" > /dev/null
 docker image rm "${name}:local" > /dev/null

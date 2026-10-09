@@ -54,6 +54,24 @@ describe("source rules", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("reads files from disk only through a path Turbopack can ignore, or from the storage directory", () => {
+    // A helper that takes the path as an argument makes Turbopack copy the whole repository into
+    // the standalone output, so a read needs `turbopackIgnore` on the base and an include list.
+    const reads = /\b(readFile|readFileSync|createReadStream|readdir|readdirSync)\s*\(/;
+    const readsStorageDirectory = new Set(["lib/ports/storage/adapters/disk.ts"]);
+    const appCode = /^(app|lib|features|components|domain)\/|^proxy\.ts$/;
+    const offenders = trackedSources()
+      .filter(
+        (file) => appCode.test(file) && !file.endsWith(".test.ts") && !file.endsWith(".test.tsx"),
+      )
+      .filter((file) => !readsStorageDirectory.has(file))
+      .filter((file) => {
+        const source = readFileSync(file, "utf8");
+        return reads.test(source) && !source.includes("turbopackIgnore");
+      });
+    expect(offenders).toEqual([]);
+  });
+
   it("invalidates by tag, never by path, and caches with use cache, never unstable_cache", () => {
     const forbidden = /\b(revalidatePath|unstable_cache)\b/;
     const offenders = trackedSources()

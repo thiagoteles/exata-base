@@ -103,6 +103,24 @@ Opt-in por três passos (README): `messages/<locale>.json`, a lista em `lib/i18n
 
 `pnpm setup:product` (`scripts/setup-product.mts`, lógica em `scripts/setup-product/apply.ts`, testada) pergunta nome, descrição, público, tom, superfícies, o preset visual e a cor da marca, e escreve em `messages/pt-BR.json` (`site.name`, `site.description`), `package.json` (nome em slug e descrição), `README.md` (título e primeiro parágrafo), `DESIGN.md` (frontmatter, título, bloco Produto, linha do Decisions Log) e `design.json` (mescla: accents e `adjust` ficam como estavam); depois roda `pnpm tokens`, formata os arquivos e roda `pnpm check` (`--no-check` pula). Idempotente: acha as linhas pela estrutura, não pelo texto "TO FILL IN", então dá para rodar de novo para corrigir. Depois das respostas do produto, `scripts/setup-product/ask-services.ts` pergunta quais serviços externos entram (Clerk ou login próprio, Google, Stripe, Mailtrap, Google Cloud, Umami); `scripts/setup-product/integrations.ts` guarda as regras (prefixo de cada chave, grupos completos, ao menos um preço Stripe) e gera `CRON_SECRET`, `BETTER_AUTH_SECRET` e `FILE_URL_SECRET`. Tudo vai para `.env.integrations` (ignorado pelo git, e de propósito não `.env.local`, que no compose faz o dev server entrar em laço de recarga); `--set NOME=valor` repetido faz o mesmo sem perguntar. Se uma variável nova entrar em `lib/env.ts`, ensine a lista de `integrations.ts`. Com `--yes` e flags não pergunta nada e recusa o que faltar; sem terminal, também não pergunta. Rejeita travessão, campos vazios e semente de cor inválida (matiz a menos de 25 graus do verde). O nome e a descrição de exemplo do catálogo contam como não respondidos. Se um novo trecho do repositório passar a carregar o nome do produto, ensine o script a escrevê-lo (e a `apply.test.ts` a conferir).
 
+### 3.3 Cobrança, o estado completo
+
+O catálogo (`domain/billing/catalog.ts`) é a única configuração do que se vende; o resto lê dele.
+
+| O que | Onde e como |
+|---|---|
+| Níveis, recursos e limites | `tiers` (`free`, `paid`), cada limite com franquia e janela (`enforcePlanLimit`, `actionFor(papel, { limit })`) |
+| Preços | `prices` por chave de busca (`paid_monthly`, `paid_yearly`, `paid_yearly_once`, `paid_lifetime`), lidos do Stripe com `'use cache'` e a tag `prices`; `price.*` expira a tag |
+| Moedas | `currencies` (padrão BRL, `offered`), escolha em preferência, conferida no servidor contra o `currency_options` do preço |
+| Intervalos | `monthly`, `yearly` (assinaturas), `yearly_once` e `lifetime` (pagamento único; o ano avulso tem fim e volta à gratuita) |
+| Trial | `trial` (14 dias para assinatura, uma vez por conta, aviso por e-mail antes do fim) |
+| Pix e boleto | pendente (`pending`) até o dinheiro chegar; falha e expiração desfazem; Pix com validade de uma hora |
+| Disputa, reembolso | `disputed` + log em ERROR; reembolso total devolve à gratuita |
+| Cupom e indicação | `allowPromotionCodes`; `referralCredit` vira saldo do cliente no Stripe |
+| Rastro | `checkout_sessions` (aberto, pendente, pago, expirado, falhou) com a origem do paywall; funil `paywall_viewed`, `checkout_started`, `checkout_completed`, `payment_confirmed` |
+
+Eventos do Stripe tratados: ver a skill `new-payment-event`. Operações diárias de cobrança: `expire-fixed-terms`, `warn-expiring-terms`, `remind-abandoned-checkouts`, `grant-referral-credits`. Variáveis: só `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET` (o preço não é variável). A conta de teste da `.env.local` tem os quatro preços com as chaves acima (BRL e USD), o Pix ligado e nenhum cliente de teste sobrando. Pontos que só o dono decide: estorno do crédito de indicação e o que é cupom.
+
 ### O que existe
 
 Contas (cadastro, confirmação, recuperação, convite, exportar em ZIP, apagar com trilha), contato (formulário público, caixa da equipe, resposta por e-mail, mensagens do membro), cobrança Stripe (`/plans`, `/account/plan` com a data de renovação ou do fim do acesso vinda da fatura paga em `plans.current_period_end`, portal, cancelar no fim do período, vitalício sobre assinatura, reembolso, cortesia, inadimplente mantém acesso), admin (usuários, convites, auditoria), `/events` com a limpeza de convites, `/catalog` (vitrine, assistente de três passos, upload), erro do navegador em `/api/client-errors`, alarme do GCP em `ops/gcp` e `pnpm gcp:alerts`, compose de produção, workflow de CI desligado, `.mcp.json`.

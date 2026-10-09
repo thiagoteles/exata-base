@@ -34,6 +34,7 @@ services:
       SMTP_LOCAL_URL: smtp://mailpit:1025
       CONTACT_EMAIL: contato@app.local
       CRON_SECRET: local-development-cron-secret-0123456789
+      INGEST_SECRETS: job-run=local-development-ingest-secret-0123456789
     depends_on:
       postgres:
         condition: service_healthy

@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 import process from "node:process";
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+import { parseIngestSecrets } from "@/lib/ingest/secrets";
 
 /*
  * The only module that reads process.env. Every variable, its local default and what makes the
@@ -16,6 +17,18 @@ const csv = z.string().transform((value) =>
     .map((item) => item.trim())
     .filter((item) => item.length > 0),
 );
+
+const ingestSecrets = z.string().transform((value, context) => {
+  try {
+    return parseIngestSecrets(value);
+  } catch (error) {
+    context.addIssue({
+      code: "custom",
+      message: error instanceof Error ? error.message : "INGEST_SECRETS is not valid",
+    });
+    return z.NEVER;
+  }
+});
 
 const gcpCredentials = z
   .string()
@@ -61,6 +74,8 @@ const server = {
   CONTACT_EMAIL: csv.pipe(z.array(z.email())).default([]),
 
   CRON_SECRET: z.string().min(32).optional(),
+  // `source=secret` pairs, one secret per source a worker outside the server may deliver to.
+  INGEST_SECRETS: ingestSecrets.default({}),
 
   STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),

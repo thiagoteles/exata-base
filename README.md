@@ -96,6 +96,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `TRUSTED_PROXY` | no | `traefik` (default, Coolify alone) or `cloudflare` (Cloudflare in front). Decides which header carries the client address for rate limits. With `cloudflare`, let only Cloudflare's addresses reach the server |
 | `MAILTRAP_TOKEN`, `MAILTRAP_INBOX`, `EMAIL_FROM` | no | Without a token nothing is sent and each send is logged as an error. `EMAIL_FROM` is required with the token |
 | `CONTACT_EMAIL` | no | Comma list that is told about new contact messages |
+| `INGEST_SECRETS` | no | `source=secret` pairs, at least 32 characters each, one per source a worker outside the server may deliver to (`POST /api/ingest/<source>`). Without a pair that source answers 401 |
 | `CRON_SECRET` | no | At least 32 characters. Without it the scheduled calls (`/events/...`) refuse everything |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | no | Together. Point the Stripe webhook at `/api/webhooks/stripe` and send `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.deleted`, `charge.succeeded` and `charge.refunded` |
 | `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PRICE_LIFETIME` | no | Each price you sell. Only a filled price is shown |
@@ -140,6 +141,8 @@ Umami, with no cookie and no personal data: events are declared in `lib/analytic
 ## Scheduled operations
 
 A call to `/events/<cadence>` (`daily`, `hourly` or `every-5-min`) runs every operation in `lib/scheduled/registry.ts` that declared that cadence, one at a time. One failing is logged and does not stop the others, and an operation whose previous run is still going is skipped instead of running twice (a lock in Postgres, across instances). Each operation is idempotent, so running a cadence twice is safe. The first two, both daily, delete invites that were never accepted and expired more than 30 days ago, and the rate limit counters of windows that already ended. A new one is a new entry in the registry (see the `new-scheduled-operation` skill), never a new route.
+
+A job that runs on another machine does not go through the registry: its worker delivers to `POST /api/ingest/<source>` with the secret of that source (`INGEST_SECRETS`), and the server validates and applies what arrives (see the `new-ingest-source` skill). The one source the base ships, `job-run`, lets such a worker report that a run ended, so the health panel and the absence alarm cover it too.
 
 Every run writes a `heartbeat` log line named after its cadence and its last run to the health panel in the admin. A cadence that has operations needs a line in `ops/gcp/heartbeats.json` (a test checks), which `pnpm gcp:alerts` turns into the alarm that fires when the host stops calling.
 

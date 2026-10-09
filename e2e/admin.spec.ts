@@ -145,6 +145,43 @@ test("the scheduled calls refuse a call without the secret, know their cadences 
   });
 });
 
+test("a worker outside the server delivers a job run with its own secret and nothing else", async ({
+  request,
+}) => {
+  const url = "/api/ingest/job-run";
+  const run = { job: "collector", failed: 0, ms: 12 };
+  const secret = "Bearer local-development-ingest-secret-0123456789";
+  // The same 401 whether the secret is wrong, missing, or the source does not exist.
+  expect((await request.post(url, { data: run })).status()).toBe(401);
+  expect(
+    (await request.post(url, { data: run, headers: { authorization: "Bearer wrong" } })).status(),
+  ).toBe(401);
+  expect(
+    (
+      await request.post("/api/ingest/nope", { data: run, headers: { authorization: secret } })
+    ).status(),
+  ).toBe(401);
+  // The daily call's secret does not open an ingest source.
+  expect(
+    (
+      await request.post(url, {
+        data: run,
+        headers: { authorization: `Bearer ${CRON_SECRET}` },
+      })
+    ).status(),
+  ).toBe(401);
+  expect((await request.get(url)).status()).toBe(405);
+
+  const ok = await request.post(url, { data: run, headers: { authorization: secret } });
+  expect(ok.status()).toBe(200);
+  expect(await ok.json()).toEqual({ result: { recorded: 1 } });
+  const bad = await request.post(url, {
+    data: { job: "daily", failed: 0, ms: 1 },
+    headers: { authorization: secret },
+  });
+  expect(bad.status()).toBe(400);
+});
+
 test.describe("without a session", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 

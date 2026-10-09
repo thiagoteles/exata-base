@@ -2,7 +2,6 @@
 
 import { getTranslations } from "next-intl/server";
 import { currentInstant } from "@/domain/clock";
-import { savedLocaleOfUser } from "@/lib/accounts/options";
 import { actionFor, limitedPublicAction } from "@/lib/actions/client";
 import { notifyTeam, sendReply } from "@/lib/contact/mailer";
 import { contactStatuses } from "@/lib/contact/options";
@@ -12,6 +11,7 @@ import { env } from "@/lib/env";
 import { defaultLocale } from "@/lib/i18n/locales";
 import { readCurrentUser } from "@/lib/ports/auth";
 import { chooseLocale, requestLocale } from "@/lib/ports/email/locale";
+import { savedLocaleOfUser } from "@/lib/preferences/service";
 import { z } from "@/lib/validation";
 import { contactSchema, replySchema } from "./schema";
 

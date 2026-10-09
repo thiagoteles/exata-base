@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { upsertClerkUser } from "@/lib/accounts/clerk-sync";
 import { applyConfirmedEmail } from "@/lib/accounts/confirmation";
 import { createInvite, findPendingInvite, revokeInvite } from "@/lib/accounts/invites";
-import { readOptions, saveTheme } from "@/lib/accounts/options";
 import { changeRole } from "@/lib/accounts/role-change";
 import { staffAuditLog } from "@/lib/db/schema/audit";
 import { invites } from "@/lib/db/schema/invites";
 import { users } from "@/lib/db/schema/users";
+import { readPreferences, readStoredOptions, savePreference } from "@/lib/preferences/service";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
 
@@ -139,27 +139,60 @@ describe("changing a role", () => {
 });
 
 describe("preferences in the options column", () => {
-  it("saves the theme without touching the other options, and forgets it on null", async () => {
+  it("saves one preference without touching the others, and the last value wins", async () => {
     const user = await createUser(db, "ana@example.com");
     await db
       .update(users)
-      .set({ options: { locale: "pt-BR" } })
+      .set({ options: { locale: "pt-BR", somethingElse: 1 } })
       .where(eq(users.id, user.id));
 
-    await saveTheme(db, user.id, "dark");
-    expect(await readOptions(db, user.id)).toEqual({ locale: "pt-BR", theme: "dark" });
+    expect(await savePreference(db, user.id, "theme", "dark")).toBe("dark");
+    expect(await readStoredOptions(db, user.id)).toEqual({
+      locale: "pt-BR",
+      somethingElse: 1,
+      theme: "dark",
+    });
 
-    await saveTheme(db, user.id, "light");
-    expect(await readOptions(db, user.id)).toEqual({ locale: "pt-BR", theme: "light" });
+    await savePreference(db, user.id, "theme", "light");
+    expect((await readStoredOptions(db, user.id))["theme"]).toBe("light");
+    await savePreference(db, user.id, "theme", "system");
+    expect((await readPreferences(db, user.id)).theme).toBe("system");
+  });
 
-    await saveTheme(db, user.id, null);
-    expect(await readOptions(db, user.id)).toEqual({ locale: "pt-BR" });
+  it("refuses a value the registry does not allow, and stores nothing", async () => {
+    const user = await createUser(db, "ana@example.com");
+    for (const value of ["sepia", 3, null, undefined, { theme: "dark" }]) {
+      await expect(savePreference(db, user.id, "theme", value)).rejects.toMatchObject({
+        status: 400,
+      });
+    }
+    expect(await readStoredOptions(db, user.id)).toEqual({});
+  });
+
+  it("reads every preference as a valid value: the saved one, or the fallback when it is missing or stale", async () => {
+    const user = await createUser(db, "ana@example.com");
+    expect(await readPreferences(db, user.id)).toEqual({ theme: "system", locale: "pt-BR" });
+    await db
+      .update(users)
+      .set({ options: { theme: "sepia", locale: "xx-XX", removedOption: true } })
+      .where(eq(users.id, user.id));
+    expect(await readPreferences(db, user.id)).toEqual({ theme: "system", locale: "pt-BR" });
+    await savePreference(db, user.id, "theme", "dark");
+    expect(await readPreferences(db, user.id)).toEqual({ theme: "dark", locale: "pt-BR" });
   });
 
   it("changes only the person it is asked to change", async () => {
     const ana = await createUser(db, "ana@example.com");
     const bia = await createUser(db, "bia@example.com");
-    await saveTheme(db, ana.id, "dark");
-    expect(await readOptions(db, bia.id)).toEqual({});
+    await savePreference(db, ana.id, "theme", "dark");
+    expect(await readStoredOptions(db, bia.id)).toEqual({});
+  });
+
+  it("keeps a value that looks like SQL as a value", async () => {
+    const user = await createUser(db, "ana@example.com");
+    await expect(
+      savePreference(db, user.id, "theme", "dark'); drop table users; --"),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(await db.select().from(users)).toHaveLength(1);
   });
 });

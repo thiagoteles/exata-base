@@ -10,6 +10,9 @@ export const themes = ["light", "dark"] as const;
 
 export type Theme = (typeof themes)[number];
 
+/** What a person picks: one of the themes, or the system's own setting. */
+export type ThemeChoice = Theme | "system";
+
 export const ONE_YEAR_SECONDS = 31_536_000;
 
 export const isTheme = (value: unknown): value is Theme => themes.some((theme) => theme === value);

@@ -61,7 +61,7 @@ As fases seguem a dependência entre elas. Cada unidade aponta a seção que det
 
 ### F3. Contas e preferências
 
-- [ ] **F3.1 Registro de opções tipadas.** Cada opção declara schema zod, padrão e se vai para cookie antes da pintura; `saveOption(key, value)` grava só a chave com `jsonb_set`; leitura validada (valor antigo ou inválido cai no padrão). Tema e idioma migram para o registro. *Contas, item 1.*
+- [x] **F3.1 Registro de opções tipadas.** (feito: `lib/preferences/`, `saveOption`, tema e idioma migrados; o sign-up por e-mail do e2e falha contra o compose local por causa do Mailtrap do `.env.local`, então o e2e vale só no `verify`) Cada opção declara schema zod, padrão e se vai para cookie antes da pintura; `saveOption(key, value)` grava só a chave com `jsonb_set`; leitura validada (valor antigo ou inválido cai no padrão). Tema e idioma migram para o registro. *Contas, item 1.*
 - [ ] **F3.2 Opções de visitante.** As mesmas opções em cookie para quem não tem conta, copiadas para a conta no cadastro e no login. Decisão: cookie, não `localStorage`, para valer antes da pintura.
 - [ ] **F3.3 Fuso horário.** `options.timeZone` vindo do navegador (`Intl`) no login, padrão `America/Sao_Paulo`; os serviços recebem o fuso junto com o relógio. Registrar o limite dos lembretes por horário local no `BASE.md`. *Contas, item 2.*
 - [ ] **F3.4 Preferências de e-mail.** Categorias em `options.email` (transacional sempre; lembretes desligáveis; novidades só com opt-in); o port de e-mail recebe a categoria e recusa enviar o que a pessoa desligou. Tela na conta. *Contas, item 3.*

@@ -33,11 +33,11 @@ export type IngestDeps = {
 const own = (record: Readonly<Record<string, unknown>>, key: string) =>
   Object.hasOwn(record, key) ? record[key] : undefined;
 
-function parseJson(text: string): unknown {
+function parseJson(text: string): { valid: true; value: unknown } | { valid: false } {
   try {
-    return JSON.parse(text) as unknown;
-  } catch (error) {
-    throw new DomainError(400, "badRequest", { cause: error });
+    return { valid: true, value: JSON.parse(text) as unknown };
+  } catch {
+    return { valid: false };
   }
 }
 
@@ -58,5 +58,9 @@ export async function handleIngest(
   if (text.length > MAX_BODY_BYTES) {
     throw new DomainError(400);
   }
-  return await source.accept({ db: deps.db, body: parseJson(text), now: deps.now });
+  const body = parseJson(text);
+  if (!body.valid) {
+    throw new DomainError(400);
+  }
+  return await source.accept({ db: deps.db, body: body.value, now: deps.now });
 }

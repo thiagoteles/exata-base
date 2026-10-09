@@ -2,10 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { afterSignIn } from "@/lib/accounts/sign-in-complete";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
-import { LOCALE_COOKIE } from "@/lib/i18n/locales";
 import { requireUser } from "@/lib/ports/auth";
 import { signInRedirect } from "@/lib/routes";
-import { ONE_YEAR_SECONDS, THEME_COOKIE } from "@/lib/theme";
+import { ONE_YEAR_SECONDS } from "@/lib/theme";
 import { timedRoute } from "@/lib/timed-route";
 
 /*
@@ -17,21 +16,14 @@ export const GET = timedRoute("/auth/complete", async (request: NextRequest) => 
   const next = request.nextUrl.searchParams.get("next");
   try {
     const user = await requireUser();
-    const { location, theme, locale } = afterSignIn(user.options, next);
+    const { location, cookies } = afterSignIn(user.options, next);
     const response = NextResponse.redirect(new URL(location, env.APP_URL));
-    if (theme !== null) {
-      response.cookies.set(THEME_COOKIE, theme, {
-        path: "/",
-        maxAge: ONE_YEAR_SECONDS,
-        sameSite: "lax",
-      });
-    }
-    if (locale !== null) {
-      response.cookies.set(LOCALE_COOKIE, locale, {
-        path: "/",
-        maxAge: ONE_YEAR_SECONDS,
-        sameSite: "lax",
-      });
+    for (const { name, value } of cookies) {
+      if (value === null) {
+        response.cookies.delete(name);
+      } else {
+        response.cookies.set(name, value, { path: "/", maxAge: ONE_YEAR_SECONDS, sameSite: "lax" });
+      }
     }
     return response;
   } catch (error) {

@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import type { ReactElement } from "react";
 import { currentInstant } from "@/domain/clock";
 import { upsertClerkUser } from "@/lib/accounts/clerk-sync";
-import { savedLocaleOfEmail } from "@/lib/accounts/options";
 import { hasRole, type Role } from "@/lib/accounts/roles";
 import { db } from "@/lib/db/client";
 import { users } from "@/lib/db/schema/users";
@@ -13,6 +12,7 @@ import { sendEvent } from "@/lib/ports/analytics";
 import { sendEmail } from "@/lib/ports/email";
 import { chooseLocale, requestLocale } from "@/lib/ports/email/locale";
 import { type EmailTranslator, emailTranslatorFor, renderEmail } from "@/lib/ports/email/render";
+import { savedLocaleOfEmail } from "@/lib/preferences/service";
 import type { AuthAdapter, CurrentUser, SessionIdentity } from "./types";
 
 /*

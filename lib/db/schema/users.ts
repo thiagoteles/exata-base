@@ -4,8 +4,11 @@ import { createdAt, id, updatedAt } from "../columns";
 
 export const userRole = pgEnum("user_role", ["member", "staff", "admin"]);
 
-/** Preferences that must not become columns. Theme and locale are copied to cookies on sign-in. */
-export type UserOptions = { theme?: "light" | "dark"; locale?: string };
+/**
+ * Preferences that must not become columns. What each one may hold is declared in
+ * `lib/preferences/definitions.ts`, and every read validates against it.
+ */
+export type UserOptions = Readonly<Record<string, unknown>>;
 
 /*
  * The application's user row, in both auth modes. In local mode it is also the better-auth user

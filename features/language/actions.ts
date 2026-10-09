@@ -1,11 +1,11 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { saveLocale } from "@/lib/accounts/options";
 import { publicAction } from "@/lib/actions/client";
 import { db } from "@/lib/db/client";
 import { LOCALE_COOKIE, locales } from "@/lib/i18n/locales";
 import { readCurrentUser } from "@/lib/ports/auth";
+import { savePreference } from "@/lib/preferences/service";
 import { z } from "@/lib/validation";
 
 const ONE_YEAR_SECONDS = 31_536_000;
@@ -25,7 +25,7 @@ export const setLanguage = publicAction
     });
     const user = await readCurrentUser();
     if (user !== null) {
-      await saveLocale(db, user.id, parsedInput.locale);
+      await savePreference(db, user.id, "locale", parsedInput.locale);
     }
     return { locale: parsedInput.locale };
   });

@@ -22,10 +22,11 @@ import {
   withGeneratedSecrets,
 } from "./setup-product/integrations";
 import { parseSeeds } from "./tokens/generate";
+import { parseDesign, presetNames } from "./tokens/preset";
 
 /*
  * `pnpm setup:product` fills in what a new product has to say about itself: its name, what it is
- * for, how it should sound, and its brand color. It asks, showing what is there now, and writes
+ * for, how it should sound, its visual preset and its brand color. It asks, showing what is there now, and writes
  * the answers where they live. Run it again any time to correct a value. For a script or an agent,
  * pass the answers as flags and `--yes`; nothing is asked.
  *
@@ -40,8 +41,8 @@ const files = {
   catalog: "messages/pt-BR.json",
   manifest: "package.json",
   readme: "README.md",
-  design: "DESIGN.md",
-  colors: "colors.json",
+  designDoc: "DESIGN.md",
+  design: "design.json",
 } as const;
 const integrationsFile = ".env.integrations";
 
@@ -52,6 +53,7 @@ const { values: flags } = parseArgs({
     audience: { type: "string" },
     tone: { type: "string" },
     surfaces: { type: "string" },
+    preset: { type: "string" },
     hue: { type: "string" },
     chroma: { type: "string" },
     set: { type: "string", multiple: true },
@@ -63,11 +65,13 @@ const { values: flags } = parseArgs({
 const read = (file: string) => readFileSync(file, "utf8");
 const run = (command: string, args: string[]) => execFileSync(command, args, { stdio: "inherit" });
 
-const colors = JSON.parse(read(files.colors)) as {
+// Only the answered keys change; accents and adjusted knobs stay as the product left them.
+const design = JSON.parse(read(files.design)) as Record<string, unknown> & {
+  preset?: string;
   brand: { hue: number; chroma: number };
   neutral: { offset: number };
 };
-const current = readCurrent(read(files.catalog), read(files.design));
+const current = readCurrent(read(files.catalog), read(files.designDoc));
 const interactive = !flags.yes && process.stdin.isTTY === true;
 
 async function ask(
@@ -111,9 +115,15 @@ const input: ProductInput = {
     current.surfaces,
   ),
 };
-const hue = Number(await ask(prompt, "Brand hue, 0 to 360", flags.hue, String(colors.brand.hue)));
+const preset = await ask(
+  prompt,
+  `Visual preset (${presetNames.join(", ")}; see DESIGN.md, Preset)`,
+  flags.preset,
+  design.preset ?? "instrument",
+);
+const hue = Number(await ask(prompt, "Brand hue, 0 to 360", flags.hue, String(design.brand.hue)));
 const chroma = Number(
-  await ask(prompt, "Brand chroma, 0.04 to 0.2", flags.chroma, String(colors.brand.chroma)),
+  await ask(prompt, "Brand chroma, 0.04 to 0.2", flags.chroma, String(design.brand.chroma)),
 );
 
 const stored: Values = existsSync(integrationsFile) ? parseEnvFile(read(integrationsFile)) : {};
@@ -140,7 +150,12 @@ const serviceProblems =
 const problems = [...validateProduct(input), ...serviceProblems];
 let seeds: ReturnType<typeof parseSeeds> | null = null;
 try {
-  seeds = parseSeeds({ brand: { hue, chroma }, neutral: colors.neutral });
+  seeds = parseSeeds({ brand: { hue, chroma }, neutral: design.neutral });
+} catch (error) {
+  problems.push(error instanceof Error ? error.message : String(error));
+}
+try {
+  parseDesign({ ...design, preset });
 } catch (error) {
   problems.push(error instanceof Error ? error.message : String(error));
 }
@@ -153,10 +168,10 @@ const today = new Date().toISOString().slice(0, 10);
 writeFileSync(files.catalog, applyCatalog(read(files.catalog), input));
 writeFileSync(files.manifest, applyPackage(read(files.manifest), input));
 writeFileSync(files.readme, applyReadme(read(files.readme), input));
-writeFileSync(files.design, applyDesign(read(files.design), input, today));
+writeFileSync(files.designDoc, applyDesign(read(files.designDoc), input, today));
 writeFileSync(
-  files.colors,
-  `${JSON.stringify({ brand: seeds.brand, neutral: seeds.neutral }, null, 2)}\n`,
+  files.design,
+  `${JSON.stringify({ ...design, preset, brand: seeds.brand, neutral: seeds.neutral }, null, 2)}\n`,
 );
 
 if (Object.keys(services).length > 0) {
@@ -164,7 +179,7 @@ if (Object.keys(services).length > 0) {
   writeFileSync(integrationsFile, renderEnvFile(complete));
 }
 
-// The palette, both themes, the e-mail colors and the DESIGN.md tables follow the seeds.
+// The palette, both themes, the preset files, the fonts and the DESIGN.md tables follow design.json.
 run("pnpm", ["tokens"]);
 run("pnpm", ["exec", "biome", "format", "--write", ...Object.values(files)]);
 if (!flags["no-check"]) {

@@ -160,13 +160,13 @@ components:
 
 **Creative North Star:** a well-made instrument. Quality shows in the rules, not in decoration: numbers aligned in their column, every state written out, borders that change with intent, motion that only explains.
 
-**Product.** The only part of this file the product writes, besides the seeds in `colors.json`. While any "TO FILL IN" remains, the agent asks for it before the first piece of visual work.
+**Product.** The only part of this file the product writes, besides `design.json` (preset, color seeds, accents). While any "TO FILL IN" remains, the agent asks for it before the first piece of visual work.
 - Name: TO FILL IN.
 - Who it is for: TO FILL IN.
 - Tone: TO FILL IN. Three words on how the product should sound and look.
 - Surfaces the product uses: TO FILL IN (public site, member area, staff area, admin).
 
-**Product context:** this system is identical in every product built on this base. The product changes the color seeds, fills in the Product block, and nothing else. Brazilian web products with a public site, a member area, a staff area and admin. Broad audience, daily use, pt-BR copy, CPF, CEP, phone numbers, BRL and `dd/mm/aaaa` dates on every screen.
+**Product context:** every product built on this base shares the rules, the components and the checks below, and chooses its character from curated options: a preset, its color seeds, and optionally one curated option per knob. It never pastes in a skin of its own. Brazilian web products with a public site, a member area, a staff area and admin. Broad audience, daily use, pt-BR copy, CPF, CEP, phone numbers, BRL and `dd/mm/aaaa` dates on every screen.
 
 **Mode per surface:**
 - Signed-in area and admin: Operate. Medium density, large targets, nothing competes with the data.
@@ -178,6 +178,64 @@ components:
 - Every number is tabular mono and lines up with the one above it.
 - State has text and shape. Color confirms; it never informs on its own.
 - The primary action is ink. The brand color tells you where you are.
+
+## Preset
+
+A preset is one curated choice per knob: typeface, text size, shape, density, elevation, motion, neutral temperature and contrast. `design.json` names the preset and may swap single knobs under `adjust`, always for another option of that knob:
+
+```json
+{ "preset": "editorial", "adjust": { "density": "medium" } }
+```
+
+| Preset | For | Typeface | Text | Shape | Density | Elevation | Motion | Neutral | Contrast |
+|--------|-----|----------|------|-------|---------|-----------|--------|---------|----------|
+| `instrument` | operational tools, back offices, daily work | instrument | standard | standard | medium | shadow | calm | cool | standard |
+| `editorial` | reading, courses, reference | editorial | standard | tight | comfortable | hairline | calm | warm | standard |
+| `accessible` | broad and older audiences, phones | hyperlegible | large | rounded | large | shadow | minimal | cool | reinforced |
+| `vivid` | consumer and playful products | expressive | standard | round | medium | deep | lively | tinted | standard |
+
+The options of each knob:
+- **Typeface:** `instrument` (Onest, JetBrains Mono), `editorial` (Newsreader titles, Public Sans, IBM Plex Mono), `hyperlegible` (Atkinson Hyperlegible Next and Mono), `expressive` (Bricolage Grotesque titles, Figtree, Geist Mono). `pnpm tokens` writes the font module, because `next/font` only accepts literal calls.
+- **Text size:** `standard` (body 17) or `large` (body 18, nothing below 15).
+- **Shape:** `tight`, `standard`, `rounded`, `round`. Only `round` makes the stamp a pill.
+- **Density:** `medium`, `comfortable`, `large`. It changes the named sizes, never the composition.
+- **Elevation:** `shadow`, `hairline`, `deep`. In the dark theme every option is a 1px outline.
+- **Motion:** `calm`, `minimal`, `lively`. Only `lively` has a small overshoot; reduced motion still jumps to the end.
+- **Neutral temperature:** `cool` and `tinted` follow the brand hue, `warm` is a paper tone at hue 75.
+- **Contrast:** `standard`, or `reinforced`, which raises muted text to 7:1 and control borders to 4.5:1.
+
+The rest of this file describes the `instrument` values; the table below is what the chosen preset changes, written by `pnpm tokens`.
+
+<!-- preset:start -->
+| Knob | Choice |
+|------|--------|
+| Preset | instrument |
+| Typeface | instrument: Onest for text, JetBrains Mono for numbers |
+| Text size | standard |
+| Shape | standard |
+| Density | medium |
+| Elevation | shadow |
+| Motion | calm |
+| Neutral temperature | cool |
+| Contrast | standard |
+
+| Variable the preset sets | Value |
+|--------------------------|-------|
+| `--radius-stamp` | `4px` |
+| `--radius-control` | `10px` |
+| `--radius-cell` | `10px` |
+| `--radius-panel` | `14px` |
+| `--radius-dialog` | `18px` |
+| `--ease-enter` | `cubic-bezier(0.2, 0.8, 0.2, 1)` |
+| `--animate-fade-in` | `fade-in 200ms var(--ease-enter) both` |
+| `--animate-fade-out` | `fade-out 140ms var(--ease-exit) both` |
+| `--animate-layer-in` | `layer-in 280ms var(--ease-enter) both` |
+| `--animate-layer-out` | `layer-out 196ms var(--ease-exit) both` |
+| `--animate-sheet-in` | `sheet-in 280ms var(--ease-enter) both` |
+| `--animate-sheet-out` | `sheet-out 196ms var(--ease-exit) both` |
+| `--animate-bar-in` | `bar-in 200ms var(--ease-enter) both` |
+| `--animate-stamp` | `stamp 120ms var(--ease-enter) both` |
+<!-- preset:end -->
 
 ## Colors
 
@@ -204,7 +262,7 @@ components:
 - Colored text always uses the role's `-ink` token, never the full tone.
 
 **Scoped accent.** A second tone that marks a category, never a place or an action: a game, a level, a sector, a client. Four tokens, `accent`, `accent-wash`, `accent-ink` and `on-accent`, that a container redefines with `data-accent="<name>"`; everything inside reads the same classes (`bg-accent`, `text-accent-ink`) and takes that tone. A nested container wins over its parent, and `data-accent="brand"` restores the brand inside any scope. Outside every scope the accent is the brand.
-- The product declares accents in `colors.json` under `accents`, each a hue (0 to 360) and a chroma (0.04 to 0.2). The name is lowercase words; `brand` is reserved.
+- The product declares accents in `design.json` under `accents`, each a hue (0 to 360) and a chroma (0.04 to 0.2). The name is lowercase words; `brand` is reserved.
 - The generator uses the brand's lightness plan, measures every accent against the grounds of both themes, moves the fill when the text on it falls short, and refuses an accent that still fails. `pnpm tokens` also writes the list of names (`AccentName`), so code knows which scopes exist.
 - The text on a filled accent is the neutral end that reads best on it, the same for every accent of a theme.
 - The accent never replaces a state color, never paints a button, and, like every color here, confirms what text and shape already say.
@@ -212,7 +270,7 @@ components:
 
 **Dark theme.** Not an inversion. Surfaces get lighter with depth: `sunken` 14.5%, `background` 16.5%, `surface` 20.5%, `layer` 23.5%. `line` 31%, `line-strong` 62%, `ink` 95%, `ink-muted` 75%. The brand rises to 74% with chroma at 85%. `brand-wash` 28%, `brand-ink` 80%. State text sits at 82% (success), 84% (warning) and 76% (danger). The generator measures every pair, and the table below shows the result.
 
-**Generated values.** This table is written by `pnpm tokens`, never by hand. `pnpm check` fails when it is out of date with `colors.json`.
+**Generated values.** This table is written by `pnpm tokens`, never by hand. `pnpm check` fails when it is out of date with `design.json`.
 
 <!-- tokens:start -->
 | Token | Light | Dark |
@@ -349,7 +407,7 @@ components:
 
 ## Typography
 
-**Faces.** Onest for everything that is text. JetBrains Mono for everything that is a number or code: dates, CPF, CNPJ, phone, CEP, ids, money, counts. Both load through `next/font/google`, as variable fonts with the Latin subset, with no font file in the repository and no secret at build time. Onest has a large x-height and a warm design, which carries a 17px body for a broad audience. JetBrains Mono has wide, clearly distinct digits (0 and O, 1 and l), which matters for CPF numbers and amounts.
+**Faces.** The typeface knob chooses them (see Preset); titles (`h1` to `h3`) use `font-heading`, text uses `font-sans`, numbers use `font-mono`. In `instrument`: Onest for everything that is text. JetBrains Mono for everything that is a number or code: dates, CPF, CNPJ, phone, CEP, ids, money, counts. Both load through `next/font/google`, as variable fonts with the Latin subset, with no font file in the repository and no secret at build time. Onest has a large x-height and a warm design, which carries a 17px body for a broad audience. JetBrains Mono has wide, clearly distinct digits (0 and O, 1 and l), which matters for CPF numbers and amounts.
 
 **Scale.** `html` stays at 16px. The body is 17px through a token, not through the root `font-size`, so Tailwind utilities keep their sizes.
 - Display (public site only): 40 to 56px, 700, -0.032em.
@@ -415,7 +473,7 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 ## Shapes
 
 - Stamp 4px (`stamp`). Controls and cell groups 10px (`control`, `cell`). Panel 14px (`panel`). Dialog and sheet 18px (`dialog`).
-- Pills only for single-line chips (filter, count). A button is never a pill.
+- Pills only for single-line chips (filter, count), and for stamps under the `round` shape. A button is never a pill.
 - Inner radius is the outer radius minus the gap. In cells that share borders, inner corners are square and only the outer outline is rounded.
 - 1px borders on containers. 2px borders on controls: what you touch weighs more than what you read.
 

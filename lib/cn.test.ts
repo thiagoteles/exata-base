@@ -12,7 +12,9 @@ import {
   textTokens,
 } from "./design-tokens";
 
-const css = readFileSync("styles/tokens.css", "utf8") + readFileSync("app/globals.css", "utf8");
+const css = ["styles/tokens.css", "styles/preset.css", "app/globals.css"]
+  .map((file) => readFileSync(file, "utf8"))
+  .join("\n");
 
 function declared(namespace: string): string[] {
   const names = [...css.matchAll(new RegExp(`(?<![\\w-])--${namespace}-([a-z-]+):`, "g"))]

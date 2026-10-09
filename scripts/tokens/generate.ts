@@ -1,4 +1,5 @@
 import { clampChroma, formatHex, type Oklch, wcagContrast } from "culori";
+import type { Temperature } from "./preset-options";
 
 /*
  * Builds the color tokens from two seeds. Each role has a fixed lightness per theme, is pulled
@@ -13,6 +14,14 @@ export type Seeds = {
 };
 
 export type Theme = "light" | "dark";
+
+/** What the preset decides about color: how the neutrals are tinted and how hard they contrast. */
+export type Look = { temperature: Temperature; contrast: "standard" | "reinforced" };
+
+const DEFAULT_LOOK: Look = {
+  temperature: { hue: "brand", chromaScale: 1 },
+  contrast: "standard",
+};
 export type TokenName = (typeof tokenNames)[number];
 export type Palette = Record<TokenName, Oklch>;
 export type PairReport = {
@@ -153,10 +162,18 @@ const READABLE = 4.5;
 const NON_TEXT = 3;
 const grounds = ["surface", "background", "sunken", "layer"] as const;
 
-const constraints: readonly Constraint[] = [
+const constraintsFor = (contrast: Look["contrast"]): readonly Constraint[] => [
   { foreground: "ink", backgrounds: grounds, minimum: TEXT },
-  { foreground: "ink-muted", backgrounds: grounds, minimum: READABLE },
-  { foreground: "line-strong", backgrounds: ["surface", "background"], minimum: NON_TEXT },
+  {
+    foreground: "ink-muted",
+    backgrounds: grounds,
+    minimum: contrast === "reinforced" ? TEXT : READABLE,
+  },
+  {
+    foreground: "line-strong",
+    backgrounds: ["surface", "background"],
+    minimum: contrast === "reinforced" ? READABLE : NON_TEXT,
+  },
   { foreground: "brand", backgrounds: ["surface", "background"], minimum: NON_TEXT },
   { foreground: "brand-ink", backgrounds: [...grounds, "brand-wash"], minimum: READABLE },
   { foreground: "success-ink", backgrounds: [...grounds, "success-wash"], minimum: READABLE },
@@ -172,11 +189,12 @@ const derived: readonly Constraint[] = [
 const toColor = (l: number, c: number, h: number): Oklch =>
   clampChroma({ mode: "oklch", l: l / PERCENT, c, h }, "oklch") as Oklch;
 
-function build(theme: Theme, seeds: Seeds): Palette {
-  const neutralHue = (seeds.brand.hue + seeds.neutral.offset) % FULL_TURN;
+function build(theme: Theme, seeds: Seeds, look: Look): Palette {
+  const { hue, chromaScale } = look.temperature;
+  const neutralHue = hue === "brand" ? (seeds.brand.hue + seeds.neutral.offset) % FULL_TURN : hue;
   const make = ([name, spec]: [string, Spec]): [string, Oklch] => {
     if (spec.source === "neutral") {
-      return [name, toColor(spec.l, spec.c, neutralHue)];
+      return [name, toColor(spec.l, spec.c * chromaScale, neutralHue)];
     }
     if (spec.source === "brand") {
       return [name, toColor(spec.l, spec.c * seeds.brand.chroma, seeds.brand.hue)];
@@ -217,8 +235,12 @@ function adjust(theme: Theme, palette: Palette, constraint: Constraint): Palette
 }
 
 /** Measures every pair of one palette. */
-export function measure(theme: Theme, palette: Palette): PairReport[] {
-  return [...constraints, ...derived].flatMap((constraint) =>
+export function measure(
+  theme: Theme,
+  palette: Palette,
+  contrast: Look["contrast"] = "standard",
+): PairReport[] {
+  return [...constraintsFor(contrast), ...derived].flatMap((constraint) =>
     constraint.backgrounds.map((background) => ({
       theme,
       foreground: constraint.foreground,
@@ -232,13 +254,14 @@ export function measure(theme: Theme, palette: Palette): PairReport[] {
 export function generateTheme(
   theme: Theme,
   seeds: Seeds,
+  look: Look = DEFAULT_LOOK,
 ): { palette: Palette; report: PairReport[] } {
-  let palette = build(theme, seeds);
-  for (const constraint of constraints) {
+  let palette = build(theme, seeds, look);
+  for (const constraint of constraintsFor(look.contrast)) {
     palette = adjust(theme, palette, constraint);
   }
   palette = { ...palette, action: palette.ink, focus: palette.brand };
-  const report = measure(theme, palette);
+  const report = measure(theme, palette, look.contrast);
   const failure = report.find((pair) => pair.ratio < pair.minimum);
   if (failure !== undefined) {
     throw new Error(

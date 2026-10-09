@@ -1,94 +1,12 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../styles/preset.css";
 
 /*
- * Everything except color. Tailwind defaults are cleared so only the scale in DESIGN.md exists.
- * Spacing and breakpoints keep Tailwind's defaults, which are the ones DESIGN.md uses, plus the
- * named sizes below: what a person touches and the insets of containers, so density changes them
- * in one place instead of in every component.
+ * What every preset shares: the keyframes the animations name. Everything else outside color, the
+ * type scale, radii, named sizes, durations and easing, is generated per preset.
  */
 @theme {
-  --spacing-control: 2.75rem;
-  --spacing-control-coarse: 3rem;
-  --spacing-field: 3rem;
-  --spacing-row: 3.5rem;
-  --spacing-chip: 2.25rem;
-  --spacing-segment: 2.5rem;
-  --spacing-bar: 3.75rem;
-  --spacing-tab: 4rem;
-  --spacing-sidebar: 15.5rem;
-  --spacing-panel-inset: 1.5rem;
-  --spacing-dialog-inset: 1.75rem;
-  --spacing-cell-x: 1rem;
-  --spacing-cell-y: 0.75rem;
-
-  --container-dialog: 32.5rem;
-
-  --font-*: initial;
-  --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
-
-  --text-*: initial;
-  --text-display: clamp(2.5rem, 1.6rem + 3vw, 3.5rem);
-  --text-display--line-height: 1.07;
-  --text-display--letter-spacing: -0.032em;
-  --text-display--font-weight: 700;
-  --text-page-title: 2rem;
-  --text-page-title--line-height: 2.375rem;
-  --text-page-title--letter-spacing: -0.022em;
-  --text-page-title--font-weight: 650;
-  --text-section: 1.375rem;
-  --text-section--line-height: 1.75rem;
-  --text-section--letter-spacing: -0.012em;
-  --text-section--font-weight: 600;
-  --text-block-title: 1.125rem;
-  --text-block-title--line-height: 1.5rem;
-  --text-block-title--letter-spacing: -0.005em;
-  --text-block-title--font-weight: 600;
-  --text-body: 1.0625rem;
-  --text-body--line-height: 1.625rem;
-  --text-body-small: 0.9375rem;
-  --text-body-small--line-height: 1.375rem;
-  --text-field-label: 0.9375rem;
-  --text-field-label--line-height: 1.25rem;
-  --text-field-label--font-weight: 550;
-  --text-label: 0.875rem;
-  --text-label--line-height: 1.125rem;
-  --text-label--font-weight: 500;
-  --text-button: 1rem;
-  --text-button--line-height: 1.25rem;
-  --text-button--font-weight: 600;
-  --text-figure: 2.25rem;
-  --text-figure--line-height: 2.75rem;
-  --text-figure--letter-spacing: -0.03em;
-  --text-figure--font-weight: 500;
-  --text-data: 0.9375rem;
-  --text-data--line-height: 1.375rem;
-
-  --radius-*: initial;
-  --radius-stamp: 4px;
-  --radius-control: 10px;
-  --radius-cell: 10px;
-  --radius-panel: 14px;
-  --radius-dialog: 18px;
-  --radius-full: 9999px;
-
-  --inset-shadow-*: initial;
-  --drop-shadow-*: initial;
-  --text-shadow-*: initial;
-  --blur-*: initial;
-
-  --animate-*: initial;
-  --animate-fade-in: fade-in 200ms var(--ease-enter) both;
-  --animate-fade-out: fade-out 140ms var(--ease-exit) both;
-  --animate-layer-in: layer-in 280ms var(--ease-enter) both;
-  --animate-layer-out: layer-out 196ms var(--ease-exit) both;
-  --animate-sheet-in: sheet-in 280ms var(--ease-enter) both;
-  --animate-sheet-out: sheet-out 196ms var(--ease-exit) both;
-  --animate-bar-in: bar-in 200ms var(--ease-enter) both;
-  --animate-stamp: stamp 120ms var(--ease-enter) both;
-  --animate-spin: spin 800ms linear infinite;
-
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -146,14 +64,15 @@
       transform: rotate(360deg);
     }
   }
-
-  --ease-*: initial;
-  --ease-enter: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-ink);

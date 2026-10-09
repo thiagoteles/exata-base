@@ -34,7 +34,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 ### Rules that do not bend
 
 - **Text is a key in `messages/pt-BR.json`**, in screens, e-mails, errors and metadata. No sentence in JSX. No em dash in interface text. Another language is a second catalog with the same keys and a line in `lib/i18n/locales.ts`; `pnpm check` compares them (see the README).
-- **Colors and sizes are tokens.** `colors.json` holds two seeds; `pnpm tokens` regenerates the palette, `DESIGN.md` and the e-mail palette. No stock Tailwind color or hand-written value.
+- **Colors and sizes are tokens.** `design.json` names a curated preset (with optional curated swaps under `adjust`), the color seeds and the accents; `pnpm tokens` regenerates the palette, the preset theme, the font module, the e-mail palette and the generated parts of `DESIGN.md`. No stock Tailwind color, hand-written value or free font.
 - **Roles.** Pages use `requirePageRole(role, path)`, actions use `actionFor(role)`, routes use `requireRole`. Reads that depend on who is looking take the viewer as an argument.
 - **Deleting an account** is declared per table: `ownedBy()` deletes with the person, `authoredBy()` keeps the row and an author e-mail column.
 - **Money is integer cents. Instants are `timestamptz`. Code that reads the clock gets it as a parameter.** Only an entry point (a page after `connection()`, an action, a route, an auth callback) reads it, once, with `currentInstant()` from `@/domain/clock`; a Biome plugin refuses `new Date()`, `Date.now` and `Math.random` everywhere else, and a test refuses silencing it. Randomness is a parameter too, so a test can seed it.

@@ -94,7 +94,7 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 
 **Decisão:** presets curados. O produto deixa de só trocar 2 sementes e passa a escolher entre botões curados, todos passando pelo mesmo verificador. Continua fechado, gerado e medido.
 
-- [ ] Reescrever a regra no `BASE.md` e no `DESIGN.md`. Os presets mantêm a intenção anti-clone, porque o produto escolhe entre opções curadas e não cola uma pele.
+- [x] Reescrever a regra no `BASE.md` e no `DESIGN.md`. Os presets mantêm a intenção anti-clone, porque o produto escolhe entre opções curadas e não cola uma pele.
 
 ### 1. Arquitetura em 3 camadas
 
@@ -108,7 +108,7 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 
 ### 2. Botões
 
-- [ ] **Cor**
+- [x] **Cor**
   - Manter as sementes brand e neutral.
   - Adicionar a **temperatura do neutro** (mais chroma e offset para papel quente).
 - [x] **Accent com escopo**
@@ -123,28 +123,28 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
   - o `check-design-tokens` passa a aceitar essas classes;
   - na base, só um exemplo neutro no `/catalog`.
 - [ ] **Paleta de dados:** categórica (cerca de 8 tons com luminosidade equilibrada, distinguíveis por quem tem daltonismo), sequencial e divergente, nos dois temas.
-- [ ] **Tipografia:**
+- [x] **Tipografia:**
   - par de fontes de uma lista curada (sans neutra, humanista, serifada editorial, hiperlegível), mais a mono para números;
   - o gerador escreve o arquivo de fontes, porque o `next/font` exige chamadas literais;
   - `font-serif` proibido só quando o par escolhido não tem serifa;
   - corpo de 17 ou 18;
-  - escala de fonte do usuário como variável CSS.
-- [ ] **Forma:** eixo `sharp | soft | round` que multiplica a escala de raios, mais o peso das bordas.
-- [ ] **Densidade:** `compacta | média | confortável` (altura de controles, linhas e ritmo).
-- [ ] **Elevação:** sombra ou borda nas camadas.
-- [ ] **Movimento:** `calmo | vivo` (duração e easing). O "Salvo" continua como o momento autoral.
+  - pendente: escala de fonte escolhida pela pessoa, como variável CSS (ver "Contas e preferências", acessibilidade).
+- [x] **Forma:** eixo `sharp | soft | round` que multiplica a escala de raios, mais o peso das bordas.
+- [x] **Densidade:** `compacta | média | confortável` (altura de controles, linhas e ritmo).
+- [x] **Elevação:** sombra ou borda nas camadas.
+- [x] **Movimento:** `calmo | vivo` (duração e easing). O "Salvo" continua como o momento autoral.
 
 ### 3. Presets
 
 Combinações completas e testadas. O produto escolhe um preset mais as sementes e pode ajustar um botão ou outro.
 
-- [ ] Proposta dos valores de cada preset (par de fontes, escala de raios, densidade, elevação, movimento) renderizada no `/catalog`, com capturas nos dois temas, aprovada antes de virar padrão.
+- [x] Proposta dos valores de cada preset (par de fontes, escala de raios, densidade, elevação, movimento) renderizada no `/catalog`, com capturas nos dois temas, aprovada antes de virar padrão.
 
-- [ ] **Instrumento:** o atual, operacional e denso.
-- [ ] **Editorial:** serifado, neutro quente, raios suaves e mais respiro. Serve ao solmiza, a conteúdo e a cursos.
-- [ ] **Acessível:** hiperlegível, corpo 18, alvos maiores e contraste reforçado. Serve ao lottery e a públicos amplos.
-- [ ] **Vivo:** raios maiores, accent forte e movimento presente. Serve a consumo e a produtos lúdicos.
-- [ ] O preset vira pergunta do `setup:product`, e o `DESIGN.md` é gerado com a seção do preset escolhido.
+- [x] **Instrumento:** o atual, operacional e denso.
+- [x] **Editorial:** serifado, neutro quente, raios suaves e mais respiro. Serve ao solmiza, a conteúdo e a cursos.
+- [x] **Acessível:** hiperlegível, corpo 18, alvos maiores e contraste reforçado. Serve ao lottery e a públicos amplos.
+- [x] **Vivo:** raios maiores, accent forte e movimento presente. Serve a consumo e a produtos lúdicos. Carimbo em pílula aprovado só nesta forma (`round`).
+- [x] O preset vira pergunta do `setup:product`, e o `DESIGN.md` é gerado com a seção do preset escolhido.
 
 ### 4. Componentes que faltam
 

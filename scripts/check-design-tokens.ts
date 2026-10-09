@@ -1,5 +1,6 @@
 import { globSync, readFileSync } from "node:fs";
 import process from "node:process";
+import { isSerif, parseDesign } from "./tokens/preset";
 
 /*
  * Tailwind silently ignores a class that has no token behind it, so a stock class like
@@ -21,7 +22,7 @@ const COLOR_UTILITIES = [
   ...["shadow", "inset-shadow", "drop-shadow", "text-shadow"],
 ].join("|");
 
-const classRules: ReadonlyArray<{ pattern: RegExp; reason: string }> = [
+const classRules: { pattern: RegExp; reason: string }[] = [
   {
     pattern: new RegExp(
       `(?<![\\w-])(?:${COLOR_UTILITIES})-(?:${STOCK_PALETTE})(?:-\\d{2,3})?(?:/\\d+)?(?![\\w-])`,
@@ -50,11 +51,16 @@ const classRules: ReadonlyArray<{ pattern: RegExp; reason: string }> = [
     pattern: /(?<![\w-])(?:h|min-h|size)-(?:9|10|11|12|14|15|16)(?![\w-])/g,
     reason: "a size with a name; use control, field, row, chip, segment, bar or tab",
   },
-  {
-    pattern: /(?<![\w-])font-serif(?![\w-])/g,
-    reason: "no serif face in DESIGN.md",
-  },
 ];
+
+// Titles use font-heading, which is serif only when the chosen typeface says so; font-serif is never a token.
+const serifRule = {
+  pattern: /(?<![\w-])font-serif(?![\w-])/g,
+  reason: isSerif(parseDesign(JSON.parse(readFileSync("design.json", "utf8"))).choices)
+    ? "use font-heading, which carries the preset's serif"
+    : "no serif face in this preset; titles use font-heading",
+};
+classRules.push(serifRule);
 
 const handWrittenColor = /#[0-9a-fA-F]{3,8}\b|\b(?:oklch|oklab|rgba?|hsla?|hwb|lab|lch)\(/g;
 
@@ -99,6 +105,8 @@ function scan(
 const ignored = (file: string) =>
   file.startsWith("node_modules/") ||
   file.startsWith(".next/") ||
+  // The generator names tokens and options in its strings; it holds no classes.
+  file.startsWith("scripts/tokens/") ||
   file === "scripts/check-design-tokens.ts";
 
 // Tests are not interface code: they name namespaces such as "shadow" as plain strings.

@@ -72,4 +72,4 @@ export const shadowTokens = ["layer"] as const;
 
 export const easeTokens = ["enter", "exit", "move"] as const;
 
-export const fontTokens = ["sans", "mono"] as const;
+export const fontTokens = ["heading", "sans", "mono"] as const;

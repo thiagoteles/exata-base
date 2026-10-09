@@ -43,8 +43,10 @@ setup("sign in as the seeded admin", async ({ request }) => {
   expect(response.ok()).toBe(true);
   await request.storageState({ path: SESSION_FILE });
   // Compiling here keeps that wait out of the tests. One at a time: two browsers already share
-  // one development server, and a burst of first compilations starves it.
+  // one development server, and a burst of first compilations starves it. A page that does not
+  // answer in time is not a failure of the setup: it only means that page is not warm, and the test
+  // that opens it waits for it as before. Failing here would take every test down with one slow page.
   for (const path of PAGES) {
-    await request.get(path, { timeout: WARM_UP_MS });
+    await request.get(path, { timeout: WARM_UP_MS }).catch(() => undefined);
   }
 });

@@ -31,6 +31,22 @@ const PAGES = [
   "/api/unsubscribe",
   "/api/ingest/job-run",
   "/events/daily",
+  // The rest of what tests reach first from two browsers at once: record pages by an address that
+  // matches no record (they compile as they would for a real one), the end of every sign-in, the
+  // account export, and the endpoints the browser and the providers call.
+  "/staff/contacts/00000000-0000-0000-0000-000000000000",
+  "/account/messages/00000000-0000-0000-0000-000000000000",
+  "/catalog/files/00000000-0000-0000-0000-000000000000",
+  "/auth/complete",
+  "/account/export",
+  "/api/auth/get-session",
+  "/api/auth/verify-email",
+  "/api/client-errors",
+  "/api/csp-report",
+  "/api/webhooks/stripe",
+  "/api/webhooks/clerk",
+  "/api/operations/reapply-deletions",
+  "/events/hourly",
 ];
 
 /* The seeded admin of the local compose signs in through the auth API; the session is saved. */

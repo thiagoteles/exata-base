@@ -51,7 +51,7 @@ As fases seguem a dependência entre elas. Cada unidade aponta a seção que det
 - [x] **F1.6 Notas de SEO e deploy.** (feito: três armadilhas no `BASE.md`, seção 5) No `BASE.md`: nunca `as` no `<Link>`; um 301 fica guardado no navegador, então renomear um caminho público mantém o antigo no mapa; o Coolify faz deploy da `main` a cada push, e o hook de push é a barreira. *SEO, item 1; Infraestrutura, item 1.*
 - [x] **F1.7 Renovate.** (feito: `renovate.json` validado pelo `renovate-config-validator`; um erro de curinga foi pego e corrigido) `renovate.json` com lotes semanais, versões exatas e as atualizações de Next, React e TypeScript isoladas. Ligar o app hospedado fica com o dono (anotar em "Depende de você"). *Infraestrutura, item 1.*
 
-### F2. Agendamento e ingestão
+### F2. Agendamento e ingestão (fase concluída, `pnpm verify` verde)
 
 - [x] **F2.1 Grupos por cadência.** (feito: `domain/operations/cadence.ts`, rotas `/events` e `/events/[group]`, e a pasta `lib/daily` virou `lib/scheduled`) `/events/[group]` com `daily`, `hourly` e `every-5-min`; cada operação declara o grupo no registro; `/events` sem grupo continua chamando `daily` (compatível). Decisão: grupo inválido responde 404. *Capacidades, item 1.*
 - [x] **F2.2 Trava por operação.** (feito com `pg_try_advisory_lock` numa conexão reservada, e não `xact`, para a operação manter as próprias transações; provado com duas execuções simultâneas) `pg_try_advisory_xact_lock` pela chave da operação: uma execução lenta não roda duas vezes ao mesmo tempo; a segunda chamada registra `skipped`. Teste de integração com duas chamadas concorrentes.

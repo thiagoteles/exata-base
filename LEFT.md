@@ -117,7 +117,7 @@ Tudo aqui se prova como a base já faz: eventos do Stripe assinados à mão e li
 ### F8. Capacidades sob demanda
 
 - [x] **F8.1 API v1 e tokens pessoais.** Tokens criados e revogados na conta, só o hash no banco, escopos por token; `app/api/v1/*` com handlers finos sobre os serviços e os mesmos schemas das actions; CORS por lista de origens, rate limit por token, erros no formato `DomainError`. Um endpoint de exemplo (`GET /api/v1/me`). *Capacidades, item 2.*
-- [ ] **F8.2 PDF e QR.** `lib/documents` com `@react-pdf/renderer` (import limitado à pasta por regra do Biome), `qrcode`, fontes do disco e cores em hex do gerador. *Capacidades, item 3.*
+- [x] **F8.2 PDF e QR.** `lib/documents` com `@react-pdf/renderer` (import limitado à pasta por regra do Biome), `qrcode`, fontes do disco e cores em hex do gerador. *Capacidades, item 3.*
 - [ ] **F8.3 Documento verificável e recibo.** Slug assinado, página pública de verificação, QR apontando para ela; recibo de pagamento a partir de `payments`, baixado pela conta.
 - [ ] **F8.4 Páginas de impressão.** Grupo `app/(print)` com casca própria, tokens de impressão, `components/print`, variante `print:` nas páginas comuns, botão "Imprimir"; uma ficha de exemplo (a de contato) com teste `emulateMedia` e `page.pdf()`. Provar a numeração por `counter(page)` no Chromium e registrar o que se sabe de Safari e Firefox. *Capacidades, item 5.*
 - [ ] **F8.5 Segundo idioma parcial.** `complete: false` em `lib/i18n/locales.ts`, o `check-catalogs` avisando em vez de falhar, chaves faltantes recebendo o pt-BR no build, relatório do quanto falta; `formatMoney(cents, currency, locale)` e datas pelo idioma; caminhos públicos em inglês no mapa (`/en/plans`). *Capacidades, item 4; SEO, item 1.*

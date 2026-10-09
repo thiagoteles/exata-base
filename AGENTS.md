@@ -22,6 +22,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 | `features/<area>/` | The screens and actions of one area (client forms, lists, record pages, `actions.ts`, `schema.ts`). A feature never imports another feature |
 | `domain/<area>/` | Pure rules with no database, React, Next or Node: calculations, engines, value types. The lowest layer; `lib`, `features` and `components` import it, never the reverse. Held to 90% coverage on every `pnpm test`; an invariant gets a property test with `fast-check` (`*.property.test.ts`) |
 | `lib/<area>/` | The rules of one area, against the database only, tested with an integration test. Services take the database and the actor as arguments |
+| `lib/documents/` | PDF and QR code. The only place that imports `@react-pdf/renderer` and `qrcode` (Biome refuses them elsewhere). Colors are the hex palette the e-mails use; the face is a TTF in `assets/fonts/`, which a route that makes a PDF lists in `outputFileTracingIncludes` |
 | `lib/ports/<port>/` | Everything that leaves the process: `auth`, `email`, `storage`, `log`, `cep`, `payment`, `analytics`. Vendor SDKs are imported only in `adapters/` |
 | `lib/db/schema/` | One file per area. Migrations are generated into `lib/db/migrations`, never edited |
 | `components/ui/` | Primitives. The only place that imports Radix |

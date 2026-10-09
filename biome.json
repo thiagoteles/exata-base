@@ -113,6 +113,10 @@
               {
                 "group": ["zod", "zod/**"],
                 "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+              },
+              {
+                "group": ["@react-pdf/**", "qrcode"],
+                "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
               }
             ]
           }
@@ -217,6 +221,62 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["lib/documents/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@clerk/**"],
+                    "message": "Clerk is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["better-auth", "better-auth/**"],
+                    "message": "better-auth is imported only by the auth port adapters."
+                  },
+                  {
+                    "group": ["stripe"],
+                    "message": "Stripe is imported only by the payment port adapter."
+                  },
+                  {
+                    "group": ["@google-cloud/**"],
+                    "message": "Google Cloud SDKs are imported only by the log and storage port adapters."
+                  },
+                  {
+                    "group": ["nodemailer"],
+                    "message": "nodemailer is imported only by the email port adapter."
+                  },
+                  {
+                    "group": ["radix-ui", "@radix-ui/**"],
+                    "message": "Radix is imported only by the UI primitives. Use the primitive from components/ui."
+                  },
+                  {
+                    "group": ["@/lib/ports/*/adapters/**"],
+                    "message": "Adapters are loaded by their port. Import the port, not the adapter."
+                  },
+                  {
+                    "group": ["@/app/**", "@/components/**", "@/features/**"],
+                    "message": "lib sits above domain only: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["zod", "zod/**"],
+                    "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
                   }
                 ]
               }
@@ -265,6 +325,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -305,6 +369,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -349,6 +417,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -393,6 +465,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -437,6 +513,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -497,6 +577,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -553,6 +637,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -605,6 +693,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -673,6 +765,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "domain receives values already validated. Validate at the edge, in lib or features."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -717,6 +813,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -795,6 +895,10 @@
                   {
                     "group": ["@/app/**", "@/components/**", "@/features/**"],
                     "message": "lib sits above domain only: it does not import app, components or features."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }
@@ -873,6 +977,10 @@
                   {
                     "group": ["zod", "zod/**"],
                     "message": "Import z from @/lib/validation, which turns every issue into a catalog key."
+                  },
+                  {
+                    "group": ["@react-pdf/**", "qrcode"],
+                    "message": "The PDF library and the QR encoder are imported only by lib/documents, which is where documents are made."
                   }
                 ]
               }

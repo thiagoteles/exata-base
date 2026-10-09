@@ -80,6 +80,9 @@ const server = {
   SOURCE_COMMIT: z.string().min(1).optional(),
   // The service name errors are reported under, when several products share one Google project.
   SERVICE_NAME: z.string().min(1).default("app"),
+  // Marco Civil, art. 15: a product run for profit keeps access records (address and time) for
+  // six months. On, the proxy writes one access line per request to a log of its own.
+  ACCESS_LOG: z.enum(["on", "off"]).default("off"),
 
   STORAGE_DIR: z.string().min(1).default(".storage"),
   FILE_URL_SECRET: z.string().min(32).default("local-development-file-url-secret"),

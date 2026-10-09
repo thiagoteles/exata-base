@@ -24,6 +24,7 @@
     "lint:catalogs": "tsx scripts/check-catalogs.ts",
     "test:integration": "vitest run --config vitest.integration.config.mts",
     "gcp:alerts": "bash scripts/gcp-alerts.sh",
+    "gcp:access-log": "bash scripts/gcp-access-log.sh",
     "email:preview": "email dev --dir emails --port 3301",
     "setup:product": "tsx scripts/setup-product.mts",
     "tokens": "tsx scripts/tokens.ts",

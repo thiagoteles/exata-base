@@ -3,6 +3,7 @@ import {
   email,
   emailList,
   nonEmpty,
+  onOff,
   proxy,
   serviceAccount,
   startsWith,
@@ -154,6 +155,12 @@ export const basics: readonly Field[] = [
     optional: true,
   },
   {
+    name: "ACCESS_LOG",
+    label: "Run for profit? Keep the Marco Civil access records (on or off)",
+    check: onOff,
+    optional: true,
+  },
+  {
     name: "TRUSTED_PROXY",
     label: "Proxy in front of the app: traefik (Coolify alone) or cloudflare",
     check: proxy,
@@ -268,6 +275,7 @@ const order = [
   "ADMIN_EMAILS",
   "CONTACT_EMAIL",
   "TRUSTED_PROXY",
+  "ACCESS_LOG",
   "CRON_SECRET",
   "FILE_URL_SECRET",
 ];

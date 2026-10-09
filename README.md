@@ -98,6 +98,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `FILE_URL_SECRET` | without a bucket | At least 32 characters. Signs file links when files are on disk |
 | `UMAMI_WEBSITE_ID`, `UMAMI_SCRIPT_URL` | no | Together. Turns on analytics |
 | `GOOGLE_SITE_VERIFICATION` | no | The token of Search Console's meta tag method; shown on the home page |
+| `ACCESS_LOG` | no | `on` for a product run for profit: one access record per request (address, source port when known, time, path), as the Marco Civil asks. Kept 183 days in a log of its own: run `pnpm gcp:access-log` once. Outside Google Cloud the lines go to stdout, and keeping them is the operator's job |
 | `SOURCE_COMMIT`, `SERVICE_NAME` | no | The deployed commit (Coolify fills it) and the service name (`app`); Error Reporting groups errors by both |
 | `UPLOAD_MAX_MB`, `UPLOAD_TYPES` | no | Upload limit (10) and accepted types |
 

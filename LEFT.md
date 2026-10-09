@@ -346,14 +346,14 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 **Decisão:** na base, opcional por flag (`ACCESS_LOG=on`, lida em `lib/env.ts`), desligada por padrão. O `setup:product` pergunta se o produto tem fins econômicos e liga a flag quando tiver.
 
-- [ ] Com a flag ligada, o `proxy.ts` grava uma linha de acesso por requisição num log separado (`access`) pelo log port.
-- [ ] No GCP:
+- [x] Com a flag ligada, o `proxy.ts` grava uma linha de acesso por requisição num log separado (`access`) pelo log port. Uma só por requisição, mesmo na segunda passagem de uma reescrita; sem a query.
+- [x] No GCP (`pnpm gcp:access-log`, com `DRY_RUN=1`; **não aplicado num projeto real ainda**):
   - um bucket próprio com retenção de 6 meses;
   - o log `access` excluído do bucket padrão;
   - os dois em `ops/gcp`.
-- [ ] Fora do GCP, a linha vai só para o stdout. Fica documentado que a retenção é responsabilidade do operador.
-- [ ] Usar o helper de IP confiável do rate limit (`TRUSTED_PROXY`).
-- [ ] **Validar:** a porta de origem do cliente, necessária por causa do CGNAT, nos dois modos: o Traefik do Coolify consegue repassá-la? A Cloudflare manda o `CF-Connecting-Port`?
+- [x] Fora do GCP, a linha vai só para o stdout. Fica documentado que a retenção é responsabilidade do operador.
+- [x] Usar o helper de IP confiável do rate limit (`TRUSTED_PROXY`).
+- [ ] **Validar:** a porta de origem do cliente, necessária por causa do CGNAT, nos dois modos. O registro lê `x-forwarded-client-port` (que o Traefik do Coolify precisa ser configurado para mandar) e o `CF-Connecting-Port` atrás da Cloudflare; sem eles, a porta sai `null`.
 
 ### 6. Desempenho
 

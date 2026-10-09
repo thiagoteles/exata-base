@@ -1,10 +1,13 @@
 import { type NextFetchEvent, NextRequest, NextResponse } from "next/server";
+import { currentInstant } from "@/domain/clock";
+import { accessRecord } from "@/lib/access-log";
 import { env } from "@/lib/env";
 import { isMultilingual, LOCALE_HEADER } from "@/lib/i18n/locales";
 import { decideLanguage, redirectToLanguage, rememberLocale } from "@/lib/i18n/proxy";
 import { internalPathOf, publicPathOf } from "@/lib/i18n/public-paths";
 import { isMissingPage } from "@/lib/known-pages";
 import { authProxy } from "@/lib/ports/auth/proxy";
+import { logger } from "@/lib/ports/log";
 import { REQUEST_ID_HEADER, requestIdFrom } from "@/lib/request-id";
 import { buildCsp } from "@/lib/security/csp";
 import { cspSources } from "@/lib/security/sources";
@@ -22,6 +25,17 @@ const REWRITTEN_HEADER = "x-public-address";
 
 export function proxy(request: NextRequest, event: NextFetchEvent) {
   const requestId = requestIdFrom(request.headers);
+  // The second pass of a rewritten request is the same access, already recorded.
+  if (env.ACCESS_LOG === "on" && !request.headers.has(REWRITTEN_HEADER)) {
+    logger.info(
+      "access",
+      accessRecord(
+        { headers: request.headers, method: request.method, path: request.nextUrl.pathname },
+        env.TRUSTED_PROXY,
+        currentInstant(),
+      ),
+    );
+  }
   const decision = isMultilingual ? decideLanguage(request) : null;
   if (decision?.redirectTo) {
     return redirectToLanguage(request, decision);

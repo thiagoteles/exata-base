@@ -23,4 +23,20 @@ describe("Cloud Logging destination", () => {
       token: "[redacted]",
     });
   });
+
+  it("sends access lines to their own log and the rest to the app log", async () => {
+    const entries: LogEntry[] = [];
+    const stream = createCloudLoggingStream({
+      write: (entry) => {
+        entries.push(entry);
+        return Promise.resolve();
+      },
+    });
+    const logger = createStdoutLogger({ level: "info", destination: stream });
+    logger.info("access", { logName: "access", address: "203.0.113.9" });
+    logger.info("hello");
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(entries.map(({ logName }) => logName)).toEqual(["access", "app"]);
+    expect(entries[0]?.payload).not.toHaveProperty("logName");
+  });
 });

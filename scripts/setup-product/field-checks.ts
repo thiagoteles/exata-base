@@ -21,6 +21,8 @@ export const url = (value: string) =>
   URL.canParse(value) ? null : "must be a full address, like https://example.com";
 export const proxy = (value: string) =>
   value === "traefik" || value === "cloudflare" ? null : "must be traefik or cloudflare";
+export const onOff = (value: string) =>
+  value === "on" || value === "off" ? null : "must be on or off";
 export const nonEmpty = (value: string) => (value.trim().length > 0 ? null : "cannot be empty");
 export const digits = (value: string) => (DIGITS.test(value) ? null : "must be only digits");
 export const uuid = (value: string) => (UUID.test(value) ? null : "must be a UUID");

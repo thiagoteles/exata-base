@@ -5,9 +5,10 @@
  *
  *   pnpm umami <command> [flags]
  *
- * Credentials come from the environment, or from `.env.umami` (ignored by git), never from flags:
- *   UMAMI_URL                    the server, such as https://analytics.example.com; when absent,
- *                                the origin of UMAMI_SCRIPT_URL
+ * Credentials come from the environment, or from `.env.umami` or `.env.local` (both ignored by
+ * git), never from flags:
+ *   UMAMI_URL                    the server, such as https://analytics.example.com (UMAMI_ADDRESS
+ *                                works too); when absent, the origin of UMAMI_SCRIPT_URL
  *   UMAMI_USERNAME, UMAMI_PASSWORD   a self-hosted user
  *   UMAMI_API_KEY                Umami Cloud, instead of a user (UMAMI_URL=https://api.umami.is/v1)
  *   UMAMI_WEBSITE_ID             the default for --website
@@ -54,13 +55,18 @@ const SHARE_BYTES = 8;
 const LIST = "pageSize=200";
 const MY_WEBSITES = `/api/me/websites?${LIST}`;
 
-if (existsSync(".env.umami")) {
-  loadEnvFile(".env.umami");
+// A variable already in the environment wins; then .env.umami, then .env.local, which holds the
+// test credentials a person leaves for local work.
+for (const file of [".env.umami", ".env.local"]) {
+  if (existsSync(file)) {
+    loadEnvFile(file);
+  }
 }
 
 // Read once, after the optional file is loaded, so every command sees the same settings.
 const {
-  UMAMI_URL,
+  UMAMI_ADDRESS,
+  UMAMI_URL = UMAMI_ADDRESS,
   UMAMI_SCRIPT_URL,
   UMAMI_API_KEY,
   UMAMI_USERNAME,

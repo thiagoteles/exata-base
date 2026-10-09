@@ -32,7 +32,7 @@ Este arquivo é o estado do trabalho. Uma sessão nova, ou a mesma depois de uma
 ### O que o loop nunca faz
 
 - Push, deploy, `pnpm gcp:alerts` ou `gcp:access-log` sem `DRY_RUN`, ou qualquer escrita em serviço externo.
-- Usar credencial real, gravar segredo em arquivo versionado ou apagar recurso fora do repositório.
+- Usar credencial que não seja de teste, gravar segredo em arquivo versionado, imprimir um valor de `.env.local` ou apagar recurso fora do repositório. O `.env.local` (ignorado pelo git) traz as chaves de teste que o dono deixou para provar o que for preciso (Stripe `sk_test_`, Clerk de teste, Mailtrap, Umami): podem ser lidas e usadas, nunca impressas nem copiadas para arquivo versionado. Uma chave `sk_live_` ou de produção é recusada. O Stripe em modo de teste pode receber produtos, preços e eventos de prova.
 - Pular hook (`--no-verify`), silenciar plugin do Biome ou baixar o piso de cobertura.
 - Acrescentar código sem consumidor: o knip recusa. Mecanismo novo entra com um uso na base (exemplo neutro no `/catalog` ou numa tela existente).
 
@@ -136,7 +136,8 @@ Itens das seções abaixo que o loop não faz, e por quê. Ficam como referênci
 
 O loop marca a unidade com `⏸` e segue. Quando você puder, cada item destrava o que diz.
 
-- **Chaves de teste do Stripe e `stripe listen`:** prova no sandbox de F6 (preços por `lookup_key`, moedas, Pix com "Simulate scan" e CPF `000.000.000-00`, trial, disputa, cupons).
+- **Chave do GCS para testar o storage:** o dono pediu a chave do projeto "test" no `.env.local`, mas não existe projeto com esse nome (o mais parecido é `testchunk`, e o `gcloud` está logado como o dono). Criar conta de serviço e chave é escrever na conta de GCP dele, então a unidade espera um nome de projeto confirmado. O `.env.local` já tem as chaves de teste de Stripe (com o `STRIPE_WEBHOOK_SECRET` impresso pelo `stripe listen --print-secret`), Clerk, Mailtrap e Umami.
+- **Pix no sandbox do Stripe:** só aparece se a conta de teste tiver o Pix habilitado e o Brasil como país; o loop confere e marca `⏸` em F6.4 se não tiver.
 - **Servidor real atrás do Traefik ou da Cloudflare:** IP e porta de origem do cliente (Marco Civil, rate limit), número de réplicas e custo da escrita por requisição.
 - **Projeto GCP:** aplicar `pnpm gcp:alerts` e `pnpm gcp:access-log` de verdade.
 - **Renovate:** instalar o app hospedado no repositório (F1.7 deixa a configuração pronta).

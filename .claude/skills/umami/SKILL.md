@@ -9,9 +9,9 @@ Everything goes through `pnpm umami`, which prints JSON. Run `pnpm umami --help`
 
 ## Before anything
 
-1. **Credentials.** The script reads `UMAMI_URL`, `UMAMI_USERNAME` and `UMAMI_PASSWORD` (or
-   `UMAMI_API_KEY` for Umami Cloud, with `UMAMI_URL=https://api.umami.is/v1`) from the environment
-   or from `.env.umami`, which git ignores. If they are missing, ask the person for them and offer
+1. **Credentials.** The script reads `UMAMI_URL` (or `UMAMI_ADDRESS`), `UMAMI_USERNAME` and
+   `UMAMI_PASSWORD` (or `UMAMI_API_KEY` for Umami Cloud, with `UMAMI_URL=https://api.umami.is/v1`)
+   from the environment, then from `.env.umami`, then from `.env.local`, which git ignores. If they are missing, ask the person for them and offer
    to write `.env.umami`. Never put them in a tracked file, a flag or a commit message. They are
    admin credentials: they never go to the hosting panel.
 2. **Check the connection** with `pnpm umami whoami`.

@@ -21,12 +21,22 @@ export type AnalyticsEvents = EventCatalog<{
   activated: Record<string, never>;
   paywall_viewed: { source: string };
   checkout_started: { interval: string };
-  payment_confirmed: { method: string; cents: number };
+  /** `revenue` (in units, not cents) and `currency` are the names Umami's revenue report reads. */
+  payment_confirmed: { method: string; cents: number; revenue: number; currency: string };
   /** LCP, INP or CLS from a sample of page loads. Milliseconds, except CLS, which has no unit. */
   web_vital: { metric: string; value: number; rating: string };
 }>;
 
 export type AnalyticsEvent = keyof AnalyticsEvents;
+
+/** The standard funnel in order, which the analytics setup builds its reports from. */
+export const funnel = [
+  "signup_completed",
+  "activated",
+  "paywall_viewed",
+  "checkout_started",
+  "payment_confirmed",
+] as const satisfies readonly AnalyticsEvent[];
 
 /** The data argument, optional when the event carries none. */
 export type EventData<E extends AnalyticsEvent> =

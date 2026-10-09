@@ -59,4 +59,4 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 
 ### Skills
 
-Recipes live in `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `new-text-key`, `new-email`, `new-daily-operation`, `new-payment-event`. Follow the recipe, then copy the pattern of the area it points to.
+Recipes live in `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `new-text-key`, `new-email`, `new-daily-operation`, `new-payment-event`, `umami` (analytics setup and checks through `pnpm umami`). Follow the recipe, then copy the pattern of the area it points to.

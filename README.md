@@ -96,7 +96,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PRICE_LIFETIME` | no | Each price you sell. Only a filled price is shown |
 | `GCP_CREDENTIALS`, `GCP_PROJECT`, `GCS_BUCKET` | no | All three. The service account JSON in base64; turns on Cloud Logging and Cloud Storage (a private bucket with uniform access) |
 | `FILE_URL_SECRET` | without a bucket | At least 32 characters. Signs file links when files are on disk |
-| `UMAMI_WEBSITE_ID`, `UMAMI_SCRIPT_URL` | no | Together. Turns on analytics |
+| `UMAMI_WEBSITE_ID`, `UMAMI_SCRIPT_URL` | no | Together. Turns on analytics. `pnpm umami setup` creates the website and prints both (see Analytics) |
 | `GOOGLE_SITE_VERIFICATION` | no | The token of Search Console's meta tag method; shown on the home page |
 | `ACCESS_LOG` | no | `on` for a product run for profit: one access record per request (address, source port when known, time, path), as the Marco Civil asks. Kept 183 days in a log of its own: run `pnpm gcp:access-log` once. Outside Google Cloud the lines go to stdout, and keeping them is the operator's job |
 | `SOURCE_COMMIT`, `SERVICE_NAME` | no | The deployed commit (Coolify fills it) and the service name (`app`); Error Reporting groups errors by both |
@@ -122,6 +122,15 @@ The database is backed up by the hosting platform: in Coolify, a scheduled backu
 - **App down:** `/health` checked every minute from three regions.
 
 `DRY_RUN=1` prints the gcloud commands without running them.
+
+## Analytics
+
+Umami, with no cookie and no personal data: events are declared in `lib/analytics-events.ts`, and only the internal account id identifies a person. `pnpm umami` talks to the Umami server and prints JSON, so a person or an AI agent can drive it (the `umami` skill is the recipe). Put the admin credentials in `.env.umami`, which git ignores (`UMAMI_URL`, `UMAMI_USERNAME`, `UMAMI_PASSWORD`, or `UMAMI_API_KEY` for Umami Cloud); they never go to the hosting panel.
+
+- `pnpm umami setup --domain <host>` finds or creates the website and the standard reports (full and purchase funnels, goals, revenue, retention, paths), and prints the two variables for the app. Run it again any time; it only creates or corrects.
+- `pnpm umami events`, `stats`, `properties` and `run --type <report>` read what arrived.
+- `pnpm umami share --on` gives the dashboard a public read-only link.
+- `pnpm umami api <METHOD> <path> [json]` reaches any other endpoint.
 
 ## Daily operations
 

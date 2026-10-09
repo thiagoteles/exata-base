@@ -58,7 +58,12 @@ describe("the payment record", () => {
     );
     expect(await db.select().from(payments)).toHaveLength(1);
     // Only the first recording is reported, so the funnel counts the payment once.
-    expect(first.newPayment).toEqual({ payerId: user.id, method: "card", cents: 1000 });
+    expect(first.newPayment).toEqual({
+      payerId: user.id,
+      method: "card",
+      cents: 1000,
+      currency: "brl",
+    });
     expect(again.newPayment).toBeNull();
   });
 

@@ -27,6 +27,7 @@
     "gcp:access-log": "bash scripts/gcp-access-log.sh",
     "email:preview": "email dev --dir emails --port 3301",
     "setup:product": "tsx scripts/setup-product.mts",
+    "umami": "tsx scripts/umami.mts",
     "tokens": "tsx scripts/tokens.ts",
     "tokens:check": "tsx scripts/tokens.ts --check",
     "content": "tsx scripts/content.ts",

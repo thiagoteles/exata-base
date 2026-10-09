@@ -26,7 +26,7 @@ describe("Umami sink", () => {
     await sink({
       name: "payment_confirmed",
       accountId: "acc_1",
-      data: { method: "card", cents: 4900 },
+      data: { method: "card", cents: 4900, revenue: 49, currency: "BRL" },
     });
     expect(sent).toHaveLength(1);
     expect(sent[0]?.url).toBe("https://umami.example.com/api/send");
@@ -37,7 +37,7 @@ describe("Umami sink", () => {
         hostname: "app.example.com",
         url: "/",
         name: "payment_confirmed",
-        data: { method: "card", cents: 4900 },
+        data: { method: "card", cents: 4900, revenue: 49, currency: "BRL" },
         id: "acc_1",
       },
     });

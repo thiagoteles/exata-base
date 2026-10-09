@@ -26,7 +26,12 @@ async function personOfCustomer(tx: Transaction, customerId: string | null) {
 }
 
 /** A payment recorded for the first time, which is when it counts in the funnel. */
-export type NewPayment = { payerId: string | null; method: string | null; cents: number };
+export type NewPayment = {
+  payerId: string | null;
+  method: string | null;
+  cents: number;
+  currency: string;
+};
 
 export async function recordPayment(
   tx: Transaction,
@@ -50,7 +55,12 @@ export async function recordPayment(
     .returning({ payerId: payments.payerId });
   return recorded === undefined
     ? null
-    : { payerId: recorded.payerId, method: event.method, cents: event.amountCents };
+    : {
+        payerId: recorded.payerId,
+        method: event.method,
+        cents: event.amountCents,
+        currency: event.currency,
+      };
 }
 
 export async function recordRefund(

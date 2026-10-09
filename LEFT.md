@@ -386,7 +386,7 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [x] **Validado** no Umami do solmiza (site de teste próprio, 9/10/2026):
   - o `id` do payload vira o `distinctId` da sessão, e as propriedades chegam (`method`, `cents`);
   - o filtro de robôs descartava os eventos do servidor: o Umami responde `200 {"beep":"boop"}` a qualquer User-Agent que não seja de navegador (`node`, que o fetch manda por padrão, um nome de servidor, `Mozilla/5.0 (compatible; ...)`), e o adapter tomava isso por sucesso. Corrigido: User-Agent vazio, que passa, e `beep` tratado como falha no log;
-  - limite: um evento do servidor abre uma sessão própria (o Umami calcula a sessão por IP e User-Agent), ligada à do navegador só pelo `distinctId`, e o país sai o do servidor.
+  - com o id da pessoa, o Umami 3 calcula a sessão pelo id: o evento do servidor cai na mesma sessão do navegador identificado (provado), então o funil junta etapas do navegador e do servidor. O país de um evento só do servidor sai o do servidor.
 
 ### 10. Funil padrão
 
@@ -394,7 +394,8 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [x] `signup_completed` sai quando a conta fica utilizável: no login próprio, na confirmação do e-mail (ou na criação, quando o Google já entrega o e-mail confirmado); no Clerk, quando a linha é inserida (o `xmax = 0` do upsert distingue inserção de ligação a uma linha existente, então o seed ligado não conta).
 - [x] `checkout_started` na action de compra; `payment_confirmed` no webhook.
 - [x] `activated` e `paywall_viewed` ficam declarados; quem emite é o produto (primeiro jogo salvo no lottery, primeira lição concluída no solmiza; o paywall, onde ele aparecer).
-- [ ] Funil e metas configurados no Umami por um script, como o `gcp:alerts`. Precisa de um Umami com usuário de API para provar.
+- [x] Funil e metas configurados no Umami por um script: `pnpm umami setup` (idempotente) cria o site e os relatórios padrão (funil completo e de compra a partir do `funnel` do catálogo, metas de cadastro e pagamento, receita, retenção, caminhos). O `pnpm umami` cobre leitura, link público, exclusões com `--yes` e qualquer endpoint por `api`; a skill `umami` ensina o uso. Provado no Umami do solmiza.
+- [x] `payment_confirmed` leva `revenue` (em reais) e `currency`, que o relatório de receita do Umami lê. Provado: R$ 49,90 apareceu no relatório.
 
 ### 11. Números de negócio no admin
 

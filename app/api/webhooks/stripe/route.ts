@@ -27,7 +27,12 @@ export const POST = timedRoute("/api/webhooks/stripe", async (request: NextReque
     sendEvent({
       name: "payment_confirmed",
       accountId: newPayment.payerId,
-      data: { method: newPayment.method ?? "unknown", cents: newPayment.cents },
+      data: {
+        method: newPayment.method ?? "unknown",
+        cents: newPayment.cents,
+        revenue: newPayment.cents / 100,
+        currency: newPayment.currency.toUpperCase(),
+      },
     });
   }
   return Response.json({ result: status });

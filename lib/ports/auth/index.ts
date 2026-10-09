@@ -28,7 +28,10 @@ async function sendAccountEmail(to: string, build: (t: EmailTranslator) => Accou
   const locale = chooseLocale(await savedLocaleOfEmail(db, to), await requestLocale());
   const message = build(await emailTranslatorFor(locale));
   const { html, text } = await renderEmail(message.element);
-  if (!(await sendEmail({ to, subject: message.subject, html, text }))) {
+  if (
+    (await sendEmail({ to, category: "transactional", subject: message.subject, html, text })) ===
+    "failed"
+  ) {
     // Surfacing the failure lets the sign-up screen tell the person the e-mail did not go out.
     throw new Error("account e-mail not sent");
   }

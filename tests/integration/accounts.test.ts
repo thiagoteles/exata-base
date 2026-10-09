@@ -174,6 +174,7 @@ describe("preferences in the options column", () => {
     expect(await readPreferences(db, user.id)).toEqual({
       theme: "system",
       timeZone: "America/Sao_Paulo",
+      email: { reminders: true, news: false },
       locale: "pt-BR",
     });
     await db
@@ -183,12 +184,14 @@ describe("preferences in the options column", () => {
     expect(await readPreferences(db, user.id)).toEqual({
       theme: "system",
       timeZone: "America/Sao_Paulo",
+      email: { reminders: true, news: false },
       locale: "pt-BR",
     });
     await savePreference(db, user.id, "theme", "dark");
     expect(await readPreferences(db, user.id)).toEqual({
       theme: "dark",
       timeZone: "America/Sao_Paulo",
+      email: { reminders: true, news: false },
       locale: "pt-BR",
     });
   });

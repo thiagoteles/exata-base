@@ -30,12 +30,14 @@ describe("resolving what is stored", () => {
     expect(resolvePreferences({})).toEqual({
       theme: "system",
       timeZone: "America/Sao_Paulo",
+      email: { reminders: true, news: false },
       locale: "pt-BR",
     });
     expect(resolvePreferences({ theme: "dark" }).theme).toBe("dark");
     expect(resolvePreferences({ theme: "sepia", locale: 3, timeZone: "Mars/Base" })).toEqual({
       theme: "system",
       timeZone: "America/Sao_Paulo",
+      email: { reminders: true, news: false },
       locale: "pt-BR",
     });
     expect(savedPreference({ theme: "sepia" }, "theme")).toBeUndefined();

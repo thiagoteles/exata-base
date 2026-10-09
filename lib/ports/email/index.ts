@@ -1,11 +1,15 @@
+import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/ports/log";
-import type { EmailMessage, EmailSender } from "./types";
+import { allowedRecipients } from "./consent";
+import type { EmailMessage, EmailSender, SendResult } from "./types";
 
 /*
  * The e-mail port. A message is sent at once, inside the action: there is no outbox and no retry.
  * With MAILTRAP_TOKEN it goes to the Mailtrap Email API; otherwise, in the compose, to Mailpit.
  * A failure is logged as an error and reported to the caller, which decides what to tell the person.
+ * A message of a kind the person turned off is not sent and is reported as declined, which is not
+ * an error.
  */
 
 async function loadSender(): Promise<EmailSender | null> {
@@ -26,19 +30,23 @@ async function loadSender(): Promise<EmailSender | null> {
 
 let sender: Promise<EmailSender | null> | undefined;
 
-/** Sends one message. Resolves to false when it was not sent; the reason is in the log. */
-export async function sendEmail(message: EmailMessage): Promise<boolean> {
+/** Sends one message to whoever may get it. The reason for anything but "sent" is in the log. */
+export async function sendEmail(message: EmailMessage): Promise<SendResult> {
+  const recipients = await allowedRecipients(db, message);
+  if (recipients.length === 0) {
+    return "declined";
+  }
   sender ??= loadSender();
   const destination = await sender;
   if (destination === null) {
     logger.error("email not sent: no destination is configured", { subject: message.subject });
-    return false;
+    return "failed";
   }
   try {
-    await destination.send(message);
-    return true;
+    await destination.send({ ...message, to: recipients });
+    return "sent";
   } catch (error) {
     logger.error("email not sent", { subject: message.subject, error });
-    return false;
+    return "failed";
   }
 }

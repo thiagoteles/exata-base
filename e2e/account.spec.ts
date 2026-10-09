@@ -96,6 +96,34 @@ test("the theme is applied at once, kept on reload, and saved in the account", a
   await forgotten;
 });
 
+test("e-mail choices start at reminders on and news off, and are kept", async ({ page }) => {
+  await signIn(page);
+  const reminders = page.getByRole("switch", { name: "Lembretes" });
+  const news = page.getByRole("switch", { name: "Novidades" });
+  await expect(reminders).toBeChecked();
+  await expect(news).not.toBeChecked();
+  // What the account needs is not a choice, and the page says so.
+  await expect(page.getByText("são sempre enviadas")).toBeVisible();
+
+  const saved = () =>
+    page.waitForResponse(
+      (response) => response.request().method() === "POST" && response.url().endsWith("/account"),
+    );
+  let answer = saved();
+  await news.click();
+  await expect(news).toBeChecked();
+  await answer;
+  answer = saved();
+  await reminders.click();
+  await expect(reminders).not.toBeChecked();
+  await answer;
+
+  // Both answers survive a reload, each as it was left.
+  await page.reload();
+  await expect(page.getByRole("switch", { name: "Novidades" })).toBeChecked();
+  await expect(page.getByRole("switch", { name: "Lembretes" })).not.toBeChecked();
+});
+
 test("the data export is a ZIP with the person's own data", async ({ page }) => {
   await signIn(page);
   const download = page.waitForEvent("download");

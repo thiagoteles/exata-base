@@ -10,7 +10,13 @@ function recordingFetch(status = 200) {
   return { calls, fetch: fetch as typeof globalThis.fetch };
 }
 
-const message = { to: "ana@example.com", subject: "Oi", html: "<p>Oi</p>", text: "Oi" };
+const message = {
+  to: "ana@example.com",
+  category: "transactional" as const,
+  subject: "Oi",
+  html: "<p>Oi</p>",
+  text: "Oi",
+};
 
 describe("Mailtrap Email API", () => {
   it("posts the message with the token to the sending API", async () => {

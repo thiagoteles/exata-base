@@ -7,6 +7,7 @@ import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { buttonClasses } from "@/components/ui/styles";
 import { DeleteAccount } from "@/features/account/delete-account";
+import { EmailPreferencesPanel } from "@/features/account/email-preferences";
 import { ThemePicker } from "@/features/account/theme-picker";
 import { LanguageSwitcher } from "@/features/language/language-switcher";
 import { db } from "@/lib/db/client";
@@ -38,7 +39,8 @@ async function AccountContent() {
     <>
       <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
       <div className="flex flex-col gap-8">
-        <RecordGrid>
+        {/* Four cells fill two columns exactly; three columns would leave a gap in the second row. */}
+        <RecordGrid className="md:grid-cols-2 xl:grid-cols-2">
           <RecordCell label={t("profile.name")}>
             {user.name.trim() || t("profile.noName")}
           </RecordCell>
@@ -54,6 +56,11 @@ async function AccountContent() {
           <ThemePicker initial={preferences.theme} />
           <p className="max-w-[52ch] text-body-small text-ink-muted">{t("theme.help")}</p>
           {isMultilingual ? <LanguageSwitcher /> : null}
+        </Panel>
+
+        <Panel className="flex flex-col gap-4">
+          <h2 className="text-block-title text-ink">{t("email.title")}</h2>
+          <EmailPreferencesPanel initial={preferences.email} />
         </Panel>
 
         <Panel className="flex flex-col gap-4">

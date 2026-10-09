@@ -26,7 +26,16 @@ export async function notifyTeam(
     url: new URL(`/staff/contacts/${message.id}`, env.APP_URL).toString(),
   });
   const { html, text } = await renderEmail(element);
-  return sendEmail({ to: recipients, subject, html, text, replyTo: message.email });
+  return (
+    (await sendEmail({
+      to: recipients,
+      category: "transactional",
+      subject,
+      html,
+      text,
+      replyTo: message.email,
+    })) !== "failed"
+  );
 }
 
 /** Sends the answer to the person who wrote. Replies to it go to the first team address, if there is one. */
@@ -41,11 +50,14 @@ export async function sendReply(
     await emailTranslatorFor(locale),
   );
   const { html, text } = await renderEmail(element);
-  return sendEmail({
-    to: message.email,
-    subject,
-    html,
-    text,
-    ...(replyTo === undefined ? {} : { replyTo }),
-  });
+  return (
+    (await sendEmail({
+      to: message.email,
+      category: "transactional",
+      subject,
+      html,
+      text,
+      ...(replyTo === undefined ? {} : { replyTo }),
+    })) !== "failed"
+  );
 }

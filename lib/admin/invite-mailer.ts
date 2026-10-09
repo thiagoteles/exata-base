@@ -20,5 +20,7 @@ export async function sendInvite(input: {
     await emailTranslatorFor(input.locale),
   );
   const { html, text } = await renderEmail(element);
-  return sendEmail({ to: input.to, subject, html, text });
+  return (
+    (await sendEmail({ to: input.to, category: "transactional", subject, html, text })) !== "failed"
+  );
 }

@@ -487,6 +487,19 @@
       "help": "Vale neste navegador e nos outros em que você entrar.",
       "failed": "Não foi possível salvar o tema."
     },
+    "email": {
+      "title": "E-mails",
+      "reminders": {
+        "label": "Lembretes",
+        "description": "Avisos sobre o que está por vencer ou ficou pela metade."
+      },
+      "news": {
+        "label": "Novidades",
+        "description": "Notícias do produto. Só enviamos se você ligar."
+      },
+      "always": "Mensagens sobre a sua conta e os seus pagamentos, como o link de confirmação e os recibos, são sempre enviadas.",
+      "failed": "Não foi possível salvar a sua escolha de e-mails."
+    },
     "data": {
       "title": "Seus dados",
       "body": "Baixe um arquivo com tudo o que guardamos sobre você: seus dados e os arquivos que você enviou.",

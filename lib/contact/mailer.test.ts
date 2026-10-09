@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
-import { notifyTeam } from "./mailer";
+import { describe, expect, it, vi } from "vitest";
 import type { ContactRow } from "./service";
+
+// Mail to the team needs nothing from the database, so a stand-in is all the port asks for here.
+vi.mock("@/lib/db/client", () => ({ db: {} }));
+
+const { notifyTeam } = await import("./mailer");
 
 const row = { id: "1", name: "Ana", email: "ana@example.com", body: "Oi" } as ContactRow;
 

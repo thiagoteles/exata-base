@@ -1,4 +1,5 @@
 import { isTimeZone } from "@/domain/calendar";
+import { defaultEmailPreferences, type EmailPreferences } from "@/domain/email/consent";
 import { defaultLocale, LOCALE_COOKIE, locales, timeZone } from "@/lib/i18n/locales";
 import { THEME_COOKIE, themes } from "@/lib/theme";
 import { z } from "@/lib/validation";
@@ -38,6 +39,11 @@ export const preferences = {
   timeZone: definePreference<string>({
     schema: z.string().refine(isTimeZone),
     fallback: timeZone,
+  }),
+  // What may be e-mailed beyond what the account needs. See `domain/email/consent.ts`.
+  email: definePreference<EmailPreferences>({
+    schema: z.object({ reminders: z.boolean(), news: z.boolean() }).strict(),
+    fallback: defaultEmailPreferences,
   }),
   locale: definePreference<(typeof locales)[number]>({
     schema: z.enum(locales),

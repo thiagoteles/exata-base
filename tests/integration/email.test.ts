@@ -28,6 +28,7 @@ describe("SMTP to Mailpit", () => {
     );
     await sender.send({
       to: "ana@example.com",
+      category: "transactional",
       subject: "Convite",
       html: "<p>Olá</p>",
       text: "Olá",

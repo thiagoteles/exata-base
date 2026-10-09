@@ -15,7 +15,8 @@ Este arquivo é o estado do trabalho. Uma sessão nova, ou a mesma depois de uma
    - `pnpm check`, julgado pelo código de saída e nunca por `grep`;
    - `pnpm test:integration`, quando tocar regra com banco;
    - tela nova: captura nos dois temas e no celular, conferida a olho, mais axe no e2e;
-   - comportamento que só aparece em produção: o item vai para o `pnpm verify`.
+   - comportamento que só aparece em produção: o item vai para o `pnpm verify`;
+   - a suíte e2e é escrita para o compose limpo (sem provedor de pagamento): com o Stripe de teste no `.env.local`, `pnpm test:e2e` contra o compose local muda o estado. A prova de e2e é o `pnpm verify`, que roda numa cópia limpa sem `.env.local`; para provar uma tela de cobrança com o Stripe ligado, use um spec próprio contra o compose local.
 5. Commit de uma unidade por vez, em inglês, no formato `tipo: descrição` (o hook roda o `pnpm check`). **Nunca faça push.**
 6. Marque `[x]` na unidade e nos itens da seção, com uma linha do que provou. Atualize o `BASE.md` (decisões e armadilhas), o `AGENTS.md` (regras novas), o `README.md` (comandos e variáveis) e as skills quando a unidade mudar uma regra.
 7. Ao fechar uma **fase**, rode o `pnpm verify` com o compose derrubado (`docker compose down`, depois `docker compose up -d`), e só então siga para a fase seguinte.
@@ -47,8 +48,8 @@ As fases seguem a dependência entre elas. Cada unidade aponta a seção que det
 - [x] **F1.3 Convenções do banco.** (feito: três regras novas no teste de convenções, com um teste que prova que cada uma pega o erro que existe para pegar) `lib/db/conventions.test.ts` recusa coluna `real`, `double` ou `numeric` com nome de dinheiro (`price`, `amount`, `cents`, `total`, `value`), `timestamp` sem fuso, e valores de enum fora de `snake_case` ASCII. *Regras, item 3.*
 - [x] **F1.4 `tools/`.** (feito: provado com um arquivo-sonda que quebra todas as regras, que o `pnpm check` não vê; a pasta também fica fora do `.dockerignore`) `tools/README.md` explicando a pasta, e ela fora do Biome, do knip, do tsconfig e do Vitest. *Regras, item 4.*
 - [x] **F1.5 Skill `port-from-legacy`.** (feito; falta citar o extrator quando F7.2 existir, anotado em F7.2) A ordem para cada arquivo trazido de fora (camada, textos, relógio e aleatoriedade, check), citando o extrator de F7.2 quando existir. *Regras, item 5.*
-- [ ] **F1.6 Notas de SEO e deploy.** No `BASE.md`: nunca `as` no `<Link>`; um 301 fica guardado no navegador, então renomear um caminho público mantém o antigo no mapa; o Coolify faz deploy da `main` a cada push, e o hook de push é a barreira. *SEO, item 1; Infraestrutura, item 1.*
-- [ ] **F1.7 Renovate.** `renovate.json` com lotes semanais, versões exatas e as atualizações de Next, React e TypeScript isoladas. Ligar o app hospedado fica com o dono (anotar em "Depende de você"). *Infraestrutura, item 1.*
+- [x] **F1.6 Notas de SEO e deploy.** (feito: três armadilhas no `BASE.md`, seção 5) No `BASE.md`: nunca `as` no `<Link>`; um 301 fica guardado no navegador, então renomear um caminho público mantém o antigo no mapa; o Coolify faz deploy da `main` a cada push, e o hook de push é a barreira. *SEO, item 1; Infraestrutura, item 1.*
+- [x] **F1.7 Renovate.** (feito: `renovate.json` validado pelo `renovate-config-validator`; um erro de curinga foi pego e corrigido) `renovate.json` com lotes semanais, versões exatas e as atualizações de Next, React e TypeScript isoladas. Ligar o app hospedado fica com o dono (anotar em "Depende de você"). *Infraestrutura, item 1.*
 
 ### F2. Agendamento e ingestão
 

@@ -109,6 +109,10 @@ Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `n
 - Com Clerk ligado, ou com a Stripe ligada, o servidor de desenvolvimento escreve no log erros do validador `instant` do Next (`Could not validate instant ...` no `RootLayout`, ou `Math.random()` vindo do SDK da Stripe na página do plano). As páginas respondem 200 e as suítes passam; é ruído de validação do modo de desenvolvimento, não falha do produto.
 - Hook de commit precisa de Node 24 no shell (`nvm use 24`), senão o `pnpm` recusa o engine.
 
+- **`as` no `<Link>` não faz nada.** No App Router o `<Link>` ignora a prop e aceita qualquer texto como `href`, então um endereço público escrito à mão compila e perde o prefetch (bate no 301). O `href` sai de `publicHref`, e um teste de fonte recusa a rota escrita à mão.
+- **Um 301 fica guardado no navegador.** Renomear um caminho público depois de publicado exige manter o antigo no mapa (ou em `lib/redirects.ts`), senão quem já o visitou não chega mais ao novo.
+- **Deploy sem CI.** O Coolify observa a `main` e faz o deploy a cada push, sem passar por nenhuma Action. A barreira é o hook de `pre-push` (build e `check:prerender`) mais o `pnpm verify` antes de entregar uma fase; `--no-verify` é a única forma de pular.
+
 ## 6. Estado
 
 As fases 0 a 12 do plano foram feitas e provadas (cada uma foi um commit `feat:`/`chore:` ... `for phase N`, hoje só no bundle da seção 8). Último estado provado, em 2026-10-08, num produto criado do zero com `create-next-app --example` contra o repositório público: `pnpm check` limpo com 215 testes de unidade, 102 de integração, 69 de 69 no Playwright no compose limpo (5 pulados: idioma e Clerk), 67 de 67 com Stripe e Cloud Storage ligados (7 pulados, os que só valem sem provedor), e 3 de 3 em `pnpm test:clerk`.

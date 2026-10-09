@@ -1,0 +1,35 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices", ":pinAllExactly"],
+  "schedule": ["before 6am on monday"],
+  "timezone": "America/Sao_Paulo",
+  "prConcurrentLimit": 3,
+  "labels": ["dependencies"],
+  "groupName": "weekly updates",
+  "packageRules": [
+    {
+      "description": "Next, React and TypeScript set how the whole app compiles and renders: one pull request each, never grouped with the rest",
+      "matchPackageNames": [
+        "next",
+        "react",
+        "react-dom",
+        "typescript",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "groupName": null,
+      "addLabels": ["core"]
+    },
+    {
+      "description": "The Node and Postgres images follow the major the base was proven with",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["node", "postgres"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on the first day of the month"]
+  }
+}

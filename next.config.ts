@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { locales } from "./lib/i18n/locales";
 import { movedAddresses } from "./lib/redirects";
+import { securityHeaders } from "./lib/security/headers";
 
 const withNextIntl = createNextIntlPlugin({
   requestConfig: "./lib/i18n/request.ts",
@@ -26,6 +27,7 @@ const nextConfig: NextConfig = {
   },
   // The image ships only the traced server, not the whole node_modules.
   output: "standalone",
+  headers: () => Promise.resolve([{ source: "/(.*)", headers: [...securityHeaders] }]),
   redirects: () => Promise.resolve(movedAddresses.map((moved) => ({ ...moved, permanent: true }))),
   turbopack: {
     rules: {

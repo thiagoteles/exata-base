@@ -710,15 +710,15 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 Hoje não há nenhum cabeçalho de segurança.
 
-- [ ] Já, sem risco:
+- [x] Já, sem risco:
   - `Strict-Transport-Security`;
   - `X-Content-Type-Options: nosniff`;
   - `Referrer-Policy: strict-origin-when-cross-origin`;
   - `frame-ancestors 'none'`;
   - `Permissions-Policy` fechando câmera, microfone e localização. O produto abre o que precisa (o solmiza, `microphone=(self)`).
-- [ ] **Decisão:** CSP sem nonce, primeiro em `Content-Security-Policy-Report-Only`, com violações enviadas para o log. Mantém a casca estática.
-- [ ] Cada port declara os domínios que usa (Clerk, Stripe, Umami, GCS), e a política é montada a partir dessas declarações.
-- [ ] O produto acrescenta o que precisa (no solmiza, `worker-src blob:` e `script-src blob:` para o AudioWorklet).
+- [x] **Decisão:** CSP sem nonce, primeiro em `Content-Security-Policy-Report-Only`, com violações enviadas para o log. Mantém a casca estática. Só `report-uri` (o `report-to` desligava a entrega no Chrome).
+- [x] Cada parte declara os domínios que usa (Clerk e Umami; Stripe e GCS abrem por navegação e não entram na página), e a política é montada a partir dessas declarações.
+- [x] O produto acrescenta o que precisa (no solmiza, `worker-src blob:` e `script-src blob:` para o AudioWorklet) em `lib/security/sources.ts`.
 - [ ] A CSP passa a valer de verdade depois de um período sem violações inesperadas.
 - [ ] **Validar:** o `experimental.sri` do Next (hash dos scripts) como reforço, sem renderização dinâmica.
 

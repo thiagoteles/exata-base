@@ -6,9 +6,14 @@ import { internalPathOf, publicPathOf } from "@/lib/i18n/public-paths";
 import { isMissingPage } from "@/lib/known-pages";
 import { authProxy } from "@/lib/ports/auth/proxy";
 import { REQUEST_ID_HEADER, requestIdFrom } from "@/lib/request-id";
+import { buildCsp } from "@/lib/security/csp";
+import { cspSources } from "@/lib/security/sources";
 
 const PERMANENT = 301;
 const MISSING_PAGE = "/_missing";
+// Built once from the runtime environment: the image is built with none, so the policy cannot be
+// fixed at build time like the other security headers.
+const reportOnlyPolicy = buildCsp(cspSources(), { development: env.NODE_ENV !== "production" });
 // Marks a request this proxy already rewrote. In production Next passes a rewritten request through
 // the proxy again to resume a prerendered page, now at the route address; without the mark that
 // second pass would answer the route address with the redirect, and the page would never load. A
@@ -59,6 +64,7 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
       ? NextResponse.rewrite(clean, { request: { headers } })
       : NextResponse.next({ request: { headers } });
     response.headers.set(REQUEST_ID_HEADER, requestId);
+    response.headers.set("Content-Security-Policy-Report-Only", reportOnlyPolicy);
     return decision === null ? response : rememberLocale(response, decision.locale);
   });
 }

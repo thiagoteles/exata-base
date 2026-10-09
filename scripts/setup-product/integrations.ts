@@ -1,3 +1,17 @@
+import {
+  digits,
+  email,
+  emailList,
+  nonEmpty,
+  proxy,
+  serviceAccount,
+  startsWith,
+  url,
+  uuid,
+} from "./field-checks";
+
+const ENV_LINE = /^([A-Z][A-Z0-9_]*)=(.*)$/;
+
 /*
  * The outside services a product can turn on, and what each one needs. The rules mirror the ones
  * the environment module enforces at boot (prefixes, groups that must be filled together), so a
@@ -22,41 +36,6 @@ export type Integration = {
   fields: readonly Field[];
   /** At least one of these fields must be filled (a service sold in several variants). */
   oneOf?: readonly string[];
-};
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DIGITS = /^\d+$/;
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ENV_LINE = /^([A-Z][A-Z0-9_]*)=(.*)$/;
-
-const startsWith = (prefix: string) => (value: string) =>
-  value.startsWith(prefix) ? null : `must start with ${prefix}`;
-const email = (value: string) => (EMAIL.test(value) ? null : "must be an e-mail address");
-const emailList = (value: string) =>
-  value
-    .split(",")
-    .map((item) => item.trim())
-    .every((item) => email(item) === null)
-    ? null
-    : "must be a comma list of e-mail addresses";
-const url = (value: string) =>
-  URL.canParse(value) ? null : "must be a full address, like https://example.com";
-const proxy = (value: string) =>
-  value === "traefik" || value === "cloudflare" ? null : "must be traefik or cloudflare";
-const nonEmpty = (value: string) => (value.trim().length > 0 ? null : "cannot be empty");
-const digits = (value: string) => (DIGITS.test(value) ? null : "must be only digits");
-const uuid = (value: string) => (UUID.test(value) ? null : "must be a UUID");
-const serviceAccount = (value: string) => {
-  try {
-    const parsed = JSON.parse(Buffer.from(value, "base64").toString("utf8")) as {
-      type?: string;
-    };
-    return parsed.type === "service_account"
-      ? null
-      : "must be the base64 of a service account JSON file";
-  } catch {
-    return "must be the base64 of a service account JSON file";
-  }
 };
 
 export const integrations: readonly Integration[] = [

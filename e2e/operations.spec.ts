@@ -17,3 +17,16 @@ test("the browser error route takes a small report and refuses the rest", async 
   ).toBe(413);
   expect((await request.get("/api/client-errors")).status()).toBe(405);
 });
+
+test("a script from an undeclared origin is reported, and the report reaches the server", async ({
+  page,
+}) => {
+  await page.goto("/termos");
+  const report = page.waitForResponse((response) => response.url().endsWith("/api/csp-report"));
+  await page.evaluate(() => {
+    const script = document.createElement("script");
+    script.src = "https://evil.example/probe.js";
+    document.body.append(script);
+  });
+  expect((await report).status()).toBe(204);
+});

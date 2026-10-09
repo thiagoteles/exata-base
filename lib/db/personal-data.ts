@@ -1,4 +1,5 @@
 import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
+import { apiTokens } from "./schema/api-tokens";
 import { accounts, sessions } from "./schema/auth";
 import { checkoutSessions, payments, plans } from "./schema/billing";
 import { contactMessages } from "./schema/contact";
@@ -30,6 +31,10 @@ export const notExportedData: readonly NotExported[] = [
     table: checkoutSessions,
     reason:
       "a trail of the person's own attempts to buy; what was bought is in the plan and the payments, which are exported",
+  },
+  {
+    table: apiTokens,
+    reason: "credentials: only the hash of each token is kept, and it is never handed out",
   },
   { table: referrals, reason: "records who invited the person, which names someone else" },
 ];

@@ -73,6 +73,13 @@ const server = {
   EMAIL_FROM: z.email().default("no-reply@app.local"),
   CONTACT_EMAIL: csv.pipe(z.array(z.email())).default([]),
 
+  // Exact origins (scheme and host, no path) whose web pages may read the API's answers.
+  API_ALLOWED_ORIGINS: csv
+    .pipe(z.array(z.url()))
+    .refine((list) => list.every((item) => new URL(item).origin === item), {
+      message: "API_ALLOWED_ORIGINS must be origins like https://app.example.com, with no path",
+    })
+    .default([]),
   CRON_SECRET: z.string().min(32).optional(),
   // `source=secret` pairs, one secret per source a worker outside the server may deliver to.
   INGEST_SECRETS: ingestSecrets.default({}),

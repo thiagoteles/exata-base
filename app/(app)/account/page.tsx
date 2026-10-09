@@ -10,6 +10,7 @@ import { buttonClasses } from "@/components/ui/styles";
 import { catalog } from "@/domain/billing/catalog";
 import { currentInstant } from "@/domain/clock";
 import { AccessibilityPreferences } from "@/features/account/accessibility-preferences";
+import { ApiTokens } from "@/features/account/api-tokens";
 import { DeleteAccount } from "@/features/account/delete-account";
 import { Devices } from "@/features/account/devices";
 import { EmailPreferencesPanel } from "@/features/account/email-preferences";
@@ -17,6 +18,7 @@ import { ReferralLink } from "@/features/account/referral-link";
 import { ThemePicker } from "@/features/account/theme-picker";
 import { LanguageSwitcher } from "@/features/language/language-switcher";
 import { FirstSteps } from "@/features/onboarding/first-steps";
+import { listApiTokens } from "@/lib/api/tokens";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { isMultilingual } from "@/lib/i18n/locales";
@@ -50,7 +52,7 @@ async function AccountContent() {
   const user = await requirePageRole("member", "/account");
   // Read fresh: the cached current user can be minutes behind a theme the person just chose.
   const access = await sessionAccess();
-  const [preferences, referral, earned, onboarding, steps, devices] = await Promise.all([
+  const [preferences, referral, earned, onboarding, steps, devices, tokens] = await Promise.all([
     readPreferences(db, user.id),
     referralSummary(db, user.id),
     earnedCredit(db, user.id),
@@ -59,6 +61,7 @@ async function AccountContent() {
     access.kind === "own"
       ? listDeviceSessions(db, user.id, access.currentId, currentInstant())
       : Promise.resolve([]),
+    listApiTokens(db, user.id),
   ]);
   return (
     <>
@@ -149,6 +152,18 @@ async function AccountContent() {
             )}
           </Panel>
         ) : null}
+
+        <Panel className="flex flex-col gap-4">
+          <h2 className="text-block-title text-ink">{t("apiTokens.title")}</h2>
+          <p className="max-w-[52ch] text-body-small text-ink-muted">{t("apiTokens.help")}</p>
+          <ApiTokens
+            rows={tokens.map((token) => ({
+              ...token,
+              expiresAt: token.expiresAt?.toISOString() ?? null,
+              lastUsedAt: token.lastUsedAt?.toISOString() ?? null,
+            }))}
+          />
+        </Panel>
 
         <Panel className="flex flex-col gap-4">
           <h2 className="text-block-title text-ink">{t("data.title")}</h2>

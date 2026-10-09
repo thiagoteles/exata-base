@@ -48,7 +48,10 @@ describe("source rules", () => {
           .filter((segment) => !segment.startsWith("("))
           .join("/")}`;
         const source = readFileSync(file, "utf8");
-        const timed = new RegExp(`timedRoute\\(\\s*"${RegExp.escape(pattern)}"`);
+        // The API wrappers time the route under the pattern they are given.
+        const timed = new RegExp(
+          `(timedRoute|apiRoute|apiPreflight)\\(\\s*"${RegExp.escape(pattern)}"`,
+        );
         return bare.test(source) || !timed.test(source);
       });
     expect(offenders).toEqual([]);

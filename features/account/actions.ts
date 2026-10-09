@@ -1,13 +1,16 @@
 "use server";
 
+import { currentInstant } from "@/domain/clock";
 import { deleteAccount } from "@/lib/accounts/delete";
 import { accountDeletionSteps } from "@/lib/accounts/deletion-steps";
 import { actionFor } from "@/lib/actions/client";
+import { createApiToken, revokeApiToken } from "@/lib/api/tokens";
 import { db } from "@/lib/db/client";
 import { DomainError } from "@/lib/errors";
 import { sessionAccess } from "@/lib/ports/auth";
 import { endDeviceSession, endOtherDeviceSessions } from "@/lib/sessions/service";
 import { z } from "@/lib/validation";
+import { createTokenSchema, revokeTokenSchema } from "./schema";
 
 /** Deletes the signed-in person's own account. The screen that calls it leaves the signed-in area. */
 export const deleteOwnAccount = actionFor("member")
@@ -41,4 +44,34 @@ export const endOtherDevices = actionFor("member")
       throw new DomainError(400);
     }
     return { ended: await endOtherDeviceSessions(db, ctx.user.id, access.currentId) };
+  });
+
+const DAY_MS = 86_400_000;
+
+/** Makes a personal API token. The token comes back once, here, and is never readable again. */
+export const createToken = actionFor("member")
+  .inputSchema(createTokenSchema)
+  .metadata({ name: "createApiToken" })
+  .action(async ({ parsedInput, ctx }) => {
+    const now = currentInstant();
+    const expiresAt =
+      parsedInput.expiresInDays === null
+        ? null
+        : new Date(now.getTime() + parsedInput.expiresInDays * DAY_MS);
+    return await createApiToken(db, ctx.user.id, {
+      name: parsedInput.name,
+      scopes: parsedInput.scopes,
+      expiresAt,
+    });
+  });
+
+/** Revokes one of the person's tokens at once. */
+export const revokeToken = actionFor("member")
+  .inputSchema(revokeTokenSchema)
+  .metadata({ name: "revokeApiToken" })
+  .action(async ({ parsedInput, ctx }) => {
+    if (!(await revokeApiToken(db, ctx.user.id, parsedInput.id, currentInstant()))) {
+      throw new DomainError(404);
+    }
+    return { revoked: true };
   });

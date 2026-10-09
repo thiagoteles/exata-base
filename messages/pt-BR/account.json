@@ -90,5 +90,31 @@
     "confirm": "Apagar minha conta",
     "cancel": "Cancelar",
     "failed": "Não foi possível apagar a conta."
+  },
+  "apiTokens": {
+    "title": "Chaves de acesso à API",
+    "help": "Uma chave deixa um programa seu ler a sua conta, sem a sua senha. Ela só aparece uma vez, quando é criada. Revogue a que não usa mais.",
+    "none": "Você ainda não criou nenhuma chave.",
+    "once": "Copie a chave agora. Depois que você sair desta página, ela não aparece mais.",
+    "copy": "Copiar chave",
+    "copied": "Chave copiada.",
+    "name": "Nome da chave",
+    "scopesLabel": "O que ela pode fazer",
+    "scopes": {
+      "profile:read": "Ler o seu perfil"
+    },
+    "lifetimeLabel": "Validade",
+    "lifetime": {
+      "30": "30 dias",
+      "90": "90 dias",
+      "365": "1 ano",
+      "never": "Sem prazo"
+    },
+    "create": "Criar chave",
+    "revoke": "Revogar",
+    "failed": "Não foi possível concluir. Tente de novo.",
+    "neverUsed": "Ainda não usada",
+    "lastUsed": "Usada em {date}",
+    "expires": "vale até {date}"
   }
 }

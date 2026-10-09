@@ -47,17 +47,17 @@ test("a theme chosen as a visitor is kept, and signing in saves it to the accoun
   const chosen = page.waitForResponse(
     (response) => response.request().method() === "POST" && response.url().endsWith("/"),
   );
-  await page.getByRole("radio", { name: "Escuro" }).click();
+  await themeChoices(page).getByRole("radio", { name: "Escuro" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await chosen;
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("radio", { name: "Escuro" })).toBeChecked();
+  await expect(themeChoices(page).getByRole("radio", { name: "Escuro" })).toBeChecked();
 
   // Signing in finds nothing saved in the account, so what this browser held is saved to it.
   await signIn(page);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("radio", { name: "Escuro" })).toBeChecked();
+  await expect(themeChoices(page).getByRole("radio", { name: "Escuro" })).toBeChecked();
   await page.context().clearCookies({ name: "theme" });
   await page.goto("/auth/complete?next=%2Faccount");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -66,7 +66,7 @@ test("a theme chosen as a visitor is kept, and signing in saves it to the accoun
   const forgotten = page.waitForResponse(
     (response) => response.request().method() === "POST" && response.url().endsWith("/account"),
   );
-  await page.getByRole("radio", { name: "Do sistema" }).click();
+  await themeChoices(page).getByRole("radio", { name: "Do sistema" }).click();
   await forgotten;
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.+/);
 });
@@ -78,13 +78,13 @@ test("the theme is applied at once, kept on reload, and saved in the account", a
   const saved = page.waitForResponse(
     (response) => response.request().method() === "POST" && response.url().endsWith("/account"),
   );
-  await page.getByRole("radio", { name: "Escuro" }).click();
+  await themeChoices(page).getByRole("radio", { name: "Escuro" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await saved;
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("radio", { name: "Escuro" })).toBeChecked();
+  await expect(themeChoices(page).getByRole("radio", { name: "Escuro" })).toBeChecked();
 
   // The saved choice follows the person to a browser that has no cookie yet.
   await page.context().clearCookies({ name: "theme" });
@@ -94,7 +94,7 @@ test("the theme is applied at once, kept on reload, and saved in the account", a
   const forgotten = page.waitForResponse(
     (response) => response.request().method() === "POST" && response.url().endsWith("/account"),
   );
-  await page.getByRole("radio", { name: "Do sistema" }).click();
+  await themeChoices(page).getByRole("radio", { name: "Do sistema" }).click();
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.+/);
   await forgotten;
 });
@@ -291,6 +291,11 @@ async function openSignIn(page: Page, query = "") {
 /** A click before hydration finds the button but not its handler; waiting for the network to idle avoids it. */
 async function settled(page: Page) {
   await page.waitForLoadState("networkidle");
+}
+
+/** The theme row, which shares "Do sistema" with the motion and contrast rows of the account page. */
+function themeChoices(page: Page) {
+  return page.getByRole("radiogroup", { name: "Tema" });
 }
 
 async function signIn(page: Page) {

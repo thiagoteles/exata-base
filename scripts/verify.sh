@@ -104,6 +104,11 @@ echo "== Browser suite on a clean compose"
 git ls-files -z --cached --others --exclude-standard | tar --null -T - -cf - | tar -xf - -C "$copy"
 (cd "$copy" && docker compose -p "$name" up -d)
 wait_for "http://localhost:3300/health" 600
-pnpm test:e2e
+if ! pnpm test:e2e; then
+  # The clean compose is removed when this ends, so what the server said has to be shown now.
+  echo "== The app's last lines in the clean compose" >&2
+  (cd "$copy" && docker compose -p "$name" ps -a >&2 && docker compose -p "$name" logs app --tail 150 >&2) || true
+  exit 1
+fi
 
 echo "Verified."

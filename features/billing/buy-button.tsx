@@ -23,7 +23,12 @@ export function BuyButton({ interval, currency, replacesSubscription = false }: 
   const describe = useErrorText();
   const notify = useToast();
   const [pending, setPending] = useState(false);
-  const label = interval === "lifetime" ? t("buyLifetime") : t("buy");
+  const label = {
+    lifetime: t("buyLifetime"),
+    yearly_once: t("buyOnce"),
+    monthly: t("buy"),
+    yearly: t("buy"),
+  }[interval];
 
   const buy = async () => {
     setPending(true);

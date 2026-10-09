@@ -14,6 +14,8 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
       customerId: string | null;
       subscriptionId: string | null;
       interval: Interval;
+      /** When the provider confirmed the checkout, which is when a fixed term starts. */
+      paidAt: Date;
     }
   | { kind: "invoice_paid"; subscriptionId: string; periodEnd: Date | null }
   | { kind: "invoice_failed"; subscriptionId: string }

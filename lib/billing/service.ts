@@ -6,6 +6,7 @@ import {
   type Holder,
   isPaidTier,
 } from "@/domain/billing/entitlements";
+import { isFixedTerm, oneYearAfter } from "@/domain/billing/term";
 import type { Database } from "@/lib/db/database";
 import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
@@ -41,7 +42,11 @@ export async function entitlementsFor(
   holder: Holder,
   now: Date,
 ): Promise<Entitlements> {
-  return entitlementsOf(await readPlan(db, holder.id), now);
+  const plan = await readPlan(db, holder.id);
+  return entitlementsOf(
+    plan === null ? null : { ...plan, fixedTerm: isFixedTerm(plan.billingInterval) },
+    now,
+  );
 }
 
 /**
@@ -69,6 +74,7 @@ export const freePlan = {
   providerSubscriptionId: null,
   cancelAtPeriodEnd: false,
   currentPeriodEnd: null,
+  expiryWarnedAt: null,
 } as const;
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
@@ -98,8 +104,10 @@ async function applyCheckout(
       providerCustomerId: event.customerId ?? current.providerCustomerId,
       providerSubscriptionId: event.interval === "lifetime" ? null : event.subscriptionId,
       cancelAtPeriodEnd: false,
-      // A new purchase has no end yet: the first invoice that follows says when the period ends.
-      currentPeriodEnd: null,
+      // A subscription has no end yet: the first invoice that follows says when the period ends. A year
+      // bought once ends a year after it was paid, which is known now.
+      currentPeriodEnd: isFixedTerm(event.interval) ? oneYearAfter(event.paidAt) : null,
+      expiryWarnedAt: null,
       ...noCourtesy,
     })
     .where(eq(plans.userId, event.userId));

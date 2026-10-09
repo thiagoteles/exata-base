@@ -19,6 +19,8 @@ export type Holder = { kind: "user"; id: string };
 
 export type PlanState = {
   tier: Tier;
+  /** Bought for a fixed term: with no renewal, it grants nothing once `currentPeriodEnd` has passed. */
+  fixedTerm?: boolean;
   status: "active" | "canceled" | "past_due" | "trialing" | "pending";
   currentPeriodEnd: Date | null;
 };
@@ -57,7 +59,11 @@ function grantedTier(plan: PlanState | null, now: Date): Tier {
     plan.status === "trialing" &&
     plan.currentPeriodEnd !== null &&
     plan.currentPeriodEnd.getTime() <= now.getTime();
-  return trialEnded ? "free" : plan.tier;
+  const termEnded =
+    plan.fixedTerm === true &&
+    plan.currentPeriodEnd !== null &&
+    plan.currentPeriodEnd.getTime() <= now.getTime();
+  return trialEnded || termEnded ? "free" : plan.tier;
 }
 
 export function entitlementsOf(plan: PlanState | null, now: Date): Entitlements {

@@ -9,8 +9,18 @@ export const webhookSecret = "whsec_test_secret_for_local_events";
 
 type Payload = Record<string, unknown>;
 
+/** When Stripe says the event happened, in seconds: a fixed moment, so what depends on it is exact. */
+export const EVENT_CREATED_SECONDS = 1_780_000_000;
+
 function event(id: string, type: string, object: Payload): Payload {
-  return { id, object: "event", type, api_version: "2025-01-01", data: { object } };
+  return {
+    id,
+    object: "event",
+    type,
+    created: EVENT_CREATED_SECONDS,
+    api_version: "2025-01-01",
+    data: { object },
+  };
 }
 
 export function sign(payload: Payload, secret: string = webhookSecret) {

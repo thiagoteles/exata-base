@@ -65,6 +65,14 @@
       "ignore": "Se você não pediu a troca, sua senha continua a mesma e pode ignorar esta mensagem."
     },
     "greetingWithoutName": "Olá.",
+    "planExpiring": {
+      "subject": "Seu plano termina em {date}",
+      "preview": "Seu plano de um ano termina em {date}.",
+      "greeting": "Olá, {name}",
+      "body": "Seu plano de um ano termina em {date}. Depois dessa data a conta volta ao plano gratuito, e tudo o que você guardou continua com você.",
+      "action": "Renovar o plano",
+      "ignore": "Se não quiser renovar, não precisa fazer nada."
+    },
     "contactNotice": {
       "subject": "Nova mensagem de contato: {subject}",
       "preview": "{name} escreveu pelo formulário de contato.",
@@ -900,14 +908,17 @@
     },
     "perMonth": "por mês",
     "perYear": "por ano",
+    "perYearOnce": "um ano, pagamento único",
     "once": "pagamento único",
     "names": {
       "free": "Gratuito",
       "monthly": "Mensal",
       "yearly": "Anual",
+      "yearly_once": "Anual avulso",
       "lifetime": "Vitalício"
     },
     "buy": "Assinar",
+    "buyOnce": "Comprar um ano",
     "buyLifetime": "Comprar",
     "current": "Seu plano",
     "signIn": "Entrar para continuar",
@@ -930,6 +941,7 @@
       "free": "Gratuito",
       "monthly": "Mensal",
       "yearly": "Anual",
+      "yearly_once": "Anual avulso",
       "lifetime": "Vitalício"
     },
     "statuses": {
@@ -963,6 +975,7 @@
       "done": "Assinatura mantida."
     },
     "canceled": "Cancelamento agendado.",
+    "validUntil": "Vale até",
     "renewsOn": "Renova em",
     "endsOn": "Acesso até"
   },

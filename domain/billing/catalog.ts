@@ -37,6 +37,7 @@ export const catalog = {
   prices: {
     "paid.monthly": "paid_monthly",
     "paid.yearly": "paid_yearly",
+    "paid.yearly_once": "paid_yearly_once",
     "paid.lifetime": "paid_lifetime",
   },
   /**

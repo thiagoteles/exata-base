@@ -1,7 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { cadences } from "@/domain/operations/cadence";
 import heartbeats from "@/ops/gcp/heartbeats.json";
 import { scheduledOperations } from "./registry";
+
+// The registry only needs the operations' names and cadences, not a way to send e-mail.
+vi.mock("@/lib/billing/mailer", () => ({ sendPlanExpiring: () => Promise.resolve(true) }));
 
 describe("the scheduled operations", () => {
   it("have names of their own, and a cadence the host knows", () => {

@@ -41,7 +41,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const unitKey = { monthly: "perMonth", yearly: "perYear", lifetime: "once" } as const;
+const unitKey = {
+  monthly: "perMonth",
+  yearly: "perYear",
+  yearly_once: "perYearOnce",
+  lifetime: "once",
+} as const;
 const faqIds = ["cancel", "refund", "invoice"] as const;
 const features = [...featuresOfTier(catalog.paidTier)];
 

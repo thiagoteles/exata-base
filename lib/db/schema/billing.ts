@@ -14,7 +14,12 @@ export const planStatus = pgEnum("plan_status", [
   "pending",
 ]);
 export const paymentProvider = pgEnum("payment_provider", ["stripe"]);
-export const billingInterval = pgEnum("billing_interval", ["lifetime", "yearly", "monthly"]);
+export const billingInterval = pgEnum("billing_interval", [
+  "lifetime",
+  "yearly",
+  "monthly",
+  "yearly_once",
+]);
 
 /*
  * One row per user, created by a database trigger when the user row is inserted, so every
@@ -38,6 +43,8 @@ export const plans = pgTable(
     cancelAtPeriodEnd: boolean().notNull().default(false),
     /* When the period already paid ends: the renewal date, or the day access stops if canceled. */
     currentPeriodEnd: instant(),
+    /* When the warning that a fixed term is about to end went out, so it goes out once. */
+    expiryWarnedAt: instant(),
     courtesyGrantedBy: authoredBy(),
     courtesyGrantedByEmail: text(),
     courtesyReason: text(),

@@ -9,6 +9,7 @@ import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
 import { isPaidTier } from "@/domain/billing/entitlements";
+import { isFixedTerm } from "@/domain/billing/term";
 import { CancellationControl, PortalButton } from "@/features/billing/plan-controls";
 import { planState, planStateTone } from "@/features/billing/presentation";
 import { isCourtesy, type Plan, readPlan, subscriptionOf } from "@/lib/billing/service";
@@ -64,6 +65,14 @@ async function PlanContent({ searchParams }: Props) {
   );
 }
 
+/** What the date says: where a plan ends or renews. A year bought once has no renewal, only a last day. */
+function dateLabel(plan: Plan) {
+  if (isFixedTerm(plan.billingInterval)) {
+    return "validUntil";
+  }
+  return plan.cancelAtPeriodEnd ? "endsOn" : "renewsOn";
+}
+
 async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: string }) {
   const t = await getTranslations("plan");
   const state = planState(plan);
@@ -82,7 +91,7 @@ async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: str
         </RecordCell>
       ) : null}
       {plan?.currentPeriodEnd ? (
-        <RecordCell label={t(plan.cancelAtPeriodEnd ? "endsOn" : "renewsOn")}>
+        <RecordCell label={t(dateLabel(plan))}>
           <span className="font-mono text-data tabular-nums">
             {formatInstantDate(plan.currentPeriodEnd, timeZone)}
           </span>

@@ -11,7 +11,7 @@ import type { Interval, PaymentGateway, PriceTag } from "./types";
  * routes see this module, never the provider's SDK.
  */
 
-const intervalOrder: readonly Interval[] = ["monthly", "yearly", "lifetime"];
+const intervalOrder: readonly Interval[] = ["monthly", "yearly", "yearly_once", "lifetime"];
 
 /** Whether billing is set up at all: the provider's keys are there. Prices are read from it separately. */
 export function billingConfigured(): boolean {

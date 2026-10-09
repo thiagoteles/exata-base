@@ -1,3 +1,4 @@
+import { expireFixedTerms, warnExpiringTerms } from "./fixed-terms";
 import { purgeExpiredInvites } from "./purge-invites";
 import { purgeRateLimits } from "./purge-rate-limits";
 import type { ScheduledOperation } from "./run";
@@ -10,4 +11,6 @@ import type { ScheduledOperation } from "./run";
 export const scheduledOperations: readonly ScheduledOperation[] = [
   purgeExpiredInvites,
   purgeRateLimits,
+  warnExpiringTerms,
+  expireFixedTerms,
 ];

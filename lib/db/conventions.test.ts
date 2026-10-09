@@ -1,8 +1,19 @@
 import { getTableColumns, getTableName } from "drizzle-orm";
-import { type AnyPgColumn, getTableConfig, type PgTable } from "drizzle-orm/pg-core";
+import {
+  type AnyPgColumn,
+  doublePrecision,
+  getTableConfig,
+  isPgEnum,
+  numeric,
+  type PgTable,
+  pgTable,
+  real,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
 import { exportedData, notExportedData } from "./personal-data";
-import { tables } from "./schema";
+import { schema, tables } from "./schema";
 import { users } from "./schema/users";
 
 /*
@@ -47,6 +58,42 @@ function isIndexed(table: PgTable, column: AnyPgColumn): boolean {
     config.primaryKeys.some((key) => key.columns[0] === column)
   );
 }
+
+const money = /price|amount|cents|total|cost|fee|balance|revenue|refund|salary|value/i;
+const approximate = new Set(["PgReal", "PgDoublePrecision", "PgNumeric", "PgNumericNumber"]);
+const timestamps = new Set(["PgTimestamp", "PgTimestampString"]);
+const snakeCase = /^[a-z][a-z0-9_]*$/;
+
+/** Money is integer cents: a float or a decimal with a money name is how a cent goes missing. */
+function inexactMoney(list: readonly PgTable[]): string[] {
+  return list.flatMap((table) =>
+    Object.entries(getTableColumns(table))
+      .filter(([key, column]) => approximate.has(column.columnType) && money.test(key))
+      .map(([key]) => `${getTableName(table)}.${key}`),
+  );
+}
+
+/** An instant without a zone means a different moment on every server that reads it. */
+function zonelessInstants(list: readonly PgTable[]): string[] {
+  return list.flatMap((table) =>
+    Object.entries(getTableColumns(table))
+      .filter(
+        ([, column]) =>
+          timestamps.has(column.columnType) &&
+          (column as { withTimezone?: boolean }).withTimezone !== true,
+      )
+      .map(([key]) => `${getTableName(table)}.${key}`),
+  );
+}
+
+/** Stored values are English identifiers: no accent, no space, no hyphen. */
+function looseEnumValues(values: readonly (readonly string[])[]): string[] {
+  return values.flat().filter((value) => !snakeCase.test(value));
+}
+
+const enumValues = Object.values(schema).flatMap((entry) =>
+  isPgEnum(entry) ? [entry.enumValues] : [],
+);
 
 describe("schema conventions", () => {
   it.each(tables.map((table) => [getTableName(table), table] as const))(
@@ -111,5 +158,37 @@ describe("schema conventions", () => {
     ];
     expect(owning.filter((table) => !listed.includes(table)).map(getTableName)).toEqual([]);
     expect(new Set(listed).size).toBe(listed.length);
+  });
+
+  it("keeps money in integer cents", () => {
+    expect(inexactMoney(tables)).toEqual([]);
+  });
+
+  it("stores every instant with its time zone", () => {
+    expect(zonelessInstants(tables)).toEqual([]);
+  });
+
+  it("stores enum values as snake_case English identifiers", () => {
+    expect(enumValues.length).toBeGreaterThan(0);
+    expect(looseEnumValues(enumValues)).toEqual([]);
+  });
+
+  it("recognizes the mistakes these rules exist for", () => {
+    const bad = pgTable("bad", {
+      price: real(),
+      totalAmount: doublePrecision(),
+      fee: numeric(),
+      note: real(),
+      seenAt: timestamp(),
+      sentAt: timestamp({ withTimezone: true }),
+      label: text(),
+    });
+    expect(inexactMoney([bad])).toEqual(["bad.price", "bad.totalAmount", "bad.fee"]);
+    expect(zonelessInstants([bad])).toEqual(["bad.seenAt"]);
+    expect(looseEnumValues([["paid", "yearly-once", "não_pago", "Paid"]])).toEqual([
+      "yearly-once",
+      "não_pago",
+      "Paid",
+    ]);
   });
 });

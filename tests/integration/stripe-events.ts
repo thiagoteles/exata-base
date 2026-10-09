@@ -57,11 +57,33 @@ export const invoiceEvent = (
 export const subscriptionDeleted = (id: string, subscription: string) =>
   event(id, "customer.subscription.deleted", { id: subscription, object: "subscription" });
 
-export const chargeRefunded = (id: string, customer: string, fullyRefunded: boolean) =>
+export const chargeRefunded = (
+  id: string,
+  customer: string,
+  fullyRefunded: boolean,
+  charge = `ch_${id}`,
+) =>
   event(id, "charge.refunded", {
-    id: `ch_${id}`,
+    id: charge,
     object: "charge",
     customer,
+    amount: 1000,
     refunded: fullyRefunded,
     amount_refunded: fullyRefunded ? 1000 : 300,
+  });
+
+export const chargeSucceeded = (
+  id: string,
+  charge: { id: string; customer: string; amount?: number; method?: string; email?: string },
+) =>
+  event(id, "charge.succeeded", {
+    id: charge.id,
+    object: "charge",
+    customer: charge.customer,
+    amount: charge.amount ?? 1000,
+    currency: "BRL",
+    created: 1_780_000_000,
+    billing_details: { email: charge.email ?? null },
+    receipt_email: null,
+    payment_method_details: { type: charge.method ?? "card" },
   });

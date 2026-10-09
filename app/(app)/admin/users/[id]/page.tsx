@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
 import { PageHeader } from "@/components/patterns/page-header";
+import { currentInstant } from "@/domain/clock";
 import { UserRecord } from "@/features/admin/user-record";
 import { getUserRecord } from "@/lib/admin/users";
 import { db } from "@/lib/db/client";
@@ -32,10 +34,12 @@ async function Record({ params }: Pick<PageProps<"/admin/users/[id]">, "params">
   if (record === null) {
     notFound();
   }
+  // The withdrawal period depends on the clock, which is read at request time only.
+  await connection();
   return (
     <>
       <PageHeader title={record.user.name.trim() || record.user.email} subtitle={t("title")} />
-      <UserRecord record={record} viewerId={viewer.id} />
+      <UserRecord record={record} viewerId={viewer.id} now={currentInstant()} />
     </>
   );
 }

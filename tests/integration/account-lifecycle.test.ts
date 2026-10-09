@@ -90,10 +90,11 @@ describe("account export", () => {
       "generated_at",
       "user",
       "plan",
+      "payments",
       "contact_messages",
       "files",
     ]);
-    expect(data).toMatchObject({ version: 1, generated_at: "2026-01-02T03:04:05.000Z" });
+    expect(data).toMatchObject({ version: 2, generated_at: "2026-01-02T03:04:05.000Z" });
     expect(data["user"]).toHaveLength(1);
     expect(data["plan"]).toHaveLength(1);
     expect(data["contact_messages"]).toHaveLength(1);

@@ -719,6 +719,26 @@
         "confirm": "Apagar a conta",
         "cancel": "Voltar",
         "done": "Conta apagada."
+      },
+      "payments": {
+        "title": "Pagamentos",
+        "empty": "Nenhum pagamento registrado.",
+        "date": "Data",
+        "amount": "Valor",
+        "method": "Forma",
+        "status": "Situação",
+        "methods": {
+          "card": "Cartão",
+          "pix": "Pix",
+          "boleto": "Boleto",
+          "other": "Outra"
+        },
+        "statuses": {
+          "paid": "Pago",
+          "partially_refunded": "Reembolso parcial",
+          "refunded": "Reembolsado"
+        },
+        "withdrawal": "Dentro do prazo de arrependimento até {date}. Pedido nesse prazo, o reembolso integral é direito da pessoa."
       }
     },
     "invites": {

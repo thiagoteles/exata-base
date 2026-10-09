@@ -255,13 +255,13 @@ A documentação do Stripe diz que uma conta Stripe brasileira aceita Pix **só 
 
 ### 6. Registro local de pagamentos
 
-- [ ] Tabela `payments` alimentada pelo webhook: valor em centavos, moeda, método (cartão, Pix), status, ids do provedor e reembolsos.
-- [ ] `authoredBy()`: o registro sobrevive à exclusão da conta.
+- [x] Tabela `payments` alimentada pelo webhook (`charge.succeeded` e `charge.refunded`): valor em centavos, moeda, método (cartão, Pix), status, ids do provedor e reembolsos.
+- [x] `authoredBy()`: o registro sobrevive à exclusão da conta.
 - [ ] Usos:
-  - admin com receita e histórico por pessoa, sem chamar o provedor;
-  - exportação de dados pessoais;
+  - admin com receita e histórico por pessoa, sem chamar o provedor (histórico por pessoa feito; receita entra na página "Números");
+  - exportação de dados pessoais (feito, formato versão 2);
   - analytics do servidor.
-- [ ] **Direito de arrependimento (CDC art. 49):** reembolso integral em até 7 dias da compra, como regra explícita em `lib/billing`.
+- [x] **Direito de arrependimento (CDC art. 49):** reembolso integral em até 7 dias da compra, como regra explícita (`domain/billing/withdrawal.ts`), mostrada na ficha do admin.
 
 ### 7. Checkout, paywall e conversão
 

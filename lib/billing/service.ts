@@ -8,8 +8,10 @@ import {
 } from "@/domain/billing/entitlements";
 import type { Database } from "@/lib/db/database";
 import { paymentEvents, plans } from "@/lib/db/schema/billing";
+import { users } from "@/lib/db/schema/users";
 import { DomainError } from "@/lib/errors";
 import type { Interval, PaymentEvent } from "@/lib/ports/payment/types";
+import { linkPayments, recordPayment, recordRefund } from "./payments";
 
 /*
  * The billing rules, against the database only. Money moves in the payment provider; this module
@@ -101,6 +103,16 @@ async function applyCheckout(
       ...noCourtesy,
     })
     .where(eq(plans.userId, event.userId));
+  const customerId = event.customerId ?? current.providerCustomerId;
+  if (customerId !== null) {
+    const [person] = await tx
+      .select({ id: users.id, email: users.email })
+      .from(users)
+      .where(eq(users.id, event.userId));
+    if (person !== undefined) {
+      await linkPayments(tx, customerId, person);
+    }
+  }
   // The lifetime purchase ends the subscription it replaces, now and with no credit. Doing it
   // inside the transaction means a failure here rolls the plan back and the provider retries.
   if (replaced !== null) {
@@ -161,7 +173,10 @@ async function applyEvent(
         .set(freePlan)
         .where(eq(plans.providerSubscriptionId, event.subscriptionId));
       return;
+    case "payment_succeeded":
+      return recordPayment(tx, event);
     case "charge_refunded":
+      await recordRefund(tx, event);
       return applyRefund(tx, event, cancel);
     case "ignored":
       return;

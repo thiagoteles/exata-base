@@ -9,10 +9,19 @@ import { formatInstantDate } from "@/lib/date";
 import { paymentGateway } from "@/lib/ports/payment";
 import { GrantCourtesy, RevokeCourtesy } from "./courtesy-controls";
 import { DeleteUser, RefundPayment } from "./danger-controls";
+import { PaymentsHistory } from "./payments-history";
 import { RoleControl } from "./role-control";
 
 /** One user as a filled-in document, with the actions an admin has over them. */
-export async function UserRecord({ record, viewerId }: { record: Record; viewerId: string }) {
+export async function UserRecord({
+  record,
+  viewerId,
+  now,
+}: {
+  record: Record;
+  viewerId: string;
+  now: Date;
+}) {
   const [t, roles, plans] = await Promise.all([
     getTranslations("admin.user"),
     getTranslations("admin.roles"),
@@ -51,6 +60,8 @@ export async function UserRecord({ record, viewerId }: { record: Record; viewerI
           </RecordCell>
         )}
       </RecordGrid>
+
+      <PaymentsHistory payments={record.payments} now={now} />
 
       <Panel className="flex flex-col gap-6">
         <h2 className="text-block-title text-ink">{t("actions")}</h2>

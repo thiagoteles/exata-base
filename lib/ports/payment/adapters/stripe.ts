@@ -60,6 +60,22 @@ function invoiceEvent(
     : { ...base, kind, subscriptionId };
 }
 
+function chargeSucceeded(event: Stripe.Event, charge: Stripe.Charge): PaymentEvent {
+  return {
+    id: event.id,
+    type: event.type,
+    provider: "stripe",
+    kind: "payment_succeeded",
+    paymentId: charge.id,
+    customerId: idOf(charge.customer),
+    email: charge.billing_details.email ?? charge.receipt_email ?? null,
+    amountCents: charge.amount,
+    currency: charge.currency.toLowerCase(),
+    method: charge.payment_method_details?.type ?? null,
+    paidAt: new Date(charge.created * MS_PER_SECOND),
+  };
+}
+
 function toPaymentEvent(event: Stripe.Event): PaymentEvent {
   const base = { id: event.id, type: event.type, provider: "stripe" as const };
   switch (event.type) {
@@ -70,6 +86,8 @@ function toPaymentEvent(event: Stripe.Event): PaymentEvent {
       return invoiceEvent(event, event.data.object, "invoice_paid");
     case "invoice.payment_failed":
       return invoiceEvent(event, event.data.object, "invoice_failed");
+    case "charge.succeeded":
+      return chargeSucceeded(event, event.data.object);
     case "customer.subscription.deleted":
       return { ...base, kind: "subscription_deleted", subscriptionId: event.data.object.id };
     case "charge.refunded": {
@@ -79,8 +97,10 @@ function toPaymentEvent(event: Stripe.Event): PaymentEvent {
         : {
             ...base,
             kind: "charge_refunded",
+            paymentId: event.data.object.id,
             customerId,
             fullyRefunded: event.data.object.refunded,
+            refundedCents: event.data.object.amount_refunded,
           };
     }
     default:

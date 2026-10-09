@@ -11,7 +11,8 @@ import type { FileStorage } from "@/lib/ports/storage/types";
  * Tables join the export through the personal data registry, never here.
  */
 
-const EXPORT_VERSION = 1;
+// 2: payments joined the export.
+const EXPORT_VERSION = 2;
 
 const encoder = new TextEncoder();
 const unsafeNameCharacters = /[^\w.-]+/g;

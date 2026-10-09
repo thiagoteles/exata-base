@@ -18,7 +18,23 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
   | { kind: "invoice_paid"; subscriptionId: string; periodEnd: Date | null }
   | { kind: "invoice_failed"; subscriptionId: string }
   | { kind: "subscription_deleted"; subscriptionId: string }
-  | { kind: "charge_refunded"; customerId: string; fullyRefunded: boolean }
+  | {
+      kind: "payment_succeeded";
+      paymentId: string;
+      customerId: string | null;
+      email: string | null;
+      amountCents: number;
+      currency: string;
+      method: string | null;
+      paidAt: Date;
+    }
+  | {
+      kind: "charge_refunded";
+      paymentId: string;
+      customerId: string;
+      fullyRefunded: boolean;
+      refundedCents: number;
+    }
   | { kind: "ignored" }
 );
 

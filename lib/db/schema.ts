@@ -2,7 +2,16 @@ import { is } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { accountDeletions, deletionRequester, staffAuditLog } from "./schema/audit";
 import { accounts, clerkEvents, sessions, verifications } from "./schema/auth";
-import { billingInterval, paymentEvents, planStatus, plans, planTier } from "./schema/billing";
+import {
+  billingInterval,
+  paymentEvents,
+  paymentProvider,
+  paymentStatus,
+  payments,
+  planStatus,
+  plans,
+  planTier,
+} from "./schema/billing";
 import { contactMessages, contactStatus, contactSubject } from "./schema/contact";
 import { files } from "./schema/files";
 import { invites } from "./schema/invites";
@@ -23,6 +32,9 @@ export const schema = {
   planStatus,
   billingInterval,
   paymentEvents,
+  paymentProvider,
+  payments,
+  paymentStatus,
   contactMessages,
   contactSubject,
   contactStatus,

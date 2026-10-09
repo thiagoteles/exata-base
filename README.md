@@ -92,7 +92,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `MAILTRAP_TOKEN`, `MAILTRAP_INBOX`, `EMAIL_FROM` | no | Without a token nothing is sent and each send is logged as an error. `EMAIL_FROM` is required with the token |
 | `CONTACT_EMAIL` | no | Comma list that is told about new contact messages |
 | `CRON_SECRET` | no | At least 32 characters. Without it `/events` refuses everything |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | no | Together. Point the Stripe webhook at `/api/webhooks/stripe` and send `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.deleted` and `charge.refunded` |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | no | Together. Point the Stripe webhook at `/api/webhooks/stripe` and send `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.deleted`, `charge.succeeded` and `charge.refunded` |
 | `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PRICE_LIFETIME` | no | Each price you sell. Only a filled price is shown |
 | `GCP_CREDENTIALS`, `GCP_PROJECT`, `GCS_BUCKET` | no | All three. The service account JSON in base64; turns on Cloud Logging and Cloud Storage (a private bucket with uniform access) |
 | `FILE_URL_SECRET` | without a bucket | At least 32 characters. Signs file links when files are on disk |

@@ -1,6 +1,6 @@
 import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
 import { accounts, sessions } from "./schema/auth";
-import { plans } from "./schema/billing";
+import { payments, plans } from "./schema/billing";
 import { contactMessages } from "./schema/contact";
 import { files } from "./schema/files";
 import { users } from "./schema/users";
@@ -17,6 +17,7 @@ type NotExported = { table: PgTable; reason: string };
 export const exportedData: readonly Exported[] = [
   { key: "user", table: users, owner: users.id },
   { key: "plan", table: plans, owner: plans.userId },
+  { key: "payments", table: payments, owner: payments.payerId },
   { key: "contact_messages", table: contactMessages, owner: contactMessages.userId },
   { key: "files", table: files, owner: files.ownerId },
 ];

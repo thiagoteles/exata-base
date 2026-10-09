@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, index, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, check, index, integer, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
 import { tierNames } from "@/domain/billing/entitlements";
-import { createdAt, instant, updatedAt } from "../columns";
+import { createdAt, id, instant, updatedAt } from "../columns";
 import { authoredBy, ownedBy } from "./user-references";
 
 // The tiers come from the catalog, so the database refuses a tier the product does not sell.
@@ -64,3 +64,44 @@ export const paymentEvents = pgTable("payment_events", {
   type: text().notNull(),
   receivedAt: createdAt(),
 });
+
+export const paymentStatus = pgEnum("payment_status", ["paid", "partially_refunded", "refunded"]);
+
+/*
+ * Every charge the provider confirmed, kept locally so revenue, a person's history and the
+ * account export never call the provider. One row per charge: the charge id is the key, so a
+ * repeated delivery and a refund both find the same row. The payer stays as an e-mail after the
+ * account is deleted, because a payment is a fiscal fact, not the person's data alone.
+ */
+export const payments = pgTable(
+  "payments",
+  {
+    id: id(),
+    provider: paymentProvider().notNull(),
+    providerPaymentId: text().notNull().unique(),
+    providerCustomerId: text(),
+    /* Null until the checkout ties the provider's customer to a person, or after deletion. */
+    payerId: authoredBy(),
+    payerEmail: text(),
+    amountCents: integer().notNull(),
+    refundedCents: integer().notNull().default(0),
+    currency: text().notNull(),
+    /* As the provider names it: card, pix, boleto. Null when the provider did not say. */
+    method: text(),
+    status: paymentStatus().notNull().default("paid"),
+    paidAt: instant().notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    index().on(table.payerId),
+    index().on(table.providerCustomerId),
+    index().on(table.paidAt),
+    check("payments_amount_positive", sql`${table.amountCents} > 0`),
+    check(
+      "payments_refund_within_amount",
+      sql`${table.refundedCents} between 0 and ${table.amountCents}`,
+    ),
+    check("payments_currency_lowercase", sql`${table.currency} = lower(${table.currency})`),
+  ],
+);

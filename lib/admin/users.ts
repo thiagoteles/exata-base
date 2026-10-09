@@ -5,6 +5,7 @@ import type { Actor } from "@/lib/accounts/actor";
 import { recordStaffWrite } from "@/lib/accounts/audit";
 import { type DeletionSteps, deleteAccount } from "@/lib/accounts/delete";
 import type { Role } from "@/lib/accounts/roles";
+import { type Payment, paymentsOf } from "@/lib/billing/payments";
 import { freePlan, isCourtesy, type Plan } from "@/lib/billing/service";
 import type { Database } from "@/lib/db/database";
 import { plans } from "@/lib/db/schema/billing";
@@ -90,9 +91,9 @@ export async function queryUsers(
   return { rows: window.total === 0 ? [] : rows.map(toRow), window };
 }
 
-export type UserRecord = { user: typeof users.$inferSelect; plan: Plan };
+export type UserRecord = { user: typeof users.$inferSelect; plan: Plan; payments: Payment[] };
 
-/** One user with their plan, or null when the address names nobody. */
+/** One user with their plan and payments, or null when the address names nobody. */
 export async function getUserRecord(
   db: Database,
   viewer: AdminViewer,
@@ -107,7 +108,7 @@ export async function getUserRecord(
     .from(users)
     .innerJoin(plans, eq(plans.userId, users.id))
     .where(eq(users.id, id));
-  return row ?? null;
+  return row === undefined ? null : { ...row, payments: await paymentsOf(db, row.user.id) };
 }
 
 async function lockPlan(tx: Parameters<Parameters<Database["transaction"]>[0]>[0], userId: string) {

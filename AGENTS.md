@@ -26,6 +26,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 | `lib/db/schema/` | One file per area. Migrations are generated into `lib/db/migrations`, never edited |
 | `components/ui/` | Primitives. The only place that imports Radix |
 | `components/patterns/` | Lists, record grids, page header, save bar. Components receive data by props and never import the database or a port |
+| `components/figures/` | Domain figures that are React (diagrams, balls, instruments): the folder is made with the first figure. Pure geometry and values come from `domain/`; the figure only draws them. `color-mix(in oklch, var(--color-x) N%, transparent)` is allowed over tokens |
 | `components/charts/` | Stat tile, sparkline, column chart, bar list, in plain SVG on the data palette. Every chart has a table view and hover and focus targets; see DESIGN.md, Data |
 | `components/shell/` | The public and signed-in shells |
 | `emails/` | E-mail components and their builders |
@@ -46,6 +47,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 - **Cache by tag.** A public read that may be cached uses `'use cache'` with `cacheLife` and a tag from `lib/cache-tags.ts`; the write that changes it calls `updateTag(tag)` in a server action or `revalidateTag(tag, "max")` in a route handler. An action that only changes what the writer sees calls `refresh()`. `revalidatePath` and `unstable_cache` are refused by a test.
 - **Security headers.** Fixed ones live in `lib/security/headers.ts` (a product opens a browser feature there, such as `microphone: "self"`). The Content Security Policy is built per request from what each part declares in `lib/security/sources.ts`, sent as Report-Only; violations reach the log through `/api/csp-report`. Loading something new in the browser means declaring its origin there.
 - **Environment variables** are read only in `lib/env.ts`. There is no `NEXT_PUBLIC_` variable.
+- **Where a thing lives depends on what it is.** A calculation with no I/O is `domain/`. A figure that draws it is `components/figures`. Audio and microphone code lives in `domain/audio` and only a client component imports it (a port with a browser adapter when a test needs a fake). Notation that belongs to a domain (note names, technical abbreviations, symbols) comes from a domain function and is not catalog text: the catalog holds sentences, the domain holds notation.
 - **Comments** explain why, never name a file.
 
 ### Commands

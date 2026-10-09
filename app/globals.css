@@ -3,9 +3,27 @@
 
 /*
  * Everything except color. Tailwind defaults are cleared so only the scale in DESIGN.md exists.
- * Spacing and breakpoints keep Tailwind's defaults, which are the ones DESIGN.md uses.
+ * Spacing and breakpoints keep Tailwind's defaults, which are the ones DESIGN.md uses, plus the
+ * named sizes below: what a person touches and the insets of containers, so density changes them
+ * in one place instead of in every component.
  */
 @theme {
+  --spacing-control: 2.75rem;
+  --spacing-control-coarse: 3rem;
+  --spacing-field: 3rem;
+  --spacing-row: 3.5rem;
+  --spacing-chip: 2.25rem;
+  --spacing-segment: 2.5rem;
+  --spacing-bar: 3.75rem;
+  --spacing-tab: 4rem;
+  --spacing-sidebar: 15.5rem;
+  --spacing-panel-inset: 1.5rem;
+  --spacing-dialog-inset: 1.75rem;
+  --spacing-cell-x: 1rem;
+  --spacing-cell-y: 0.75rem;
+
+  --container-dialog: 32.5rem;
+
   --font-*: initial;
   --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;

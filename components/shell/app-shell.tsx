@@ -27,7 +27,7 @@ export function AppShell({ sidebar, bottomBar, userMenu, children }: AppShellPro
       >
         {t("nav.skip")}
       </a>
-      <header className="flex h-15 shrink-0 items-center justify-between border-b border-line bg-surface px-4 md:px-8">
+      <header className="flex h-bar shrink-0 items-center justify-between border-b border-line bg-surface px-4 md:px-8">
         <Link
           href="/"
           className="text-block-title text-ink focus-visible:outline-2 focus-visible:outline-focus"
@@ -37,7 +37,7 @@ export function AppShell({ sidebar, bottomBar, userMenu, children }: AppShellPro
         {userMenu}
       </header>
       <div className="flex min-h-0 flex-1">
-        <aside className="hidden w-62 shrink-0 overflow-y-auto border-r border-line bg-surface lg:block">
+        <aside className="hidden w-sidebar shrink-0 overflow-y-auto border-r border-line bg-surface lg:block">
           {sidebar}
         </aside>
         <main

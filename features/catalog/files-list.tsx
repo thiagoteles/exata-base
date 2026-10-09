@@ -19,7 +19,7 @@ export async function FilesList({ files }: { files: readonly FileRow[] }) {
       {files.map((file) => (
         <li
           key={file.id}
-          className="flex min-h-14 items-center justify-between gap-4 border-b border-line"
+          className="flex min-h-row items-center justify-between gap-4 border-b border-line"
         >
           <Link
             href={`/catalog/files/${file.id}`}

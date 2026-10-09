@@ -7,7 +7,7 @@ export function PublicHeader({ actions }: { actions: ReactNode }) {
   const t = useTranslations();
   return (
     <header className="border-b border-line bg-surface">
-      <div className="mx-auto flex h-15 w-full max-w-310 items-center justify-between gap-4 px-4 md:px-8">
+      <div className="mx-auto flex h-bar w-full max-w-310 items-center justify-between gap-4 px-4 md:px-8">
         <Link
           href="/"
           className="text-block-title text-ink focus-visible:outline-2 focus-visible:outline-focus"

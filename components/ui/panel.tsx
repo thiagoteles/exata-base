@@ -13,5 +13,7 @@ export function Panel({
   className,
   ...props
 }: ComponentProps<"section"> & { level?: keyof typeof levels }) {
-  return <section className={cn("rounded-panel p-6", levels[level], className)} {...props} />;
+  return (
+    <section className={cn("rounded-panel p-panel-inset", levels[level], className)} {...props} />
+  );
 }

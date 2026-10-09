@@ -20,7 +20,7 @@ export function ListSkeleton({ rows = 8, label }: { rows?: number; label: string
   return (
     <div role="status" aria-label={label} className="appear-after flex flex-col">
       {skeletonKeys(rows).map((key) => (
-        <div key={key} className="flex min-h-14 items-center border-b border-line">
+        <div key={key} className="flex min-h-row items-center border-b border-line">
           <div className="h-4 w-1/3 rounded-stamp bg-sunken" />
         </div>
       ))}

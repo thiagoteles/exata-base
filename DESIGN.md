@@ -348,6 +348,24 @@ components:
 
 **Density.** Medium. A list row is 56px. A field is 48px. Nothing is compressed to fit more: a narrow screen gets its own composition, not the wide one squeezed.
 
+**Named sizes.** What a person touches and the insets of containers are tokens, never a number in a component, so density changes them in one place. `pnpm check` refuses `h-`, `min-h-` and `size-` with 9, 10, 11, 12, 14, 15 or 16.
+
+| Token | Class | Value | Used by |
+|-------|-------|-------|---------|
+| `control` | `h-control`, `size-control` | 44px | buttons, menu and nav items, icon buttons |
+| `control-coarse` | `pointer-coarse:h-control-coarse` | 48px | buttons under a coarse pointer |
+| `field` | `h-field` | 48px | text fields, select and combobox triggers |
+| `row` | `min-h-row` | 56px | list rows |
+| `chip` | `h-chip` | 36px | filter chips |
+| `segment` | `h-segment` | 40px | segmented control |
+| `bar` | `h-bar` | 60px | top bars |
+| `tab` | `h-tab` | 64px | bottom bar destinations |
+| `sidebar` | `w-sidebar` | 248px | signed-in sidebar |
+| `panel-inset` | `p-panel-inset` | 24px | panel padding |
+| `dialog-inset` | `p-dialog-inset` | 28px | dialog padding |
+| `cell-x`, `cell-y` | `px-cell-x`, `py-cell-y` | 16px, 12px | record cells |
+| `dialog` (container) | `w-dialog` | 520px | dialog width |
+
 ## Elevation & Depth
 
 Three levels and nothing else:

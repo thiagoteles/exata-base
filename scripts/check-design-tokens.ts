@@ -4,7 +4,8 @@ import process from "node:process";
 /*
  * Tailwind silently ignores a class that has no token behind it, so a stock class like
  * `bg-blue-500` would ship as a no-op. This check fails on the stock palette, the stock
- * size, radius and shadow scales, and on colors written by hand outside the token file.
+ * size, radius and shadow scales, on colors written by hand outside the token file, and on
+ * the heights that have a named size, which density changes in one place.
  */
 
 const TOKEN_FILE = "styles/tokens.css";
@@ -44,6 +45,10 @@ const classRules: ReadonlyArray<{ pattern: RegExp; reason: string }> = [
     pattern:
       /(?<![\w-])(?:shadow|inset-shadow|drop-shadow|text-shadow)(?:-(?:2xs|xs|sm|md|lg|xl|2xl|inner))?(?![\w-])/g,
     reason: "stock shadow; only the layer shadow exists",
+  },
+  {
+    pattern: /(?<![\w-])(?:h|min-h|size)-(?:9|10|11|12|14|15|16)(?![\w-])/g,
+    reason: "a size with a name; use control, field, row, chip, segment, bar or tab",
   },
   {
     pattern: /(?<![\w-])font-serif(?![\w-])/g,

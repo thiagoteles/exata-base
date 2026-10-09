@@ -74,7 +74,7 @@ function ComboboxRow({ option, id, isActive, isSelected, onHover, onChoose }: Ro
       onClick={onChoose}
       onKeyDown={() => undefined}
       className={cn(
-        "flex h-11 cursor-default items-center justify-between gap-2 rounded-cell px-3 text-body",
+        "flex h-control cursor-default items-center justify-between gap-2 rounded-cell px-3 text-body",
         isActive ? "bg-sunken" : undefined,
         isSelected ? "bg-brand-wash" : undefined,
       )}
@@ -106,7 +106,7 @@ function ComboboxPanel({ options, value, placeholder, onChoose }: PanelProps) {
         value={query}
         onChange={(event) => search(event.target.value)}
         onKeyDown={onKeyDown}
-        className="mb-1 h-11 w-full rounded-cell border-2 border-line-strong bg-surface px-3 text-body outline-none focus:border-brand"
+        className="mb-1 h-control w-full rounded-cell border-2 border-line-strong bg-surface px-3 text-body outline-none focus:border-brand"
       />
       <div id={listId} role="listbox" aria-label={placeholder} className="max-h-64 overflow-y-auto">
         {shown.length === 0 ? (

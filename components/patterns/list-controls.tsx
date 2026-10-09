@@ -67,7 +67,7 @@ export function ActiveFilters({ filters }: { filters: readonly ActiveFilter[] })
             type="button"
             aria-label={t("removeFilter", { name: `${name}: ${value}` })}
             onClick={() => setParams({ [key]: null, page: null })}
-            className="inline-flex h-9 items-center gap-2 rounded-full border border-line-strong bg-surface px-3 text-label text-ink hover:border-ink"
+            className="inline-flex h-chip items-center gap-2 rounded-full border border-line-strong bg-surface px-3 text-label text-ink hover:border-ink"
           >
             {`${name}: ${value}`}
             <IconX className="size-4" aria-hidden="true" />

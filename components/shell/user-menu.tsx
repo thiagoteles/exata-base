@@ -30,7 +30,7 @@ export function UserMenu({
         <button
           type="button"
           aria-label={menuLabel}
-          className="inline-flex size-11 items-center justify-center rounded-control border-2 border-line-strong bg-surface font-semibold text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="inline-flex size-control items-center justify-center rounded-control border-2 border-line-strong bg-surface font-semibold text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           {initial}
         </button>
@@ -43,7 +43,7 @@ export function UserMenu({
         </div>
         <Link
           href="/account"
-          className="flex h-11 items-center rounded-cell px-3 text-body text-ink hover:bg-sunken"
+          className="flex h-control items-center rounded-cell px-3 text-body text-ink hover:bg-sunken"
         >
           {accountLabel}
         </Link>

@@ -25,7 +25,7 @@ export function Sidebar({ groups, label }: { groups: readonly ShellGroup[]; labe
                 href={item.href}
                 aria-current={current ? "page" : undefined}
                 className={cn(
-                  "flex h-11 items-center gap-3 rounded-control border-s-[3px] px-3 text-body focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+                  "flex h-control items-center gap-3 rounded-control border-s-[3px] px-3 text-body focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
                   current
                     ? "border-brand bg-brand-wash font-semibold text-brand-ink"
                     : "border-transparent text-ink hover:bg-sunken",

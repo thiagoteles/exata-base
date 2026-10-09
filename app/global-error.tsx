@@ -32,7 +32,7 @@ export default function GlobalError({
           <button
             type="button"
             onClick={() => retry()}
-            className="h-11 self-start rounded-control bg-action px-4.5 text-button font-semibold text-on-action"
+            className="h-control self-start rounded-control bg-action px-4.5 text-button font-semibold text-on-action"
           >
             {t("retry")}
           </button>

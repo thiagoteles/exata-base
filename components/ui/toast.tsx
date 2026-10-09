@@ -67,7 +67,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   <button
                     type="button"
                     onClick={action.onAction}
-                    className="mt-2 h-11 text-button font-semibold text-brand-ink underline"
+                    className="mt-2 h-control text-button font-semibold text-brand-ink underline"
                   >
                     {action.label}
                   </button>
@@ -76,7 +76,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             </div>
             <Primitive.Close
               aria-label={t("close")}
-              className="inline-flex size-11 items-center justify-center text-ink-muted hover:text-ink"
+              className="inline-flex size-control items-center justify-center text-ink-muted hover:text-ink"
             >
               <IconX className="size-5" aria-hidden="true" />
             </Primitive.Close>

@@ -47,7 +47,7 @@ export function DialogContent({ title, description, children, className }: Dialo
         {children}
         <Primitive.Close
           aria-label={t("close")}
-          className="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-control text-ink-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-focus"
+          className="absolute top-4 right-4 inline-flex size-control items-center justify-center rounded-control text-ink-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-focus"
         >
           <IconX className="size-5" aria-hidden="true" />
         </Primitive.Close>

@@ -56,7 +56,7 @@ export function Select({
               <Primitive.Item
                 key={option.value}
                 value={option.value}
-                className="flex h-11 cursor-default items-center justify-between gap-2 rounded-cell px-3 text-body outline-none data-[highlighted]:bg-sunken data-[state=checked]:bg-brand-wash"
+                className="flex h-control cursor-default items-center justify-between gap-2 rounded-cell px-3 text-body outline-none data-[highlighted]:bg-sunken data-[state=checked]:bg-brand-wash"
               >
                 <Primitive.ItemText>{option.label}</Primitive.ItemText>
                 <Primitive.ItemIndicator>

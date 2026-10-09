@@ -99,7 +99,7 @@ export function PageHeader({ title, subtitle, showBack = true, actions = [] }: P
             type="button"
             aria-label={t("back")}
             onClick={() => router.back()}
-            className="inline-flex size-11 shrink-0 items-center justify-center rounded-control border-2 border-line-strong bg-surface text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="inline-flex size-control shrink-0 items-center justify-center rounded-control border-2 border-line-strong bg-surface text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             <IconArrowLeft className="size-5" aria-hidden="true" />
           </button>

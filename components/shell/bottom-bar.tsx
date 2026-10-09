@@ -18,7 +18,7 @@ type BottomBarProps = {
 };
 
 const slot =
-  "flex h-16 flex-1 flex-col items-center justify-center gap-0.5 text-label focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus";
+  "flex h-tab flex-1 flex-col items-center justify-center gap-0.5 text-label focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus";
 
 /*
  * Below `lg` the sidebar becomes a bar of at most four destinations, each filling its whole column
@@ -62,7 +62,7 @@ export function BottomBar({ items, more, label, moreLabel, moreTitle }: BottomBa
                 <li key={item.key}>
                   <Link
                     href={item.href}
-                    className="flex h-11 items-center gap-3 rounded-control px-3 text-body hover:bg-sunken"
+                    className="flex h-control items-center gap-3 rounded-control px-3 text-body hover:bg-sunken"
                   >
                     <NavIcon name={item.icon} />
                     {item.label}

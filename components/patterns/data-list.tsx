@@ -87,7 +87,7 @@ export function DataList<Row>({
               style={style}
               className={cn(
                 rowClasses,
-                "relative flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line py-3 hover:bg-sunken md:min-h-14 md:py-0",
+                "relative flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line py-3 hover:bg-sunken md:min-h-row md:py-0",
               )}
             >
               {columns.map((column) => {

@@ -54,7 +54,7 @@ export async function BottomBarSlot() {
 }
 
 const signOutClasses =
-  "flex h-11 w-full items-center rounded-cell px-3 text-left text-body text-ink hover:bg-sunken focus-visible:outline-2 focus-visible:outline-focus";
+  "flex h-control w-full items-center rounded-cell px-3 text-left text-body text-ink hover:bg-sunken focus-visible:outline-2 focus-visible:outline-focus";
 
 export async function UserMenuSlot() {
   const [nav, account, user] = await Promise.all([

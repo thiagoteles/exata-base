@@ -36,7 +36,7 @@ export function MenuItem({ children, onSelect, icon, destructive = false }: Menu
     <DropdownMenu.Item
       {...(onSelect === undefined ? {} : { onSelect })}
       className={cn(
-        "flex h-11 cursor-default items-center gap-2 rounded-cell px-3 text-body outline-none data-[highlighted]:bg-sunken",
+        "flex h-control cursor-default items-center gap-2 rounded-cell px-3 text-body outline-none data-[highlighted]:bg-sunken",
         destructive ? "text-danger-ink" : "text-ink",
       )}
     >

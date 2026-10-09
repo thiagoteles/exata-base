@@ -44,6 +44,24 @@ export const textTokens = [
   "data",
 ] as const;
 
+export const spacingTokens = [
+  "control",
+  "control-coarse",
+  "field",
+  "row",
+  "chip",
+  "segment",
+  "bar",
+  "tab",
+  "sidebar",
+  "panel-inset",
+  "dialog-inset",
+  "cell-x",
+  "cell-y",
+] as const;
+
+export const containerTokens = ["dialog"] as const;
+
 export const radiusTokens = ["stamp", "control", "cell", "panel", "dialog", "full"] as const;
 
 export const shadowTokens = ["layer"] as const;

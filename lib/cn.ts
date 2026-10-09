@@ -2,10 +2,12 @@ import { type ClassValue, clsx } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 import {
   colorTokens,
+  containerTokens,
   easeTokens,
   fontTokens,
   radiusTokens,
   shadowTokens,
+  spacingTokens,
   textTokens,
 } from "@/lib/design-tokens";
 
@@ -18,6 +20,13 @@ const merge = extendTailwindMerge({
       shadow: [...shadowTokens],
       ease: [...easeTokens],
       font: [...fontTokens],
+    },
+  },
+  // Named sizes join Tailwind's numeric scale instead of replacing it.
+  extend: {
+    theme: {
+      spacing: [...spacingTokens],
+      container: [...containerTokens],
     },
   },
 });

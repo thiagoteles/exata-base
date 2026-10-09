@@ -24,7 +24,7 @@ export function Segmented({ label, value, onValueChange, options }: SegmentedPro
           key={option.value}
           value={option.value}
           className={cn(
-            "h-10 rounded-cell px-4 text-button font-semibold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+            "h-segment rounded-cell px-4 text-button font-semibold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
             "data-[state=checked]:bg-action data-[state=checked]:text-on-action",
           )}
         >

@@ -32,7 +32,9 @@ type RecordCellProps = {
 
 export function RecordCell({ label, children, wide = false, stamp }: RecordCellProps) {
   return (
-    <div className={cn("relative bg-surface px-4 py-3", wide ? "md:col-span-2" : undefined)}>
+    <div
+      className={cn("relative bg-surface px-cell-x py-cell-y", wide ? "md:col-span-2" : undefined)}
+    >
       <dt className="text-label text-ink-muted">{label}</dt>
       <dd className="mt-1 text-body text-ink">
         {children}

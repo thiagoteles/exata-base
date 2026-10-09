@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import process from "node:process";
 import { generateAccent, parseAccents } from "./tokens/accent";
+import { generateDataPalette } from "./tokens/data";
 import { generateTheme, parseSeeds } from "./tokens/generate";
 import {
   describeChoices,
@@ -83,7 +84,18 @@ const design = [
 const outputs: ReadonlyArray<readonly [string, string]> = [
   [
     "styles/tokens.css",
-    renderTokensCss(light.palette, dark.palette, accents, elevationOf(choices)),
+    renderTokensCss(
+      {
+        light: light.palette,
+        dark: dark.palette,
+        data: {
+          light: generateDataPalette("light", seeds.brand.hue),
+          dark: generateDataPalette("dark", seeds.brand.hue),
+        },
+      },
+      accents,
+      elevationOf(choices),
+    ),
   ],
   ["styles/preset.css", renderPresetCss(preset, choices)],
   ["app/fonts.ts", renderFonts(choices)],

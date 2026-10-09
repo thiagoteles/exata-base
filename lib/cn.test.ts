@@ -17,7 +17,7 @@ const css = ["styles/tokens.css", "styles/preset.css", "app/globals.css"]
   .join("\n");
 
 function declared(namespace: string): string[] {
-  const names = [...css.matchAll(new RegExp(`(?<![\\w-])--${namespace}-([a-z-]+):`, "g"))]
+  const names = [...css.matchAll(new RegExp(`(?<![\\w-])--${namespace}-([a-z0-9-]+):`, "g"))]
     .map((match) => match[1] ?? "")
     .filter((name) => !name.includes("--"));
   return [...new Set(names)].sort();

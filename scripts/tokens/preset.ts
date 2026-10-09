@@ -141,6 +141,8 @@ const baseTheme: [string, string][] = [
   ["--text-data--line-height", "1.375rem"],
   ...Object.entries(shapes.standard),
   ["--radius-full", "9999px"],
+  // The rounded data end of a chart bar; the same in every preset, as the chart method asks.
+  ["--radius-mark", "4px"],
   ["--spacing-control", "2.75rem"],
   ["--spacing-control-coarse", "3rem"],
   ["--spacing-field", "3rem"],

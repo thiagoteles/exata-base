@@ -5,7 +5,7 @@ export type ShellItem = {
   key: string;
   href: Route;
   label: string;
-  icon: "user" | "mail" | "inbox" | "card" | "users" | "send" | "history";
+  icon: "user" | "mail" | "inbox" | "card" | "users" | "send" | "history" | "chart";
   exact?: boolean;
 };
 

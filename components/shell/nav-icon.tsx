@@ -1,4 +1,5 @@
 import {
+  IconChartBar,
   IconCreditCard,
   IconHistory,
   IconInbox,
@@ -17,6 +18,7 @@ const icons = {
   users: IconUsers,
   send: IconSend,
   history: IconHistory,
+  chart: IconChartBar,
 } as const;
 
 export function NavIcon({ name }: { name: ShellItem["icon"] }) {

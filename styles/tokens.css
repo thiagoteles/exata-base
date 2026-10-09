@@ -33,6 +33,24 @@
   --color-accent-wash: oklch(94.5% 0.028 245);
   --color-accent-ink: oklch(44% 0.111 245);
   --color-on-accent: oklch(99.5% 0.002 245);
+  --color-chart-1: oklch(57.5% 0.163 255.5);
+  --color-chart-2: oklch(67.1% 0.175 40.6);
+  --color-chart-3: oklch(66.9% 0.141 162.1);
+  --color-chart-4: oklch(76.4% 0.161 75.1);
+  --color-chart-5: oklch(71.6% 0.141 357.4);
+  --color-chart-6: oklch(52.9% 0.18 142.5);
+  --color-chart-7: oklch(43.3% 0.167 283.6);
+  --color-chart-8: oklch(62.3% 0.191 24.9);
+  --color-chart-seq-1: oklch(93% 0.036 245);
+  --color-chart-seq-2: oklch(85% 0.07 245);
+  --color-chart-seq-3: oklch(76% 0.1 245);
+  --color-chart-seq-4: oklch(66% 0.12 245);
+  --color-chart-seq-5: oklch(56% 0.13 245);
+  --color-chart-seq-6: oklch(46% 0.116 245);
+  --color-chart-seq-7: oklch(37% 0.093 245);
+  --color-chart-negative: oklch(62.3% 0.191 24.9);
+  --color-chart-middle: oklch(94% 0.004 91.4);
+  --color-chart-positive: oklch(57.5% 0.163 255.5);
   --color-scrim: oklch(0% 0 0 / 0.5);
 
   --shadow-*: initial;
@@ -73,6 +91,24 @@
     --color-accent-wash: oklch(28% 0.039 245);
     --color-accent-ink: oklch(80% 0.091 245);
     --color-on-accent: oklch(16.5% 0.01 245);
+    --color-chart-1: oklch(62.2% 0.161 255.1);
+    --color-chart-2: oklch(62.2% 0.173 40.1);
+    --color-chart-3: oklch(62.1% 0.128 163.1);
+    --color-chart-4: oklch(67% 0.143 73.2);
+    --color-chart-5: oklch(62.2% 0.171 0.8);
+    --color-chart-6: oklch(52.9% 0.18 142.5);
+    --color-chart-7: oklch(67% 0.145 286.8);
+    --color-chart-8: oklch(66.9% 0.159 22.3);
+    --color-chart-seq-1: oklch(93% 0.036 245);
+    --color-chart-seq-2: oklch(85% 0.07 245);
+    --color-chart-seq-3: oklch(76% 0.1 245);
+    --color-chart-seq-4: oklch(66% 0.12 245);
+    --color-chart-seq-5: oklch(56% 0.13 245);
+    --color-chart-seq-6: oklch(46% 0.116 245);
+    --color-chart-seq-7: oklch(37% 0.093 245);
+    --color-chart-negative: oklch(66.9% 0.159 22.3);
+    --color-chart-middle: oklch(34.7% 0.005 106.7);
+    --color-chart-positive: oklch(62.2% 0.161 255.1);
     --shadow-layer: 0 0 0 1px var(--color-line-strong);
   }
 
@@ -106,6 +142,24 @@
       --color-accent-wash: oklch(28% 0.039 245);
       --color-accent-ink: oklch(80% 0.091 245);
       --color-on-accent: oklch(16.5% 0.01 245);
+      --color-chart-1: oklch(62.2% 0.161 255.1);
+      --color-chart-2: oklch(62.2% 0.173 40.1);
+      --color-chart-3: oklch(62.1% 0.128 163.1);
+      --color-chart-4: oklch(67% 0.143 73.2);
+      --color-chart-5: oklch(62.2% 0.171 0.8);
+      --color-chart-6: oklch(52.9% 0.18 142.5);
+      --color-chart-7: oklch(67% 0.145 286.8);
+      --color-chart-8: oklch(66.9% 0.159 22.3);
+      --color-chart-seq-1: oklch(93% 0.036 245);
+      --color-chart-seq-2: oklch(85% 0.07 245);
+      --color-chart-seq-3: oklch(76% 0.1 245);
+      --color-chart-seq-4: oklch(66% 0.12 245);
+      --color-chart-seq-5: oklch(56% 0.13 245);
+      --color-chart-seq-6: oklch(46% 0.116 245);
+      --color-chart-seq-7: oklch(37% 0.093 245);
+      --color-chart-negative: oklch(66.9% 0.159 22.3);
+      --color-chart-middle: oklch(34.7% 0.005 106.7);
+      --color-chart-positive: oklch(62.2% 0.161 255.1);
       --shadow-layer: 0 0 0 1px var(--color-line-strong);
     }
   }

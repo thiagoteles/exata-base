@@ -1,4 +1,5 @@
 import { type AccentPalette, type AccentReport, accentTokenNames } from "./accent";
+import type { DataPalette } from "./data";
 import { css, hex, type PairReport, type Palette, type TokenName, tokenNames } from "./generate";
 import type { Elevation } from "./preset-options";
 
@@ -42,9 +43,17 @@ ${rules((name) => `:root:not([data-theme="light"]) ${scope(name)}`, "dark", "   
 }
 
 /** The brand comes first: it is the accent outside every scope and the way back to it inside one. */
+const dataDeclarations = (palette: DataPalette, indent: string) =>
+  palette.map(([name, color]) => `${indent}--color-${name}: ${css(color)};`).join("\n");
+
+export type ThemePalettes = {
+  light: Palette;
+  dark: Palette;
+  data: { light: DataPalette; dark: DataPalette };
+};
+
 export function renderTokensCss(
-  light: Palette,
-  dark: Palette,
+  { light, dark, data }: ThemePalettes,
   accents: readonly [RenderedAccent, ...RenderedAccent[]],
   elevation: Elevation,
 ): string {
@@ -62,6 +71,7 @@ export function renderTokensCss(
 
 ${declarations(light, "  ")}
 ${accentDeclarations(brand.light, "  ")}
+${dataDeclarations(data.light, "  ")}
   --color-scrim: ${SCRIM};
 
   --shadow-*: initial;
@@ -77,6 +87,7 @@ ${accentDeclarations(brand.light, "  ")}
     color-scheme: dark;
 ${declarations(dark, "    ")}
 ${accentDeclarations(brand.dark, "    ")}
+${dataDeclarations(data.dark, "    ")}
     --shadow-layer: ${darkShadow};
   }
 
@@ -85,6 +96,7 @@ ${accentDeclarations(brand.dark, "    ")}
       color-scheme: dark;
 ${declarations(dark, "      ")}
 ${accentDeclarations(brand.dark, "      ")}
+${dataDeclarations(data.dark, "      ")}
       --shadow-layer: ${darkShadow};
     }
   }

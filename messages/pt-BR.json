@@ -337,7 +337,8 @@
       "plan": "Meu plano",
       "users": "Usuários",
       "invites": "Convites",
-      "audit": "Auditoria"
+      "audit": "Auditoria",
+      "numbers": "Números"
     },
     "contact": "Contato",
     "plans": "Planos",
@@ -803,6 +804,32 @@
         "contact_status_change": "Mudou a situação do contato",
         "contact_reply": "Respondeu um contato"
       }
+    },
+    "numbers": {
+      "title": "Números",
+      "subtitle": "Cadastros, pagantes e receita, lidos direto do banco.",
+      "range": "Período",
+      "ranges": {
+        "7": "7 dias",
+        "30": "30 dias",
+        "90": "90 dias"
+      },
+      "summary": "Resumo do período",
+      "signups": "Cadastros",
+      "revenue": "Receita líquida",
+      "revenueNote": "Em reais, já descontados os reembolsos.",
+      "refunded": "Reembolsado",
+      "refundedNote": "De pagamentos feitos no período.",
+      "payers": "Pagantes",
+      "payersNote": "{courtesies, plural, =0 {Sem cortesias} one {Mais # cortesia} other {Mais # cortesias}}",
+      "cancellations": "Cancelamentos agendados",
+      "cancellationsNote": "Assinaturas que terminam no fim do período pago.",
+      "signupsByDay": "Cadastros por dia",
+      "revenueByDay": "Receita líquida por dia",
+      "payersByPlan": "Pagantes por plano",
+      "table": "Ver os números em tabela",
+      "day": "Dia",
+      "value": "Valor"
     }
   }
 }

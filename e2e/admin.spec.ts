@@ -23,6 +23,7 @@ for (const theme of themes) {
     page,
   }) => {
     const screens = [
+      ["/admin/numbers", "Números"],
       ["/admin/users", "Usuários"],
       ["/admin/invites", "Convites"],
       ["/admin/audit", "Auditoria"],
@@ -132,4 +133,26 @@ test.describe("without a session", () => {
       expect(new URL(page.url()).pathname).toBe("/sign-in");
     }
   });
+});
+
+test("the numbers follow the chosen period and every chart has a table", async ({ page }) => {
+  await open(page, "/admin/numbers?range=7", "light", "Números");
+  const periods = page.getByRole("navigation", { name: "Período" });
+  await expect(periods.getByRole("link", { name: "7 dias" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await periods.getByRole("link", { name: "90 dias" }).click();
+  await expect(page).toHaveURL(/range=90/);
+  await expect(periods.getByRole("link", { name: "90 dias" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  // Each day is a focus stop that says its value, and the same values are in a table.
+  const signups = page
+    .getByRole("figure")
+    .filter({ has: page.getByRole("img", { name: "Cadastros por dia" }) });
+  await expect(signups.getByRole("button")).toHaveCount(90);
+  await signups.getByText("Ver os números em tabela").click();
+  await expect(signups.getByRole("table").getByRole("row")).toHaveCount(91);
 });

@@ -551,6 +551,17 @@ A card inside a card does not exist.
 
 **Empty, error and loading states** are part of the component, not extras. The error page shows the request id in mono.
 
+## Data
+
+Charts follow one method: pick the form first (a single number is a stat tile, not a chart), then color by the job.
+- **Categorical** (`chart-1` to `chart-8`): series that are the subject. Slots are taken in order and never cycled; the order is what keeps neighbors apart for color-blind readers, validated against this system's surfaces in both themes. A ninth series folds into "Other". Three light slots are under 3:1 on the surface, so a chart with categories always has direct labels or its table.
+- **Sequential** (`chart-seq-1` to `chart-seq-7`): magnitude, the brand hue from light to dark. A single series uses `chart-seq-5`, and the hovered mark `chart-seq-6`.
+- **Diverging** (`chart-negative`, `chart-middle`, `chart-positive`): above or below a baseline.
+- **State** stays with the state colors and their stamps, never a chart slot.
+- Marks: columns at most 24px wide with a 4px rounded data end (`rounded-mark`, the same in every preset) and a square foot; lines 2px; hairline gridlines in `line`. Axis text in `ink-muted`, values in `ink`; text never wears a series color.
+- One axis per chart, ticks on round steps (a count never steps by a half). A single series has no legend: the title says what it is.
+- Every chart is drawn at the container's real width, so its text keeps the token sizes; every mark has a hover and focus target wider than the mark; every chart has a table view with the same values.
+
 ## Do's and Don'ts
 
 - Do: numbers in tabular JetBrains Mono, right-aligned in columns.

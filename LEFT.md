@@ -123,7 +123,7 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
   - cada cor passa pelo verificador e vira token;
   - o `check-design-tokens` passa a aceitar essas classes;
   - na base, só um exemplo neutro no `/catalog`.
-- [ ] **Paleta de dados:** categórica (cerca de 8 tons com luminosidade equilibrada, distinguíveis por quem tem daltonismo), sequencial e divergente, nos dois temas.
+- [x] **Paleta de dados:** categórica (cerca de 8 tons com luminosidade equilibrada, distinguíveis por quem tem daltonismo), sequencial e divergente, nos dois temas.
 - [x] **Tipografia:**
   - par de fontes de uma lista curada (sans neutra, humanista, serifada editorial, hiperlegível), mais a mono para números;
   - o gerador escreve o arquivo de fontes, porque o `next/font` exige chamadas literais;
@@ -151,7 +151,7 @@ Combinações completas e testadas. O produto escolhe um preset mais as sementes
 
 - [ ] **Primitivos** sobre Radix em `components/ui`: tabs, stepper, date picker, slider, progress/meter, accordion, checkbox, radio e switch (se faltarem), skeleton, chip removível e breadcrumb.
 - [ ] **Padrões do site público:** hero, seções de conteúdo, tabela de preços, FAQ e um **layout de leitura (prose)** com tokens próprios (`/aprenda` do lottery, glossário do solmiza).
-- [ ] **Gráficos em SVG** (`components/charts`): barras, linha, sparkline, heatmap e stat tile, usando a paleta de dados, sem biblioteca pesada.
+- [x] **Gráficos em SVG** (`components/charts`): colunas, barras, sparkline e stat tile, usando a paleta de dados, sem biblioteca. Linha e heatmap entram com o primeiro consumidor.
 - [ ] **Figuras de domínio** (`components/figures`): a família existe na base com as regras e um exemplo neutro; as figuras de cada produto (diagramas, bolas, instrumentos) vivem no produto. `color-mix(in oklch, var(--color-x) N%, transparent)` permitido sobre tokens.
 - [ ] **Texto dentro de SVG** (`<text>`) vindo do catálogo, sem esbarrar no `noJsxLiterals`.
 - [ ] **Padrões de produto pago:** paywall e gate, estado de trial, progresso, conquistas e onboarding.
@@ -391,15 +391,15 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 11. Números de negócio no admin
 
-- [ ] Página "Números" lendo o Postgres (`users`, `plans`, `payments`), com os gráficos do design system:
+- [x] Página "Números" lendo o Postgres (`users`, `plans`, `payments`), com os gráficos do design system (feito: cadastros, receita líquida, reembolsos, pagantes por plano, cancelamentos agendados; pendentes marcados abaixo):
   - cadastros por dia;
-  - pessoas ativas;
+  - pessoas ativas (pendente: a base não registra atividade);
   - pagantes por plano;
-  - receita recorrente mensal;
+  - receita recorrente mensal (pendente: precisa do valor de cada preço, que entra com os preços por `lookup_key`);
   - cancelamentos;
   - reembolsos;
-  - conversão do trial.
-- [ ] Não depende do Umami.
+  - conversão do trial (pendente: entra com o trial).
+- [x] Não depende do Umami.
 
 ### 12. Experimentos
 

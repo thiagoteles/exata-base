@@ -8,7 +8,7 @@ import { hasRole, type Role } from "@/lib/accounts/roles";
  */
 
 export type NavGroup = "main" | "staff" | "admin";
-type NavIcon = "user" | "mail" | "inbox" | "card" | "users" | "send" | "history";
+type NavIcon = "user" | "mail" | "inbox" | "card" | "users" | "send" | "history" | "chart";
 
 export type NavItem = {
   key: string;
@@ -25,6 +25,7 @@ const navItems: readonly NavItem[] = [
   { key: "plan", href: "/account/plan", group: "main", minimum: "member", icon: "card" },
   { key: "messages", href: "/account/messages", group: "main", minimum: "member", icon: "mail" },
   { key: "contacts", href: "/staff/contacts", group: "staff", minimum: "staff", icon: "inbox" },
+  { key: "numbers", href: "/admin/numbers", group: "admin", minimum: "admin", icon: "chart" },
   { key: "users", href: "/admin/users", group: "admin", minimum: "admin", icon: "users" },
   { key: "invites", href: "/admin/invites", group: "admin", minimum: "admin", icon: "send" },
   { key: "audit", href: "/admin/audit", group: "admin", minimum: "admin", icon: "history" },

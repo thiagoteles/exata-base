@@ -26,6 +26,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 | `lib/db/schema/` | One file per area. Migrations are generated into `lib/db/migrations`, never edited |
 | `components/ui/` | Primitives. The only place that imports Radix |
 | `components/patterns/` | Lists, record grids, page header, save bar. Components receive data by props and never import the database or a port |
+| `components/charts/` | Stat tile, sparkline, column chart, bar list, in plain SVG on the data palette. Every chart has a table view and hover and focus targets; see DESIGN.md, Data |
 | `components/shell/` | The public and signed-in shells |
 | `emails/` | E-mail components and their builders |
 | `messages/pt-BR.json` | Every sentence a person reads. The file is the type of the catalog |

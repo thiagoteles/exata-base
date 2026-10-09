@@ -64,6 +64,24 @@ const call = (role: string, face: Face) => {
   return `const ${role} = ${face.loader}({\n  variable: "--font-face-${role}",\n  subsets: ["latin"],${extra}\n});`;
 };
 
+/**
+ * Every density, by name, as a scope any element can opt into with `data-density`. The same
+ * variables the active preset sets, each at the value that density gives, so a catalog can show a
+ * component at each density in one page and a test can ask the whole page for one. The active
+ * preset's own density is unaffected: these rules only apply where the attribute is.
+ */
+function renderDensityScopes(): string {
+  const base = new Map(baseTheme);
+  const names = [...new Set(Object.values(densities).flatMap((vars) => Object.keys(vars)))];
+  const scopes = Object.entries(densities).map(([density, vars]) => {
+    const lines = names.map(
+      (name) => `    ${name}: ${(vars as Record<string, string>)[name] ?? base.get(name) ?? ""};`,
+    );
+    return `  [data-density="${density}"] {\n${lines.join("\n")}\n  }`;
+  });
+  return `@layer base {\n${scopes.join("\n\n")}\n}\n`;
+}
+
 /*
  * next/font reads its calls at compile time: each must be a literal call assigned to a module
  * level const, with literal options. So the module is written, not configured. When titles use
@@ -198,7 +216,8 @@ export function renderPresetCss(preset: PresetName, choices: Choices): string {
 
 ${lines.join("\n")}
 }
-`;
+
+${renderDensityScopes()}`;
 }
 
 const familyOf = (face: Face) => face.loader.replaceAll("_", " ");

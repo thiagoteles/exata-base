@@ -24,6 +24,26 @@ describe("presets", () => {
     }
   });
 
+  it("offers every density as a scope any element can ask for by name, whatever the preset", () => {
+    for (const name of presetNames) {
+      const { preset, choices } = parseDesign({ preset: name });
+      const css = renderPresetCss(preset, choices);
+      for (const density of knobs.density) {
+        expect(css).toContain(`[data-density="${density}"] {`);
+      }
+      // Each scope states every density variable, so asking for one never leaves another behind.
+      const scope = (density: string) =>
+        css.slice(css.indexOf(`[data-density="${density}"] {`)).split("}")[0] ?? "";
+      const variables = (density: string) =>
+        [...scope(density).matchAll(/(--[a-z-]+):/g)].map((m) => m[1]);
+      expect(variables("comfortable")).toEqual(variables("large"));
+      expect(variables("medium")).toEqual(variables("large"));
+      // The medium scope is the base the others are measured from.
+      expect(scope("medium")).toContain("--spacing-control: 2.75rem;");
+      expect(scope("large")).toContain("--spacing-control: 3.25rem;");
+    }
+  });
+
   it("raises muted text to 7:1 when the contrast is reinforced", () => {
     const { choices } = parseDesign({ preset: "accessible" });
     const look = { temperature: temperatureOf(choices), contrast: choices.contrast };

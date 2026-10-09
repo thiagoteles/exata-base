@@ -10,6 +10,7 @@ import { ButtonsDemo } from "@/features/catalog/buttons-demo";
 import { CatalogHeader } from "@/features/catalog/catalog-header";
 import { ChoicesDemo } from "@/features/catalog/choices-demo";
 import { CompositionDemo } from "@/features/catalog/composition-demo";
+import { DensityDemo } from "@/features/catalog/density-demo";
 import { FieldsDemo } from "@/features/catalog/fields-demo";
 import { FiguresDemo } from "@/features/catalog/figures-demo";
 import { FilesList } from "@/features/catalog/files-list";
@@ -67,68 +68,71 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
     <>
       <CatalogHeader />
       <div className="flex flex-col gap-16">
-        <CatalogSection title={t("accent.title")}>
+        <CatalogSection name="accent" title={t("accent.title")}>
           <AccentDemo />
         </CatalogSection>
-        <CatalogSection title={t("palettes.title")}>
+        <CatalogSection name="palettes" title={t("palettes.title")}>
           <PaletteDemo />
         </CatalogSection>
-        <CatalogSection title={t("choices.title")}>
+        <CatalogSection name="choices" title={t("choices.title")}>
           <ChoicesDemo />
         </CatalogSection>
-        <CatalogSection title={t("structure.title")}>
+        <CatalogSection name="structure" title={t("structure.title")}>
           <StructureDemo />
         </CatalogSection>
-        <CatalogSection title={t("measures.title")}>
+        <CatalogSection name="measures" title={t("measures.title")}>
           <MeasuresDemo />
         </CatalogSection>
-        <CatalogSection title={t("composition.title")}>
+        <CatalogSection name="composition" title={t("composition.title")}>
           <CompositionDemo today={dateInSaoPaulo(currentInstant())} />
         </CatalogSection>
-        <CatalogSection title={t("publicPatterns.title")}>
+        <CatalogSection name="publicPatterns" title={t("publicPatterns.title")}>
           <PublicDemo />
         </CatalogSection>
-        <CatalogSection title={t("figures.title")}>
+        <CatalogSection name="figures" title={t("figures.title")}>
           <FiguresDemo />
         </CatalogSection>
-        <CatalogSection title={t("paidPatterns.title")}>
+        <CatalogSection name="paidPatterns" title={t("paidPatterns.title")}>
           <PaidPatternsDemo now={currentInstant().toISOString()} />
         </CatalogSection>
-        <CatalogSection title={t("buttons.title")}>
+        <CatalogSection name="density" title={t("density.title")}>
+          <DensityDemo />
+        </CatalogSection>
+        <CatalogSection name="buttons" title={t("buttons.title")}>
           <ButtonsDemo />
         </CatalogSection>
-        <CatalogSection title={t("fields.title")}>
+        <CatalogSection name="fields" title={t("fields.title")}>
           <FieldsDemo />
         </CatalogSection>
-        <CatalogSection title={t("pickers.title")}>
+        <CatalogSection name="pickers" title={t("pickers.title")}>
           <PickersDemo />
         </CatalogSection>
-        <CatalogSection title={t("layers.title")}>
+        <CatalogSection name="layers" title={t("layers.title")}>
           <LayersDemo />
         </CatalogSection>
-        <CatalogSection title={t("states.title")}>
+        <CatalogSection name="states" title={t("states.title")}>
           <StatesDemo />
         </CatalogSection>
-        <CatalogSection title={t("list.title")}>
+        <CatalogSection name="list" title={t("list.title")}>
           <Suspense fallback={<ListSkeleton label={t("list.loading")} />}>
             <OrdersList searchParams={searchParams} />
           </Suspense>
         </CatalogSection>
-        <CatalogSection title={t("record.title")}>
+        <CatalogSection name="record" title={t("record.title")}>
           <RecordDemo />
         </CatalogSection>
-        <CatalogSection title={t("save.title")}>
+        <CatalogSection name="save" title={t("save.title")}>
           <SaveDemo />
         </CatalogSection>
-        <CatalogSection title={t("wizard.title")}>
+        <CatalogSection name="wizard" title={t("wizard.title")}>
           <Wizard />
         </CatalogSection>
-        <CatalogSection title={t("paid.title")}>
+        <CatalogSection name="paid" snapshot={false} title={t("paid.title")}>
           <Suspense>
             <PaidBlock />
           </Suspense>
         </CatalogSection>
-        <CatalogSection title={t("files.title")}>
+        <CatalogSection name="files" snapshot={false} title={t("files.title")}>
           <UploadDemo maxMb={env.UPLOAD_MAX_MB} types={env.UPLOAD_TYPES.join(", ")} />
           <FilesList files={files} />
         </CatalogSection>

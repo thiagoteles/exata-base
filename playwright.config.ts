@@ -22,7 +22,13 @@ export default defineConfig({
   // The development server compiles a page the first time it is asked for.
   timeout: FIRST_LOAD_MS,
   // An expectation waits for the app, not for the compiler.
-  expect: { timeout: EXPECT_MS },
+  expect: {
+    timeout: EXPECT_MS,
+    // References are kept in the repository, one set per preset and theme, whatever the machine
+    // that took them; a small share of pixels may differ, since text edges are not identical everywhere.
+    toHaveScreenshot: { animations: "disabled", caret: "hide", maxDiffPixelRatio: 0.02 },
+  },
+  snapshotPathTemplate: "{testDir}/__snapshots__/{arg}{ext}",
   use: {
     baseURL: "http://localhost:3300",
     // The product speaks Portuguese; the browser asks for it like a person in Brazil would.

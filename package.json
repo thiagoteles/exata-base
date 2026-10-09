@@ -22,6 +22,7 @@
     "db:generate": "drizzle-kit generate",
     "lint:migrations": "tsx scripts/check-migrations.ts",
     "lint:catalogs": "tsx scripts/check-catalogs.ts",
+    "catalog:presets": "tsx scripts/catalog-presets.mts",
     "test:integration": "vitest run --config vitest.integration.config.mts",
     "gcp:alerts": "bash scripts/gcp-alerts.sh",
     "gcp:access-log": "bash scripts/gcp-access-log.sh",

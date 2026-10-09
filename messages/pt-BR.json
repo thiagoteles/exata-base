@@ -326,6 +326,23 @@
         "streak": { "title": "Sete dias seguidos", "body": "Volte sete dias seguidos." }
       }
     },
+    "density": {
+      "title": "Densidades",
+      "help": "Os mesmos controles em cada densidade do sistema. O preset escolhe uma delas para o produto; aqui cada coluna pede a sua pelo nome.",
+      "names": { "medium": "Média", "comfortable": "Confortável", "large": "Grande" },
+      "field": "Nome",
+      "value": "Ana Souza",
+      "primary": "Salvar",
+      "secondary": "Cancelar",
+      "mode": "Modo",
+      "first": "Primeiro",
+      "second": "Segundo",
+      "tabs": "Seções de exemplo",
+      "body": "Painel da aba escolhida.",
+      "switch": "Avisos por e-mail",
+      "checkbox": "Lembrar deste aparelho",
+      "stamp": "Concluído"
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",

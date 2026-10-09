@@ -88,3 +88,47 @@
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ease-move: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@layer base {
+  [data-density="medium"] {
+    --spacing-control: 2.75rem;
+    --spacing-control-coarse: 3rem;
+    --spacing-field: 3rem;
+    --spacing-row: 3.5rem;
+    --spacing-panel-inset: 1.5rem;
+    --spacing-dialog-inset: 1.75rem;
+    --spacing-cell-x: 1rem;
+    --spacing-cell-y: 0.75rem;
+    --spacing-sidebar: 15.5rem;
+    --spacing-chip: 2.25rem;
+    --spacing-segment: 2.5rem;
+  }
+
+  [data-density="comfortable"] {
+    --spacing-control: 3rem;
+    --spacing-control-coarse: 3.25rem;
+    --spacing-field: 3.25rem;
+    --spacing-row: 4rem;
+    --spacing-panel-inset: 2rem;
+    --spacing-dialog-inset: 2rem;
+    --spacing-cell-x: 1.25rem;
+    --spacing-cell-y: 1rem;
+    --spacing-sidebar: 17rem;
+    --spacing-chip: 2.25rem;
+    --spacing-segment: 2.5rem;
+  }
+
+  [data-density="large"] {
+    --spacing-control: 3.25rem;
+    --spacing-control-coarse: 3.5rem;
+    --spacing-field: 3.5rem;
+    --spacing-row: 4rem;
+    --spacing-panel-inset: 1.5rem;
+    --spacing-dialog-inset: 1.75rem;
+    --spacing-cell-x: 1rem;
+    --spacing-cell-y: 0.75rem;
+    --spacing-sidebar: 17rem;
+    --spacing-chip: 2.75rem;
+    --spacing-segment: 3rem;
+  }
+}

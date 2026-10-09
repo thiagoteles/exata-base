@@ -68,6 +68,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 - `pnpm verify` is the full proof before delivering a phase: check, integration, the production image booting against a throwaway Postgres, and the browser suite on a clean compose. Stop the local compose first.
 - `pnpm test:integration` runs the rules against a real Postgres. `pnpm test:e2e` runs the browser suite against the running compose.
 - `pnpm db:generate` writes a migration after a schema change.
+- `pnpm catalog:presets` visits every preset (writes it into `design.json`, regenerates, restarts the app, runs the catalog snapshots, restores everything); `--update` rewrites the references in `e2e/__snapshots__`, `--preset=<name>` visits one. The catalog snapshots of the active preset also run in `pnpm test:e2e`.
 
 ### Skills
 

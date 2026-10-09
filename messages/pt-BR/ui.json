@@ -1,0 +1,19 @@
+{
+  "close": "Fechar",
+  "loading": "Carregando",
+  "search": "Buscar",
+  "noOptions": "Nenhuma opção encontrada.",
+  "choose": "Escolha uma opção",
+  "back": "Voltar",
+  "datePicker": {
+    "placeholder": "dd/mm/aaaa",
+    "open": "Abrir calendário",
+    "previousMonth": "Mês anterior",
+    "nextMonth": "Próximo mês"
+  },
+  "stepper": {
+    "done": "concluída",
+    "current": "etapa atual",
+    "upcoming": "a fazer"
+  }
+}

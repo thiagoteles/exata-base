@@ -1,7 +1,7 @@
 /*
  * The single list of locales. The proxy, the request config and the type declarations all read it.
- * Portuguese is the only language the product ships. To add one, create messages/<locale>.json
- * with exactly the keys of pt-BR and add the locale to this list; `pnpm check` compares the two.
+ * Portuguese is the only language the product ships. To add one, create messages/<locale>/ with
+ * the same area files and keys as pt-BR and add the locale to this list; `pnpm check` compares the two.
  */
 export const locales = ["pt-BR"] as const;
 

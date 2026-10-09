@@ -7,7 +7,7 @@
     "defaultBranch": "main"
   },
   "files": {
-    "includes": ["**", "!**/*.md", "!tools"]
+    "includes": ["**", "!**/*.md", "!tools", "!messages/*.json"]
   },
   "formatter": {
     "enabled": true,

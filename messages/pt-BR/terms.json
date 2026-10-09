@@ -1,0 +1,22 @@
+{
+  "title": "Termos de uso",
+  "notice": "Texto de exemplo. Substitua pelos termos reais do produto antes de publicar.",
+  "sections": {
+    "service": {
+      "title": "O serviço",
+      "body": "Descreva o que o produto oferece e o que ele não oferece."
+    },
+    "account": {
+      "title": "Sua conta",
+      "body": "Explique as responsabilidades de quem cria uma conta e como ela pode ser encerrada."
+    },
+    "payment": {
+      "title": "Pagamento e cancelamento",
+      "body": "Descreva preços, renovação, cancelamento e reembolso, se o produto cobrar."
+    },
+    "changes": {
+      "title": "Mudanças nestes termos",
+      "body": "Diga como as pessoas serão avisadas quando os termos mudarem."
+    }
+  }
+}

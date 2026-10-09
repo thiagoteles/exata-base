@@ -1,728 +1,4 @@
 {
-  "errors": {
-    "badRequest": "Não foi possível processar o pedido. Confira os dados e tente de novo.",
-    "unauthorized": "Entre na sua conta para continuar.",
-    "forbidden": "Você não tem permissão para fazer isso.",
-    "notFound": "Não encontramos o que você procurou.",
-    "conflict": "Isso já foi feito ou mudou enquanto você editava. Atualize a página e tente de novo.",
-    "tooManyRequests": "Muitas tentativas em pouco tempo. Espere um pouco e tente de novo.",
-    "internal": "Algo deu errado do nosso lado. Tente de novo em instantes.",
-    "requestId": "Código do pedido: {requestId}",
-    "fileTooLarge": "O arquivo é maior que o limite de {maxMb, number} MB.",
-    "fileType": "Esse tipo de arquivo não é aceito.",
-    "emptyFile": "O arquivo está vazio.",
-    "invalidCredentials": "E-mail ou senha incorretos.",
-    "emailNotVerified": "Confirme seu e-mail antes de entrar. Enviamos o link de confirmação.",
-    "emailTaken": "Já existe uma conta com esse e-mail.",
-    "invalidResetToken": "O link para trocar a senha venceu ou já foi usado. Peça um novo.",
-    "billingOff": "A cobrança não está ativa neste ambiente.",
-    "planUnavailable": "Esse plano não está à venda no momento.",
-    "alreadyPaid": "Você já tem um plano pago. Para mudar, use o portal do cliente.",
-    "noSubscription": "Você não tem uma assinatura ativa.",
-    "noBillingAccount": "Você ainda não tem uma conta de cobrança.",
-    "paidPlanRequired": "Esse recurso é do plano pago.",
-    "nothingToRefund": "Não há pagamento para reembolsar.",
-    "emailNotSent": "Não foi possível enviar o e-mail. Tente de novo."
-  },
-  "validation": {
-    "required": "Preencha este campo.",
-    "invalid": "Valor inválido.",
-    "invalidType": "Valor inválido.",
-    "invalidOption": "Escolha uma das opções.",
-    "invalidEmail": "Informe um e-mail válido.",
-    "invalidUrl": "Informe um endereço válido.",
-    "invalidDate": "Informe uma data válida no formato dd/mm/aaaa.",
-    "invalidMoney": "Informe um valor em reais.",
-    "tooShort": "{minimum, plural, one {Use pelo menos # caractere.} other {Use pelo menos # caracteres.}}",
-    "tooLong": "{maximum, plural, one {Use no máximo # caractere.} other {Use no máximo # caracteres.}}",
-    "tooSmall": "O valor mínimo é {minimum}.",
-    "tooBig": "O valor máximo é {maximum}.",
-    "tooFew": "{minimum, plural, one {Escolha pelo menos # item.} other {Escolha pelo menos # itens.}}",
-    "tooMany": "{maximum, plural, one {Escolha no máximo # item.} other {Escolha no máximo # itens.}}"
-  },
-  "emails": {
-    "layout": {
-      "footer": "Este é um e-mail automático. Não é preciso responder.",
-      "unsubscribe": {
-        "reason": "Você recebe esta mensagem porque ligou esse aviso na sua conta.",
-        "action": "Parar de receber"
-      }
-    },
-    "verifyEmail": {
-      "subject": "Confirme seu e-mail",
-      "preview": "Falta um passo para usar sua conta.",
-      "greeting": "Olá, {name}.",
-      "body": "Para confirmar que este e-mail é seu e liberar o acesso, use o botão abaixo. O link vale por uma hora.",
-      "action": "Confirmar e-mail",
-      "ignore": "Se você não criou uma conta, pode ignorar esta mensagem."
-    },
-    "resetPassword": {
-      "subject": "Redefina sua senha",
-      "preview": "Recebemos um pedido para trocar sua senha.",
-      "greeting": "Olá, {name}.",
-      "body": "Use o botão abaixo para escolher uma nova senha. O link vale por uma hora.",
-      "action": "Escolher nova senha",
-      "ignore": "Se você não pediu a troca, sua senha continua a mesma e pode ignorar esta mensagem."
-    },
-    "greetingWithoutName": "Olá.",
-    "abandonedCheckout": {
-      "subject": "Seu plano ficou esperando",
-      "preview": "Você começou a assinar e não terminou.",
-      "greeting": "Olá, {name}",
-      "body": "Você começou a assinar e não terminou. O plano continua à sua espera, a um passo de distância.",
-      "action": "Voltar ao plano",
-      "ignore": "Se mudou de ideia, tudo bem: não vamos mandar outro lembrete sobre isso."
-    },
-    "trialEnding": {
-      "subject": "Seu teste gratuito termina em {date}",
-      "preview": "Seu teste gratuito termina em {date}.",
-      "greeting": "Olá, {name}",
-      "body": "Seu teste gratuito termina em {date}. A partir daí a primeira cobrança do plano acontece no cartão que você cadastrou. Se quiser mudar ou cancelar, é só abrir o seu plano.",
-      "action": "Abrir meu plano",
-      "ignore": "Se está tudo certo, não precisa fazer nada."
-    },
-    "planExpiring": {
-      "subject": "Seu plano termina em {date}",
-      "preview": "Seu plano de um ano termina em {date}.",
-      "greeting": "Olá, {name}",
-      "body": "Seu plano de um ano termina em {date}. Depois dessa data a conta volta ao plano gratuito, e tudo o que você guardou continua com você.",
-      "action": "Renovar o plano",
-      "ignore": "Se não quiser renovar, não precisa fazer nada."
-    },
-    "contactNotice": {
-      "subject": "Nova mensagem de contato: {subject}",
-      "preview": "{name} escreveu pelo formulário de contato.",
-      "heading": "Nova mensagem de contato",
-      "from": "De",
-      "subjectLabel": "Assunto",
-      "action": "Abrir na caixa de contatos"
-    },
-    "contactReply": {
-      "subject": "Resposta à sua mensagem",
-      "preview": "Respondemos a sua mensagem de contato.",
-      "greeting": "Olá, {name}.",
-      "intro": "Esta é a resposta à sua mensagem:",
-      "original": "Sua mensagem"
-    },
-    "invite": {
-      "subject": "Você foi convidado",
-      "preview": "Crie sua conta para começar.",
-      "greeting": "Você recebeu um convite.",
-      "body": "{inviter} convidou você para entrar como {role}. Use o botão abaixo para criar a conta com este e-mail. O convite vale por 7 dias.",
-      "action": "Criar minha conta",
-      "ignore": "Se você não esperava este convite, pode ignorar esta mensagem.",
-      "roles": {
-        "member": "membro",
-        "staff": "equipe",
-        "admin": "administrador"
-      }
-    }
-  },
-  "ui": {
-    "close": "Fechar",
-    "loading": "Carregando",
-    "search": "Buscar",
-    "noOptions": "Nenhuma opção encontrada.",
-    "choose": "Escolha uma opção",
-    "back": "Voltar",
-    "datePicker": {
-      "placeholder": "dd/mm/aaaa",
-      "open": "Abrir calendário",
-      "previousMonth": "Mês anterior",
-      "nextMonth": "Próximo mês"
-    },
-    "stepper": { "done": "concluída", "current": "etapa atual", "upcoming": "a fazer" }
-  },
-  "patterns": {
-    "header": {
-      "back": "Voltar",
-      "moreActions": "Mais ações"
-    },
-    "list": {
-      "search": "Buscar",
-      "searchPlaceholder": "Buscar na lista",
-      "previous": "Anterior",
-      "next": "Próxima",
-      "position": "{from, number} a {to, number} de {total, number}",
-      "positionNone": "0 resultados",
-      "clear": "Limpar busca",
-      "removeFilter": "Remover filtro {name}",
-      "noResults": "Nada para “{term}”{filters, plural, =0 {} one { com # filtro} other { com # filtros}}",
-      "noResultsFilters": "Nada com {filters, plural, one {# filtro} other {# filtros}}",
-      "activeFilters": "Filtros ativos",
-      "loading": "Carregando a lista",
-      "pagination": "Paginação"
-    },
-    "saveBar": {
-      "label": "Alterações",
-      "save": "Salvar",
-      "discard": "Descartar",
-      "saved": "Salvo",
-      "unsaved": "Há alterações não salvas"
-    },
-    "unsaved": {
-      "title": "Sair sem salvar?",
-      "consequence": "As alterações que você fez nesta tela serão perdidas.",
-      "leave": "Sair sem salvar",
-      "stay": "Continuar editando"
-    }
-  },
-  "catalog": {
-    "title": "Catálogo",
-    "subtitle": "Componentes e padrões do sistema, funcionando de verdade.",
-    "actions": {
-      "notify": "Mostrar aviso",
-      "second": "Segunda ação",
-      "third": "Terceira ação"
-    },
-    "toast": {
-      "title": "Aviso de exemplo",
-      "description": "Fora da tela atual, some em 6 segundos."
-    },
-    "accent": {
-      "title": "Tons com escopo",
-      "fill": "Preenchido",
-      "ink": "Texto no tom",
-      "nested": "Um tom dentro de outro vence o de fora, e a marca devolve o tom de fora de todos os escopos."
-    },
-    "palettes": {
-      "title": "Paletas de categorias",
-      "help": "Cada categoria do produto tem uma cor própria, na ordem em que o gerador mediu: vizinhas se distinguem por quem enxerga bem e por quem tem daltonismo.",
-      "barLabel": "Barra dividida entre cinco categorias de exemplo",
-      "share": "{value, number}%",
-      "names": {
-        "alpha": "Primeira categoria",
-        "beta": "Segunda categoria",
-        "gamma": "Terceira categoria",
-        "delta": "Quarta categoria",
-        "epsilon": "Quinta categoria"
-      }
-    },
-    "choices": {
-      "title": "Caixas e opções",
-      "all": "Todos os assuntos",
-      "topics": { "billing": "Cobrança", "product": "Produto", "security": "Segurança" },
-      "sure": "Entendo que isto não tem volta",
-      "sureHelp": "A caixa de tom perigoso marca o que pede cuidado.",
-      "plan": {
-        "legend": "Forma de cobrança",
-        "monthly": "Mensal",
-        "monthlyHelp": "Cobrado todo mês, cancela quando quiser.",
-        "yearly": "Anual",
-        "lifetime": "Vitalício"
-      },
-      "compact": { "legend": "Tamanho compacto", "a": "Primeira opção", "b": "Segunda opção" }
-    },
-    "structure": {
-      "title": "Trilha, abas e seções",
-      "trail": "Você está aqui",
-      "crumbs": { "home": "Início", "catalog": "Catálogo", "current": "Estrutura" },
-      "tabs": {
-        "label": "Seções da conta",
-        "overview": "Resumo",
-        "overviewBody": "O painel escolhido ocupa o lugar dos outros, e a aba escolhida fica sublinhada em tinta.",
-        "activity": "Atividade",
-        "activityBody": "As setas movem e escolhem, e Home e End vão às pontas.",
-        "locked": "Bloqueada",
-        "settings": "Ajustes",
-        "settingsBody": "Uma aba desabilitada é pulada pelo teclado.",
-        "compact": "Seções compactas",
-        "one": "Primeira",
-        "oneBody": "Tamanho pequeno para espaços apertados.",
-        "two": "Segunda",
-        "twoBody": "O mesmo comportamento, em linha menor."
-      },
-      "accordion": {
-        "first": "Posso cancelar quando quiser?",
-        "firstBody": "Sim. O cancelamento vale ao fim do período já pago, sem multa.",
-        "second": "Como troco de plano?",
-        "secondBody": "Na página do plano, escolhendo outro. A diferença é calculada na hora.",
-        "third": "Onde ficam os recibos?",
-        "thirdBody": "Na conta, em Meu plano, e também no seu e-mail a cada cobrança.",
-        "a": "Vários abertos",
-        "aBody": "Neste modo cada linha abre e fecha por conta própria.",
-        "b": "Tamanho pequeno",
-        "bBody": "Linha menor para listas longas."
-      }
-    },
-    "measures": {
-      "title": "Medidas e espera",
-      "upload": "Envio do arquivo",
-      "compact": "Importação, tamanho pequeno",
-      "failing": "Tentativa com falhas",
-      "storage": "Armazenamento",
-      "storageText": "{used, number} GB de {total, number} GB",
-      "quota": "Cota do mês",
-      "quotaText": "Quase no limite da cota.",
-      "volume": "Volume",
-      "range": "Faixa de preço",
-      "from": "De",
-      "until": "Até",
-      "rangeText": "De R$ {from, number} até R$ {until, number}",
-      "loading": "Carregando o perfil"
-    },
-    "composition": {
-      "title": "Etapas, etiquetas e datas",
-      "stepsLabel": "Etapas do cadastro",
-      "stepsCompact": "Etapas, tamanho pequeno",
-      "steps": { "data": "Dados", "address": "Endereço", "review": "Revisão" },
-      "tags": "Assuntos escolhidos",
-      "tagNames": { "billing": "Cobrança", "product": "Produto", "security": "Segurança" },
-      "remove": "Remover {name}",
-      "noTags": "Nenhum assunto escolhido.",
-      "due": "Vencimento",
-      "dueHelp": "Digite ou escolha no calendário.",
-      "window": "Retirada, a partir de hoje",
-      "windowHelp": "A semana começa na segunda e dias passados não valem."
-    },
-    "publicPatterns": {
-      "title": "Tabela de preços e perguntas",
-      "caption": "Planos de exemplo",
-      "compare": "O que está incluso",
-      "included": "Incluído",
-      "notIncluded": "Não incluído",
-      "features": {
-        "reports": "Relatórios",
-        "export": "Exportação dos dados",
-        "support": "Suporte por e-mail"
-      },
-      "plans": { "free": "Gratuito", "monthly": "Mensal", "yearly": "Anual" },
-      "free": "Grátis",
-      "noEnd": "sem prazo",
-      "perMonth": "por mês",
-      "perYear": "por ano",
-      "yearlyNote": "Dois meses de graça em relação ao mensal.",
-      "subscribe": "Assinar",
-      "faq": {
-        "trial": {
-          "question": "Existe período de teste?",
-          "answer": "Existe, e a conta gratuita não vence: você usa o quanto quiser antes de decidir."
-        },
-        "switch": {
-          "question": "Posso trocar de plano depois?",
-          "answer": "Pode, na página do seu plano. A troca vale na hora."
-        }
-      }
-    },
-    "figures": {
-      "title": "Figuras",
-      "help": "Uma figura só desenha o que o domínio calculou. O texto vem do catálogo ou de uma função de notação, a trilha é a tinta numa fração fraca e o valor é a marca, então os dois acompanham o tema.",
-      "caption": "Uso do mês",
-      "summary": "Uso do mês: {value, number} de {max, number}"
-    },
-    "paidPatterns": {
-      "title": "Teste, passos e conquistas",
-      "trial": {
-        "title": "Teste gratuito",
-        "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para o fim do teste.",
-        "bar": "Dias do teste já usados",
-        "action": "Ver planos"
-      },
-      "checklist": {
-        "progress": "Progresso dos passos",
-        "count": "{done, number} de {total, number}",
-        "done": "(feito)",
-        "finish": "Marcar como feito",
-        "steps": {
-          "profile": {
-            "title": "Complete o perfil",
-            "help": "Nome e foto aparecem para quem você convida."
-          },
-          "import": {
-            "title": "Importe seus dados",
-            "help": "Traga o que você já tem de uma planilha."
-          },
-          "invite": {
-            "title": "Convide alguém",
-            "help": "Quem entra pelo seu link já chega com tudo pronto."
-          }
-        }
-      },
-      "achievements": {
-        "earned": "Conquistada",
-        "locked": "A conquistar",
-        "first": { "title": "Primeira ficha", "body": "Cadastre a primeira ficha." },
-        "ten": {
-          "title": "Dez fichas",
-          "body": "Cadastre dez fichas.",
-          "bar": "Fichas cadastradas"
-        },
-        "streak": { "title": "Sete dias seguidos", "body": "Volte sete dias seguidos." }
-      }
-    },
-    "density": {
-      "title": "Densidades",
-      "help": "Os mesmos controles em cada densidade do sistema. O preset escolhe uma delas para o produto; aqui cada coluna pede a sua pelo nome.",
-      "names": { "medium": "Média", "comfortable": "Confortável", "large": "Grande" },
-      "field": "Nome",
-      "value": "Ana Souza",
-      "primary": "Salvar",
-      "secondary": "Cancelar",
-      "mode": "Modo",
-      "first": "Primeiro",
-      "second": "Segundo",
-      "tabs": "Seções de exemplo",
-      "body": "Painel da aba escolhida.",
-      "switch": "Avisos por e-mail",
-      "checkbox": "Lembrar deste aparelho",
-      "stamp": "Concluído"
-    },
-    "buttons": {
-      "title": "Botões",
-      "primary": "Salvar",
-      "secondary": "Cancelar",
-      "small": "Pequeno",
-      "dangerQuiet": "Excluir sem alarde",
-      "danger": "Excluir 3 pedidos",
-      "loading": "Enviando",
-      "disabled": "Indisponível",
-      "withIcon": "Novo pedido"
-    },
-    "fields": {
-      "title": "Campos",
-      "name": "Nome",
-      "nameHelp": "Como aparece nos documentos.",
-      "email": "E-mail",
-      "emailError": "Informe um e-mail válido.",
-      "cpf": "CPF",
-      "phone": "Telefone",
-      "cep": "CEP",
-      "date": "Data de nascimento",
-      "money": "Valor",
-      "message": "Mensagem"
-    },
-    "pickers": {
-      "title": "Seleção",
-      "select": "Situação",
-      "selectPlaceholder": "Escolha a situação",
-      "combobox": "Estado",
-      "comboboxPlaceholder": "Escolha o estado"
-    },
-    "layers": {
-      "title": "Camadas",
-      "dialog": "Abrir diálogo",
-      "dialogTitle": "Diálogo de exemplo",
-      "dialogBody": "No celular ele sobe da borda inferior como uma folha.",
-      "confirm": "Excluir",
-      "confirmTitle": "Excluir 3 pedidos?",
-      "confirmBody": "Os 3 pedidos serão apagados e não voltam.",
-      "confirmAction": "Excluir 3 pedidos",
-      "cancel": "Cancelar",
-      "popover": "Abrir popover",
-      "popoverBody": "Um painel flutuante com conteúdo curto.",
-      "help": "Ajuda",
-      "tooltip": "Explica só o ícone",
-      "menu": "Ações",
-      "menuEdit": "Editar",
-      "menuArchive": "Arquivar",
-      "menuDelete": "Excluir",
-      "toast": "Mostrar aviso"
-    },
-    "states": {
-      "title": "Estados e painéis",
-      "done": "Concluído",
-      "progress": "Em andamento",
-      "attention": "Atenção",
-      "refused": "Recusado",
-      "neutral": "Neutro",
-      "panelDefault": "Painel padrão",
-      "panelHighlight": "Painel de destaque, um por tela",
-      "panelDanger": "Zona de perigo"
-    },
-    "list": {
-      "title": "Lista",
-      "label": "Pedidos de exemplo",
-      "customer": "Cliente",
-      "status": "Situação",
-      "amount": "Valor",
-      "date": "Data",
-      "searchLabel": "Buscar pedido",
-      "statusFilter": "Situação",
-      "allStatuses": "Todas",
-      "sortBy": "Ordenar por",
-      "sortDateDesc": "Mais recentes",
-      "sortDateAsc": "Mais antigos",
-      "sortCustomer": "Cliente, A a Z",
-      "sortAmountDesc": "Maior valor",
-      "sortAmountAsc": "Menor valor",
-      "emptyTitle": "Ainda não há pedidos.",
-      "emptyAction": "Novo pedido",
-      "loading": "Carregando pedidos"
-    },
-    "statuses": {
-      "new": "Nova",
-      "progress": "Em andamento",
-      "paid": "Paga",
-      "refused": "Recusada"
-    },
-    "record": {
-      "title": "Ficha",
-      "customer": "Cliente",
-      "document": "CPF",
-      "total": "Total",
-      "created": "Criado em",
-      "note": "Observação",
-      "noteValue": "Entrega combinada com a recepção.",
-      "status": "Situação",
-      "dangerTitle": "Excluir este pedido",
-      "dangerBody": "Apagar remove o pedido e o histórico dele."
-    },
-    "save": {
-      "title": "Barra de salvar",
-      "name": "Nome do produto",
-      "hint": "Altere o campo para ver a barra. Salvar leva meio segundo.",
-      "link": "Ir para outra página"
-    },
-    "wizard": {
-      "title": "Assistente",
-      "stepsLabel": "Etapas do cadastro",
-      "step": "Passo {current, number} de {total, number}",
-      "steps": {
-        "data": "Dados",
-        "address": "Endereço",
-        "value": "Valor e revisão"
-      },
-      "name": "Nome completo",
-      "cpf": "CPF",
-      "birth": "Data de nascimento",
-      "cep": "CEP",
-      "searchCep": "Buscar CEP",
-      "cepUnavailable": "Não foi possível buscar o CEP agora. Digite o endereço.",
-      "cepNotFound": "Esse CEP não foi encontrado. Confira ou digite o endereço.",
-      "street": "Rua",
-      "number": "Número",
-      "district": "Bairro",
-      "city": "Cidade",
-      "state": "UF",
-      "amount": "Valor",
-      "next": "Continuar",
-      "back": "Voltar",
-      "confirm": "Conferir tudo",
-      "checked": "Tudo conferido. Nada foi gravado.",
-      "review": "Revisão",
-      "reviewName": "Nome",
-      "reviewAddress": "Endereço",
-      "reviewAmount": "Valor",
-      "serverError": "Não foi possível conferir. Tente de novo."
-    },
-    "files": {
-      "title": "Arquivos",
-      "choose": "Arquivo",
-      "send": "Enviar",
-      "sent": "Arquivo enviado.",
-      "empty": "Nenhum arquivo enviado ainda.",
-      "limits": "Até {maxMb, number} MB. Aceitos: {types}.",
-      "open": "Abrir",
-      "list": "Seus arquivos",
-      "genericError": "Não foi possível enviar. Tente de novo.",
-      "download": "Abrir {name}"
-    },
-    "paid": {
-      "title": "Plano pago",
-      "unlocked": "Seu plano é pago, então este bloco abre. A guarda que o protege é requirePaidPlan().",
-      "closedTitle": "Este bloco é do plano pago",
-      "locked": "Quem está no plano gratuito vê esta porta no lugar do conteúdo, com o que o plano abre e um caminho para os planos.",
-      "benefits": {
-        "one": "Conteúdo e recursos pagos",
-        "two": "Tudo o que o plano gratuito já tem"
-      },
-      "unlockedStamp": "Aberto"
-    }
-  },
-  "site": {
-    "name": "Meu produto",
-    "description": "Descreva aqui, em uma frase, o que o produto faz e para quem ele é."
-  },
-  "nav": {
-    "home": "Início",
-    "signIn": "Entrar",
-    "signUp": "Criar conta",
-    "account": "Minha conta",
-    "privacy": "Privacidade",
-    "terms": "Termos de uso",
-    "main": "Navegação principal",
-    "footer": "Rodapé",
-    "skip": "Ir para o conteúdo",
-    "more": "Mais",
-    "moreTitle": "Mais destinos",
-    "userMenu": "Menu da conta",
-    "side": "Navegação da área logada",
-    "bottom": "Navegação principal do celular",
-    "groups": {
-      "main": "Geral",
-      "staff": "Equipe",
-      "admin": "Administração"
-    },
-    "items": {
-      "account": "Minha conta",
-      "contacts": "Caixa de contatos",
-      "messages": "Minhas mensagens",
-      "plan": "Meu plano",
-      "users": "Usuários",
-      "invites": "Convites",
-      "audit": "Auditoria",
-      "numbers": "Números",
-      "health": "Saúde"
-    },
-    "contact": "Contato",
-    "plans": "Planos",
-    "language": "Idioma",
-    "articles": "Artigos"
-  },
-  "home": {
-    "eyebrow": "Texto de exemplo",
-    "steps": {
-      "title": "Como funciona",
-      "intro": "Três passos, na ordem em que acontecem. Troque pelos do seu produto.",
-      "items": {
-        "create": {
-          "title": "Crie sua conta",
-          "body": "Leva um minuto e só pede o que é preciso. Você confirma o e-mail e já entra."
-        },
-        "fill": {
-          "title": "Cadastre o que você já tem",
-          "body": "Digite ou importe. O que for pessoal fica só com você e pode ser exportado a qualquer hora."
-        },
-        "follow": {
-          "title": "Acompanhe sem esforço",
-          "body": "Tudo o que importa fica numa tela só, com avisos que você mesmo escolhe receber."
-        }
-      }
-    },
-    "faq": {
-      "title": "Perguntas frequentes",
-      "intro": "Respostas curtas para o que mais se pergunta antes de começar.",
-      "items": {
-        "start": {
-          "question": "Preciso pagar para começar?",
-          "answer": "Não. A conta gratuita já traz o essencial, e você só assina se quiser mais."
-        },
-        "data": {
-          "question": "O que acontece com os meus dados?",
-          "answer": "Ficam na sua conta. Você baixa uma cópia quando quiser e apaga tudo com um botão, sem pedir a ninguém."
-        },
-        "cancel": {
-          "question": "Posso cancelar quando quiser?",
-          "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa e sem ligação."
-        }
-      }
-    },
-    "title": "O dia a dia organizado, sem enfeite",
-    "subtitle": "Texto de exemplo. Troque esta frase pela proposta do seu produto, em um parágrafo curto.",
-    "primary": "Criar conta",
-    "secondary": "Já tenho conta",
-    "sampleLabel": "Exemplo de ficha",
-    "sampleCustomer": "Cliente",
-    "sampleDocument": "CPF",
-    "sampleTotal": "Total",
-    "sampleStatus": "Paga",
-    "sampleName": "Ana Souza"
-  },
-  "privacy": {
-    "title": "Política de privacidade",
-    "notice": "Texto de exemplo. Substitua pela política real do produto antes de publicar.",
-    "sections": {
-      "collected": {
-        "title": "Quais dados coletamos",
-        "body": "Liste aqui os dados que o produto coleta, como nome, e-mail e o que a pessoa informa ao usar o serviço."
-      },
-      "use": {
-        "title": "Para que usamos os dados",
-        "body": "Explique a finalidade de cada dado e a base legal prevista na LGPD."
-      },
-      "rights": {
-        "title": "Seus direitos",
-        "body": "A pessoa pode baixar os próprios dados e apagar a conta a qualquer momento, na página da conta."
-      },
-      "contact": {
-        "title": "Como falar com a gente",
-        "body": "Informe aqui o canal para dúvidas sobre privacidade."
-      }
-    }
-  },
-  "terms": {
-    "title": "Termos de uso",
-    "notice": "Texto de exemplo. Substitua pelos termos reais do produto antes de publicar.",
-    "sections": {
-      "service": {
-        "title": "O serviço",
-        "body": "Descreva o que o produto oferece e o que ele não oferece."
-      },
-      "account": {
-        "title": "Sua conta",
-        "body": "Explique as responsabilidades de quem cria uma conta e como ela pode ser encerrada."
-      },
-      "payment": {
-        "title": "Pagamento e cancelamento",
-        "body": "Descreva preços, renovação, cancelamento e reembolso, se o produto cobrar."
-      },
-      "changes": {
-        "title": "Mudanças nestes termos",
-        "body": "Diga como as pessoas serão avisadas quando os termos mudarem."
-      }
-    }
-  },
-  "errorPage": {
-    "title": "Algo deu errado",
-    "body": "Tivemos um problema do nosso lado. Tente de novo em instantes.",
-    "retry": "Tentar de novo",
-    "home": "Ir para o início",
-    "code": "Código do erro: {code}"
-  },
-  "notFound": {
-    "title": "Página não encontrada",
-    "body": "O endereço pode ter mudado ou nunca ter existido.",
-    "home": "Ir para o início"
-  },
-  "auth": {
-    "signIn": {
-      "title": "Entrar",
-      "subtitle": "Use o e-mail e a senha da sua conta.",
-      "email": "E-mail",
-      "password": "Senha",
-      "submit": "Entrar",
-      "forgot": "Esqueci minha senha",
-      "noAccount": "Ainda não tem conta?",
-      "create": "Criar conta",
-      "verified": "E-mail confirmado. Já pode entrar."
-    },
-    "signUp": {
-      "title": "Criar conta",
-      "subtitle": "Leva um minuto. Enviamos um link para confirmar seu e-mail.",
-      "name": "Nome",
-      "email": "E-mail",
-      "password": "Senha",
-      "passwordHelp": "Pelo menos 8 caracteres.",
-      "submit": "Criar conta",
-      "hasAccount": "Já tem conta?",
-      "signIn": "Entrar",
-      "inviteNotice": "Você foi convidado. Use o e-mail do convite para criar a conta."
-    },
-    "checkEmail": {
-      "title": "Confira seu e-mail",
-      "body": "Enviamos um link de confirmação para {email}. Abra o e-mail e clique no link para ativar a conta.",
-      "back": "Voltar para entrar"
-    },
-    "forgot": {
-      "title": "Recuperar senha",
-      "subtitle": "Informe o e-mail da conta. Se ele existir, enviamos um link para escolher uma nova senha.",
-      "email": "E-mail",
-      "submit": "Enviar link",
-      "sentTitle": "Link enviado",
-      "sentBody": "Se existe uma conta com esse e-mail, o link já está a caminho.",
-      "back": "Voltar para entrar"
-    },
-    "reset": {
-      "title": "Escolher nova senha",
-      "password": "Nova senha",
-      "passwordHelp": "Pelo menos 8 caracteres.",
-      "submit": "Salvar nova senha",
-      "done": "Senha trocada. Entre com a nova senha.",
-      "missing": "Este link não é válido. Peça um novo na tela de recuperação.",
-      "request": "Pedir novo link"
-    },
-    "signOut": "Sair"
-  },
   "account": {
     "title": "Minha conta",
     "subtitle": "Seus dados, suas preferências e o que você pode levar embora.",
@@ -816,196 +92,6 @@
       "cancel": "Cancelar",
       "failed": "Não foi possível apagar a conta."
     }
-  },
-  "contact": {
-    "title": "Fale com a gente",
-    "subtitle": "Escreva sua mensagem e respondemos por e-mail.",
-    "name": "Nome",
-    "email": "E-mail",
-    "subject": "Assunto",
-    "subjectPlaceholder": "Escolha o assunto",
-    "message": "Mensagem",
-    "messageHelp": "Conte o que você precisa. Quanto mais detalhe, mais rápido respondemos.",
-    "signedInAs": "Enviando como {email}.",
-    "submit": "Enviar mensagem",
-    "sentTitle": "Mensagem enviada",
-    "sentBody": "Recebemos sua mensagem e vamos responder por e-mail.",
-    "sentBack": "Voltar para o início",
-    "subjects": {
-      "general": "Dúvida geral",
-      "support": "Suporte",
-      "billing": "Cobrança",
-      "privacy": "Privacidade e dados"
-    },
-    "statuses": {
-      "new": "Nova",
-      "in_progress": "Em atendimento",
-      "answered": "Respondida",
-      "archived": "Arquivada"
-    }
-  },
-  "inbox": {
-    "title": "Caixa de contatos",
-    "subtitle": "Mensagens enviadas pelo formulário de contato.",
-    "label": "Mensagens de contato",
-    "sender": "Remetente",
-    "subject": "Assunto",
-    "status": "Situação",
-    "date": "Recebida em",
-    "searchLabel": "Buscar mensagem",
-    "statusFilter": "Situação",
-    "allStatuses": "Todas",
-    "sortBy": "Ordenar por",
-    "sortDateDesc": "Mais recentes",
-    "sortDateAsc": "Mais antigas",
-    "sortName": "Remetente, A a Z",
-    "sortStatus": "Situação",
-    "emptyTitle": "Nenhuma mensagem ainda.",
-    "loading": "Carregando mensagens"
-  },
-  "myMessages": {
-    "title": "Minhas mensagens",
-    "subtitle": "O que você enviou pelo formulário de contato e as respostas.",
-    "emptyTitle": "Você ainda não enviou mensagens.",
-    "emptyAction": "Enviar mensagem"
-  },
-  "record": {
-    "from": "Remetente",
-    "email": "E-mail",
-    "subject": "Assunto",
-    "received": "Recebida em",
-    "status": "Situação",
-    "message": "Mensagem",
-    "replyTitle": "Resposta",
-    "answeredBy": "Respondida por {name} em {date}",
-    "noReplyYet": "Ainda sem resposta.",
-    "manage": "Atendimento",
-    "changeStatus": "Situação",
-    "statusSaved": "Situação atualizada.",
-    "replyLabel": "Escreva a resposta",
-    "replyHelp": "Vai por e-mail para {email}. Depois de enviada, a resposta não muda.",
-    "send": "Enviar resposta",
-    "sent": "Resposta enviada.",
-    "failed": "Não foi possível concluir. Tente de novo.",
-    "unknownPerson": "Equipe"
-  },
-  "plans": {
-    "title": "Planos",
-    "subtitle": "Escolha como quer usar o produto. Você pode mudar depois.",
-    "none": "Os planos ainda não estão à venda.",
-    "productName": "Plano pago",
-    "compare": "O que está incluso",
-    "included": "Incluído",
-    "notIncluded": "Não incluído",
-    "freePrice": "Grátis",
-    "freeUnit": "sem prazo",
-    "features": { "premium": "Conteúdo e recursos pagos" },
-    "paywall": { "label": "Conteúdo de plano pago", "action": "Ver planos" },
-    "currency": {
-      "label": "Moeda dos preços",
-      "failed": "Não foi possível trocar a moeda. Tente de novo."
-    },
-    "faq": {
-      "title": "Sobre cobrança",
-      "intro": "O que mais se pergunta antes de assinar.",
-      "items": {
-        "cancel": {
-          "question": "Posso cancelar quando quiser?",
-          "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa."
-        },
-        "refund": {
-          "question": "Posso pedir o dinheiro de volta?",
-          "answer": "Nas compras online você tem sete dias para desistir. Escreva para o suporte e devolvemos o valor."
-        },
-        "invoice": {
-          "question": "Recebo recibo de cada cobrança?",
-          "answer": "Sim. Ele chega por e-mail a cada pagamento e fica guardado na sua conta."
-        }
-      }
-    },
-    "perMonth": "por mês",
-    "perYear": "por ano",
-    "perYearOnce": "um ano, pagamento único",
-    "once": "pagamento único",
-    "names": {
-      "free": "Gratuito",
-      "monthly": "Mensal",
-      "yearly": "Anual",
-      "yearly_once": "Anual avulso",
-      "lifetime": "Vitalício"
-    },
-    "awaiting": "Aguardando pagamento",
-    "buy": "Assinar",
-    "buyTrial": "{days, plural, one {Começar # dia grátis} other {Começar # dias grátis}}",
-    "trialNote": "{days, plural, one {# dia grátis} other {# dias grátis}} antes da primeira cobrança.",
-    "buyOnce": "Comprar um ano",
-    "buyLifetime": "Comprar",
-    "current": "Seu plano",
-    "signIn": "Entrar para continuar",
-    "failed": "Não foi possível abrir o pagamento.",
-    "replaces": {
-      "title": "Trocar a assinatura pelo plano vitalício?",
-      "body": "Sua assinatura será cancelada agora, sem crédito pelo tempo que sobrou, e o plano vitalício vale assim que o pagamento for confirmado.",
-      "confirm": "Comprar vitalício",
-      "cancel": "Voltar",
-      "note": "Sua assinatura atual será cancelada na compra, sem crédito proporcional."
-    }
-  },
-  "plan": {
-    "title": "Meu plano",
-    "subtitle": "O que você tem hoje e como mudar.",
-    "plan": "Plano",
-    "status": "Situação",
-    "origin": "Origem",
-    "names": {
-      "free": "Gratuito",
-      "monthly": "Mensal",
-      "yearly": "Anual",
-      "yearly_once": "Anual avulso",
-      "lifetime": "Vitalício"
-    },
-    "statuses": {
-      "free": "Gratuito",
-      "pending": "Aguardando pagamento",
-      "trialing": "Em teste",
-      "active": "Ativo",
-      "pastDue": "Pagamento pendente",
-      "endsSoon": "Termina no fim do período",
-      "ended": "Encerrado"
-    },
-    "origins": {
-      "purchase": "Compra",
-      "courtesy": "Cortesia"
-    },
-    "courtesyReason": "Motivo",
-    "pastDue": "Não conseguimos cobrar o último pagamento. Você mantém o acesso enquanto tentamos de novo. Para trocar o cartão, abra o portal de pagamento.",
-    "confirming": "Estamos confirmando seu pagamento. Atualize esta página em instantes.",
-    "seePlans": "Ver planos",
-    "portal": "Gerenciar pagamento",
-    "portalFailed": "Não foi possível abrir o portal de pagamento.",
-    "cancel": {
-      "title": "Cancelar no fim do período",
-      "confirmTitle": "Cancelar a assinatura?",
-      "confirmBody": "Você mantém o acesso até o fim do período já pago. Depois disso, a conta volta para o plano gratuito.",
-      "confirm": "Cancelar assinatura",
-      "back": "Voltar",
-      "failed": "Não foi possível cancelar a assinatura."
-    },
-    "keep": {
-      "title": "Manter a assinatura",
-      "failed": "Não foi possível manter a assinatura.",
-      "done": "Assinatura mantida."
-    },
-    "canceled": "Cancelamento agendado.",
-    "pending": "Seu pagamento ainda não foi confirmado. Pagamentos por Pix e boleto podem levar alguns minutos, e o plano começa assim que o dinheiro chega. Se o código expirar, é só tentar de novo.",
-    "trial": {
-      "title": "Teste gratuito",
-      "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para a primeira cobrança.",
-      "bar": "Dias do teste já usados"
-    },
-    "validUntil": "Vale até",
-    "renewsOn": "Renova em",
-    "endsOn": "Acesso até"
   },
   "admin": {
     "roles": {
@@ -1249,6 +335,478 @@
     "trail": "Você está aqui",
     "home": "Início"
   },
+  "auth": {
+    "signIn": {
+      "title": "Entrar",
+      "subtitle": "Use o e-mail e a senha da sua conta.",
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar",
+      "forgot": "Esqueci minha senha",
+      "noAccount": "Ainda não tem conta?",
+      "create": "Criar conta",
+      "verified": "E-mail confirmado. Já pode entrar."
+    },
+    "signUp": {
+      "title": "Criar conta",
+      "subtitle": "Leva um minuto. Enviamos um link para confirmar seu e-mail.",
+      "name": "Nome",
+      "email": "E-mail",
+      "password": "Senha",
+      "passwordHelp": "Pelo menos 8 caracteres.",
+      "submit": "Criar conta",
+      "hasAccount": "Já tem conta?",
+      "signIn": "Entrar",
+      "inviteNotice": "Você foi convidado. Use o e-mail do convite para criar a conta."
+    },
+    "checkEmail": {
+      "title": "Confira seu e-mail",
+      "body": "Enviamos um link de confirmação para {email}. Abra o e-mail e clique no link para ativar a conta.",
+      "back": "Voltar para entrar"
+    },
+    "forgot": {
+      "title": "Recuperar senha",
+      "subtitle": "Informe o e-mail da conta. Se ele existir, enviamos um link para escolher uma nova senha.",
+      "email": "E-mail",
+      "submit": "Enviar link",
+      "sentTitle": "Link enviado",
+      "sentBody": "Se existe uma conta com esse e-mail, o link já está a caminho.",
+      "back": "Voltar para entrar"
+    },
+    "reset": {
+      "title": "Escolher nova senha",
+      "password": "Nova senha",
+      "passwordHelp": "Pelo menos 8 caracteres.",
+      "submit": "Salvar nova senha",
+      "done": "Senha trocada. Entre com a nova senha.",
+      "missing": "Este link não é válido. Peça um novo na tela de recuperação.",
+      "request": "Pedir novo link"
+    },
+    "signOut": "Sair"
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "subtitle": "Componentes e padrões do sistema, funcionando de verdade.",
+    "actions": {
+      "notify": "Mostrar aviso",
+      "second": "Segunda ação",
+      "third": "Terceira ação"
+    },
+    "toast": {
+      "title": "Aviso de exemplo",
+      "description": "Fora da tela atual, some em 6 segundos."
+    },
+    "accent": {
+      "title": "Tons com escopo",
+      "fill": "Preenchido",
+      "ink": "Texto no tom",
+      "nested": "Um tom dentro de outro vence o de fora, e a marca devolve o tom de fora de todos os escopos."
+    },
+    "palettes": {
+      "title": "Paletas de categorias",
+      "help": "Cada categoria do produto tem uma cor própria, na ordem em que o gerador mediu: vizinhas se distinguem por quem enxerga bem e por quem tem daltonismo.",
+      "barLabel": "Barra dividida entre cinco categorias de exemplo",
+      "share": "{value, number}%",
+      "names": {
+        "alpha": "Primeira categoria",
+        "beta": "Segunda categoria",
+        "gamma": "Terceira categoria",
+        "delta": "Quarta categoria",
+        "epsilon": "Quinta categoria"
+      }
+    },
+    "choices": {
+      "title": "Caixas e opções",
+      "all": "Todos os assuntos",
+      "topics": {
+        "billing": "Cobrança",
+        "product": "Produto",
+        "security": "Segurança"
+      },
+      "sure": "Entendo que isto não tem volta",
+      "sureHelp": "A caixa de tom perigoso marca o que pede cuidado.",
+      "plan": {
+        "legend": "Forma de cobrança",
+        "monthly": "Mensal",
+        "monthlyHelp": "Cobrado todo mês, cancela quando quiser.",
+        "yearly": "Anual",
+        "lifetime": "Vitalício"
+      },
+      "compact": {
+        "legend": "Tamanho compacto",
+        "a": "Primeira opção",
+        "b": "Segunda opção"
+      }
+    },
+    "structure": {
+      "title": "Trilha, abas e seções",
+      "trail": "Você está aqui",
+      "crumbs": {
+        "home": "Início",
+        "catalog": "Catálogo",
+        "current": "Estrutura"
+      },
+      "tabs": {
+        "label": "Seções da conta",
+        "overview": "Resumo",
+        "overviewBody": "O painel escolhido ocupa o lugar dos outros, e a aba escolhida fica sublinhada em tinta.",
+        "activity": "Atividade",
+        "activityBody": "As setas movem e escolhem, e Home e End vão às pontas.",
+        "locked": "Bloqueada",
+        "settings": "Ajustes",
+        "settingsBody": "Uma aba desabilitada é pulada pelo teclado.",
+        "compact": "Seções compactas",
+        "one": "Primeira",
+        "oneBody": "Tamanho pequeno para espaços apertados.",
+        "two": "Segunda",
+        "twoBody": "O mesmo comportamento, em linha menor."
+      },
+      "accordion": {
+        "first": "Posso cancelar quando quiser?",
+        "firstBody": "Sim. O cancelamento vale ao fim do período já pago, sem multa.",
+        "second": "Como troco de plano?",
+        "secondBody": "Na página do plano, escolhendo outro. A diferença é calculada na hora.",
+        "third": "Onde ficam os recibos?",
+        "thirdBody": "Na conta, em Meu plano, e também no seu e-mail a cada cobrança.",
+        "a": "Vários abertos",
+        "aBody": "Neste modo cada linha abre e fecha por conta própria.",
+        "b": "Tamanho pequeno",
+        "bBody": "Linha menor para listas longas."
+      }
+    },
+    "measures": {
+      "title": "Medidas e espera",
+      "upload": "Envio do arquivo",
+      "compact": "Importação, tamanho pequeno",
+      "failing": "Tentativa com falhas",
+      "storage": "Armazenamento",
+      "storageText": "{used, number} GB de {total, number} GB",
+      "quota": "Cota do mês",
+      "quotaText": "Quase no limite da cota.",
+      "volume": "Volume",
+      "range": "Faixa de preço",
+      "from": "De",
+      "until": "Até",
+      "rangeText": "De R$ {from, number} até R$ {until, number}",
+      "loading": "Carregando o perfil"
+    },
+    "composition": {
+      "title": "Etapas, etiquetas e datas",
+      "stepsLabel": "Etapas do cadastro",
+      "stepsCompact": "Etapas, tamanho pequeno",
+      "steps": {
+        "data": "Dados",
+        "address": "Endereço",
+        "review": "Revisão"
+      },
+      "tags": "Assuntos escolhidos",
+      "tagNames": {
+        "billing": "Cobrança",
+        "product": "Produto",
+        "security": "Segurança"
+      },
+      "remove": "Remover {name}",
+      "noTags": "Nenhum assunto escolhido.",
+      "due": "Vencimento",
+      "dueHelp": "Digite ou escolha no calendário.",
+      "window": "Retirada, a partir de hoje",
+      "windowHelp": "A semana começa na segunda e dias passados não valem."
+    },
+    "publicPatterns": {
+      "title": "Tabela de preços e perguntas",
+      "caption": "Planos de exemplo",
+      "compare": "O que está incluso",
+      "included": "Incluído",
+      "notIncluded": "Não incluído",
+      "features": {
+        "reports": "Relatórios",
+        "export": "Exportação dos dados",
+        "support": "Suporte por e-mail"
+      },
+      "plans": {
+        "free": "Gratuito",
+        "monthly": "Mensal",
+        "yearly": "Anual"
+      },
+      "free": "Grátis",
+      "noEnd": "sem prazo",
+      "perMonth": "por mês",
+      "perYear": "por ano",
+      "yearlyNote": "Dois meses de graça em relação ao mensal.",
+      "subscribe": "Assinar",
+      "faq": {
+        "trial": {
+          "question": "Existe período de teste?",
+          "answer": "Existe, e a conta gratuita não vence: você usa o quanto quiser antes de decidir."
+        },
+        "switch": {
+          "question": "Posso trocar de plano depois?",
+          "answer": "Pode, na página do seu plano. A troca vale na hora."
+        }
+      }
+    },
+    "figures": {
+      "title": "Figuras",
+      "help": "Uma figura só desenha o que o domínio calculou. O texto vem do catálogo ou de uma função de notação, a trilha é a tinta numa fração fraca e o valor é a marca, então os dois acompanham o tema.",
+      "caption": "Uso do mês",
+      "summary": "Uso do mês: {value, number} de {max, number}"
+    },
+    "paidPatterns": {
+      "title": "Teste, passos e conquistas",
+      "trial": {
+        "title": "Teste gratuito",
+        "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para o fim do teste.",
+        "bar": "Dias do teste já usados",
+        "action": "Ver planos"
+      },
+      "checklist": {
+        "progress": "Progresso dos passos",
+        "count": "{done, number} de {total, number}",
+        "done": "(feito)",
+        "finish": "Marcar como feito",
+        "steps": {
+          "profile": {
+            "title": "Complete o perfil",
+            "help": "Nome e foto aparecem para quem você convida."
+          },
+          "import": {
+            "title": "Importe seus dados",
+            "help": "Traga o que você já tem de uma planilha."
+          },
+          "invite": {
+            "title": "Convide alguém",
+            "help": "Quem entra pelo seu link já chega com tudo pronto."
+          }
+        }
+      },
+      "achievements": {
+        "earned": "Conquistada",
+        "locked": "A conquistar",
+        "first": {
+          "title": "Primeira ficha",
+          "body": "Cadastre a primeira ficha."
+        },
+        "ten": {
+          "title": "Dez fichas",
+          "body": "Cadastre dez fichas.",
+          "bar": "Fichas cadastradas"
+        },
+        "streak": {
+          "title": "Sete dias seguidos",
+          "body": "Volte sete dias seguidos."
+        }
+      }
+    },
+    "density": {
+      "title": "Densidades",
+      "help": "Os mesmos controles em cada densidade do sistema. O preset escolhe uma delas para o produto; aqui cada coluna pede a sua pelo nome.",
+      "names": {
+        "medium": "Média",
+        "comfortable": "Confortável",
+        "large": "Grande"
+      },
+      "field": "Nome",
+      "value": "Ana Souza",
+      "primary": "Salvar",
+      "secondary": "Cancelar",
+      "mode": "Modo",
+      "first": "Primeiro",
+      "second": "Segundo",
+      "tabs": "Seções de exemplo",
+      "body": "Painel da aba escolhida.",
+      "switch": "Avisos por e-mail",
+      "checkbox": "Lembrar deste aparelho",
+      "stamp": "Concluído"
+    },
+    "buttons": {
+      "title": "Botões",
+      "primary": "Salvar",
+      "secondary": "Cancelar",
+      "small": "Pequeno",
+      "dangerQuiet": "Excluir sem alarde",
+      "danger": "Excluir 3 pedidos",
+      "loading": "Enviando",
+      "disabled": "Indisponível",
+      "withIcon": "Novo pedido"
+    },
+    "fields": {
+      "title": "Campos",
+      "name": "Nome",
+      "nameHelp": "Como aparece nos documentos.",
+      "email": "E-mail",
+      "emailError": "Informe um e-mail válido.",
+      "cpf": "CPF",
+      "phone": "Telefone",
+      "cep": "CEP",
+      "date": "Data de nascimento",
+      "money": "Valor",
+      "message": "Mensagem"
+    },
+    "pickers": {
+      "title": "Seleção",
+      "select": "Situação",
+      "selectPlaceholder": "Escolha a situação",
+      "combobox": "Estado",
+      "comboboxPlaceholder": "Escolha o estado"
+    },
+    "layers": {
+      "title": "Camadas",
+      "dialog": "Abrir diálogo",
+      "dialogTitle": "Diálogo de exemplo",
+      "dialogBody": "No celular ele sobe da borda inferior como uma folha.",
+      "confirm": "Excluir",
+      "confirmTitle": "Excluir 3 pedidos?",
+      "confirmBody": "Os 3 pedidos serão apagados e não voltam.",
+      "confirmAction": "Excluir 3 pedidos",
+      "cancel": "Cancelar",
+      "popover": "Abrir popover",
+      "popoverBody": "Um painel flutuante com conteúdo curto.",
+      "help": "Ajuda",
+      "tooltip": "Explica só o ícone",
+      "menu": "Ações",
+      "menuEdit": "Editar",
+      "menuArchive": "Arquivar",
+      "menuDelete": "Excluir",
+      "toast": "Mostrar aviso"
+    },
+    "states": {
+      "title": "Estados e painéis",
+      "done": "Concluído",
+      "progress": "Em andamento",
+      "attention": "Atenção",
+      "refused": "Recusado",
+      "neutral": "Neutro",
+      "panelDefault": "Painel padrão",
+      "panelHighlight": "Painel de destaque, um por tela",
+      "panelDanger": "Zona de perigo"
+    },
+    "list": {
+      "title": "Lista",
+      "label": "Pedidos de exemplo",
+      "customer": "Cliente",
+      "status": "Situação",
+      "amount": "Valor",
+      "date": "Data",
+      "searchLabel": "Buscar pedido",
+      "statusFilter": "Situação",
+      "allStatuses": "Todas",
+      "sortBy": "Ordenar por",
+      "sortDateDesc": "Mais recentes",
+      "sortDateAsc": "Mais antigos",
+      "sortCustomer": "Cliente, A a Z",
+      "sortAmountDesc": "Maior valor",
+      "sortAmountAsc": "Menor valor",
+      "emptyTitle": "Ainda não há pedidos.",
+      "emptyAction": "Novo pedido",
+      "loading": "Carregando pedidos"
+    },
+    "statuses": {
+      "new": "Nova",
+      "progress": "Em andamento",
+      "paid": "Paga",
+      "refused": "Recusada"
+    },
+    "record": {
+      "title": "Ficha",
+      "customer": "Cliente",
+      "document": "CPF",
+      "total": "Total",
+      "created": "Criado em",
+      "note": "Observação",
+      "noteValue": "Entrega combinada com a recepção.",
+      "status": "Situação",
+      "dangerTitle": "Excluir este pedido",
+      "dangerBody": "Apagar remove o pedido e o histórico dele."
+    },
+    "save": {
+      "title": "Barra de salvar",
+      "name": "Nome do produto",
+      "hint": "Altere o campo para ver a barra. Salvar leva meio segundo.",
+      "link": "Ir para outra página"
+    },
+    "wizard": {
+      "title": "Assistente",
+      "stepsLabel": "Etapas do cadastro",
+      "step": "Passo {current, number} de {total, number}",
+      "steps": {
+        "data": "Dados",
+        "address": "Endereço",
+        "value": "Valor e revisão"
+      },
+      "name": "Nome completo",
+      "cpf": "CPF",
+      "birth": "Data de nascimento",
+      "cep": "CEP",
+      "searchCep": "Buscar CEP",
+      "cepUnavailable": "Não foi possível buscar o CEP agora. Digite o endereço.",
+      "cepNotFound": "Esse CEP não foi encontrado. Confira ou digite o endereço.",
+      "street": "Rua",
+      "number": "Número",
+      "district": "Bairro",
+      "city": "Cidade",
+      "state": "UF",
+      "amount": "Valor",
+      "next": "Continuar",
+      "back": "Voltar",
+      "confirm": "Conferir tudo",
+      "checked": "Tudo conferido. Nada foi gravado.",
+      "review": "Revisão",
+      "reviewName": "Nome",
+      "reviewAddress": "Endereço",
+      "reviewAmount": "Valor",
+      "serverError": "Não foi possível conferir. Tente de novo."
+    },
+    "files": {
+      "title": "Arquivos",
+      "choose": "Arquivo",
+      "send": "Enviar",
+      "sent": "Arquivo enviado.",
+      "empty": "Nenhum arquivo enviado ainda.",
+      "limits": "Até {maxMb, number} MB. Aceitos: {types}.",
+      "open": "Abrir",
+      "list": "Seus arquivos",
+      "genericError": "Não foi possível enviar. Tente de novo.",
+      "download": "Abrir {name}"
+    },
+    "paid": {
+      "title": "Plano pago",
+      "unlocked": "Seu plano é pago, então este bloco abre. A guarda que o protege é requirePaidPlan().",
+      "closedTitle": "Este bloco é do plano pago",
+      "locked": "Quem está no plano gratuito vê esta porta no lugar do conteúdo, com o que o plano abre e um caminho para os planos.",
+      "benefits": {
+        "one": "Conteúdo e recursos pagos",
+        "two": "Tudo o que o plano gratuito já tem"
+      },
+      "unlockedStamp": "Aberto"
+    }
+  },
+  "contact": {
+    "title": "Fale com a gente",
+    "subtitle": "Escreva sua mensagem e respondemos por e-mail.",
+    "name": "Nome",
+    "email": "E-mail",
+    "subject": "Assunto",
+    "subjectPlaceholder": "Escolha o assunto",
+    "message": "Mensagem",
+    "messageHelp": "Conte o que você precisa. Quanto mais detalhe, mais rápido respondemos.",
+    "signedInAs": "Enviando como {email}.",
+    "submit": "Enviar mensagem",
+    "sentTitle": "Mensagem enviada",
+    "sentBody": "Recebemos sua mensagem e vamos responder por e-mail.",
+    "sentBack": "Voltar para o início",
+    "subjects": {
+      "general": "Dúvida geral",
+      "support": "Suporte",
+      "billing": "Cobrança",
+      "privacy": "Privacidade e dados"
+    },
+    "statuses": {
+      "new": "Nova",
+      "in_progress": "Em atendimento",
+      "answered": "Respondida",
+      "archived": "Arquivada"
+    }
+  },
   "contentCheck": {
     "field": "{file}: campo {field}: {problem}",
     "fieldNames": {
@@ -1265,6 +823,231 @@
     "yaml": "{file}: o bloco de abertura não é um YAML válido: {detail}",
     "emDash": "{file}:{line}:{column}: travessão no texto. Use vírgula, ponto ou hífen.",
     "slug": "{file}: o nome do arquivo deve ser palavras minúsculas ligadas por hífen."
+  },
+  "emails": {
+    "layout": {
+      "footer": "Este é um e-mail automático. Não é preciso responder.",
+      "unsubscribe": {
+        "reason": "Você recebe esta mensagem porque ligou esse aviso na sua conta.",
+        "action": "Parar de receber"
+      }
+    },
+    "verifyEmail": {
+      "subject": "Confirme seu e-mail",
+      "preview": "Falta um passo para usar sua conta.",
+      "greeting": "Olá, {name}.",
+      "body": "Para confirmar que este e-mail é seu e liberar o acesso, use o botão abaixo. O link vale por uma hora.",
+      "action": "Confirmar e-mail",
+      "ignore": "Se você não criou uma conta, pode ignorar esta mensagem."
+    },
+    "resetPassword": {
+      "subject": "Redefina sua senha",
+      "preview": "Recebemos um pedido para trocar sua senha.",
+      "greeting": "Olá, {name}.",
+      "body": "Use o botão abaixo para escolher uma nova senha. O link vale por uma hora.",
+      "action": "Escolher nova senha",
+      "ignore": "Se você não pediu a troca, sua senha continua a mesma e pode ignorar esta mensagem."
+    },
+    "greetingWithoutName": "Olá.",
+    "abandonedCheckout": {
+      "subject": "Seu plano ficou esperando",
+      "preview": "Você começou a assinar e não terminou.",
+      "greeting": "Olá, {name}",
+      "body": "Você começou a assinar e não terminou. O plano continua à sua espera, a um passo de distância.",
+      "action": "Voltar ao plano",
+      "ignore": "Se mudou de ideia, tudo bem: não vamos mandar outro lembrete sobre isso."
+    },
+    "trialEnding": {
+      "subject": "Seu teste gratuito termina em {date}",
+      "preview": "Seu teste gratuito termina em {date}.",
+      "greeting": "Olá, {name}",
+      "body": "Seu teste gratuito termina em {date}. A partir daí a primeira cobrança do plano acontece no cartão que você cadastrou. Se quiser mudar ou cancelar, é só abrir o seu plano.",
+      "action": "Abrir meu plano",
+      "ignore": "Se está tudo certo, não precisa fazer nada."
+    },
+    "planExpiring": {
+      "subject": "Seu plano termina em {date}",
+      "preview": "Seu plano de um ano termina em {date}.",
+      "greeting": "Olá, {name}",
+      "body": "Seu plano de um ano termina em {date}. Depois dessa data a conta volta ao plano gratuito, e tudo o que você guardou continua com você.",
+      "action": "Renovar o plano",
+      "ignore": "Se não quiser renovar, não precisa fazer nada."
+    },
+    "contactNotice": {
+      "subject": "Nova mensagem de contato: {subject}",
+      "preview": "{name} escreveu pelo formulário de contato.",
+      "heading": "Nova mensagem de contato",
+      "from": "De",
+      "subjectLabel": "Assunto",
+      "action": "Abrir na caixa de contatos"
+    },
+    "contactReply": {
+      "subject": "Resposta à sua mensagem",
+      "preview": "Respondemos a sua mensagem de contato.",
+      "greeting": "Olá, {name}.",
+      "intro": "Esta é a resposta à sua mensagem:",
+      "original": "Sua mensagem"
+    },
+    "invite": {
+      "subject": "Você foi convidado",
+      "preview": "Crie sua conta para começar.",
+      "greeting": "Você recebeu um convite.",
+      "body": "{inviter} convidou você para entrar como {role}. Use o botão abaixo para criar a conta com este e-mail. O convite vale por 7 dias.",
+      "action": "Criar minha conta",
+      "ignore": "Se você não esperava este convite, pode ignorar esta mensagem.",
+      "roles": {
+        "member": "membro",
+        "staff": "equipe",
+        "admin": "administrador"
+      }
+    }
+  },
+  "errorPage": {
+    "title": "Algo deu errado",
+    "body": "Tivemos um problema do nosso lado. Tente de novo em instantes.",
+    "retry": "Tentar de novo",
+    "home": "Ir para o início",
+    "code": "Código do erro: {code}"
+  },
+  "errors": {
+    "badRequest": "Não foi possível processar o pedido. Confira os dados e tente de novo.",
+    "unauthorized": "Entre na sua conta para continuar.",
+    "forbidden": "Você não tem permissão para fazer isso.",
+    "notFound": "Não encontramos o que você procurou.",
+    "conflict": "Isso já foi feito ou mudou enquanto você editava. Atualize a página e tente de novo.",
+    "tooManyRequests": "Muitas tentativas em pouco tempo. Espere um pouco e tente de novo.",
+    "internal": "Algo deu errado do nosso lado. Tente de novo em instantes.",
+    "requestId": "Código do pedido: {requestId}",
+    "fileTooLarge": "O arquivo é maior que o limite de {maxMb, number} MB.",
+    "fileType": "Esse tipo de arquivo não é aceito.",
+    "emptyFile": "O arquivo está vazio.",
+    "invalidCredentials": "E-mail ou senha incorretos.",
+    "emailNotVerified": "Confirme seu e-mail antes de entrar. Enviamos o link de confirmação.",
+    "emailTaken": "Já existe uma conta com esse e-mail.",
+    "invalidResetToken": "O link para trocar a senha venceu ou já foi usado. Peça um novo.",
+    "billingOff": "A cobrança não está ativa neste ambiente.",
+    "planUnavailable": "Esse plano não está à venda no momento.",
+    "alreadyPaid": "Você já tem um plano pago. Para mudar, use o portal do cliente.",
+    "noSubscription": "Você não tem uma assinatura ativa.",
+    "noBillingAccount": "Você ainda não tem uma conta de cobrança.",
+    "paidPlanRequired": "Esse recurso é do plano pago.",
+    "nothingToRefund": "Não há pagamento para reembolsar.",
+    "emailNotSent": "Não foi possível enviar o e-mail. Tente de novo."
+  },
+  "home": {
+    "eyebrow": "Texto de exemplo",
+    "steps": {
+      "title": "Como funciona",
+      "intro": "Três passos, na ordem em que acontecem. Troque pelos do seu produto.",
+      "items": {
+        "create": {
+          "title": "Crie sua conta",
+          "body": "Leva um minuto e só pede o que é preciso. Você confirma o e-mail e já entra."
+        },
+        "fill": {
+          "title": "Cadastre o que você já tem",
+          "body": "Digite ou importe. O que for pessoal fica só com você e pode ser exportado a qualquer hora."
+        },
+        "follow": {
+          "title": "Acompanhe sem esforço",
+          "body": "Tudo o que importa fica numa tela só, com avisos que você mesmo escolhe receber."
+        }
+      }
+    },
+    "faq": {
+      "title": "Perguntas frequentes",
+      "intro": "Respostas curtas para o que mais se pergunta antes de começar.",
+      "items": {
+        "start": {
+          "question": "Preciso pagar para começar?",
+          "answer": "Não. A conta gratuita já traz o essencial, e você só assina se quiser mais."
+        },
+        "data": {
+          "question": "O que acontece com os meus dados?",
+          "answer": "Ficam na sua conta. Você baixa uma cópia quando quiser e apaga tudo com um botão, sem pedir a ninguém."
+        },
+        "cancel": {
+          "question": "Posso cancelar quando quiser?",
+          "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa e sem ligação."
+        }
+      }
+    },
+    "title": "O dia a dia organizado, sem enfeite",
+    "subtitle": "Texto de exemplo. Troque esta frase pela proposta do seu produto, em um parágrafo curto.",
+    "primary": "Criar conta",
+    "secondary": "Já tenho conta",
+    "sampleLabel": "Exemplo de ficha",
+    "sampleCustomer": "Cliente",
+    "sampleDocument": "CPF",
+    "sampleTotal": "Total",
+    "sampleStatus": "Paga",
+    "sampleName": "Ana Souza"
+  },
+  "inbox": {
+    "title": "Caixa de contatos",
+    "subtitle": "Mensagens enviadas pelo formulário de contato.",
+    "label": "Mensagens de contato",
+    "sender": "Remetente",
+    "subject": "Assunto",
+    "status": "Situação",
+    "date": "Recebida em",
+    "searchLabel": "Buscar mensagem",
+    "statusFilter": "Situação",
+    "allStatuses": "Todas",
+    "sortBy": "Ordenar por",
+    "sortDateDesc": "Mais recentes",
+    "sortDateAsc": "Mais antigas",
+    "sortName": "Remetente, A a Z",
+    "sortStatus": "Situação",
+    "emptyTitle": "Nenhuma mensagem ainda.",
+    "loading": "Carregando mensagens"
+  },
+  "myMessages": {
+    "title": "Minhas mensagens",
+    "subtitle": "O que você enviou pelo formulário de contato e as respostas.",
+    "emptyTitle": "Você ainda não enviou mensagens.",
+    "emptyAction": "Enviar mensagem"
+  },
+  "nav": {
+    "home": "Início",
+    "signIn": "Entrar",
+    "signUp": "Criar conta",
+    "account": "Minha conta",
+    "privacy": "Privacidade",
+    "terms": "Termos de uso",
+    "main": "Navegação principal",
+    "footer": "Rodapé",
+    "skip": "Ir para o conteúdo",
+    "more": "Mais",
+    "moreTitle": "Mais destinos",
+    "userMenu": "Menu da conta",
+    "side": "Navegação da área logada",
+    "bottom": "Navegação principal do celular",
+    "groups": {
+      "main": "Geral",
+      "staff": "Equipe",
+      "admin": "Administração"
+    },
+    "items": {
+      "account": "Minha conta",
+      "contacts": "Caixa de contatos",
+      "messages": "Minhas mensagens",
+      "plan": "Meu plano",
+      "users": "Usuários",
+      "invites": "Convites",
+      "audit": "Auditoria",
+      "numbers": "Números",
+      "health": "Saúde"
+    },
+    "contact": "Contato",
+    "plans": "Planos",
+    "language": "Idioma",
+    "articles": "Artigos"
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "body": "O endereço pode ter mudado ou nunca ter existido.",
+    "home": "Ir para o início"
   },
   "onboarding": {
     "title": "Primeiros passos",
@@ -1289,6 +1072,250 @@
       }
     }
   },
+  "patterns": {
+    "header": {
+      "back": "Voltar",
+      "moreActions": "Mais ações"
+    },
+    "list": {
+      "search": "Buscar",
+      "searchPlaceholder": "Buscar na lista",
+      "previous": "Anterior",
+      "next": "Próxima",
+      "position": "{from, number} a {to, number} de {total, number}",
+      "positionNone": "0 resultados",
+      "clear": "Limpar busca",
+      "removeFilter": "Remover filtro {name}",
+      "noResults": "Nada para “{term}”{filters, plural, =0 {} one { com # filtro} other { com # filtros}}",
+      "noResultsFilters": "Nada com {filters, plural, one {# filtro} other {# filtros}}",
+      "activeFilters": "Filtros ativos",
+      "loading": "Carregando a lista",
+      "pagination": "Paginação"
+    },
+    "saveBar": {
+      "label": "Alterações",
+      "save": "Salvar",
+      "discard": "Descartar",
+      "saved": "Salvo",
+      "unsaved": "Há alterações não salvas"
+    },
+    "unsaved": {
+      "title": "Sair sem salvar?",
+      "consequence": "As alterações que você fez nesta tela serão perdidas.",
+      "leave": "Sair sem salvar",
+      "stay": "Continuar editando"
+    }
+  },
+  "plan": {
+    "title": "Meu plano",
+    "subtitle": "O que você tem hoje e como mudar.",
+    "plan": "Plano",
+    "status": "Situação",
+    "origin": "Origem",
+    "names": {
+      "free": "Gratuito",
+      "monthly": "Mensal",
+      "yearly": "Anual",
+      "yearly_once": "Anual avulso",
+      "lifetime": "Vitalício"
+    },
+    "statuses": {
+      "free": "Gratuito",
+      "pending": "Aguardando pagamento",
+      "trialing": "Em teste",
+      "active": "Ativo",
+      "pastDue": "Pagamento pendente",
+      "endsSoon": "Termina no fim do período",
+      "ended": "Encerrado"
+    },
+    "origins": {
+      "purchase": "Compra",
+      "courtesy": "Cortesia"
+    },
+    "courtesyReason": "Motivo",
+    "pastDue": "Não conseguimos cobrar o último pagamento. Você mantém o acesso enquanto tentamos de novo. Para trocar o cartão, abra o portal de pagamento.",
+    "confirming": "Estamos confirmando seu pagamento. Atualize esta página em instantes.",
+    "seePlans": "Ver planos",
+    "portal": "Gerenciar pagamento",
+    "portalFailed": "Não foi possível abrir o portal de pagamento.",
+    "cancel": {
+      "title": "Cancelar no fim do período",
+      "confirmTitle": "Cancelar a assinatura?",
+      "confirmBody": "Você mantém o acesso até o fim do período já pago. Depois disso, a conta volta para o plano gratuito.",
+      "confirm": "Cancelar assinatura",
+      "back": "Voltar",
+      "failed": "Não foi possível cancelar a assinatura."
+    },
+    "keep": {
+      "title": "Manter a assinatura",
+      "failed": "Não foi possível manter a assinatura.",
+      "done": "Assinatura mantida."
+    },
+    "canceled": "Cancelamento agendado.",
+    "pending": "Seu pagamento ainda não foi confirmado. Pagamentos por Pix e boleto podem levar alguns minutos, e o plano começa assim que o dinheiro chega. Se o código expirar, é só tentar de novo.",
+    "trial": {
+      "title": "Teste gratuito",
+      "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para a primeira cobrança.",
+      "bar": "Dias do teste já usados"
+    },
+    "validUntil": "Vale até",
+    "renewsOn": "Renova em",
+    "endsOn": "Acesso até"
+  },
+  "plans": {
+    "title": "Planos",
+    "subtitle": "Escolha como quer usar o produto. Você pode mudar depois.",
+    "none": "Os planos ainda não estão à venda.",
+    "productName": "Plano pago",
+    "compare": "O que está incluso",
+    "included": "Incluído",
+    "notIncluded": "Não incluído",
+    "freePrice": "Grátis",
+    "freeUnit": "sem prazo",
+    "features": {
+      "premium": "Conteúdo e recursos pagos"
+    },
+    "paywall": {
+      "label": "Conteúdo de plano pago",
+      "action": "Ver planos"
+    },
+    "currency": {
+      "label": "Moeda dos preços",
+      "failed": "Não foi possível trocar a moeda. Tente de novo."
+    },
+    "faq": {
+      "title": "Sobre cobrança",
+      "intro": "O que mais se pergunta antes de assinar.",
+      "items": {
+        "cancel": {
+          "question": "Posso cancelar quando quiser?",
+          "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa."
+        },
+        "refund": {
+          "question": "Posso pedir o dinheiro de volta?",
+          "answer": "Nas compras online você tem sete dias para desistir. Escreva para o suporte e devolvemos o valor."
+        },
+        "invoice": {
+          "question": "Recebo recibo de cada cobrança?",
+          "answer": "Sim. Ele chega por e-mail a cada pagamento e fica guardado na sua conta."
+        }
+      }
+    },
+    "perMonth": "por mês",
+    "perYear": "por ano",
+    "perYearOnce": "um ano, pagamento único",
+    "once": "pagamento único",
+    "names": {
+      "free": "Gratuito",
+      "monthly": "Mensal",
+      "yearly": "Anual",
+      "yearly_once": "Anual avulso",
+      "lifetime": "Vitalício"
+    },
+    "awaiting": "Aguardando pagamento",
+    "buy": "Assinar",
+    "buyTrial": "{days, plural, one {Começar # dia grátis} other {Começar # dias grátis}}",
+    "trialNote": "{days, plural, one {# dia grátis} other {# dias grátis}} antes da primeira cobrança.",
+    "buyOnce": "Comprar um ano",
+    "buyLifetime": "Comprar",
+    "current": "Seu plano",
+    "signIn": "Entrar para continuar",
+    "failed": "Não foi possível abrir o pagamento.",
+    "replaces": {
+      "title": "Trocar a assinatura pelo plano vitalício?",
+      "body": "Sua assinatura será cancelada agora, sem crédito pelo tempo que sobrou, e o plano vitalício vale assim que o pagamento for confirmado.",
+      "confirm": "Comprar vitalício",
+      "cancel": "Voltar",
+      "note": "Sua assinatura atual será cancelada na compra, sem crédito proporcional."
+    }
+  },
+  "privacy": {
+    "title": "Política de privacidade",
+    "notice": "Texto de exemplo. Substitua pela política real do produto antes de publicar.",
+    "sections": {
+      "collected": {
+        "title": "Quais dados coletamos",
+        "body": "Liste aqui os dados que o produto coleta, como nome, e-mail e o que a pessoa informa ao usar o serviço."
+      },
+      "use": {
+        "title": "Para que usamos os dados",
+        "body": "Explique a finalidade de cada dado e a base legal prevista na LGPD."
+      },
+      "rights": {
+        "title": "Seus direitos",
+        "body": "A pessoa pode baixar os próprios dados e apagar a conta a qualquer momento, na página da conta."
+      },
+      "contact": {
+        "title": "Como falar com a gente",
+        "body": "Informe aqui o canal para dúvidas sobre privacidade."
+      }
+    }
+  },
+  "record": {
+    "from": "Remetente",
+    "email": "E-mail",
+    "subject": "Assunto",
+    "received": "Recebida em",
+    "status": "Situação",
+    "message": "Mensagem",
+    "replyTitle": "Resposta",
+    "answeredBy": "Respondida por {name} em {date}",
+    "noReplyYet": "Ainda sem resposta.",
+    "manage": "Atendimento",
+    "changeStatus": "Situação",
+    "statusSaved": "Situação atualizada.",
+    "replyLabel": "Escreva a resposta",
+    "replyHelp": "Vai por e-mail para {email}. Depois de enviada, a resposta não muda.",
+    "send": "Enviar resposta",
+    "sent": "Resposta enviada.",
+    "failed": "Não foi possível concluir. Tente de novo.",
+    "unknownPerson": "Equipe"
+  },
+  "site": {
+    "name": "Meu produto",
+    "description": "Descreva aqui, em uma frase, o que o produto faz e para quem ele é."
+  },
+  "terms": {
+    "title": "Termos de uso",
+    "notice": "Texto de exemplo. Substitua pelos termos reais do produto antes de publicar.",
+    "sections": {
+      "service": {
+        "title": "O serviço",
+        "body": "Descreva o que o produto oferece e o que ele não oferece."
+      },
+      "account": {
+        "title": "Sua conta",
+        "body": "Explique as responsabilidades de quem cria uma conta e como ela pode ser encerrada."
+      },
+      "payment": {
+        "title": "Pagamento e cancelamento",
+        "body": "Descreva preços, renovação, cancelamento e reembolso, se o produto cobrar."
+      },
+      "changes": {
+        "title": "Mudanças nestes termos",
+        "body": "Diga como as pessoas serão avisadas quando os termos mudarem."
+      }
+    }
+  },
+  "ui": {
+    "close": "Fechar",
+    "loading": "Carregando",
+    "search": "Buscar",
+    "noOptions": "Nenhuma opção encontrada.",
+    "choose": "Escolha uma opção",
+    "back": "Voltar",
+    "datePicker": {
+      "placeholder": "dd/mm/aaaa",
+      "open": "Abrir calendário",
+      "previousMonth": "Mês anterior",
+      "nextMonth": "Próximo mês"
+    },
+    "stepper": {
+      "done": "concluída",
+      "current": "etapa atual",
+      "upcoming": "a fazer"
+    }
+  },
   "unsubscribe": {
     "title": "Cancelar inscrição",
     "confirm": {
@@ -1303,5 +1330,21 @@
     "changeLater": "Você pode mudar isso quando quiser, em Minha conta.",
     "invalid": "Este link não vale. Use o da mensagem mais recente, ou ajuste suas escolhas em Minha conta.",
     "toAccount": "Ir para Minha conta"
+  },
+  "validation": {
+    "required": "Preencha este campo.",
+    "invalid": "Valor inválido.",
+    "invalidType": "Valor inválido.",
+    "invalidOption": "Escolha uma das opções.",
+    "invalidEmail": "Informe um e-mail válido.",
+    "invalidUrl": "Informe um endereço válido.",
+    "invalidDate": "Informe uma data válida no formato dd/mm/aaaa.",
+    "invalidMoney": "Informe um valor em reais.",
+    "tooShort": "{minimum, plural, one {Use pelo menos # caractere.} other {Use pelo menos # caracteres.}}",
+    "tooLong": "{maximum, plural, one {Use no máximo # caractere.} other {Use no máximo # caracteres.}}",
+    "tooSmall": "O valor mínimo é {minimum}.",
+    "tooBig": "O valor máximo é {maximum}.",
+    "tooFew": "{minimum, plural, one {Escolha pelo menos # item.} other {Escolha pelo menos # itens.}}",
+    "tooMany": "{maximum, plural, one {Escolha no máximo # item.} other {Escolha no máximo # itens.}}"
   }
 }

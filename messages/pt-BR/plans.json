@@ -1,0 +1,67 @@
+{
+  "title": "Planos",
+  "subtitle": "Escolha como quer usar o produto. Você pode mudar depois.",
+  "none": "Os planos ainda não estão à venda.",
+  "productName": "Plano pago",
+  "compare": "O que está incluso",
+  "included": "Incluído",
+  "notIncluded": "Não incluído",
+  "freePrice": "Grátis",
+  "freeUnit": "sem prazo",
+  "features": {
+    "premium": "Conteúdo e recursos pagos"
+  },
+  "paywall": {
+    "label": "Conteúdo de plano pago",
+    "action": "Ver planos"
+  },
+  "currency": {
+    "label": "Moeda dos preços",
+    "failed": "Não foi possível trocar a moeda. Tente de novo."
+  },
+  "faq": {
+    "title": "Sobre cobrança",
+    "intro": "O que mais se pergunta antes de assinar.",
+    "items": {
+      "cancel": {
+        "question": "Posso cancelar quando quiser?",
+        "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa."
+      },
+      "refund": {
+        "question": "Posso pedir o dinheiro de volta?",
+        "answer": "Nas compras online você tem sete dias para desistir. Escreva para o suporte e devolvemos o valor."
+      },
+      "invoice": {
+        "question": "Recebo recibo de cada cobrança?",
+        "answer": "Sim. Ele chega por e-mail a cada pagamento e fica guardado na sua conta."
+      }
+    }
+  },
+  "perMonth": "por mês",
+  "perYear": "por ano",
+  "perYearOnce": "um ano, pagamento único",
+  "once": "pagamento único",
+  "names": {
+    "free": "Gratuito",
+    "monthly": "Mensal",
+    "yearly": "Anual",
+    "yearly_once": "Anual avulso",
+    "lifetime": "Vitalício"
+  },
+  "awaiting": "Aguardando pagamento",
+  "buy": "Assinar",
+  "buyTrial": "{days, plural, one {Começar # dia grátis} other {Começar # dias grátis}}",
+  "trialNote": "{days, plural, one {# dia grátis} other {# dias grátis}} antes da primeira cobrança.",
+  "buyOnce": "Comprar um ano",
+  "buyLifetime": "Comprar",
+  "current": "Seu plano",
+  "signIn": "Entrar para continuar",
+  "failed": "Não foi possível abrir o pagamento.",
+  "replaces": {
+    "title": "Trocar a assinatura pelo plano vitalício?",
+    "body": "Sua assinatura será cancelada agora, sem crédito pelo tempo que sobrou, e o plano vitalício vale assim que o pagamento for confirmado.",
+    "confirm": "Comprar vitalício",
+    "cancel": "Voltar",
+    "note": "Sua assinatura atual será cancelada na compra, sem crédito proporcional."
+  }
+}

@@ -5,7 +5,7 @@ description: Add text a person reads. Use for any label, message, title, e-mail 
 
 # New text key
 
-Every sentence a person reads lives in `messages/pt-BR.json`. The Biome rule `noJsxLiterals` fails
+Every sentence a person reads lives in `messages/pt-BR/<area>.json`; `pnpm messages` joins them into `messages/pt-BR.json`. The Biome rule `noJsxLiterals` fails
 a sentence written inside JSX. The catalog is typed: a key that does not exist, or a missing value
 for a `{name}`, fails `tsc`.
 

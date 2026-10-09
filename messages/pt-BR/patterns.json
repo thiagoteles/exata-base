@@ -1,0 +1,34 @@
+{
+  "header": {
+    "back": "Voltar",
+    "moreActions": "Mais ações"
+  },
+  "list": {
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar na lista",
+    "previous": "Anterior",
+    "next": "Próxima",
+    "position": "{from, number} a {to, number} de {total, number}",
+    "positionNone": "0 resultados",
+    "clear": "Limpar busca",
+    "removeFilter": "Remover filtro {name}",
+    "noResults": "Nada para “{term}”{filters, plural, =0 {} one { com # filtro} other { com # filtros}}",
+    "noResultsFilters": "Nada com {filters, plural, one {# filtro} other {# filtros}}",
+    "activeFilters": "Filtros ativos",
+    "loading": "Carregando a lista",
+    "pagination": "Paginação"
+  },
+  "saveBar": {
+    "label": "Alterações",
+    "save": "Salvar",
+    "discard": "Descartar",
+    "saved": "Salvo",
+    "unsaved": "Há alterações não salvas"
+  },
+  "unsaved": {
+    "title": "Sair sem salvar?",
+    "consequence": "As alterações que você fez nesta tela serão perdidas.",
+    "leave": "Sair sem salvar",
+    "stay": "Continuar editando"
+  }
+}

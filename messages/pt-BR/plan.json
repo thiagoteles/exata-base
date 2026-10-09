@@ -1,0 +1,56 @@
+{
+  "title": "Meu plano",
+  "subtitle": "O que você tem hoje e como mudar.",
+  "plan": "Plano",
+  "status": "Situação",
+  "origin": "Origem",
+  "names": {
+    "free": "Gratuito",
+    "monthly": "Mensal",
+    "yearly": "Anual",
+    "yearly_once": "Anual avulso",
+    "lifetime": "Vitalício"
+  },
+  "statuses": {
+    "free": "Gratuito",
+    "pending": "Aguardando pagamento",
+    "trialing": "Em teste",
+    "active": "Ativo",
+    "pastDue": "Pagamento pendente",
+    "endsSoon": "Termina no fim do período",
+    "ended": "Encerrado"
+  },
+  "origins": {
+    "purchase": "Compra",
+    "courtesy": "Cortesia"
+  },
+  "courtesyReason": "Motivo",
+  "pastDue": "Não conseguimos cobrar o último pagamento. Você mantém o acesso enquanto tentamos de novo. Para trocar o cartão, abra o portal de pagamento.",
+  "confirming": "Estamos confirmando seu pagamento. Atualize esta página em instantes.",
+  "seePlans": "Ver planos",
+  "portal": "Gerenciar pagamento",
+  "portalFailed": "Não foi possível abrir o portal de pagamento.",
+  "cancel": {
+    "title": "Cancelar no fim do período",
+    "confirmTitle": "Cancelar a assinatura?",
+    "confirmBody": "Você mantém o acesso até o fim do período já pago. Depois disso, a conta volta para o plano gratuito.",
+    "confirm": "Cancelar assinatura",
+    "back": "Voltar",
+    "failed": "Não foi possível cancelar a assinatura."
+  },
+  "keep": {
+    "title": "Manter a assinatura",
+    "failed": "Não foi possível manter a assinatura.",
+    "done": "Assinatura mantida."
+  },
+  "canceled": "Cancelamento agendado.",
+  "pending": "Seu pagamento ainda não foi confirmado. Pagamentos por Pix e boleto podem levar alguns minutos, e o plano começa assim que o dinheiro chega. Se o código expirar, é só tentar de novo.",
+  "trial": {
+    "title": "Teste gratuito",
+    "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para a primeira cobrança.",
+    "bar": "Dias do teste já usados"
+  },
+  "validUntil": "Vale até",
+  "renewsOn": "Renova em",
+  "endsOn": "Acesso até"
+}

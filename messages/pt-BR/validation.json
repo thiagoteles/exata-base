@@ -1,0 +1,16 @@
+{
+  "required": "Preencha este campo.",
+  "invalid": "Valor inválido.",
+  "invalidType": "Valor inválido.",
+  "invalidOption": "Escolha uma das opções.",
+  "invalidEmail": "Informe um e-mail válido.",
+  "invalidUrl": "Informe um endereço válido.",
+  "invalidDate": "Informe uma data válida no formato dd/mm/aaaa.",
+  "invalidMoney": "Informe um valor em reais.",
+  "tooShort": "{minimum, plural, one {Use pelo menos # caractere.} other {Use pelo menos # caracteres.}}",
+  "tooLong": "{maximum, plural, one {Use no máximo # caractere.} other {Use no máximo # caracteres.}}",
+  "tooSmall": "O valor mínimo é {minimum}.",
+  "tooBig": "O valor máximo é {maximum}.",
+  "tooFew": "{minimum, plural, one {Escolha pelo menos # item.} other {Escolha pelo menos # itens.}}",
+  "tooMany": "{maximum, plural, one {Escolha no máximo # item.} other {Escolha no máximo # itens.}}"
+}

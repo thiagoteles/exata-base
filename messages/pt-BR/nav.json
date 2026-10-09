@@ -1,0 +1,36 @@
+{
+  "home": "Início",
+  "signIn": "Entrar",
+  "signUp": "Criar conta",
+  "account": "Minha conta",
+  "privacy": "Privacidade",
+  "terms": "Termos de uso",
+  "main": "Navegação principal",
+  "footer": "Rodapé",
+  "skip": "Ir para o conteúdo",
+  "more": "Mais",
+  "moreTitle": "Mais destinos",
+  "userMenu": "Menu da conta",
+  "side": "Navegação da área logada",
+  "bottom": "Navegação principal do celular",
+  "groups": {
+    "main": "Geral",
+    "staff": "Equipe",
+    "admin": "Administração"
+  },
+  "items": {
+    "account": "Minha conta",
+    "contacts": "Caixa de contatos",
+    "messages": "Minhas mensagens",
+    "plan": "Meu plano",
+    "users": "Usuários",
+    "invites": "Convites",
+    "audit": "Auditoria",
+    "numbers": "Números",
+    "health": "Saúde"
+  },
+  "contact": "Contato",
+  "plans": "Planos",
+  "language": "Idioma",
+  "articles": "Artigos"
+}

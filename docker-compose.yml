@@ -8,7 +8,7 @@ services:
     # The development server compiles routes on as many threads as it is given, and each thread
     # holds memory while it works; two keep the peak under what the machine running Docker has.
     cpus: 2
-    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm dev --hostname 0.0.0.0 --port 3000"
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile && (pnpm messages --watch &) && pnpm dev --hostname 0.0.0.0 --port 3000"
     ports:
       - "47300:3000"
     volumes:

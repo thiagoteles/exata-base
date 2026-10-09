@@ -1,0 +1,94 @@
+{
+  "title": "Minha conta",
+  "subtitle": "Seus dados, suas preferências e o que você pode levar embora.",
+  "profile": {
+    "name": "Nome",
+    "email": "E-mail",
+    "role": "Papel",
+    "timeZone": "Fuso horário",
+    "noName": "Não informado"
+  },
+  "roles": {
+    "member": "Membro",
+    "staff": "Equipe",
+    "admin": "Administrador"
+  },
+  "theme": {
+    "title": "Aparência",
+    "label": "Tema",
+    "system": "Do sistema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "help": "Vale neste navegador e nos outros em que você entrar.",
+    "failed": "Não foi possível salvar o tema."
+  },
+  "accessibility": {
+    "title": "Acessibilidade",
+    "fontScale": {
+      "label": "Tamanho do texto",
+      "default": "Padrão",
+      "large": "Grande",
+      "larger": "Maior"
+    },
+    "motion": {
+      "label": "Movimento",
+      "system": "Do sistema",
+      "reduce": "Reduzir"
+    },
+    "contrast": {
+      "label": "Contraste",
+      "system": "Do sistema",
+      "more": "Reforçado"
+    },
+    "help": "Vale neste navegador e nos outros em que você entrar.",
+    "failed": "Não foi possível salvar a sua escolha."
+  },
+  "email": {
+    "title": "E-mails",
+    "reminders": {
+      "label": "Lembretes",
+      "description": "Avisos sobre o que está por vencer ou ficou pela metade."
+    },
+    "news": {
+      "label": "Novidades",
+      "description": "Notícias do produto. Só enviamos se você ligar."
+    },
+    "always": "Mensagens sobre a sua conta e os seus pagamentos, como o link de confirmação e os recibos, são sempre enviadas.",
+    "failed": "Não foi possível salvar a sua escolha de e-mails."
+  },
+  "devices": {
+    "title": "Aparelhos conectados",
+    "help": "Os lugares onde a sua conta está aberta agora. Encerre os que você não reconhece.",
+    "unknown": "Aparelho desconhecido",
+    "thisOne": "Este aparelho",
+    "since": "Entrou em {date}",
+    "end": "Encerrar",
+    "endOthers": "Encerrar todos os outros",
+    "failed": "Não foi possível encerrar. Tente de novo.",
+    "external": "Os aparelhos conectados ficam no seu perfil, no serviço de acesso.",
+    "externalLink": "Abrir perfil"
+  },
+  "referral": {
+    "title": "Convide pessoas",
+    "help": "Quem criar uma conta pelo seu link fica registrado como indicado por você.",
+    "linkLabel": "Seu link",
+    "copy": "Copiar link",
+    "copied": "Link copiado.",
+    "earned": "Crédito ganho com convites: {amount}, abatido da sua próxima fatura.",
+    "count": "{count, plural, =0 {Ninguém criou conta pelo seu link ainda.} one {# pessoa criou conta pelo seu link.} other {# pessoas criaram conta pelo seu link.}}"
+  },
+  "data": {
+    "title": "Seus dados",
+    "body": "Baixe um arquivo com tudo o que guardamos sobre você: seus dados e os arquivos que você enviou.",
+    "download": "Baixar meus dados"
+  },
+  "delete": {
+    "title": "Apagar minha conta",
+    "body": "Isso apaga sua conta, seus arquivos e as mensagens que você enviou. Não dá para desfazer.",
+    "confirmTitle": "Apagar sua conta?",
+    "confirmBody": "Sua conta, seus arquivos e suas mensagens serão apagados para sempre. Você sai agora.",
+    "confirm": "Apagar minha conta",
+    "cancel": "Cancelar",
+    "failed": "Não foi possível apagar a conta."
+  }
+}

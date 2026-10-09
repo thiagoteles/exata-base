@@ -1,0 +1,7 @@
+{
+  "title": "Algo deu errado",
+  "body": "Tivemos um problema do nosso lado. Tente de novo em instantes.",
+  "retry": "Tentar de novo",
+  "home": "Ir para o início",
+  "code": "Código do erro: {code}"
+}

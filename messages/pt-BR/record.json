@@ -1,0 +1,20 @@
+{
+  "from": "Remetente",
+  "email": "E-mail",
+  "subject": "Assunto",
+  "received": "Recebida em",
+  "status": "Situação",
+  "message": "Mensagem",
+  "replyTitle": "Resposta",
+  "answeredBy": "Respondida por {name} em {date}",
+  "noReplyYet": "Ainda sem resposta.",
+  "manage": "Atendimento",
+  "changeStatus": "Situação",
+  "statusSaved": "Situação atualizada.",
+  "replyLabel": "Escreva a resposta",
+  "replyHelp": "Vai por e-mail para {email}. Depois de enviada, a resposta não muda.",
+  "send": "Enviar resposta",
+  "sent": "Resposta enviada.",
+  "failed": "Não foi possível concluir. Tente de novo.",
+  "unknownPerson": "Equipe"
+}

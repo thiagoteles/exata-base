@@ -1,8 +1,151 @@
 # Pendências da base
 
-Arquivo temporário. Lista o que falta na base para que produtos como o lottery e o solmiza, e os próximos, nasçam dela. O foco é técnico: a migração operacional de cada produto (dados, assinantes, corte) fica no repositório do produto.
+Arquivo temporário. Lista o que falta na base para que produtos como o lottery e o solmiza, e os próximos, nasçam dela, e é executado em loop pela **Fila** até o fim. O foco é técnico: a migração operacional de cada produto (dados, assinantes, corte) fica no repositório do produto.
 
-## Antes de começar
+## Como executar em loop
+
+Este arquivo é o estado do trabalho. Uma sessão nova, ou a mesma depois de uma compactação, retoma daqui sem precisar de outra memória. Para rodar: `/loop siga o LEFT.md` (ou "siga" a cada rodada).
+
+### Protocolo de cada rodada
+
+1. Leia a **Fila** abaixo e pegue a primeira unidade `[ ]` que não esteja marcada `⏸`.
+2. Leia a seção de especificação que ela cita, o código da área e a skill que se aplica (`.claude/skills`). Siga o `AGENTS.md`, o `DESIGN.md` e as regras de texto (sem travessão em interface, nada de nome de arquivo em comentário).
+3. Implemente a unidade inteira, com os testes que provam o comportamento: unidade para `domain/`, integração para regra com banco, e2e para tela e fluxo.
+4. Prove:
+   - `pnpm check`, julgado pelo código de saída e nunca por `grep`;
+   - `pnpm test:integration`, quando tocar regra com banco;
+   - tela nova: captura nos dois temas e no celular, conferida a olho, mais axe no e2e;
+   - comportamento que só aparece em produção: o item vai para o `pnpm verify`.
+5. Commit de uma unidade por vez, em inglês, no formato `tipo: descrição` (o hook roda o `pnpm check`). **Nunca faça push.**
+6. Marque `[x]` na unidade e nos itens da seção, com uma linha do que provou. Atualize o `BASE.md` (decisões e armadilhas), o `AGENTS.md` (regras novas), o `README.md` (comandos e variáveis) e as skills quando a unidade mudar uma regra.
+7. Ao fechar uma **fase**, rode o `pnpm verify` com o compose derrubado (`docker compose down`, depois `docker compose up -d`), e só então siga para a fase seguinte.
+8. Vá para a próxima unidade. Pare quando só restarem unidades `⏸`, e então escreva o relatório final (ver F9).
+
+### Como decidir no caminho
+
+- A decisão escrita na unidade vale. Não pergunte de novo.
+- Surgiu uma decisão nova: escolha pelos princípios da base (genérico para muitos produtos, fechado e tipado, nenhuma infraestrutura nova, o produto configura em vez de copiar código) e registre em **Decisões tomadas no loop**, com a data.
+- Uma unidade grande demais para uma rodada vira subunidades na própria fila, antes de começar.
+- Um defeito antigo achado no caminho é corrigido na mesma rodada, com teste, e anotado no commit.
+- Uma unidade que exige algo de fora (chave, conta, servidor real, aprovação) ganha `⏸ motivo` e o loop segue. Nada é inventado para contornar.
+
+### O que o loop nunca faz
+
+- Push, deploy, `pnpm gcp:alerts` ou `gcp:access-log` sem `DRY_RUN`, ou qualquer escrita em serviço externo.
+- Usar credencial real, gravar segredo em arquivo versionado ou apagar recurso fora do repositório.
+- Pular hook (`--no-verify`), silenciar plugin do Biome ou baixar o piso de cobertura.
+- Acrescentar código sem consumidor: o knip recusa. Mecanismo novo entra com um uso na base (exemplo neutro no `/catalog` ou numa tela existente).
+
+## Fila
+
+As fases seguem a dependência entre elas. Cada unidade aponta a seção que detalha o que fazer.
+
+### F1. Regras e arrumação
+
+- [ ] **F1.1 Onde cada coisa vai.** Escrever no `AGENTS.md`: cálculo puro em `domain/`, figuras SVG em `components/figures`, áudio e microfone em `domain/audio` importado só por componente cliente (ou port com adapter de navegador quando precisar de falso em teste); notação de domínio (nomes de nota, siglas) vem de funções do domínio e não é texto do catálogo. *Estrutura, Camada; Regras, item 1.* A validação de mover um módulo já está provada: `domain/billing` e `domain/charts` passam no check.
+- [ ] **F1.2 Arquivos estáticos.** Criar `public/` (com `.gitkeep`) e o `COPY` no Dockerfile, provado no `pnpm verify`. Teste de fonte que recusa `readFile`/`readFileSync` com caminho vindo de argumento sem o comentário `turbopackIgnore`. Arquivo pago fica atrás de rota com guarda: documentar o padrão com a rota de storage existente. *Estrutura, Arquivos estáticos.*
+- [ ] **F1.3 Convenções do banco.** `lib/db/conventions.test.ts` recusa coluna `real`, `double` ou `numeric` com nome de dinheiro (`price`, `amount`, `cents`, `total`, `value`), `timestamp` sem fuso, e valores de enum fora de `snake_case` ASCII. *Regras, item 3.*
+- [ ] **F1.4 `tools/`.** `tools/README.md` explicando a pasta, e ela fora do Biome, do knip, do tsconfig e do Vitest. *Regras, item 4.*
+- [ ] **F1.5 Skill `port-from-legacy`.** A ordem para cada arquivo trazido de fora (camada, textos, relógio e aleatoriedade, check), citando o extrator de F7.2 quando existir. *Regras, item 5.*
+- [ ] **F1.6 Notas de SEO e deploy.** No `BASE.md`: nunca `as` no `<Link>`; um 301 fica guardado no navegador, então renomear um caminho público mantém o antigo no mapa; o Coolify faz deploy da `main` a cada push, e o hook de push é a barreira. *SEO, item 1; Infraestrutura, item 1.*
+- [ ] **F1.7 Renovate.** `renovate.json` com lotes semanais, versões exatas e as atualizações de Next, React e TypeScript isoladas. Ligar o app hospedado fica com o dono (anotar em "Depende de você"). *Infraestrutura, item 1.*
+
+### F2. Agendamento e ingestão
+
+- [ ] **F2.1 Grupos por cadência.** `/events/[group]` com `daily`, `hourly` e `every-5-min`; cada operação declara o grupo no registro; `/events` sem grupo continua chamando `daily` (compatível). Decisão: grupo inválido responde 404. *Capacidades, item 1.*
+- [ ] **F2.2 Trava por operação.** `pg_try_advisory_xact_lock` pela chave da operação: uma execução lenta não roda duas vezes ao mesmo tempo; a segunda chamada registra `skipped`. Teste de integração com duas chamadas concorrentes.
+- [ ] **F2.3 Batimento e painel por grupo.** `recordJobRun` e a linha `heartbeat` por grupo (`daily`, `hourly`, `every-5-min`); `ops/gcp/heartbeats.json` com a janela de cada um; o painel Saúde lista os grupos que têm operação registrada.
+- [ ] **F2.4 Ingestão de workers externos.** `POST /api/ingest/[source]` com segredo próprio por fonte (`INGEST_SECRET`, comparado em tempo constante), payload validado por zod declarado num registro de fontes, `timedRoute` e rate limit. Na base, uma fonte de exemplo neutra com teste; a regra fica no servidor e o worker só entrega.
+- [ ] **F2.5 Documentar.** `BASE.md`, `README.md` (um cron por grupo no Coolify) e a skill `new-daily-operation` passam a falar de grupo de cadência.
+
+### F3. Contas e preferências
+
+- [ ] **F3.1 Registro de opções tipadas.** Cada opção declara schema zod, padrão e se vai para cookie antes da pintura; `saveOption(key, value)` grava só a chave com `jsonb_set`; leitura validada (valor antigo ou inválido cai no padrão). Tema e idioma migram para o registro. *Contas, item 1.*
+- [ ] **F3.2 Opções de visitante.** As mesmas opções em cookie para quem não tem conta, copiadas para a conta no cadastro e no login. Decisão: cookie, não `localStorage`, para valer antes da pintura.
+- [ ] **F3.3 Fuso horário.** `options.timeZone` vindo do navegador (`Intl`) no login, padrão `America/Sao_Paulo`; os serviços recebem o fuso junto com o relógio. Registrar o limite dos lembretes por horário local no `BASE.md`. *Contas, item 2.*
+- [ ] **F3.4 Preferências de e-mail.** Categorias em `options.email` (transacional sempre; lembretes desligáveis; novidades só com opt-in); o port de e-mail recebe a categoria e recusa enviar o que a pessoa desligou. Tela na conta. *Contas, item 3.*
+- [ ] **F3.5 Descadastro com um clique.** Link assinado com HMAC e sem tabela, cabeçalhos `List-Unsubscribe` e `List-Unsubscribe-Post`, página de confirmação pública. e2e pelo mail catcher.
+- [ ] **F3.6 Acessibilidade como preferência.** Escala de fonte, reduzir movimento forçado e contraste reforçado, em cookie antes da pintura como o tema; a escala vira variável CSS lida pelos tokens. *Contas, item 4; Design system, tipografia.*
+- [ ] **F3.7 Dados de visitante reivindicados.** Helper genérico: dado guardado no navegador, action `claimVisitorData` que copia para a conta no primeiro login e apaga o local. Exemplo neutro na base (rascunho do formulário de contato) com e2e. *Contas, item 6.*
+- [ ] **F3.8 Indicações.** Código por pessoa, cookie de atribuição na chegada por `?ref=`, `referredBy` como `authoredBy` gravado no cadastro, contagem na conta. A recompensa fica para F6.10. *Contas, item 5.*
+- [ ] **F3.9 Onboarding.** Passos em `options.onboarding`, uma tela de primeiros passos que o produto preenche, e o evento `activated` do funil emitido quando o produto declara o passo final. *Contas, item 7.*
+- [ ] **F3.10 Sessões e dispositivos.** No login próprio, listar e encerrar sessões (better-auth); com Clerk, um link para o perfil do Clerk. *Contas, item 7.*
+- [ ] **F3.11 Exclusão de conta conferida.** Teste de integração: apagar a conta cancela a assinatura ativa no provedor, e `payments` e `referredBy` ficam com o e-mail do autor.
+
+### F4. Design system
+
+- [ ] **F4.1 Cor oficial fixa.** `design.json` aceita accent com `fixed: true`: o tom puro só decora e o gerador calcula `-ink` e `on-accent` com contraste medido nos dois temas. Provar com amarelo, verde-limão e laranja saturados e claros, e registrar o resultado (fecha o "Validar" do Design system). *Design system, item 2.*
+- [ ] **F4.2 Paletas de domínio nomeadas.** `design.json` declara grupos (`palettes.category.*`), cada cor passa pelo verificador e vira token; o `check-design-tokens` aceita essas classes; exemplo neutro no `/catalog`.
+- [ ] **F4.3 Primitivos.** Em `components/ui`, sobre Radix, os que faltam: tabs, stepper, date picker, slider, progress e meter, accordion, checkbox, radio, switch, skeleton, chip removível e breadcrumb. API uniforme com `tone` e `size` tipados. Cada um no `/catalog` com teste de teclado e axe. Pode virar subunidades.
+- [ ] **F4.4 Padrões do site público.** Hero, seções de conteúdo, tabela de preços (lida do catálogo de planos) e FAQ, aplicados à página inicial e a `/planos`, com desenho próprio e nunca o cartão genérico. JSON-LD junto: `FAQPage` no FAQ, `Product` com `Offer` em `/planos`, `Article` e `BreadcrumbList` nos artigos. *Design system, item 4; SEO, item 4.*
+- [ ] **F4.5 Texto em SVG e figuras.** Um `<SvgText>` que recebe a chave do catálogo sem esbarrar no `noJsxLiterals`, e a família `components/figures` com as regras e um exemplo neutro (`color-mix` sobre tokens permitido).
+- [ ] **F4.6 Padrões de produto pago.** Paywall e gate (apoiados no `requireFeature`), estado de trial, progresso e conquistas, e o onboarding de F3.9 com o desenho do design system. O paywall emite `paywall_viewed`.
+- [ ] **F4.7 API uniforme.** Os componentes existentes que têm variação de cor ou tamanho passam a `tone` e `size` tipados, sem mudar o visual.
+- [ ] **F4.8 Catálogo vivo e snapshots.** O `/catalog` mostra cada componente nos dois temas e em cada densidade do preset ativo; snapshots do Playwright (`toHaveScreenshot`) sobre ele, com as referências versionadas. Decisão: os presets não trocam em execução, então a matriz de presets é um comando (`pnpm catalog:presets`) que gera cada preset, captura e restaura o `design.json`.
+
+### F5. Conteúdo e SEO
+
+- [ ] **F5.1 Erros de frontmatter legíveis.** O `pnpm content` mostra o erro do zod em português, com o campo e o arquivo, no lugar da chave crua. *SEO, item 9.*
+
+### F6. Cobrança, construída e provada com eventos assinados
+
+Tudo aqui se prova como a base já faz: eventos do Stripe assinados à mão e lidos pelo adaptador real, chamadas ao Stripe por `fetch` falso. A prova no sandbox de verdade fica em "Depende de você".
+
+- [ ] **F6.1 Limites por plano.** `limits` do catálogo consumidos pela tabela de contadores do rate limit (`consumeLimit(holder, limit)`, com janela por limite), e `actionFor(role, { limit })`. Exemplo neutro com teste. *Cobrança, item 1; Rate limit.*
+- [ ] **F6.2 Preços por `lookup_key`.** O catálogo declara `"premium.monthly": "premium_monthly"`; o adaptador lê os preços do Stripe com cache por tag (`'use cache'`), e o `STRIPE_PRICE_*` sai do env. Preço do par nível e intervalo. *Cobrança, item 3.*
+- [ ] **F6.3 Moedas.** `currency_options` do próprio Price, exibição em BRL como padrão e outra moeda como opção do produto.
+- [ ] **F6.4 Pix e anual avulso.** Intervalo `yearly-once` em `mode: "payment"` com Pix e cartão; `currentPeriodEnd` gravado na compra; operação diária devolve a free no vencimento; e-mail de aviso antes do vencimento; expiração do QR por `expires_after_seconds`. *Cobrança, item 4.*
+- [ ] **F6.5 Pendente e falha assíncrona.** `pending` quando o checkout completa sem o dinheiro, "aguardando pagamento" na tela do plano, `async_payment_failed` e a expiração do Pix tratados. *Cobrança, item 5.*
+- [ ] **F6.6 Trial.** `trial_period_days` no checkout, `trial_will_end` disparando e-mail, `trialUsedAt` impedindo repetir; eventos `trial_started` e `refund_issued` no catálogo de analytics e emitidos. *Cobrança, item 5; Observabilidade, item 9.*
+- [ ] **F6.7 Disputa.** `charge.dispute.created` registrado na `payments` e alertado no log como erro (o Error Reporting avisa).
+- [ ] **F6.8 Rastro de checkout.** Tabela `checkout_sessions` (aberto, pago, expirado) com a origem do paywall; eventos de exibição, clique e conversão. *Cobrança, item 7.*
+- [ ] **F6.9 Checkout abandonado.** Operação diária que envia um e-mail uma vez por sessão expirada, respeitando a preferência de e-mail de F3.4.
+- [ ] **F6.10 Cupons e crédito de indicação.** `allow_promotion_codes` no checkout; crédito de indicação como saldo do cliente no Stripe, com as regras em `lib/referral`. *Cobrança, item 8.*
+- [ ] **F6.11 Skill e documentos.** `new-payment-event` com os eventos novos; o `BASE.md` com o estado completo da cobrança.
+
+### F7. Textos e catálogo
+
+- [ ] **F7.1 Catálogo dividido.** `messages/pt-BR/<área>.json`, juntado por um comando num `messages/pt-BR.json` gerado, que continua sendo o tipo; o `pnpm check` confere que o gerado está em dia. A paridade entre idiomas continua. *Regras, item 1.*
+- [ ] **F7.2 Extrator de textos.** `scripts/extract-text.ts` com `ts-morph`: acha literais em JSX e nas props `aria-label`, `placeholder`, `title` e `alt`, propõe a chave pelo caminho, grava no catálogo da área e troca por `t("chave")`; recusa travessão. Testado sobre um arquivo de exemplo.
+- [ ] **F7.3 Peso do catálogo.** Medir o typecheck do TS 7 com um catálogo sintético de 5 mil chaves e registrar o tempo no `BASE.md`. Se passar de 2× o atual, propor a mitigação no próprio registro.
+
+### F8. Capacidades sob demanda
+
+- [ ] **F8.1 API v1 e tokens pessoais.** Tokens criados e revogados na conta, só o hash no banco, escopos por token; `app/api/v1/*` com handlers finos sobre os serviços e os mesmos schemas das actions; CORS por lista de origens, rate limit por token, erros no formato `DomainError`. Um endpoint de exemplo (`GET /api/v1/me`). *Capacidades, item 2.*
+- [ ] **F8.2 PDF e QR.** `lib/documents` com `@react-pdf/renderer` (import limitado à pasta por regra do Biome), `qrcode`, fontes do disco e cores em hex do gerador. *Capacidades, item 3.*
+- [ ] **F8.3 Documento verificável e recibo.** Slug assinado, página pública de verificação, QR apontando para ela; recibo de pagamento a partir de `payments`, baixado pela conta.
+- [ ] **F8.4 Páginas de impressão.** Grupo `app/(print)` com casca própria, tokens de impressão, `components/print`, variante `print:` nas páginas comuns, botão "Imprimir"; uma ficha de exemplo (a de contato) com teste `emulateMedia` e `page.pdf()`. Provar a numeração por `counter(page)` no Chromium e registrar o que se sabe de Safari e Firefox. *Capacidades, item 5.*
+- [ ] **F8.5 Segundo idioma parcial.** `complete: false` em `lib/i18n/locales.ts`, o `check-catalogs` avisando em vez de falhar, chaves faltantes recebendo o pt-BR no build, relatório do quanto falta; `formatMoney(cents, currency, locale)` e datas pelo idioma; caminhos públicos em inglês no mapa (`/en/plans`). *Capacidades, item 4; SEO, item 1.*
+
+### F9. Fechamento
+
+- [ ] **F9.1 Retenção do backup no `setup:product`.** A pergunta, e o valor escrito no README e na política de privacidade. *Infraestrutura, item 3.*
+- [ ] **F9.2 SRI.** Prova em branch descartável do `experimental.sri` do Next com a casca estática. Se funcionar sem renderização dinâmica, ligar; se não, registrar por quê. *Infraestrutura, item 2.*
+- [ ] **F9.3 Relatório final.** `pnpm verify` verde; o que sobrou de "Depende de você" e "Fora do loop" vai para uma seção "Pendências externas" do `BASE.md`; este arquivo é apagado num commit próprio (`chore: remove the work list`).
+
+## Fora do loop
+
+Itens das seções abaixo que o loop não faz, e por quê. Ficam como referência.
+
+- **Esperam um consumidor** (o knip recusa código sem uso): `generateSitemaps` em partes de 50 mil (SEO, item 3); port `indexing` com IndexNow (SEO, item 8); linha e heatmap nos gráficos.
+- **São do produto:** URLs atuais do lottery no mapa; JSON-LD de domínio (sorteio, curso); `/aprenda`, FAQ e glossários dos produtos; acesso por nível do solmiza, que usa o mecanismo de `features` e `limits` sem código novo; arquivos pagos do solmiza.
+- **Decididos contra:** Google Indexing API (só serve a `JobPosting` e `BroadcastEvent`); mutation testing com Stryker (não há matemática de prêmios na base); OpenAPI gerado (entra com o primeiro cliente de fora que o peça); experimentos A/B.
+- **Dependem de tempo em produção:** ligar a CSP de verdade depois de um período sem violações inesperadas.
+
+## Depende de você
+
+O loop marca a unidade com `⏸` e segue. Quando você puder, cada item destrava o que diz.
+
+- **Chaves de teste do Stripe e `stripe listen`:** prova no sandbox de F6 (preços por `lookup_key`, moedas, Pix com "Simulate scan" e CPF `000.000.000-00`, trial, disputa, cupons).
+- **Servidor real atrás do Traefik ou da Cloudflare:** IP e porta de origem do cliente (Marco Civil, rate limit), número de réplicas e custo da escrita por requisição.
+- **Projeto GCP:** aplicar `pnpm gcp:alerts` e `pnpm gcp:access-log` de verdade.
+- **Renovate:** instalar o app hospedado no repositório (F1.7 deixa a configuração pronta).
+
+## Decisões tomadas no loop
+
+(O loop acrescenta aqui, com a data, cada decisão nova que precisar tomar.)
+
+## Histórico
 
 ### Decisões tomadas (2026-10-08)
 
@@ -13,6 +156,7 @@ Arquivo temporário. Lista o que falta na base para que produtos como o lottery 
 - **Migração operacional fora do LEFT.md.** Backfill de usuários, mapa de enums, conversão de valores e tabelas de equivalência ficam em cada produto.
 - **Só o mecanismo na base.** Cores oficiais de terceiros, figuras e paletas de um domínio vivem no produto. A base traz o mecanismo com exemplos neutros, e a conferência de higiene do `BASE.md` continua passando.
 - **Presets visuais:** a proposta de valores de cada preset é feita no `/catalog`, com capturas nos dois temas, e aprovada antes de virar padrão.
+- **Sem experimentos A/B** (2026-10-09).
 
 ### Provas técnicas (feitas em 2026-10-09)
 
@@ -27,15 +171,7 @@ Cada uma num branch descartável (`spike/*`, fora da `main`). Todas passaram e n
 
 Achado que vale para o produto inteiro: sob `cacheComponents` com `partialPrefetching`, uma rota dinâmica com slug inexistente responde **200** com `noindex` e a tela de não encontrado, porque a casca já saiu. Um 404 de verdade exige checar o slug no `proxy.ts` (ver SEO, item 2).
 
-### Ordem entre seções
-
-1. Provas técnicas.
-2. `domain/`, relógio e aleatoriedade, hooks locais.
-3. Tokenizar as dimensões; accent com escopo; presets propostos no `/catalog`.
-4. Rate limit e helper de IP.
-5. Estado neutro de provedor, catálogo de planos e guardas (dependem de `domain/` e do rate limit).
-6. `payments`, paleta de dados e gráficos, e então a página "Números".
-7. O resto de cada seção, na ordem dela.
+# Especificação por seção
 
 ## Estrutura
 

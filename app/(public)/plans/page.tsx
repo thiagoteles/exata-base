@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
@@ -10,8 +11,10 @@ import { RuntimeMarker } from "@/components/runtime-marker";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
 import { catalog } from "@/domain/billing/catalog";
+import { chooseCurrency, currenciesToOffer, priceIn } from "@/domain/billing/currency";
 import { featuresOfTier, isPaidTier } from "@/domain/billing/entitlements";
 import { BuyButton } from "@/features/billing/buy-button";
+import { CurrencySwitch } from "@/features/billing/currency-switch";
 import { canBuy, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
@@ -19,7 +22,8 @@ import { publicHref } from "@/lib/i18n/public-paths";
 import { formatPrice, toCents } from "@/lib/money";
 import { getCurrentUser } from "@/lib/ports/auth";
 import { offeredIntervals, readPrices } from "@/lib/ports/payment";
-import type { Interval } from "@/lib/ports/payment/types";
+import type { Interval, PriceTag } from "@/lib/ports/payment/types";
+import { preferenceFromCookie, specFor } from "@/lib/preferences/resolve";
 import { signInRedirect } from "@/lib/routes";
 import { buildSocialMetadata } from "@/lib/social-metadata";
 import { faqData, productData } from "@/lib/structured-data";
@@ -77,6 +81,17 @@ async function Offers() {
     return <p className="text-body text-ink-muted">{t("none")}</p>;
   }
   const plan = user === null ? null : await readPlan(db, user.id);
+  const priceList = intervals.flatMap((interval) => prices[interval] ?? []);
+  const offered = currenciesToOffer(catalog.currencies.offered, priceList);
+  // The person's choice from the cookie the preference travels in, else the product's default.
+  const jar = await cookies();
+  const spec = specFor("currency", undefined);
+  const currency =
+    chooseCurrency({
+      preferred: preferenceFromCookie("currency", jar.get(spec.name)?.value),
+      defaultCurrency: catalog.currencies.default,
+      available: offered,
+    }) ?? catalog.currencies.default;
   const shown = intervals.filter((interval) => prices[interval] !== undefined);
   if (shown.length === 0) {
     return <p className="text-body text-ink-muted">{t("none")}</p>;
@@ -102,11 +117,13 @@ async function Offers() {
     return (
       <BuyButton
         interval={interval}
+        currency={currency}
         replacesSubscription={interval === "lifetime" && subscriptionOf(plan) !== null}
       />
     );
   };
 
+  const inCurrency = (price: PriceTag) => priceIn(price, currency);
   const freeHas = featuresOfTier("free");
   const paidHas = featuresOfTier(catalog.paidTier);
   const highlighted = shown.includes("yearly") ? "yearly" : shown[0];
@@ -129,7 +146,7 @@ async function Offers() {
         {
           id: interval,
           name: t(`names.${interval}`),
-          price: formatPrice(toCents(price.cents), price.currency),
+          price: formatPrice(toCents(inCurrency(price).cents), inCurrency(price).currency),
           unit: t(unitKey[interval]),
           highlighted: interval === highlighted,
           ...(note === undefined ? {} : { note }),
@@ -142,6 +159,11 @@ async function Offers() {
 
   return (
     <>
+      {offered.length > 1 ? (
+        <div className="mb-6">
+          <CurrencySwitch current={currency} options={offered} />
+        </div>
+      ) : null}
       <PricingTable
         caption={t("title")}
         featuresLabel={t("compare")}
@@ -158,7 +180,10 @@ async function Offers() {
             const price = prices[interval];
             return price === undefined
               ? []
-              : [{ name: t(`names.${interval}`), cents: price.cents, currency: price.currency }];
+              : offered.map((code) => ({
+                  name: t(`names.${interval}`),
+                  ...priceIn(price, code),
+                }));
           }),
         )}
       />

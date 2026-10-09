@@ -46,11 +46,20 @@ type CheckoutRequest = {
   customerId: string | null;
   interval: Interval;
   priceId: string;
+  /** The currency to charge in, when the price carries it. Absent means the price's own. */
+  currency?: string;
   successUrl: string;
   cancelUrl: string;
 };
 
-export type PriceTag = { priceId: string; lookupKey: string; cents: number; currency: string };
+export type PriceTag = {
+  priceId: string;
+  lookupKey: string;
+  cents: number;
+  currency: string;
+  /** The amount in each other currency the price carries, by lowercase code. */
+  options: Readonly<Record<string, number>>;
+};
 
 /** The shape every payment provider implements. */
 export type PaymentGateway = {

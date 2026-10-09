@@ -876,6 +876,10 @@
     "freeUnit": "sem prazo",
     "features": { "premium": "Conteúdo e recursos pagos" },
     "paywall": { "label": "Conteúdo de plano pago", "action": "Ver planos" },
+    "currency": {
+      "label": "Moeda dos preços",
+      "failed": "Não foi possível trocar a moeda. Tente de novo."
+    },
     "faq": {
       "title": "Sobre cobrança",
       "intro": "O que mais se pergunta antes de assinar.",

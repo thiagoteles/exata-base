@@ -1,5 +1,7 @@
 "use server";
 
+import { catalog } from "@/domain/billing/catalog";
+import { chooseCurrency, currenciesToOffer } from "@/domain/billing/currency";
 import { actionFor } from "@/lib/actions/client";
 import { canBuy, changeCancellation, readPlan } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
@@ -16,10 +18,17 @@ export const startCheckout = actionFor("member")
   .metadata({ name: "startCheckout" })
   .action(async ({ parsedInput, ctx }) => {
     const gateway = await requireGateway();
-    const price = (await readPrices())[parsedInput.interval];
+    const prices = await readPrices();
+    const price = prices[parsedInput.interval];
     if (price === undefined) {
       throw new DomainError(404, "planUnavailable");
     }
+    // What is charged is what was shown, but only if the product offers it and this price carries it.
+    const currency = chooseCurrency({
+      preferred: parsedInput.currency,
+      defaultCurrency: catalog.currencies.default,
+      available: currenciesToOffer(catalog.currencies.offered, [price]),
+    });
     const plan = await readPlan(db, ctx.user.id);
     if (!canBuy(plan, parsedInput.interval)) {
       throw new DomainError(409, "alreadyPaid");
@@ -30,6 +39,7 @@ export const startCheckout = actionFor("member")
       customerId: plan?.providerCustomerId ?? null,
       interval: parsedInput.interval,
       priceId: price.priceId,
+      ...(currency === undefined || currency === price.currency ? {} : { currency }),
       successUrl: `${env.APP_URL}/account/plan?checkout=success`,
       cancelUrl: `${env.APP_URL}${publicHref("/plans")}`,
     });

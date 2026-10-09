@@ -1,3 +1,4 @@
+import { catalog } from "@/domain/billing/catalog";
 import { isTimeZone } from "@/domain/calendar";
 import { defaultEmailPreferences, type EmailPreferences } from "@/domain/email/consent";
 import { MAX_STEP_ID_LENGTH, MAX_STEPS } from "@/domain/onboarding/steps";
@@ -97,6 +98,11 @@ export const preferences = {
   onboarding: definePreference<string[]>({
     schema: z.array(z.string().min(1).max(MAX_STEP_ID_LENGTH)).max(MAX_STEPS),
     fallback: [],
+  }),
+  // The currency prices are shown and charged in, when the product offers more than one.
+  currency: definePreference<string>({
+    schema: z.string().regex(/^[a-z]{3}$/),
+    fallback: catalog.currencies.default,
   }),
   locale: definePreference<(typeof locales)[number]>({
     schema: z.enum(locales),

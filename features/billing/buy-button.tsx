@@ -11,12 +11,14 @@ import { startCheckout } from "./actions";
 
 type Props = {
   interval: Interval;
+  /** The currency the plans page showed, so the charge matches the price on screen. */
+  currency?: string;
   /** The purchase ends a subscription the person already has, so it asks first. */
   replacesSubscription?: boolean;
 };
 
 /** Opens the provider's checkout. The browser leaves the site, so success is never shown here. */
-export function BuyButton({ interval, replacesSubscription = false }: Props) {
+export function BuyButton({ interval, currency, replacesSubscription = false }: Props) {
   const t = useTranslations("plans");
   const describe = useErrorText();
   const notify = useToast();
@@ -25,7 +27,10 @@ export function BuyButton({ interval, replacesSubscription = false }: Props) {
 
   const buy = async () => {
     setPending(true);
-    const result = await startCheckout({ interval });
+    const result = await startCheckout({
+      interval,
+      ...(currency === undefined ? {} : { currency }),
+    });
     if (result?.data !== undefined) {
       globalThis.location.assign(result.data.url);
       return;

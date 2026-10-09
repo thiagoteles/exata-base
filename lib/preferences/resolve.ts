@@ -45,6 +45,17 @@ export function specFor(key: string, declared: CookieSpec | undefined): CookieSp
 const cookieSpec = (key: PreferenceKey): CookieSpec =>
   specFor(key, (preferences[key] as { cookie?: CookieSpec }).cookie);
 
+/** What a cookie says about a preference, or undefined when it is missing or does not fit the registry. */
+export function preferenceFromCookie<K extends PreferenceKey>(
+  key: K,
+  raw: string | undefined,
+): PreferenceValue<K> | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+  return savedPreference({ [key]: cookieSpec(key).decode(raw) }, key);
+}
+
 /** The saved value of one preference, or undefined when none was saved or it does not parse. */
 export function savedPreference<K extends PreferenceKey>(
   stored: Stored,

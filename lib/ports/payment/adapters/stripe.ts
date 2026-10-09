@@ -123,6 +123,7 @@ export function createStripeGateway({ secretKey, webhookSecret }: Options): Paym
       const session = await stripe.checkout.sessions.create({
         mode: lifetime ? "payment" : "subscription",
         line_items: [{ price: request.priceId, quantity: 1 }],
+        ...(request.currency === undefined ? {} : { currency: request.currency }),
         client_reference_id: request.userId,
         metadata: { interval: request.interval },
         success_url: request.successUrl,
@@ -180,6 +181,7 @@ export function createStripeGateway({ secretKey, webhookSecret }: Options): Paym
         lookup_keys: [...lookupKeys],
         active: true,
         limit: lookupKeys.length,
+        expand: ["data.currency_options"],
       });
       return prices.data.flatMap((price) =>
         price.unit_amount === null || price.lookup_key === null
@@ -190,6 +192,13 @@ export function createStripeGateway({ secretKey, webhookSecret }: Options): Paym
                 lookupKey: price.lookup_key,
                 cents: price.unit_amount,
                 currency: price.currency,
+                options: Object.fromEntries(
+                  Object.entries(price.currency_options ?? {}).flatMap(([code, option]) =>
+                    option.unit_amount === null || option.unit_amount === undefined
+                      ? []
+                      : [[code.toLowerCase(), option.unit_amount] as const],
+                  ),
+                ),
               },
             ],
       );

@@ -17,6 +17,7 @@ const defaults = {
   timeZone: "America/Sao_Paulo",
   email: { reminders: true, news: false },
   contactDraft: null,
+  currency: "brl",
   onboarding: [],
   locale: "pt-BR",
 };
@@ -115,5 +116,16 @@ describe("resolving what is stored", () => {
       parsePreference("contactDraft", { subject: "", body: "x".repeat(5001) }),
     ).toThrow();
     expect(() => parsePreference("contactDraft", { body: "sem assunto" })).toThrow();
+  });
+});
+
+describe("reading a preference from its cookie", () => {
+  it("takes a value that fits the registry and ignores one that does not, or none at all", async () => {
+    const { preferenceFromCookie } = await import("./resolve");
+    expect(preferenceFromCookie("currency", JSON.stringify("usd"))).toBe("usd");
+    expect(preferenceFromCookie("currency", JSON.stringify("DOLAR"))).toBeUndefined();
+    expect(preferenceFromCookie("currency", "not json")).toBeUndefined();
+    expect(preferenceFromCookie("currency", undefined)).toBeUndefined();
+    expect(preferenceFromCookie("theme", "dark")).toBe("dark");
   });
 });

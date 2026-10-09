@@ -39,11 +39,18 @@ export const catalog = {
     "paid.yearly": "paid_yearly",
     "paid.lifetime": "paid_lifetime",
   },
+  /**
+   * The currency prices are shown in by default, and the ones the product offers a person to choose
+   * from. A currency is offered only where every price carries it (a price's currency options are set at
+   * the provider). Start with the default alone; add a code when the prices have it.
+   */
+  currencies: { default: "brl", offered: ["brl"] },
   /** The tier the checkout sells and a courtesy grants, until prices name their own tier. */
   paidTier: "paid",
 } as const satisfies {
   tiers: { free: TierDefinition } & Record<string, TierDefinition>;
   prices: Readonly<Record<string, string>>;
+  currencies: { default: string; offered: readonly string[] };
   paidTier: string;
 };
 

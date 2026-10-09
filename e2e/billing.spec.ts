@@ -76,7 +76,11 @@ test("the catalog's paid block stays shut for the free plan and points to the pl
     has: page.getByRole("heading", { name: "Plano pago" }),
   });
   await expect(block.getByRole("heading", { name: "Este bloco é do plano pago" })).toBeVisible();
-  await expect(block.getByRole("link", { name: "Ver planos" })).toHaveAttribute("href", "/planos");
+  // The link says where the offer was seen, so the purchase can be traced back to it.
+  await expect(block.getByRole("link", { name: "Ver planos" })).toHaveAttribute(
+    "href",
+    "/planos?source=catalog",
+  );
 });
 
 test("the payment webhook accepts nothing while billing is off", async ({ request }) => {

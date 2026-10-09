@@ -7,6 +7,7 @@ export default defineConfig({
     // Files written by storage tests stay out of the development folder.
     env: { STORAGE_DIR: ".storage-test" },
     include: ["**/*.test.{ts,tsx}"],
-    exclude: ["node_modules/**", ".next/**", "e2e/**", "tests/integration/**"],
+    // Agent worktrees live under .claude and carry their own node_modules.
+    exclude: ["node_modules/**", ".next/**", ".claude/**", "e2e/**", "tests/integration/**"],
   },
 });

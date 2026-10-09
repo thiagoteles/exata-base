@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import { applyPaymentEvent } from "@/lib/billing/service";
+import { applyPaymentEvent } from "@/lib/billing/events";
 import type { Database } from "@/lib/db/database";
 import { createStripeGateway } from "@/lib/ports/payment/adapters/stripe";
 import { createUser } from "./factories";

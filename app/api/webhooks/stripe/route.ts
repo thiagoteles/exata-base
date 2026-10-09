@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
+import { applyPaymentEvent, type Effects } from "@/lib/billing/events";
 import { sendTrialEnding } from "@/lib/billing/mailer";
-import { applyPaymentEvent, type Effects } from "@/lib/billing/service";
 import { cacheTags } from "@/lib/cache-tags";
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
@@ -13,6 +13,15 @@ import { timedRoute } from "@/lib/timed-route";
 
 /** What a delivery caused, done once it is committed: events to count, an e-mail to send. */
 async function announce(effects: Effects): Promise<void> {
+  if (effects.dispute !== null) {
+    // An error on purpose: the error reporter turns it into an alert, and a dispute has a deadline.
+    logger.error("payment disputed", {
+      paymentId: effects.dispute.paymentId,
+      amountCents: effects.dispute.amountCents,
+      reason: effects.dispute.reason,
+      recorded: effects.dispute.known,
+    });
+  }
   if (effects.trialStarted !== null) {
     sendEvent({
       name: "trial_started",

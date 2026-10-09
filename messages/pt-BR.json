@@ -1092,7 +1092,8 @@
         "statuses": {
           "paid": "Pago",
           "partially_refunded": "Reembolso parcial",
-          "refunded": "Reembolsado"
+          "refunded": "Reembolsado",
+          "disputed": "Em disputa"
         },
         "withdrawal": "Dentro do prazo de arrependimento até {date}. Pedido nesse prazo, o reembolso integral é direito da pessoa."
       }

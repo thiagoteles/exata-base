@@ -23,6 +23,8 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
   | { kind: "checkout_pending"; userId: string; interval: Interval }
   /** A pending payment will not arrive: the code expired, or the bank refused it. */
   | { kind: "checkout_failed"; userId: string }
+  /** The customer's bank questioned a charge: the money is held and a reply is owed to the provider. */
+  | { kind: "dispute_created"; paymentId: string; amountCents: number; reason: string }
   /** The trial of a subscription is about to end and the first charge is near. */
   | { kind: "trial_ending"; subscriptionId: string; endsAt: Date }
   | { kind: "invoice_paid"; subscriptionId: string; periodEnd: Date | null }

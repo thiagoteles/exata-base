@@ -9,6 +9,7 @@ const statusTone: Record<Payment["status"], StampTone> = {
   paid: "success",
   partially_refunded: "warning",
   refunded: "neutral",
+  disputed: "danger",
 };
 
 const knownMethods = ["card", "pix", "boleto"] as const;

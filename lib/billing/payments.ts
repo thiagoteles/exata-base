@@ -90,6 +90,30 @@ export async function recordRefund(
   return added > 0 ? { payerId: payment.payerId, cents: added, currency: payment.currency } : null;
 }
 
+/** A dispute on a charge: what the alert needs, never who the person is. */
+export type NewDispute = { paymentId: string; amountCents: number; reason: string; known: boolean };
+
+/**
+ * Marks the payment as disputed, so nobody reads it as settled money. A dispute for a charge this
+ * database never saw is still returned, with `known: false`: the provider has it, and it still needs an answer.
+ */
+export async function recordDispute(
+  tx: Transaction,
+  event: Extract<PaymentEvent, { kind: "dispute_created" }>,
+): Promise<NewDispute> {
+  const marked = await tx
+    .update(payments)
+    .set({ status: "disputed" })
+    .where(eq(payments.providerPaymentId, event.paymentId))
+    .returning({ id: payments.id });
+  return {
+    paymentId: event.paymentId,
+    amountCents: event.amountCents,
+    reason: event.reason,
+    known: marked.length > 0,
+  };
+}
+
 /** Ties the payments of a provider customer that arrived before the checkout to the person. */
 export async function linkPayments(
   tx: Transaction,

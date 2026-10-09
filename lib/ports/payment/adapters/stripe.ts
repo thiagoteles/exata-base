@@ -130,6 +130,18 @@ function toPaymentEvent(event: Stripe.Event): PaymentEvent {
         ? { ...base, kind: "ignored" }
         : { ...base, kind: "checkout_failed", userId };
     }
+    case "charge.dispute.created": {
+      const paymentId = idOf(event.data.object.charge);
+      return paymentId === null
+        ? { ...base, kind: "ignored" }
+        : {
+            ...base,
+            kind: "dispute_created",
+            paymentId,
+            amountCents: event.data.object.amount,
+            reason: event.data.object.reason,
+          };
+    }
     case "customer.subscription.trial_will_end": {
       const { trial_end: trialEnd, id } = event.data.object;
       return trialEnd === null

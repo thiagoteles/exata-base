@@ -72,7 +72,12 @@ export const paymentEvents = pgTable("payment_events", {
   receivedAt: createdAt(),
 });
 
-export const paymentStatus = pgEnum("payment_status", ["paid", "partially_refunded", "refunded"]);
+export const paymentStatus = pgEnum("payment_status", [
+  "paid",
+  "partially_refunded",
+  "refunded",
+  "disputed",
+]);
 
 /*
  * Every charge the provider confirmed, kept locally so revenue, a person's history and the

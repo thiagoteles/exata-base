@@ -130,3 +130,13 @@ export const trialWillEnd = (id: string, subscription: string, trialEndSeconds: 
     object: "subscription",
     trial_end: trialEndSeconds,
   });
+
+export const disputeCreated = (id: string, charge: string, amount = 1000) =>
+  event(id, "charge.dispute.created", {
+    id: `dp_${id}`,
+    object: "dispute",
+    charge,
+    amount,
+    reason: "fraudulent",
+    status: "needs_response",
+  });

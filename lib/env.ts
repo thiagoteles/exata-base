@@ -74,6 +74,8 @@ const server = {
 
   UMAMI_WEBSITE_ID: z.uuid().optional(),
   UMAMI_SCRIPT_URL: z.url().optional(),
+  // The token Search Console gives for the meta tag method; it goes on the home page only.
+  GOOGLE_SITE_VERIFICATION: z.string().min(1).optional(),
 
   STORAGE_DIR: z.string().min(1).default(".storage"),
   FILE_URL_SECRET: z.string().min(32).default("local-development-file-url-secret"),

@@ -146,6 +146,17 @@ export const integrations: readonly Integration[] = [
       { name: "UMAMI_SCRIPT_URL", label: "Umami script address", check: url },
     ],
   },
+  {
+    id: "search-console",
+    question: "Google Search Console, verified by meta tag",
+    fields: [
+      {
+        name: "GOOGLE_SITE_VERIFICATION",
+        label: "Verification token (the content of the meta tag)",
+        check: nonEmpty,
+      },
+    ],
+  },
 ];
 
 /** Asked of every product, whichever services it turns on. */

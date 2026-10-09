@@ -468,11 +468,11 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 2. Metadados completos
 
-- [ ] `type` (`website | article`), `publishedTime` e `modifiedTime` no `buildSocialMetadata`.
-- [ ] Locale vindo do pedido e `alternates.languages` (`hreflang`) com mais de um idioma.
-- [ ] Opção `index: false` para buscas filtradas, páginas paginadas além da primeira e páginas sem conteúdo.
+- [x] `type` (`website | article`), `publishedTime` e `modifiedTime` no `buildSocialMetadata`.
+- [x] Locale vindo do pedido e `alternates.languages` (`hreflang`) com mais de um idioma.
+- [x] Opção `index: false` para buscas filtradas, páginas paginadas além da primeira e páginas sem conteúdo.
 - [x] `canonical` normalizado, sem parâmetros de filtro ou de rastreamento, e com o endereço de execução (antes saía com o host do build).
-- [ ] `GOOGLE_SITE_VERIFICATION` em `lib/env.ts` para o Search Console.
+- [x] `GOOGLE_SITE_VERIFICATION` em `lib/env.ts` para o Search Console (só na página inicial, onde o Google procura).
 - [ ] **404 de verdade em rota dinâmica:** sob `cacheComponents`, slug inexistente responde 200 com `noindex`. O `proxy.ts` confere o slug contra uma lista gerada no build (ou uma consulta barata) e responde 404 antes da casca. `dynamicParams = false` é recusado sob `cacheComponents`.
 
 ### 3. Sitemap por fontes

@@ -97,6 +97,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `GCP_CREDENTIALS`, `GCP_PROJECT`, `GCS_BUCKET` | no | All three. The service account JSON in base64; turns on Cloud Logging and Cloud Storage (a private bucket with uniform access) |
 | `FILE_URL_SECRET` | without a bucket | At least 32 characters. Signs file links when files are on disk |
 | `UMAMI_WEBSITE_ID`, `UMAMI_SCRIPT_URL` | no | Together. Turns on analytics |
+| `GOOGLE_SITE_VERIFICATION` | no | The token of Search Console's meta tag method; shown on the home page |
 | `UPLOAD_MAX_MB`, `UPLOAD_TYPES` | no | Upload limit (10) and accepted types |
 
 ## Daily operations

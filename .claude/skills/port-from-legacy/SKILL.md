@@ -21,7 +21,11 @@ commit, so a port is reviewable and can be undone.
 2. **Take out what the base already does.** Sign-in, roles, plans, rate limits, logging, error
    reports, e-mail, analytics and file storage come from the base. Do not carry the old project's
    copy over; call the base's.
-3. **Move the text to the catalog** (`new-text-key`). Notation that belongs to the domain (note
+3. **Move the text to the catalog** (`new-text-key`). For a component full of literals, run
+   `pnpm extract-text <file> --area <area>` first: it lists the sentences it finds in JSX and in
+   `aria-label`, `placeholder`, `title` and `alt`, and `--write` moves them to
+   `messages/pt-BR/<area>.json` and leaves `t("key")` behind. Read the keys it proposes (they come from
+   the first words, and a good key names the sentence's job), and it refuses an em dash. Notation that belongs to the domain (note
    names, codes, abbreviations) stays in a domain function and is not catalog text. No em dash.
 4. **Take the clock and randomness out.** `new Date()`, `Date.now()` and `Math.random()` become
    parameters: an entry point reads the clock once with `currentInstant()` and passes it down, and

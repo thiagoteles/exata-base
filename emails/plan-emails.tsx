@@ -44,3 +44,33 @@ export function trialEndingMessage(
     ),
   };
 }
+
+/**
+ * A reminder, sent once, to someone who started to subscribe and did not finish. It is a reminder
+ * (about their own activity), so it carries the way to turn such notices off.
+ */
+export function abandonedCheckoutMessage(
+  { name, plansUrl }: { name: string; plansUrl: string },
+  t: EmailTranslator = emailTranslator(),
+) {
+  return {
+    subject: t("abandonedCheckout.subject"),
+    element: (
+      <ActionEmail
+        preview={t("abandonedCheckout.preview")}
+        greeting={
+          name === "" ? t("greetingWithoutName") : t("abandonedCheckout.greeting", { name })
+        }
+        body={t("abandonedCheckout.body")}
+        action={t("abandonedCheckout.action")}
+        url={plansUrl}
+        ignore={t("abandonedCheckout.ignore")}
+        footer={t("layout.footer")}
+        unsubscribe={{
+          reason: t("layout.unsubscribe.reason"),
+          action: t("layout.unsubscribe.action"),
+        }}
+      />
+    ),
+  };
+}

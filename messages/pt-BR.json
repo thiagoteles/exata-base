@@ -65,6 +65,14 @@
       "ignore": "Se você não pediu a troca, sua senha continua a mesma e pode ignorar esta mensagem."
     },
     "greetingWithoutName": "Olá.",
+    "abandonedCheckout": {
+      "subject": "Seu plano ficou esperando",
+      "preview": "Você começou a assinar e não terminou.",
+      "greeting": "Olá, {name}",
+      "body": "Você começou a assinar e não terminou. O plano continua à sua espera, a um passo de distância.",
+      "action": "Voltar ao plano",
+      "ignore": "Se mudou de ideia, tudo bem: não vamos mandar outro lembrete sobre isso."
+    },
     "trialEnding": {
       "subject": "Seu teste gratuito termina em {date}",
       "preview": "Seu teste gratuito termina em {date}.",

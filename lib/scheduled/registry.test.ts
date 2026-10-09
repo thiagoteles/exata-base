@@ -4,7 +4,10 @@ import heartbeats from "@/ops/gcp/heartbeats.json";
 import { scheduledOperations } from "./registry";
 
 // The registry only needs the operations' names and cadences, not a way to send e-mail.
-vi.mock("@/lib/billing/mailer", () => ({ sendPlanExpiring: () => Promise.resolve(true) }));
+vi.mock("@/lib/billing/mailer", () => ({
+  sendPlanExpiring: () => Promise.resolve(true),
+  sendAbandonedCheckout: () => Promise.resolve("sent"),
+}));
 
 describe("the scheduled operations", () => {
   it("have names of their own, and a cadence the host knows", () => {

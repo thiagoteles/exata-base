@@ -1,3 +1,4 @@
+import { remindAbandonedCheckouts } from "./abandoned-checkouts";
 import { expireFixedTerms, warnExpiringTerms } from "./fixed-terms";
 import { purgeExpiredInvites } from "./purge-invites";
 import { purgeRateLimits } from "./purge-rate-limits";
@@ -13,4 +14,5 @@ export const scheduledOperations: readonly ScheduledOperation[] = [
   purgeRateLimits,
   warnExpiringTerms,
   expireFixedTerms,
+  remindAbandonedCheckouts,
 ];

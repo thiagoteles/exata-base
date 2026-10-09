@@ -92,6 +92,8 @@ export const checkoutSessions = pgTable(
     trialDays: integer().notNull().default(0),
     /* When it stopped being open: paid, expired or failed. */
     closedAt: instant(),
+    /* When the reminder about this abandoned checkout was claimed, so it is sent once. */
+    abandonedEmailAt: instant(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

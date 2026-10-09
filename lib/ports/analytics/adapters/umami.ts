@@ -20,7 +20,7 @@ const userAgent = "Mozilla/5.0 (compatible; ServerEvents/1.0)";
  */
 export function umamiSink(options: UmamiOptions): AnalyticsSink {
   const send = options.fetch ?? globalThis.fetch;
-  const hostname = new URL(options.appUrl).hostname;
+  const { hostname } = new URL(options.appUrl);
   return async (event) => {
     try {
       const response = await send(new URL("/api/send", options.origin), {

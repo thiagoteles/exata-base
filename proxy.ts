@@ -3,10 +3,12 @@ import { env } from "@/lib/env";
 import { isMultilingual, LOCALE_HEADER } from "@/lib/i18n/locales";
 import { decideLanguage, redirectToLanguage, rememberLocale } from "@/lib/i18n/proxy";
 import { internalPathOf, publicPathOf } from "@/lib/i18n/public-paths";
+import { isMissingPage } from "@/lib/known-pages";
 import { authProxy } from "@/lib/ports/auth/proxy";
 import { REQUEST_ID_HEADER, requestIdFrom } from "@/lib/request-id";
 
 const PERMANENT = 301;
+const MISSING_PAGE = "/_missing";
 // Marks a request this proxy already rewrote. In production Next passes a rewritten request through
 // the proxy again to resume a prerendered page, now at the route address; without the mark that
 // second pass would answer the route address with the redirect, and the page would never load. A
@@ -37,6 +39,11 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   // is served from its route, and the auth guard below sees that route address.
   const clean = new URL(request.url);
   clean.pathname = internalPathOf(unprefixed) ?? unprefixed;
+  // A dynamic page that does not exist is sent where no route matches, so Next answers its
+  // not-found page with a real 404 instead of a 200 shell that later says "not found".
+  if (isMissingPage(clean.pathname)) {
+    clean.pathname = MISSING_PAGE;
+  }
   const rewritten = clean.pathname !== visible;
   const seen = rewritten ? new NextRequest(clean, request) : request;
   return authProxy(seen, event, (forwarded) => {

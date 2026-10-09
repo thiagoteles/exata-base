@@ -1,3 +1,4 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { locales } from "./lib/i18n/locales";
@@ -34,4 +35,15 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+/*
+ * Editorial content is MDX. Plugins are named by string because Turbopack runs the loader in a
+ * separate process and cannot receive functions. The YAML block at the top of a file becomes the
+ * `frontmatter` export, which the page validates before rendering.
+ */
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: ["remark-frontmatter", "remark-mdx-frontmatter"],
+  },
+});
+
+export default withNextIntl(withMDX(nextConfig));

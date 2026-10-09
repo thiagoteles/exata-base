@@ -1,3 +1,5 @@
+import { articleSitemap } from "./content/articles";
+
 /*
  * Public pages that come from the database register here, one source per area, each returning
  * its route addresses and when each last changed. The sitemap joins them with the fixed pages
@@ -9,5 +11,5 @@ export type SitemapEntry = { path: `/${string}`; lastModified?: Date };
 
 export type SitemapSource = { name: string; entries: () => Promise<readonly SitemapEntry[]> };
 
-/** Every source of database pages. A product adds one per public area (results, articles). */
-export const sitemapSources: readonly SitemapSource[] = [];
+/** Every source of generated or database pages. A product adds one per public area. */
+export const sitemapSources: readonly SitemapSource[] = [articleSitemap];

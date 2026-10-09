@@ -150,7 +150,7 @@ Combinações completas e testadas. O produto escolhe um preset mais as sementes
 ### 4. Componentes que faltam
 
 - [ ] **Primitivos** sobre Radix em `components/ui`: tabs, stepper, date picker, slider, progress/meter, accordion, checkbox, radio e switch (se faltarem), skeleton, chip removível e breadcrumb.
-- [ ] **Padrões do site público:** hero, seções de conteúdo, tabela de preços, FAQ e um **layout de leitura (prose)** com tokens próprios (`/aprenda` do lottery, glossário do solmiza).
+- [ ] **Padrões do site público:** hero, seções de conteúdo, tabela de preços, FAQ. O **layout de leitura (prose)** está feito (`mdx-components.tsx`).
 - [x] **Gráficos em SVG** (`components/charts`): colunas, barras, sparkline e stat tile, usando a paleta de dados, sem biblioteca. Linha e heatmap entram com o primeiro consumidor.
 - [ ] **Figuras de domínio** (`components/figures`): a família existe na base com as regras e um exemplo neutro; as figuras de cada produto (diagramas, bolas, instrumentos) vivem no produto. `color-mix(in oklch, var(--color-x) N%, transparent)` permitido sobre tokens.
 - [ ] **Texto dentro de SVG** (`<text>`) vindo do catálogo, sem esbarrar no `noJsxLiterals`.
@@ -473,7 +473,7 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [x] Opção `index: false` para buscas filtradas, páginas paginadas além da primeira e páginas sem conteúdo.
 - [x] `canonical` normalizado, sem parâmetros de filtro ou de rastreamento, e com o endereço de execução (antes saía com o host do build).
 - [x] `GOOGLE_SITE_VERIFICATION` em `lib/env.ts` para o Search Console (só na página inicial, onde o Google procura).
-- [ ] **404 de verdade em rota dinâmica:** sob `cacheComponents`, slug inexistente responde 200 com `noindex`. O `proxy.ts` confere o slug contra uma lista gerada no build (ou uma consulta barata) e responde 404 antes da casca. `dynamicParams = false` é recusado sob `cacheComponents`.
+- [x] **404 de verdade em rota dinâmica** (`lib/known-pages.ts`, conferido no `pnpm verify` em produção): sob `cacheComponents`, slug inexistente responde 200 com `noindex`. O `proxy.ts` confere o slug contra uma lista gerada no build (ou uma consulta barata) e responde 404 antes da casca. `dynamicParams = false` é recusado sob `cacheComponents`.
 
 ### 3. Sitemap por fontes
 
@@ -517,10 +517,10 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 9. Conteúdo editorial em MDX
 
-- [ ] Textos de interface continuam no `messages/pt-BR.json`.
-- [ ] Conteúdo longo em `content/<locale>/<área>/*.mdx`, com frontmatter validado por zod (título, descrição, datas, autor) e o layout de leitura do design system.
+- [x] Textos de interface continuam no `messages/pt-BR.json`.
+- [x] Conteúdo longo em `content/<locale>/<área>/*.mdx`, com frontmatter validado por zod (título, descrição, datas, autor) e o layout de leitura do design system. Na base, a área `/artigos`, com índice gerado por `pnpm content`.
 - [ ] Atende `/aprenda`, FAQ e glossário do lottery, e glossário e referência do solmiza.
-- [ ] Declarar a exceção à regra do catálogo no `AGENTS.md`.
+- [x] Declarar a exceção à regra do catálogo no `AGENTS.md`.
 - [x] **Provado em dev e build:** `@next/mdx` com Turbopack, frontmatter YAML por `remark-frontmatter` e `remark-mdx-frontmatter` passados por nome (texto), o módulo importado como `unknown` e validado inteiro por zod. Frontmatter inválido derruba o build daquela página. A página sai como pré-renderização parcial.
 - [x] Conferência de travessão nos `.mdx` (caractere e entidades HTML, frontmatter incluso), no `pnpm check`.
 - [ ] Mensagens de erro do zod saem como a chave do catálogo (`{"key":"required"}`), com o caminho do campo: legível para quem escreve, mas pode ganhar um formatador próprio para conteúdo.

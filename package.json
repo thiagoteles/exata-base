@@ -12,7 +12,7 @@
     "format": "biome check --write .",
     "knip": "knip",
     "test": "vitest run",
-    "check": "pnpm typecheck && pnpm lint && pnpm lint:tokens && pnpm tokens:check && pnpm lint:migrations && pnpm lint:catalogs && pnpm knip && pnpm test",
+    "check": "pnpm typecheck && pnpm lint && pnpm lint:tokens && pnpm tokens:check && pnpm content:check && pnpm lint:migrations && pnpm lint:catalogs && pnpm knip && pnpm test",
     "check:full": "pnpm check && pnpm test:integration && pnpm test:e2e",
     "check:prerender": "tsx scripts/check-prerender.ts",
     "verify": "bash scripts/verify.sh",
@@ -26,6 +26,8 @@
     "setup:product": "tsx scripts/setup-product.mts",
     "tokens": "tsx scripts/tokens.ts",
     "tokens:check": "tsx scripts/tokens.ts --check",
+    "content": "tsx scripts/content.ts",
+    "content:check": "tsx scripts/content.ts --check",
     "test:clerk": "playwright test --config playwright.clerk.config.ts"
   },
   "dependencies": {
@@ -35,6 +37,9 @@
     "@google-cloud/logging": "12.1.0",
     "@google-cloud/storage": "8.2.0",
     "@hookform/resolvers": "5.9.1",
+    "@mdx-js/loader": "3.1.1",
+    "@mdx-js/react": "3.1.1",
+    "@next/mdx": "16.4.0",
     "@react-email/components": "1.0.12",
     "@react-email/render": "2.1.0",
     "@t3-oss/env-nextjs": "0.13.11",
@@ -55,6 +60,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-hook-form": "7.89.0",
+    "remark-frontmatter": "5.0.0",
+    "remark-mdx-frontmatter": "6.0.0",
     "schema-dts": "2.0.0",
     "server-only": "0.0.1",
     "sharp": "0.35.5",
@@ -74,6 +81,7 @@
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.7",
     "@types/culori": "4.0.1",
+    "@types/mdx": "2.0.14",
     "@types/node": "24.19.1",
     "@types/nodemailer": "8.0.2",
     "@types/react": "19.3.0",
@@ -89,7 +97,8 @@
     "testcontainers": "12.2.0",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vitest": "5.0.3"
+    "vitest": "5.0.3",
+    "yaml": "2.9.1"
   },
   "packageManager": "pnpm@10.33.2",
   "engines": {

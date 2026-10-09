@@ -16,12 +16,15 @@ export function PublicFooter({
     <footer className="border-t border-line">
       <div className="mx-auto flex w-full max-w-310 flex-col gap-2 px-4 py-8 text-body-small text-ink-muted md:flex-row md:items-center md:justify-between md:px-8">
         <p>{t("site.name")}</p>
-        <nav aria-label={t("nav.footer")} className="flex gap-6">
+        <nav aria-label={t("nav.footer")} className="flex flex-wrap gap-x-6 gap-y-2">
           {showPlans ? (
             <Link href={publicHref("/plans")} className="hover:text-ink">
               {t("nav.plans")}
             </Link>
           ) : null}
+          <Link href={publicHref("/articles")} className="hover:text-ink">
+            {t("nav.articles")}
+          </Link>
           <Link href={publicHref("/contact")} className="hover:text-ink">
             {t("nav.contact")}
           </Link>

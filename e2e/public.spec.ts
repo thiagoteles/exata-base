@@ -146,3 +146,18 @@ test("the home page describes the organization to search engines", async ({ page
   expect(data.map((item) => item["@type"])).toEqual(["Organization", "WebSite"]);
   expect(data[0]?.url).toBe("http://localhost:3300/");
 });
+
+test("articles list, open with their reading layout, and a missing one is a real 404", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/artigos");
+  await expect(page.getByRole("heading", { level: 1, name: "Artigos" })).toBeVisible();
+  await page.getByRole("link", { name: "Como escrever um artigo" }).click();
+  await expect(page).toHaveURL(/\/artigos\/como-escrever-um-artigo$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Como escrever um artigo" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "O topo do arquivo" })).toBeVisible();
+  expect((await request.get("/artigos/nao-existe")).status()).toBe(404);
+});

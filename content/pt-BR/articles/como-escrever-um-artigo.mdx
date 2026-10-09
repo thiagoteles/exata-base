@@ -1,0 +1,29 @@
+---
+title: Como escrever um artigo
+description: O que vai no topo de cada arquivo, onde ele mora e como ele chega ao site.
+publishedAt: 2026-10-09
+author: Equipe
+---
+
+Cada artigo é um arquivo `.mdx` na pasta `content/pt-BR/articles`. O nome do arquivo vira o
+endereço: este aqui responde em `/artigos/como-escrever-um-artigo`.
+
+## O topo do arquivo
+
+O bloco entre as linhas de traços diz o título, uma frase de descrição, a data de publicação e
+quem escreveu. A data de atualização é opcional. Se faltar um campo ou uma data vier errada, o
+`pnpm check` para e diz qual arquivo e qual campo.
+
+## O texto
+
+Escreva em Markdown: parágrafos, listas, links e títulos de seção. Cada elemento já sai com a
+tipografia de leitura do sistema, numa coluna de no máximo 680 pixels.
+
+- Use títulos de seção para quem lê pulando.
+- Prefira frases curtas.
+- Nada de travessão: use vírgula, ponto ou hífen.
+
+## Depois de salvar
+
+Rode `pnpm content` para atualizar o índice. O artigo entra na lista, no sitemap e nos dados
+para buscadores, com as datas do topo.

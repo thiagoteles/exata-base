@@ -13,6 +13,8 @@ export const publicPaths = {
   "/contact": "/contato",
   "/privacy": "/privacidade",
   "/terms": "/termos",
+  "/articles": "/artigos",
+  "/articles/[slug]": "/artigos/[slug]",
 } as const;
 
 type MappedRoute = keyof typeof publicPaths;

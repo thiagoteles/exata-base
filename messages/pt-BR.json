@@ -342,7 +342,8 @@
     },
     "contact": "Contato",
     "plans": "Planos",
-    "language": "Idioma"
+    "language": "Idioma",
+    "articles": "Artigos"
   },
   "home": {
     "title": "O dia a dia organizado, sem enfeite",
@@ -831,5 +832,14 @@
       "day": "Dia",
       "value": "Valor"
     }
+  },
+  "articles": {
+    "title": "Artigos",
+    "subtitle": "Textos para ler com calma, do mais novo para o mais antigo.",
+    "empty": "Ainda não há artigos.",
+    "published": "Publicado em {date}",
+    "updated": "Atualizado em {date}",
+    "by": "Por {author}",
+    "all": "Todos os artigos"
   }
 }

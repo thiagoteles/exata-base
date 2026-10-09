@@ -1,4 +1,5 @@
-import type { Organization, WebSite, WithContext } from "schema-dts";
+import type { Article, Organization, WebSite, WithContext } from "schema-dts";
+import type { Frontmatter } from "./content/frontmatter";
 
 /*
  * Typed builders for schema.org data, so a page describes itself to search engines in the shape
@@ -28,5 +29,18 @@ export function websiteData(appUrl: string, name: string): WithContext<WebSite> 
     name,
     url: new URL("/", appUrl).toString(),
     inLanguage: "pt-BR",
+  };
+}
+
+export function structuredArticle(url: string, article: Frontmatter): WithContext<Article> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.description,
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt ?? article.publishedAt,
+    author: { "@type": "Organization", name: article.author },
+    mainEntityOfPage: url,
   };
 }

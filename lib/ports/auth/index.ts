@@ -49,7 +49,7 @@ async function loadAdapter(): Promise<AuthAdapter> {
       if (stored.created) {
         signedUp(stored.id);
       }
-    });
+    }, env.CLERK_PUBLISHABLE_KEY);
   }
   const [{ localAdapter }, auth] = await Promise.all([import("./adapters/local"), localAuth()]);
   return localAdapter(auth);
@@ -174,6 +174,14 @@ export const requestPasswordReset = async (input: { email: string }) =>
   (await passwordCredentials()).requestReset(input);
 export const resetPassword = async (input: { token: string; password: string }) =>
   (await passwordCredentials()).resetPassword(input);
+
+/** Who keeps the person's list of devices, and which one is this browser (local mode only). */
+export async function sessionAccess(): Promise<
+  { kind: "own"; currentId: string | null } | { kind: "external"; url: string | null }
+> {
+  const access = (await authAdapter()).sessionAccess;
+  return access.kind === "own" ? { kind: "own", currentId: await access.currentId() } : access;
+}
 
 /** The auth API under /api/auth. Exists only in local mode; Clerk answers 404. */
 export async function handleAuthRequest(request: Request): Promise<Response> {

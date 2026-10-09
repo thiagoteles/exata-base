@@ -525,6 +525,18 @@
       "always": "Mensagens sobre a sua conta e os seus pagamentos, como o link de confirmação e os recibos, são sempre enviadas.",
       "failed": "Não foi possível salvar a sua escolha de e-mails."
     },
+    "devices": {
+      "title": "Aparelhos conectados",
+      "help": "Os lugares onde a sua conta está aberta agora. Encerre os que você não reconhece.",
+      "unknown": "Aparelho desconhecido",
+      "thisOne": "Este aparelho",
+      "since": "Entrou em {date}",
+      "end": "Encerrar",
+      "endOthers": "Encerrar todos os outros",
+      "failed": "Não foi possível encerrar. Tente de novo.",
+      "external": "Os aparelhos conectados ficam no seu perfil, no serviço de acesso.",
+      "externalLink": "Abrir perfil"
+    },
     "referral": {
       "title": "Convide pessoas",
       "help": "Quem criar uma conta pelo seu link fica registrado como indicado por você.",

@@ -140,6 +140,13 @@ export function localAdapter(auth: LocalAuth): AuthAdapter {
   const handler = toNextJsHandler(auth);
   return {
     credentials: passwordCredentials(auth),
+    sessionAccess: {
+      kind: "own",
+      currentId: async () => {
+        const session = await auth.api.getSession({ headers: await headers() });
+        return session?.session.id ?? null;
+      },
+    },
     async identity() {
       const session = await auth.api.getSession({ headers: await headers() });
       return session === null ? null : { kind: "local", userId: session.user.id };

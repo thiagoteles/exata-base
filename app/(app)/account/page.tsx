@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
@@ -6,8 +7,10 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { buttonClasses } from "@/components/ui/styles";
+import { currentInstant } from "@/domain/clock";
 import { AccessibilityPreferences } from "@/features/account/accessibility-preferences";
 import { DeleteAccount } from "@/features/account/delete-account";
+import { Devices } from "@/features/account/devices";
 import { EmailPreferencesPanel } from "@/features/account/email-preferences";
 import { ReferralLink } from "@/features/account/referral-link";
 import { ThemePicker } from "@/features/account/theme-picker";
@@ -18,8 +21,10 @@ import { env } from "@/lib/env";
 import { isMultilingual } from "@/lib/i18n/locales";
 import { readOnboarding } from "@/lib/onboarding/service";
 import { requirePageRole } from "@/lib/page-guard";
+import { sessionAccess } from "@/lib/ports/auth";
 import { readPreferences } from "@/lib/preferences/service";
 import { referralSummary } from "@/lib/referral/service";
+import { listDeviceSessions } from "@/lib/sessions/service";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
@@ -37,14 +42,19 @@ export default function AccountPage() {
 }
 
 async function AccountContent() {
+  await connection();
   const t = await getTranslations("account");
   const user = await requirePageRole("member", "/account");
   // Read fresh: the cached current user can be minutes behind a theme the person just chose.
-  const [preferences, referral, onboarding, steps] = await Promise.all([
+  const access = await sessionAccess();
+  const [preferences, referral, onboarding, steps, devices] = await Promise.all([
     readPreferences(db, user.id),
     referralSummary(db, user.id),
     readOnboarding(db, user.id),
     getTranslations("onboarding"),
+    access.kind === "own"
+      ? listDeviceSessions(db, user.id, access.currentId, currentInstant())
+      : Promise.resolve([]),
   ]);
   return (
     <>
@@ -100,6 +110,34 @@ async function AccountContent() {
           <h2 className="text-block-title text-ink">{t("email.title")}</h2>
           <EmailPreferencesPanel initial={preferences.email} />
         </Panel>
+
+        {access.kind === "own" || access.url !== null ? (
+          <Panel className="flex flex-col gap-4">
+            <h2 className="text-block-title text-ink">{t("devices.title")}</h2>
+            {access.kind === "own" ? (
+              <>
+                <p className="max-w-[52ch] text-body-small text-ink-muted">{t("devices.help")}</p>
+                <Devices
+                  rows={devices.map((device) => ({
+                    ...device,
+                    createdAt: device.createdAt.toISOString(),
+                  }))}
+                />
+              </>
+            ) : (
+              <>
+                <p className="max-w-[52ch] text-body text-ink">{t("devices.external")}</p>
+                <a
+                  href={access.url ?? ""}
+                  rel="noreferrer"
+                  className={`${buttonClasses("secondary")} self-start`}
+                >
+                  {t("devices.externalLink")}
+                </a>
+              </>
+            )}
+          </Panel>
+        ) : null}
 
         <Panel className="flex flex-col gap-4">
           <h2 className="text-block-title text-ink">{t("data.title")}</h2>

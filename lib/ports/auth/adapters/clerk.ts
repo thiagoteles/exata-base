@@ -3,6 +3,7 @@ import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import type { NextRequest } from "next/server";
 import type { ClerkProfile } from "@/lib/accounts/clerk-sync";
 import type { ClerkEvent } from "@/lib/accounts/clerk-webhook";
+import { clerkProfileUrl } from "../clerk-portal";
 import type { AuthAdapter, SessionIdentity } from "../types";
 
 /*
@@ -54,8 +55,12 @@ export async function readClerkWebhook(
   return { type: "ignored", id };
 }
 
-export function clerkAdapter(upsert: (profile: ClerkProfile) => Promise<unknown>): AuthAdapter {
+export function clerkAdapter(
+  upsert: (profile: ClerkProfile) => Promise<unknown>,
+  publishableKey: string | undefined,
+): AuthAdapter {
   return {
+    sessionAccess: { kind: "external", url: clerkProfileUrl(publishableKey) },
     async identity(): Promise<SessionIdentity | null> {
       const { userId } = await auth();
       return userId === null ? null : { kind: "clerk", clerkId: userId };

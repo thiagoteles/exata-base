@@ -23,7 +23,16 @@ export type PasswordCredentials = {
   resetPassword: (input: { token: string; password: string }) => Promise<void>;
 };
 
+/**
+ * Who keeps the list of a person's signed-in devices. Local mode keeps it in the app's own table and
+ * knows which one is this browser; Clerk keeps it itself, so the app only points to its portal.
+ */
+type SessionAccess =
+  | { kind: "own"; currentId: () => Promise<string | null> }
+  | { kind: "external"; url: string | null };
+
 export type AuthAdapter = {
+  sessionAccess: SessionAccess;
   credentials?: PasswordCredentials;
   /** Reads the current request's session. Never writes. */
   identity: () => Promise<SessionIdentity | null>;

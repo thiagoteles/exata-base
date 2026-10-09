@@ -57,6 +57,7 @@ test("a link is no use to its own owner, and a made-up code counts for nobody", 
   await page.goto("/?ref=000000000000");
   await signInAs(page, guest);
   // The guest was invited already, and a made-up code adds no one anywhere.
+  await page.context().clearCookies();
   await signInAs(page, inviter);
   await expect(page.getByText("1 pessoa criou conta pelo seu link.")).toBeVisible();
 });

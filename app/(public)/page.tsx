@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
+import { JsonLd } from "@/components/json-ld";
 import { Figure, RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
+import { env } from "@/lib/env";
 import { maskCpf } from "@/lib/masks";
 import { buildSocialMetadata } from "@/lib/social-metadata";
+import { organizationData, websiteData } from "@/lib/structured-data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations();
@@ -54,6 +59,21 @@ export default async function HomePage() {
           <Figure prefix={currencyMark}>{sampleTotal}</Figure>
         </RecordCell>
       </RecordGrid>
+      <Suspense>
+        <SiteData />
+      </Suspense>
     </main>
+  );
+}
+
+/** Who publishes the site, for search engines. Built per request, with the runtime address. */
+async function SiteData() {
+  await connection();
+  const t = await getTranslations("site");
+  return (
+    <>
+      <JsonLd data={organizationData(env.APP_URL, t("name"), t("description"))} />
+      <JsonLd data={websiteData(env.APP_URL, t("name"))} />
+    </>
   );
 }

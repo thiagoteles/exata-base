@@ -137,3 +137,12 @@ test("links and the canonical use the public address", async ({ page }) => {
     "/termos",
   );
 });
+
+test("the home page describes the organization to search engines", async ({ page }) => {
+  await page.goto("/");
+  const data = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((scripts) => scripts.map((script) => JSON.parse(script.textContent ?? "{}")));
+  expect(data.map((item) => item["@type"])).toEqual(["Organization", "WebSite"]);
+  expect(data[0]?.url).toBe("http://localhost:3300/");
+});

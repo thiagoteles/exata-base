@@ -2,11 +2,20 @@ import type { MetadataRoute } from "next";
 import { publicPathOf } from "./i18n/public-paths";
 import { publicRoutes } from "./public-routes";
 import { protectedPrefixes } from "./routes";
+import type { SitemapEntry } from "./sitemap-sources";
 
-/** The sitemap: one absolute URL per public page. */
-export function sitemapFor(appUrl: string): MetadataRoute.Sitemap {
-  return publicRoutes.map((path) => ({
+/** The sitemap: one absolute URL per public page, fixed pages first, then each source's. */
+export function sitemapFor(
+  appUrl: string,
+  fromSources: readonly SitemapEntry[] = [],
+): MetadataRoute.Sitemap {
+  const entries: readonly SitemapEntry[] = [
+    ...publicRoutes.map((path) => ({ path })),
+    ...fromSources,
+  ];
+  return entries.map(({ path, lastModified }) => ({
     url: new URL(publicPathOf(path) ?? path, appUrl).toString(),
+    ...(lastModified === undefined ? {} : { lastModified }),
   }));
 }
 

@@ -477,14 +477,16 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 3. Sitemap por fontes
 
-- [ ] Cada área registra uma fonte que devolve URLs públicas com `lastModified` do banco.
-- [ ] O `sitemap.ts` junta as rotas fixas e as fontes, e o `generateSitemaps` divide por fonte e em partes de até 50 mil.
-- [ ] `publicRoutes` continua sendo a fonte das páginas fixas.
+- [x] Cada área registra uma fonte que devolve URLs públicas com `lastModified` do banco (`lib/sitemap-sources.ts`).
+- [x] O `sitemap.ts` junta as rotas fixas e as fontes.
+- [ ] O `generateSitemaps` divide por fonte e em partes de até 50 mil. Entra quando uma fonte passar de algumas centenas de endereços.
+- [x] `publicRoutes` continua sendo a fonte das páginas fixas.
 
 ### 4. JSON-LD tipado
 
-- [ ] Componente `<JsonLd>` que escapa `<`, para evitar injeção de script.
-- [ ] Construtores tipados com `schema-dts`: `Organization`, `WebSite`, `BreadcrumbList`, `FAQPage`, `Article` e `Product` com `Offer`.
+- [x] Componente `<JsonLd>` que escapa `<`, para evitar injeção de script.
+- [x] Construtores tipados com `schema-dts`: `Organization` e `WebSite`, na página inicial.
+- [ ] `BreadcrumbList`, `FAQPage`, `Article` e `Product` com `Offer` entram com a primeira página que os use (MDX, planos).
 - [ ] O produto acrescenta os seus (resultado de sorteio, curso).
 
 ### 5. Imagem OG por página

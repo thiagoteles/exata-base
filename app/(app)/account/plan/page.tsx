@@ -105,7 +105,7 @@ async function PlanActions({ plan }: { plan: Plan | null }) {
           {t("seePlans")}
         </Link>
       )}
-      {billingOn && plan?.stripeCustomerId ? <PortalButton /> : null}
+      {billingOn && plan?.providerCustomerId ? <PortalButton /> : null}
       {billingOn && subscribed ? <CancellationControl canceling={plan.cancelAtPeriodEnd} /> : null}
     </div>
   );

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
 import { canBuy, changeCancellation, readPlan } from "@/lib/billing/service";
-import { stripeEvents } from "@/lib/db/schema/billing";
+import { paymentEvents } from "@/lib/db/schema/billing";
 import { billingFixture, gateway } from "./billing-fixture";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
@@ -18,8 +18,8 @@ describe("a refund", () => {
     expect(await readPlan(db, user.id)).toMatchObject({
       tier: "free",
       status: "canceled",
-      stripeSubscriptionId: null,
-      stripeCustomerId: `cus_${user.id}`,
+      providerSubscriptionId: null,
+      providerCustomerId: `cus_${user.id}`,
     });
   });
 
@@ -39,7 +39,7 @@ describe("a refund", () => {
     expect(result).toBe("applied");
     expect(cancel).not.toHaveBeenCalled();
     expect(await readPlan(db, user.id)).toMatchObject({ tier: "paid", status: "active" });
-    expect(await db.select().from(stripeEvents).where(eq(stripeEvents.id, "evt_r"))).toHaveLength(
+    expect(await db.select().from(paymentEvents).where(eq(paymentEvents.id, "evt_r"))).toHaveLength(
       1,
     );
   });

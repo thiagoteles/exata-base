@@ -14,7 +14,7 @@ import type { DeletionSteps } from "./delete";
  */
 async function endSubscription(userId: string): Promise<void> {
   const [plan] = await db
-    .select({ subscription: plans.stripeSubscriptionId })
+    .select({ subscription: plans.providerSubscriptionId })
     .from(plans)
     .where(eq(plans.userId, userId));
   if (plan?.subscription === null || plan === undefined) {

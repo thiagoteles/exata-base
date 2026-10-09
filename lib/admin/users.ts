@@ -191,10 +191,10 @@ export async function refundLastPayment(
   if (plan.tier !== "paid" || isCourtesy(plan)) {
     throw new DomainError(409, "nothingToRefund");
   }
-  if (plan.stripeCustomerId === null) {
+  if (plan.providerCustomerId === null) {
     throw new DomainError(409, "noBillingAccount");
   }
-  await refund(plan.stripeCustomerId, `refund-${userId}-${plan.updatedAt.toISOString()}`);
+  await refund(plan.providerCustomerId, `refund-${userId}-${plan.updatedAt.toISOString()}`);
   await recordStaffWrite(db, actor, {
     action: "plan.refund",
     targetTable: "plans",

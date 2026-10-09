@@ -4,7 +4,14 @@ import { createdAt, instant, updatedAt } from "../columns";
 import { authoredBy, ownedBy } from "./user-references";
 
 export const planTier = pgEnum("plan_tier", ["free", "paid"]);
-export const planStatus = pgEnum("plan_status", ["active", "canceled", "past_due"]);
+export const planStatus = pgEnum("plan_status", [
+  "active",
+  "canceled",
+  "past_due",
+  "trialing",
+  "pending",
+]);
+export const paymentProvider = pgEnum("payment_provider", ["stripe"]);
 export const billingInterval = pgEnum("billing_interval", ["lifetime", "yearly", "monthly"]);
 
 /*
@@ -18,8 +25,14 @@ export const plans = pgTable(
     tier: planTier().notNull().default("free"),
     status: planStatus().notNull().default("active"),
     billingInterval: billingInterval(),
-    stripeCustomerId: text().unique(),
-    stripeSubscriptionId: text().unique(),
+    /* The provider that sells this plan; null for a free or courtesy plan. */
+    provider: paymentProvider(),
+    providerCustomerId: text().unique(),
+    providerSubscriptionId: text().unique(),
+    /* The catalog price that was bought (tier and interval), never the provider's price id. */
+    priceKey: text(),
+    /* Set when a trial starts, so the same account never gets a second one. */
+    trialUsedAt: instant(),
     cancelAtPeriodEnd: boolean().notNull().default(false),
     /* When the period already paid ends: the renewal date, or the day access stops if canceled. */
     currentPeriodEnd: instant(),
@@ -42,9 +55,10 @@ export const plans = pgTable(
   ],
 );
 
-/* Stripe webhook deliveries. Inserting the id is the replay lock: a second delivery conflicts. */
-export const stripeEvents = pgTable("stripe_events", {
+/* Provider webhook deliveries. Inserting the id is the replay lock: a second delivery conflicts. */
+export const paymentEvents = pgTable("payment_events", {
   id: text().primaryKey(),
+  provider: paymentProvider().notNull(),
   type: text().notNull(),
   receivedAt: createdAt(),
 });

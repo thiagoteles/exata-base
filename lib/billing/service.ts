@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import type { Database } from "@/lib/db/database";
-import { plans, stripeEvents } from "@/lib/db/schema/billing";
+import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { DomainError } from "@/lib/errors";
 import type { Interval, PaymentEvent } from "@/lib/ports/payment/types";
 
@@ -21,8 +21,8 @@ export const isCourtesy = (plan: Pick<Plan, "courtesyGrantedByEmail">): boolean 
   plan.courtesyGrantedByEmail !== null;
 
 /** The subscription a plan is paid through, or null for a free, courtesy or lifetime plan. */
-export const subscriptionOf = (plan: Pick<Plan, "stripeSubscriptionId"> | null): string | null =>
-  plan?.stripeSubscriptionId ?? null;
+export const subscriptionOf = (plan: Pick<Plan, "providerSubscriptionId"> | null): string | null =>
+  plan?.providerSubscriptionId ?? null;
 
 export async function readPlan(db: Database, userId: string): Promise<Plan | null> {
   const [plan] = await db.select().from(plans).where(eq(plans.userId, userId));
@@ -37,7 +37,7 @@ export function canBuy(plan: Plan | null, interval: Interval): boolean {
   if (plan === null || plan.tier === "free") {
     return true;
   }
-  return interval === "lifetime" && plan.stripeSubscriptionId !== null;
+  return interval === "lifetime" && plan.providerSubscriptionId !== null;
 }
 
 const noCourtesy = {
@@ -50,7 +50,8 @@ export const freePlan = {
   tier: "free",
   status: "canceled",
   billingInterval: null,
-  stripeSubscriptionId: null,
+  priceKey: null,
+  providerSubscriptionId: null,
   cancelAtPeriodEnd: false,
   currentPeriodEnd: null,
 } as const;
@@ -70,15 +71,17 @@ async function applyCheckout(
   if (current === undefined) {
     return;
   }
-  const replaced = event.interval === "lifetime" ? current.stripeSubscriptionId : null;
+  const replaced = event.interval === "lifetime" ? current.providerSubscriptionId : null;
   await tx
     .update(plans)
     .set({
       tier: "paid",
       status: "active",
       billingInterval: event.interval,
-      stripeCustomerId: event.customerId ?? current.stripeCustomerId,
-      stripeSubscriptionId: event.interval === "lifetime" ? null : event.subscriptionId,
+      provider: event.provider,
+      priceKey: `paid.${event.interval}`,
+      providerCustomerId: event.customerId ?? current.providerCustomerId,
+      providerSubscriptionId: event.interval === "lifetime" ? null : event.subscriptionId,
       cancelAtPeriodEnd: false,
       // A new purchase has no end yet: the first invoice that follows says when the period ends.
       currentPeriodEnd: null,
@@ -104,14 +107,14 @@ async function applyRefund(
   const [current] = await tx
     .select()
     .from(plans)
-    .where(eq(plans.stripeCustomerId, event.customerId))
+    .where(eq(plans.providerCustomerId, event.customerId))
     .for("update");
   if (current === undefined) {
     return;
   }
   await tx.update(plans).set(freePlan).where(eq(plans.userId, current.userId));
-  if (current.stripeSubscriptionId !== null) {
-    await cancel(current.stripeSubscriptionId);
+  if (current.providerSubscriptionId !== null) {
+    await cancel(current.providerSubscriptionId);
   }
 }
 
@@ -130,20 +133,20 @@ async function applyEvent(
           status: "active",
           ...(event.periodEnd === null ? {} : { currentPeriodEnd: event.periodEnd }),
         })
-        .where(and(eq(plans.stripeSubscriptionId, event.subscriptionId), eq(plans.tier, "paid")));
+        .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), eq(plans.tier, "paid")));
       return;
     case "invoice_failed":
       await tx
         .update(plans)
         .set({ status: "past_due" })
-        .where(and(eq(plans.stripeSubscriptionId, event.subscriptionId), eq(plans.tier, "paid")));
+        .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), eq(plans.tier, "paid")));
       return;
     case "subscription_deleted":
       // A subscription replaced by the lifetime plan no longer matches any row, so it is ignored.
       await tx
         .update(plans)
         .set(freePlan)
-        .where(eq(plans.stripeSubscriptionId, event.subscriptionId));
+        .where(eq(plans.providerSubscriptionId, event.subscriptionId));
       return;
     case "charge_refunded":
       return applyRefund(tx, event, cancel);
@@ -166,10 +169,10 @@ export function applyPaymentEvent(
 ): Promise<"applied" | "duplicate"> {
   return db.transaction(async (tx) => {
     const locked = await tx
-      .insert(stripeEvents)
-      .values({ id: event.id, type: event.type })
+      .insert(paymentEvents)
+      .values({ id: event.id, provider: event.provider, type: event.type })
       .onConflictDoNothing()
-      .returning({ id: stripeEvents.id });
+      .returning({ id: paymentEvents.id });
     if (locked.length === 0) {
       return "duplicate";
     }
@@ -186,9 +189,9 @@ export async function changeCancellation(
   setAtProvider: (subscriptionId: string, cancel: boolean) => Promise<void>,
 ): Promise<void> {
   const plan = await readPlan(db, userId);
-  if (plan === null || plan.tier !== "paid" || plan.stripeSubscriptionId === null) {
+  if (plan === null || plan.tier !== "paid" || plan.providerSubscriptionId === null) {
     throw new DomainError(409, "noSubscription");
   }
-  await setAtProvider(plan.stripeSubscriptionId, cancel);
+  await setAtProvider(plan.providerSubscriptionId, cancel);
   await db.update(plans).set({ cancelAtPeriodEnd: cancel }).where(eq(plans.userId, userId));
 }

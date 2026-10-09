@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
 import { grantsAccess, readPlan } from "@/lib/billing/service";
-import { plans, stripeEvents } from "@/lib/db/schema/billing";
+import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { billingFixture } from "./billing-fixture";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
@@ -24,8 +24,8 @@ describe("a purchase", () => {
       tier: "paid",
       status: "active",
       billingInterval: "monthly",
-      stripeCustomerId: `cus_${user.id}`,
-      stripeSubscriptionId: `sub_${user.id}`,
+      providerCustomerId: `cus_${user.id}`,
+      providerSubscriptionId: `sub_${user.id}`,
       cancelAtPeriodEnd: false,
     });
   });
@@ -36,7 +36,7 @@ describe("a purchase", () => {
     expect(await readPlan(db, user.id)).toMatchObject({
       tier: "paid",
       billingInterval: "lifetime",
-      stripeSubscriptionId: null,
+      providerSubscriptionId: null,
     });
   });
 
@@ -104,7 +104,7 @@ describe("the same delivery twice", () => {
     expect((await deliver(purchase)).result).toBe("duplicate");
     // The replay changed nothing: the manual downgrade above is still what is stored.
     expect((await readPlan(db, user.id))?.tier).toBe("free");
-    expect(await db.select().from(stripeEvents)).toHaveLength(1);
+    expect(await db.select().from(paymentEvents)).toHaveLength(1);
   });
 
   it("is retried when applying it failed, because the lock rolled back with the change", async () => {
@@ -112,7 +112,7 @@ describe("the same delivery twice", () => {
     const lifetime = checkoutCompleted("evt_2", { userId: user.id, interval: "lifetime" });
     const broken = vi.fn(() => Promise.reject(new Error("provider is down")));
     await expect(deliver(lifetime, broken)).rejects.toThrow("provider is down");
-    expect(await db.select().from(stripeEvents).where(eq(stripeEvents.id, "evt_2"))).toEqual([]);
+    expect(await db.select().from(paymentEvents).where(eq(paymentEvents.id, "evt_2"))).toEqual([]);
     expect((await readPlan(db, user.id))?.billingInterval).toBe("monthly");
     expect((await deliver(lifetime)).result).toBe("applied");
     expect((await readPlan(db, user.id))?.billingInterval).toBe("lifetime");
@@ -137,7 +137,7 @@ describe("a payment that fails", () => {
       tier: "free",
       status: "canceled",
       billingInterval: null,
-      stripeSubscriptionId: null,
+      providerSubscriptionId: null,
     });
     expect(grantsAccess(ended)).toBe(false);
   });
@@ -164,7 +164,7 @@ describe("the lifetime plan over a subscription", () => {
     expect(await readPlan(db, user.id)).toMatchObject({
       tier: "paid",
       billingInterval: "lifetime",
-      stripeSubscriptionId: null,
+      providerSubscriptionId: null,
     });
 
     await deliver(subscriptionDeleted("evt_gone", `sub_${user.id}`));

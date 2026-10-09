@@ -213,12 +213,12 @@ Fora de escopo: nota fiscal (resolvida fora da base) e a migração de assinatur
 
 ### 2. Estado neutro de provedor
 
-- [ ] `plans`:
-  - `tier` com os nomes do catálogo;
+- [x] `plans` (feito em 2026-10-09, com três migrations: adiciona, copia os dados, remove; provado com linhas reais num Postgres descartável):
+  - `tier` com os nomes do catálogo (entra com o catálogo);
   - `status` com `trialing | active | past_due | pending | canceled`;
   - `provider`, `providerCustomerId`, `providerSubscriptionId`, `priceKey` e `trialUsedAt`.
-- [ ] `stripe_events` vira `payment_events`, com a coluna `provider`.
-- [ ] Migração das colunas atuais. A recomendação continua sendo só Stripe, mas as regras deixam de depender dele.
+- [x] `stripe_events` vira `payment_events`, com a coluna `provider`.
+- [x] Migração das colunas atuais. A recomendação continua sendo só Stripe, mas as regras deixam de depender dele.
 
 ### 3. Preços e moedas
 

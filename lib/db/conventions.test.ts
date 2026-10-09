@@ -16,7 +16,7 @@ const trailingId = /Id$/;
 const conventionExceptions: Record<string, string> = {
   plans: "one row per user: the primary key is the user id",
   clerk_events: "keyed by the provider's event id, which is the replay lock",
-  stripe_events: "keyed by the provider's event id, which is the replay lock",
+  payment_events: "keyed by the provider's event id, which is the replay lock",
   staff_audit_log: "append-only, never updated",
   account_deletions: "append-only, never updated",
   rate_limits: "keyed by the hash of limit, subject and window; a row lives for one window",

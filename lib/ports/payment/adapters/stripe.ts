@@ -20,7 +20,7 @@ const idOf = (value: string | { id: string } | null | undefined): string | null 
   typeof value === "string" ? value : (value?.id ?? null);
 
 function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): PaymentEvent {
-  const base = { id: event.id, type: event.type };
+  const base = { id: event.id, type: event.type, provider: "stripe" as const };
   const interval = session.metadata?.["interval"];
   const userId = session.client_reference_id;
   // An asynchronous payment (such as a bank slip) completes the session before the money arrives;
@@ -50,7 +50,7 @@ function invoiceEvent(
   invoice: Stripe.Invoice,
   kind: "invoice_paid" | "invoice_failed",
 ): PaymentEvent {
-  const base = { id: event.id, type: event.type };
+  const base = { id: event.id, type: event.type, provider: "stripe" as const };
   const subscriptionId = idOf(invoice.parent?.subscription_details?.subscription);
   if (subscriptionId === null) {
     return { ...base, kind: "ignored" };
@@ -61,7 +61,7 @@ function invoiceEvent(
 }
 
 function toPaymentEvent(event: Stripe.Event): PaymentEvent {
-  const base = { id: event.id, type: event.type };
+  const base = { id: event.id, type: event.type, provider: "stripe" as const };
   switch (event.type) {
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded":

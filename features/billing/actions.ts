@@ -24,7 +24,7 @@ export const startCheckout = actionFor("member")
     const url = await gateway.createCheckout({
       userId: ctx.user.id,
       email: ctx.user.email,
-      customerId: plan?.stripeCustomerId ?? null,
+      customerId: plan?.providerCustomerId ?? null,
       interval: parsedInput.interval,
       priceId,
       successUrl: `${env.APP_URL}/account/plan?checkout=success`,
@@ -37,10 +37,12 @@ export const startCheckout = actionFor("member")
 export const openPortal = actionFor("member").action(async ({ ctx }) => {
   const gateway = await requireGateway();
   const plan = await readPlan(db, ctx.user.id);
-  if (plan?.stripeCustomerId === null || plan === null) {
+  if (plan?.providerCustomerId === null || plan === null) {
     throw new DomainError(409, "noBillingAccount");
   }
-  return { url: await gateway.createPortal(plan.stripeCustomerId, `${env.APP_URL}/account/plan`) };
+  return {
+    url: await gateway.createPortal(plan.providerCustomerId, `${env.APP_URL}/account/plan`),
+  };
 });
 
 export const setCancellation = actionFor("member")

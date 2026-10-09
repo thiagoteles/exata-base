@@ -21,7 +21,7 @@ export async function UserRecord({ record, viewerId }: { record: Record; viewerI
   const paid = plan.tier === "paid";
   const courtesy = isCourtesy(plan);
   const canRefund =
-    paid && !courtesy && plan.stripeCustomerId !== null && (await paymentGateway()) !== null;
+    paid && !courtesy && plan.providerCustomerId !== null && (await paymentGateway()) !== null;
   return (
     <div className="flex flex-col gap-8">
       <RecordGrid>

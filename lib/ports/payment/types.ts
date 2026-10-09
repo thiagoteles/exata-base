@@ -1,12 +1,13 @@
-import type { billingInterval } from "@/lib/db/schema/billing";
+import type { billingInterval, paymentProvider } from "@/lib/db/schema/billing";
 
 export type Interval = (typeof billingInterval.enumValues)[number];
+type PaymentProvider = (typeof paymentProvider.enumValues)[number];
 
 /*
  * What a payment provider tells us, reduced to the facts the app acts on. The adapter turns the
  * provider's own events into these, so the billing rules never see a provider type.
  */
-export type PaymentEvent = { id: string; type: string } & (
+export type PaymentEvent = { id: string; type: string; provider: PaymentProvider } & (
   | {
       kind: "checkout_paid";
       userId: string;

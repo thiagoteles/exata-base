@@ -1,9 +1,10 @@
 import { lt } from "drizzle-orm";
 import { rateLimits } from "@/lib/db/schema/rate-limits";
-import type { DailyOperation } from "./run";
+import type { ScheduledOperation } from "./run";
 
 /** Deletes the counters of windows that already ended. Running it twice deletes nothing new. */
-export const purgeRateLimits: DailyOperation = {
+export const purgeRateLimits: ScheduledOperation = {
+  cadence: "daily",
   name: "purge-rate-limits",
   async run({ db, now }) {
     const removed = await db

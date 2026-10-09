@@ -18,7 +18,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 
 | Folder | What lives there |
 |---|---|
-| `app/` | Routes only. Groups: `(public)` the site, `(auth)` sign-in screens, `(app)` the signed-in shell. A page is thin: it guards (`requirePageRole`), reads through a service, composes a feature. `app/api/` holds webhooks and browser reports, `app/events/` the daily call |
+| `app/` | Routes only. Groups: `(public)` the site, `(auth)` sign-in screens, `(app)` the signed-in shell. A page is thin: it guards (`requirePageRole`), reads through a service, composes a feature. `app/api/` holds webhooks and browser reports, `app/events/` the scheduler's calls, one per cadence |
 | `features/<area>/` | The screens and actions of one area (client forms, lists, record pages, `actions.ts`, `schema.ts`). A feature never imports another feature |
 | `domain/<area>/` | Pure rules with no database, React, Next or Node: calculations, engines, value types. The lowest layer; `lib`, `features` and `components` import it, never the reverse. Held to 90% coverage on every `pnpm test`; an invariant gets a property test with `fast-check` (`*.property.test.ts`) |
 | `lib/<area>/` | The rules of one area, against the database only, tested with an integration test. Services take the database and the actor as arguments |
@@ -62,4 +62,4 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 
 ### Skills
 
-Recipes live in `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `new-text-key`, `new-email`, `new-daily-operation`, `new-payment-event`, `umami` (analytics setup and checks through `pnpm umami`), `port-from-legacy` (bringing code in from another project). Follow the recipe, then copy the pattern of the area it points to.
+Recipes live in `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `new-text-key`, `new-email`, `new-scheduled-operation`, `new-payment-event`, `umami` (analytics setup and checks through `pnpm umami`), `port-from-legacy` (bringing code in from another project). Follow the recipe, then copy the pattern of the area it points to.

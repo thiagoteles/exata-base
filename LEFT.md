@@ -53,11 +53,11 @@ As fases seguem a dependência entre elas. Cada unidade aponta a seção que det
 
 ### F2. Agendamento e ingestão
 
-- [ ] **F2.1 Grupos por cadência.** `/events/[group]` com `daily`, `hourly` e `every-5-min`; cada operação declara o grupo no registro; `/events` sem grupo continua chamando `daily` (compatível). Decisão: grupo inválido responde 404. *Capacidades, item 1.*
-- [ ] **F2.2 Trava por operação.** `pg_try_advisory_xact_lock` pela chave da operação: uma execução lenta não roda duas vezes ao mesmo tempo; a segunda chamada registra `skipped`. Teste de integração com duas chamadas concorrentes.
-- [ ] **F2.3 Batimento e painel por grupo.** `recordJobRun` e a linha `heartbeat` por grupo (`daily`, `hourly`, `every-5-min`); `ops/gcp/heartbeats.json` com a janela de cada um; o painel Saúde lista os grupos que têm operação registrada.
+- [x] **F2.1 Grupos por cadência.** (feito: `domain/operations/cadence.ts`, rotas `/events` e `/events/[group]`, e a pasta `lib/daily` virou `lib/scheduled`) `/events/[group]` com `daily`, `hourly` e `every-5-min`; cada operação declara o grupo no registro; `/events` sem grupo continua chamando `daily` (compatível). Decisão: grupo inválido responde 404. *Capacidades, item 1.*
+- [x] **F2.2 Trava por operação.** (feito com `pg_try_advisory_lock` numa conexão reservada, e não `xact`, para a operação manter as próprias transações; provado com duas execuções simultâneas) `pg_try_advisory_xact_lock` pela chave da operação: uma execução lenta não roda duas vezes ao mesmo tempo; a segunda chamada registra `skipped`. Teste de integração com duas chamadas concorrentes.
+- [x] **F2.3 Batimento e painel por grupo.** (feito: a linha `heartbeat` e o `recordJobRun` levam o nome da cadência; um teste exige uma linha em `heartbeats.json` para cada cadência com operação, e é essa linha que faz o painel listá-la) `recordJobRun` e a linha `heartbeat` por grupo (`daily`, `hourly`, `every-5-min`); `ops/gcp/heartbeats.json` com a janela de cada um; o painel Saúde lista os grupos que têm operação registrada.
 - [ ] **F2.4 Ingestão de workers externos.** `POST /api/ingest/[source]` com segredo próprio por fonte (`INGEST_SECRET`, comparado em tempo constante), payload validado por zod declarado num registro de fontes, `timedRoute` e rate limit. Na base, uma fonte de exemplo neutra com teste; a regra fica no servidor e o worker só entrega.
-- [ ] **F2.5 Documentar.** `BASE.md`, `README.md` (um cron por grupo no Coolify) e a skill `new-daily-operation` passam a falar de grupo de cadência.
+- [x] **F2.5 Documentar.** (feito junto com F2.1 a F2.3: README, BASE.md, AGENTS.md e a skill `new-scheduled-operation`; falta só F2.4 na documentação) `BASE.md`, `README.md` (um cron por grupo no Coolify) e a skill `new-daily-operation` passam a falar de grupo de cadência.
 
 ### F3. Contas e preferências
 

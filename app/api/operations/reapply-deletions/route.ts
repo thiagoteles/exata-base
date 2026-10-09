@@ -1,10 +1,10 @@
 import type { NextRequest } from "next/server";
 import { accountDeletionSteps } from "@/lib/accounts/deletion-steps";
 import { reapplyDeletions } from "@/lib/accounts/reapply-deletions";
-import { isAuthorizedCall } from "@/lib/daily/authorize";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/ports/log";
+import { isAuthorizedCall } from "@/lib/scheduled/authorize";
 import { timedRoute } from "@/lib/timed-route";
 
 const MAX_BYTES = 1_048_576;
@@ -13,7 +13,7 @@ const uuidShape = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
 /*
  * After a backup is restored, the operator sends the former ids of accounts deleted since the
  * backup (one per line), and each is deleted again with the app's real steps. Authorized like the
- * daily call, with CRON_SECRET; `pnpm restore:reapply` sends the file.
+ * scheduled calls, with CRON_SECRET; `pnpm restore:reapply` sends the file.
  */
 export const POST = timedRoute(
   "/api/operations/reapply-deletions",

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { readHealth } from "@/lib/admin/health";
-import { type DailyOperation, runDailyOperations } from "@/lib/daily/run";
 import { clerkEvents } from "@/lib/db/schema/auth";
 import { paymentEvents } from "@/lib/db/schema/billing";
+import { runScheduledOperations, type ScheduledOperation } from "@/lib/scheduled/run";
 import { testDatabase } from "./database";
 import { createUser, recordingLogger } from "./factories";
 
@@ -10,8 +10,16 @@ const db = testDatabase();
 const now = new Date("2026-10-09T12:00:00Z");
 const HOUR = 3_600_000;
 
-const passing: DailyOperation = { name: "passing", run: () => Promise.resolve({ done: 1 }) };
-const failing: DailyOperation = { name: "failing", run: () => Promise.reject(new Error("boom")) };
+const passing: ScheduledOperation = {
+  name: "passing",
+  cadence: "daily",
+  run: () => Promise.resolve({ done: 1 }),
+};
+const failing: ScheduledOperation = {
+  name: "failing",
+  cadence: "daily",
+  run: () => Promise.reject(new Error("boom")),
+};
 
 async function admin() {
   const user = await createUser(db, "admin@example.com", "admin");
@@ -32,20 +40,20 @@ describe("the health panel", () => {
       { name: "daily", windowMs: 88_200_000, state: "never", run: null },
     ]);
 
-    await runDailyOperations([passing, failing], { db, now }, recordingLogger());
+    await runScheduledOperations("daily", [passing, failing], { db, now }, recordingLogger());
     const [daily] = (await readHealth(db, viewer, new Date(now.getTime() + HOUR))).jobs;
     expect(daily).toMatchObject({ state: "failing", run: { ranAt: now, failed: 1 } });
 
     // The next run overwrites the row, so the panel shows the latest one only.
     const later = new Date(now.getTime() + 2 * HOUR);
-    await runDailyOperations([passing], { db, now: later }, recordingLogger());
+    await runScheduledOperations("daily", [passing], { db, now: later }, recordingLogger());
     const [again] = (await readHealth(db, viewer, later)).jobs;
     expect(again).toMatchObject({ state: "ok", run: { ranAt: later, failed: 0 } });
   });
 
   it("calls the job late once its alarm window has passed", async () => {
     const viewer = await admin();
-    await runDailyOperations([passing], { db, now }, recordingLogger());
+    await runScheduledOperations("daily", [passing], { db, now }, recordingLogger());
     const [daily] = (await readHealth(db, viewer, new Date(now.getTime() + 25 * HOUR))).jobs;
     expect(daily?.state).toBe("late");
   });

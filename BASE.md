@@ -29,7 +29,7 @@ O `exata-ui` não foi tocado. Lottery e brb continuam nele.
 - **Stripe, só Stripe,** implementado e desligado sem chave. Mercado Pago não entra.
 - **GCP para arquivo e log** (Cloud Storage privado com URL assinada, Cloud Logging), sem S3. Sem chave: disco e stdout. Erro de produção é log com alarme; Sentry não entra.
 - **E-mail sai na hora,** sem fila nem nova tentativa. Produção: Email API do Mailtrap. Local: Mailpit.
-- **Agendamento é um endpoint só, `/events`,** chamado uma vez por dia pelo Coolify com `CRON_SECRET`. Sem fila, worker ou cron no container.
+- **Agendamento é HTTP chamado de fora, um endereço por cadência** (`/events/daily`, `/events/hourly`, `/events/every-5-min`; `/events` é o `daily` de antes), cada um com a sua tarefa agendada no Coolify e o `CRON_SECRET`. O registro (`lib/scheduled/registry.ts`) dá a cada operação a sua cadência. Sem fila, worker ou cron no container. Uma operação nunca roda duas vezes ao mesmo tempo: `pg_try_advisory_lock` numa conexão reservada pelo tempo da execução (`lib/scheduled/lock.ts`), então a chamada que acha a anterior viva marca `skipped` e não espera. O segredo é conferido antes do grupo (401 antes de 404), para não revelar quais grupos existem. Cada cadência com operação precisa de uma linha em `ops/gcp/heartbeats.json` (um teste confere).
 - **Tudo que viaja é em inglês** (código, comentário, tabela, coluna, valor guardado, rota, env, README, AGENTS, DESIGN, skills). Exceção desde 2026-10-09: o endereço público visto pelo visitante, que vem do mapa `lib/i18n/public-paths.ts` (as pastas continuam em inglês; o proxy reescreve, e o endereço da rota responde 301 para o público). Só `messages/pt-BR.json` é em português, e é o único idioma. Valores do banco ficam em inglês e o catálogo os traduz (`member` aparece como "Membro").
 - **pnpm é o único gerenciador. Node 24.** Dependências em versão exata, com `minimumReleaseAge` de uma semana (o `next` é a exceção).
 - **Qualidade estrita desde a linha 1:** TypeScript estrito, Biome preset `all` com `--error-on-warnings` e fronteiras de import, knip para código morto, React Compiler, lefthook rodando `pnpm check` em todo commit. Sem ESLint.
@@ -76,7 +76,7 @@ Opt-in por três passos (README): `messages/<locale>.json`, a lista em `lib/i18n
 
 Contas (cadastro, confirmação, recuperação, convite, exportar em ZIP, apagar com trilha), contato (formulário público, caixa da equipe, resposta por e-mail, mensagens do membro), cobrança Stripe (`/plans`, `/account/plan` com a data de renovação ou do fim do acesso vinda da fatura paga em `plans.current_period_end`, portal, cancelar no fim do período, vitalício sobre assinatura, reembolso, cortesia, inadimplente mantém acesso), admin (usuários, convites, auditoria), `/events` com a limpeza de convites, `/catalog` (vitrine, assistente de três passos, upload), erro do navegador em `/api/client-errors`, alarme do GCP em `ops/gcp` e `pnpm gcp:alerts`, compose de produção, workflow de CI desligado, `.mcp.json`.
 
-Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `new-text-key`, `new-email`, `new-daily-operation`, `new-payment-event`. A referência viva de cada uma é o módulo que ela aponta (contato, convites, Stripe).
+Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `new-text-key`, `new-email`, `new-scheduled-operation`, `new-payment-event`, `umami`, `port-from-legacy`. A referência viva de cada uma é o módulo que ela aponta (contato, convites, Stripe).
 
 ## 4. Como se prova
 
@@ -102,7 +102,7 @@ Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `n
 - Duplicata transitória no DOM durante streaming: testes esperam `toHaveCount(1)` ou filtram visível. `networkidle` antes de clicar (clique antes da hidratação se perde). `browser.newContext` herda o `storageState` do projeto: passe um vazio de forma explícita. O banco do compose sobrevive entre execuções: use nomes únicos.
 - `new Date()` e `Math.random()` durante a pré-renderização são recusados pelo Next 16: `connection()` antes, relógio por parâmetro.
 - `next-intl` trata `.` em chave como aninhamento: nome de ação do log vira `user_role_change` na busca do texto.
-- A imagem `node:24-alpine` traz o `wget` do BusyBox, sem `--method`. A chamada diária é `wget -qO- --header="Authorization: Bearer $CRON_SECRET" --post-data='' http://127.0.0.1:3000/events`.
+- A imagem `node:24-alpine` traz o `wget` do BusyBox, sem `--method`. A chamada agendada é `wget -qO- --header="Authorization: Bearer $CRON_SECRET" --post-data='' http://127.0.0.1:3000/events/daily`.
 - Log pino: um campo `message` no objeto colide com o `message` da linha. O relatório do navegador sai como `errorMessage`.
 - A busca ignora acento e caixa: `contains()` em `lib/db/search.ts` usa a extensão `unaccent`, criada por migration. Toda busca nova com `ILIKE` deve usar essa função.
 - `docker compose up --force-recreate` mantém os volumes anônimos, inclusive o cache do `.next`. Para uma compilação realmente fria, acrescente `-V`. O preço aparece com espaço sem quebra (`R$ 29,00`): uma busca por texto precisa aceitá-lo.

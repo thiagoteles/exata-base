@@ -3,7 +3,7 @@ import { isAuthorizedCall } from "./authorize";
 
 const secret = "s".repeat(32);
 
-describe("the daily call", () => {
+describe("a scheduled call", () => {
   it("is refused when no secret is configured, even with a header", () => {
     expect(isAuthorizedCall(undefined, "Bearer anything")).toBe(false);
     expect(isAuthorizedCall(undefined, null)).toBe(false);

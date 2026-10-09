@@ -66,13 +66,18 @@ On Coolify:
 
 1. Create a **Postgres resource** and turn on its **scheduled backup** to a bucket. The product ships no backup script: the host owns backups.
 2. Create the app from this repository with `docker-compose.production.yml`. Set the variables below in the panel.
-3. Add a **scheduled task** that runs inside the app container once a day:
+3. Add one **scheduled task** per cadence, running inside the app container. A product that only has daily operations needs only the first:
 
    ```sh
-   wget -qO- --header="Authorization: Bearer $CRON_SECRET" --post-data='' http://127.0.0.1:3000/events
+   # daily, at the hour you choose
+   wget -qO- --header="Authorization: Bearer $CRON_SECRET" --post-data='' http://127.0.0.1:3000/events/daily
+   # hourly (0 * * * *), only when an operation declares it
+   wget -qO- --header="Authorization: Bearer $CRON_SECRET" --post-data='' http://127.0.0.1:3000/events/hourly
+   # every five minutes (*/5 * * * *), only when an operation declares it
+   wget -qO- --header="Authorization: Bearer $CRON_SECRET" --post-data='' http://127.0.0.1:3000/events/every-5-min
    ```
 
-   The container image has BusyBox `wget`, which has no `--method` option; `--post-data=''` makes the request a POST. `/events` accepts only a POST with that header and refuses everything when `CRON_SECRET` is not set.
+   The container image has BusyBox `wget`, which has no `--method` option; `--post-data=''` makes the request a POST. Each address accepts only a POST with that header and refuses everything when `CRON_SECRET` is not set. `/events` answers the same as `/events/daily`, for hosts set up before the cadences existed.
 4. Optional: `GCP_PROJECT=... ALERT_EMAIL=... pnpm gcp:alerts` creates (or updates) the Google Cloud alarm that e-mails you when the app logs an error. It needs `gcloud` signed in and is safe to run again.
 
 ### Variables
@@ -91,7 +96,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `TRUSTED_PROXY` | no | `traefik` (default, Coolify alone) or `cloudflare` (Cloudflare in front). Decides which header carries the client address for rate limits. With `cloudflare`, let only Cloudflare's addresses reach the server |
 | `MAILTRAP_TOKEN`, `MAILTRAP_INBOX`, `EMAIL_FROM` | no | Without a token nothing is sent and each send is logged as an error. `EMAIL_FROM` is required with the token |
 | `CONTACT_EMAIL` | no | Comma list that is told about new contact messages |
-| `CRON_SECRET` | no | At least 32 characters. Without it `/events` refuses everything |
+| `CRON_SECRET` | no | At least 32 characters. Without it the scheduled calls (`/events/...`) refuse everything |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | no | Together. Point the Stripe webhook at `/api/webhooks/stripe` and send `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.deleted`, `charge.succeeded` and `charge.refunded` |
 | `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PRICE_LIFETIME` | no | Each price you sell. Only a filled price is shown |
 | `GCP_CREDENTIALS`, `GCP_PROJECT`, `GCS_BUCKET` | no | All three. The service account JSON in base64; turns on Cloud Logging and Cloud Storage (a private bucket with uniform access) |
@@ -132,9 +137,11 @@ Umami, with no cookie and no personal data: events are declared in `lib/analytic
 - `pnpm umami share --on` gives the dashboard a public read-only link.
 - `pnpm umami api <METHOD> <path> [json]` reaches any other endpoint.
 
-## Daily operations
+## Scheduled operations
 
-`/events` runs every operation in `lib/daily/registry.ts`, one at a time. One failing is logged and does not stop the others. Each operation is idempotent, so running the call twice is safe. The first one deletes invites that were never accepted and expired more than 30 days ago; the second deletes the rate limit counters of windows that already ended. A new one is a new entry in the registry (see the `new-daily-operation` skill), never a new route.
+A call to `/events/<cadence>` (`daily`, `hourly` or `every-5-min`) runs every operation in `lib/scheduled/registry.ts` that declared that cadence, one at a time. One failing is logged and does not stop the others, and an operation whose previous run is still going is skipped instead of running twice (a lock in Postgres, across instances). Each operation is idempotent, so running a cadence twice is safe. The first two, both daily, delete invites that were never accepted and expired more than 30 days ago, and the rate limit counters of windows that already ended. A new one is a new entry in the registry (see the `new-scheduled-operation` skill), never a new route.
+
+Every run writes a `heartbeat` log line named after its cadence and its last run to the health panel in the admin. A cadence that has operations needs a line in `ops/gcp/heartbeats.json` (a test checks), which `pnpm gcp:alerts` turns into the alarm that fires when the host stops calling.
 
 ## Errors
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { purgeRateLimits } from "@/lib/daily/purge-rate-limits";
 import { rateLimits } from "@/lib/db/schema/rate-limits";
 import { consume } from "@/lib/rate-limit/service";
+import { purgeRateLimits } from "@/lib/scheduled/purge-rate-limits";
 import { testDatabase } from "./database";
 
 const db = testDatabase();
@@ -36,7 +36,7 @@ describe("rate limit", () => {
     expect(JSON.stringify(await db.select().from(rateLimits))).not.toContain("203.0.113.9");
   });
 
-  it("is purged by the daily call once the window has ended", async () => {
+  it("is purged by the daily operations once the window has ended", async () => {
     await consume(db, rule, "user:a", now);
     const later = new Date(now.getTime() + 120_000);
     await consume(db, rule, "user:b", later);

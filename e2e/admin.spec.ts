@@ -100,7 +100,7 @@ test("the user list searches, opens a record, and an admin cannot delete themsel
   await expect(page.getByRole("button", { name: "Conceder cortesia" })).toBeVisible();
 });
 
-test("the daily call refuses a call without the secret and cleans up the same way twice", async ({
+test("the scheduled calls refuse a call without the secret, know their cadences and clean up the same way twice", async ({
   request,
 }) => {
   const refused = await request.post("/events");
@@ -111,6 +111,26 @@ test("the daily call refuses a call without the secret and cleans up the same wa
   expect((await request.get("/events")).status()).toBe(405);
 
   const headers = { authorization: `Bearer ${CRON_SECRET}` };
+  // One address per cadence: the secret is checked first, then the group.
+  expect((await request.post("/events/hourly")).status()).toBe(401);
+  expect((await request.post("/events/nope")).status()).toBe(401);
+  expect((await request.post("/events/nope", { headers })).status()).toBe(404);
+  expect((await request.get("/events/hourly")).status()).toBe(405);
+  const hourly = await request.post("/events/hourly", { headers });
+  expect(hourly.status()).toBe(200);
+  expect(await hourly.json()).toMatchObject({
+    cadence: "hourly",
+    ran: [],
+    failed: [],
+    skipped: [],
+  });
+  const daily = (await (await request.post("/events/daily", { headers })).json()) as {
+    cadence: string;
+    ran: { name: string }[];
+  };
+  expect(daily.cadence).toBe("daily");
+  expect(daily.ran.map((entry) => entry.name)).toContain("purge-rate-limits");
+
   const first = await request.post("/events", { headers });
   expect(first.status()).toBe(200);
   const report = (await first.json()) as { ran: { name: string }[]; failed: unknown[] };

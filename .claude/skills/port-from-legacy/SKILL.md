@@ -15,7 +15,7 @@ commit, so a port is reviewable and can be undone.
    - leaves the process (e-mail, payments, files, a vendor SDK): a port in `lib/ports/<port>/`;
    - a screen, a form or an action of one area: `features/<area>/`;
    - a reusable piece of interface: `components/ui`, `components/patterns` or `components/figures`;
-   - something that must happen on a schedule: a daily operation (`new-daily-operation`);
+   - something that must happen on a schedule: a scheduled operation (`new-scheduled-operation`);
    - a table: `new-table`, with the deletion policy and the export decision;
    - a script that is not the app (a converter, an analysis): `tools/`, not here.
 2. **Take out what the base already does.** Sign-in, roles, plans, rate limits, logging, error

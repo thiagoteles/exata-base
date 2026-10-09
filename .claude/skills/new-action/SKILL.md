@@ -34,8 +34,11 @@ Rules:
 5. **Refuse by throwing `DomainError`** (400, 401, 403, 404, 409, 429) with a catalog key. Anything else
    is a 500 the person sees as a code, never as the message. The client turns the result into text
    with `useErrorText()` from `lib/use-error-text.ts`.
-6. **Staff writes are audited**: call `recordStaffWrite` inside the same transaction as the write
+6. **After the write.** If a cached read shows what changed, expire its tag with
+   `updateTag(cacheTags.<area>())` from `lib/cache-tags.ts`; if only the writer's own screen must
+   catch up, call `refresh()`. Never `revalidatePath`.
+7. **Staff writes are audited**: call `recordStaffWrite` inside the same transaction as the write
    (see `changeContactStatus`).
-7. **Money is integer cents, dates are ISO strings, instants are `timestamptz`.**
-8. Test the service with an integration test, and the refusal paths (wrong role, not found,
+8. **Money is integer cents, dates are ISO strings, instants are `timestamptz`.**
+9. Test the service with an integration test, and the refusal paths (wrong role, not found,
    conflict) as well as the happy one.

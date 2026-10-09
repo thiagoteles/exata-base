@@ -1,4 +1,5 @@
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
+import { cacheTags } from "@/lib/cache-tags";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
 import type { Interval, PaymentGateway, PriceTag } from "./types";
@@ -57,6 +58,7 @@ export async function requireGateway(): Promise<PaymentGateway> {
 export async function readPrices(): Promise<Partial<Record<Interval, PriceTag>>> {
   "use cache";
   cacheLife("hours");
+  cacheTag(cacheTags.prices());
   const current = await paymentGateway();
   const wanted = offeredIntervals();
   if (current === null || wanted.length === 0) {

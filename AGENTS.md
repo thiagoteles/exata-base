@@ -41,6 +41,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 - **Deleting an account** is declared per table: `ownedBy()` deletes with the person, `authoredBy()` keeps the row and an author e-mail column.
 - **Money is integer cents. Instants are `timestamptz`. Code that reads the clock gets it as a parameter.** Only an entry point (a page after `connection()`, an action, a route, an auth callback) reads it, once, with `currentInstant()` from `@/domain/clock`; a Biome plugin refuses `new Date()`, `Date.now` and `Math.random` everywhere else, and a test refuses silencing it. Randomness is a parameter too, so a test can seed it.
 - **Public addresses are in Portuguese, routes in English.** `lib/i18n/public-paths.ts` maps each public route to the address a visitor sees; the proxy serves it and sends the route address there with a 301. Link with `publicHref(route)`, never the route written by hand (a test refuses it). The signed-in area and sign-in screens keep their route addresses.
+- **Cache by tag.** A public read that may be cached uses `'use cache'` with `cacheLife` and a tag from `lib/cache-tags.ts`; the write that changes it calls `updateTag(tag)` in a server action or `revalidateTag(tag, "max")` in a route handler. An action that only changes what the writer sees calls `refresh()`. `revalidatePath` and `unstable_cache` are refused by a test.
 - **Environment variables** are read only in `lib/env.ts`. There is no `NEXT_PUBLIC_` variable.
 - **Comments** explain why, never name a file.
 

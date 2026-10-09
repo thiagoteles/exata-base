@@ -35,4 +35,12 @@ describe("source rules", () => {
       .filter((file) => handWritten.test(readFileSync(file, "utf8")));
     expect(offenders).toEqual([]);
   });
+
+  it("invalidates by tag, never by path, and caches with use cache, never unstable_cache", () => {
+    const forbidden = /\b(revalidatePath|unstable_cache)\b/;
+    const offenders = trackedSources()
+      .filter((file) => file !== "lib/source-rules.test.ts")
+      .filter((file) => forbidden.test(readFileSync(file, "utf8")));
+    expect(offenders).toEqual([]);
+  });
 });

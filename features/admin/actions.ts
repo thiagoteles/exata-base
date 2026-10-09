@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh } from "next/cache";
 import { currentInstant } from "@/domain/clock";
 import { accountDeletionSteps } from "@/lib/accounts/deletion-steps";
 import { revokeInvite } from "@/lib/accounts/invites";
@@ -51,7 +51,8 @@ export const deleteUser = actionFor("admin")
   .inputSchema(userIdSchema)
   .action(async ({ parsedInput, ctx }) => {
     await removeUser(db, accountDeletionSteps, actorOf(ctx.user), parsedInput.id);
-    revalidatePath("/admin/users");
+    // The list is read per request, so only the admin's own screen needs to catch up.
+    refresh();
     return { deleted: true };
   });
 

@@ -496,11 +496,11 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 6. Cache e invalidação
 
-- [ ] Leituras públicas em funções `'use cache'`, com `cacheTag` e `cacheLife`.
-- [ ] Tags num módulo tipado por área (`cacheTags.draw(game, n)`), nunca string solta.
-- [ ] Em server action, `updateTag(tag)`: só funciona ali, e a pessoa vê a mudança na hora.
-- [ ] Em route handler (webhook, operação diária, sincronização), `revalidateTag(tag, "max")`, ou `{ expire: 0 }` quando o dado precisa sumir na hora.
-- [ ] `revalidatePath` e `unstable_cache` proibidos por convenção.
+- [x] Leituras públicas em funções `'use cache'`, com `cacheTag` e `cacheLife`.
+- [x] Tags num módulo tipado por área (`lib/cache-tags.ts`), nunca string solta.
+- [x] Em server action, `updateTag(tag)`: só funciona ali, e a pessoa vê a mudança na hora. Para a tela de quem agiu, `refresh()`.
+- [x] Em route handler (webhook, operação diária, sincronização), `revalidateTag(tag, "max")`, ou `{ expire: 0 }` quando o dado precisa sumir na hora.
+- [x] `revalidatePath` e `unstable_cache` proibidos por um teste do código-fonte.
 
 ### 7. Redirects
 

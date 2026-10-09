@@ -7,9 +7,10 @@ import { env } from "@/lib/env";
 import { sendEvent } from "@/lib/ports/analytics";
 import { readClerkWebhookRequest } from "@/lib/ports/auth";
 import { logger } from "@/lib/ports/log";
+import { timedRoute } from "@/lib/timed-route";
 
 /** Clerk's user events. The signature is checked before anything is read or written. */
-export async function POST(request: NextRequest) {
+export const POST = timedRoute("/api/webhooks/clerk", async (request: NextRequest) => {
   let event: Awaited<ReturnType<typeof readClerkWebhookRequest>>;
   try {
     event = await readClerkWebhookRequest(request);
@@ -28,4 +29,4 @@ export async function POST(request: NextRequest) {
     onSignedUp: (accountId) => sendEvent({ name: "signup_completed", accountId, data: {} }),
   });
   return Response.json({ result });
-}
+});

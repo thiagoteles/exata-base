@@ -6,13 +6,14 @@ import { env } from "@/lib/env";
 import { logger } from "@/lib/ports/log";
 import { consume } from "@/lib/rate-limit/service";
 import { readViolations } from "@/lib/security/csp-report";
+import { timedRoute } from "@/lib/timed-route";
 
 const MAX_BYTES = 16_384;
 // A page in a loop can report on every frame; past this, an address is dropped for the minute.
 const reportsPerAddress = { name: "csp-reports", limit: 30, windowSeconds: 60 };
 
 /** Where browsers send Content Security Policy violations. They are logged as warnings. */
-export async function POST(request: NextRequest) {
+export const POST = timedRoute("/api/csp-report", async (request: NextRequest) => {
   if (Number(request.headers.get("content-length") ?? "0") > MAX_BYTES) {
     return new Response(null, { status: 413 });
   }
@@ -34,4 +35,4 @@ export async function POST(request: NextRequest) {
     logger.warn("csp violation", violation);
   }
   return new Response(null, { status: 204 });
-}
+});

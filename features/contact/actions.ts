@@ -18,6 +18,7 @@ import { contactSchema, replySchema } from "./schema";
 /** The public form. A signed-in person is recognized; a visitor is welcome too. */
 export const sendContact = limitedPublicAction({ name: "contact", limit: 20, windowSeconds: 3600 })
   .inputSchema(contactSchema)
+  .metadata({ name: "sendContact" })
   .action(async ({ parsedInput }) => {
     const [t, user, locale] = await Promise.all([
       getTranslations("contact"),
@@ -35,6 +36,7 @@ export const sendContact = limitedPublicAction({ name: "contact", limit: 20, win
 
 export const setContactStatus = actionFor("staff")
   .inputSchema(z.object({ id: z.uuid(), status: z.enum(contactStatuses) }))
+  .metadata({ name: "setContactStatus" })
   .action(async ({ parsedInput, ctx }) => {
     await changeContactStatus(
       db,
@@ -47,6 +49,7 @@ export const setContactStatus = actionFor("staff")
 
 export const answerContact = actionFor("staff")
   .inputSchema(replySchema)
+  .metadata({ name: "answerContact" })
   .action(async ({ parsedInput, ctx }) => {
     await replyToContact({
       db,

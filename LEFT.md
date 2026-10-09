@@ -357,9 +357,10 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 6. Desempenho
 
-- [ ] `useReportWebVitals` enviando LCP, INP e CLS como eventos do Umami, com amostragem.
-- [ ] Duração de cada action e route no log.
-- [ ] Consultas acima de N ms no log, com o nome da consulta e sem os parâmetros.
+- [x] `useReportWebVitals` enviando LCP, INP e CLS como o evento `web_vital` do catálogo, numa amostra de 10% por id da métrica (`domain/analytics/sample.ts`, determinística, sem ler aleatoriedade; provada por propriedades e pela fração em 20 mil ids sequenciais). Só com o Umami ligado.
+- [ ] **Validar** num Umami real que o INP e o CLS, mandados quando a página é escondida, chegam (o rastreador do Umami usa `fetch` com `keepalive`).
+- [x] Duração de cada action e route no log: `action finished` com o nome (`.metadata({ name })`, exigido pelo tipo), a duração e o status HTTP equivalente; `route finished` com o padrão da rota, o método, a duração e o status (`timedRoute`, conferido por um teste de fonte). O `/health` fica de fora: o uptime check o chama a cada minuto de três regiões. O nome da action também vai para o log de erro.
+- [x] Consultas acima de 250 ms no log (`slow query`), com o nome (comando e tabela principal, como `select users`) e o texto com os `$1`, nunca os valores. O cliente do postgres.js é envolvido num Proxy que mede o `unsafe`, inclusive dentro de transações e savepoints; provado contra o Postgres real.
 
 ### 7. Painel "Saúde" no admin
 

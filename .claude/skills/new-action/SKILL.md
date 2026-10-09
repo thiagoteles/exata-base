@@ -11,8 +11,12 @@ The reference is `features/contact/actions.ts`. An action is built with `actionF
 ```
 export const setContactStatus = actionFor("staff")
   .inputSchema(z.object({ id: z.uuid(), status: z.enum(contactStatuses) }))
+  .metadata({ name: "setContactStatus" })
   .action(async ({ parsedInput, ctx }) => { ... });
 ```
+
+The name is the exported constant's name. The types refuse an action without it, and the log
+writes every run as `action finished` with that name, the duration and the status.
 
 Rules:
 
@@ -23,7 +27,9 @@ Rules:
    `limitedPublicAction({ name, limit, windowSeconds })`, counted per address (see `sendContact`).
    A signed-in action that costs something (an e-mail, a paid call, an export) takes
    `actionFor(role, { rateLimit: { name, limit, windowSeconds } })`, counted per person. Over the
-   limit the action refuses with 429 and `tooManyRequests`. A route handler calls
+   limit the action refuses with 429 and `tooManyRequests`. A route handler is exported as
+   `export const POST = timedRoute("/its/pattern", async (request) => { ... })` (a test checks the
+   pattern matches the folder), and calls
    `enforceRateLimit` from `lib/rate-limit/guard.ts`. An action for paying customers takes
    `actionFor(role, { feature })` with a feature from `domain/billing/catalog.ts`; without it the
    plan refuses with 403 and `paidPlanRequired`.

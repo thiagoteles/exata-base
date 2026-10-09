@@ -4,9 +4,10 @@ import { db } from "@/lib/db/client";
 import { sendEvent } from "@/lib/ports/analytics";
 import { logger } from "@/lib/ports/log";
 import { paymentGateway } from "@/lib/ports/payment";
+import { timedRoute } from "@/lib/timed-route";
 
 /** The payment provider's events. The signature is checked on the raw body before anything is read. */
-export async function POST(request: NextRequest) {
+export const POST = timedRoute("/api/webhooks/stripe", async (request: NextRequest) => {
   const gateway = await paymentGateway();
   if (gateway === null) {
     // Billing is off: the route exists but accepts nothing.
@@ -30,4 +31,4 @@ export async function POST(request: NextRequest) {
     });
   }
   return Response.json({ result: status });
-}
+});

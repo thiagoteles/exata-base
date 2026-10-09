@@ -5,13 +5,14 @@ import { saveUpload } from "@/lib/files/service";
 import { withErrorResponse } from "@/lib/http";
 import { requireRole } from "@/lib/ports/auth";
 import { fileStorage } from "@/lib/ports/storage";
+import { timedRoute } from "@/lib/timed-route";
 
 const FORM_OVERHEAD_BYTES = 1_048_576;
 
 const declaredBytes = (request: Request) => Number(request.headers.get("content-length") ?? 0);
 
 /** Receives one file from the catalog. Size and type are checked before anything is stored. */
-export function POST(request: Request) {
+export const POST = timedRoute("/catalog/upload", (request: Request) => {
   return withErrorResponse(async () => {
     const user = await requireRole("staff");
     const limits = uploadLimits();
@@ -33,4 +34,4 @@ export function POST(request: Request) {
     });
     return Response.json(saved, { status: 201 });
   });
-}
+});

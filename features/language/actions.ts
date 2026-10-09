@@ -16,6 +16,7 @@ const ONE_YEAR_SECONDS = 31_536_000;
  */
 export const setLanguage = publicAction
   .inputSchema(z.object({ locale: z.enum(locales) }))
+  .metadata({ name: "setLanguage" })
   .action(async ({ parsedInput }) => {
     (await cookies()).set(LOCALE_COOKIE, parsedInput.locale, {
       path: "/",

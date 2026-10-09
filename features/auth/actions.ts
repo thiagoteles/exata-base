@@ -15,19 +15,24 @@ import { forgotPasswordSchema, resetPasswordSchema, signInSchema, signUpSchema }
 
 export const signIn = publicAction
   .inputSchema(signInSchema.extend({ next: z.string().optional() }))
+  .metadata({ name: "signIn" })
   .action(async ({ parsedInput: { next, ...credentials } }) => {
     await signInWithPassword(credentials);
     return { redirectTo: `/auth/complete?next=${encodeURIComponent(safeReturnPath(next))}` };
   });
 
-export const signUp = publicAction.inputSchema(signUpSchema).action(async ({ parsedInput }) => {
-  await signUpWithPassword(parsedInput);
-  return { email: parsedInput.email };
-});
+export const signUp = publicAction
+  .inputSchema(signUpSchema)
+  .metadata({ name: "signUp" })
+  .action(async ({ parsedInput }) => {
+    await signUpWithPassword(parsedInput);
+    return { email: parsedInput.email };
+  });
 
 /** Answers the same whether or not the account exists, so the form cannot be used to find out. */
 export const forgotPassword = publicAction
   .inputSchema(forgotPasswordSchema)
+  .metadata({ name: "forgotPassword" })
   .action(async ({ parsedInput }) => {
     await requestPasswordReset(parsedInput);
     return { sent: true };
@@ -35,6 +40,7 @@ export const forgotPassword = publicAction
 
 export const choosePassword = publicAction
   .inputSchema(resetPasswordSchema)
+  .metadata({ name: "choosePassword" })
   .action(async ({ parsedInput }) => {
     await resetPassword(parsedInput);
     return { done: true };

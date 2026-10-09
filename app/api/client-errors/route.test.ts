@@ -9,6 +9,7 @@ vi.mock("@/lib/ports/log", () => ({
     error: (...args: unknown[]) => {
       logged.errors.push(args);
     },
+    info: () => undefined,
   },
 }));
 

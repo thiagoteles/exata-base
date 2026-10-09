@@ -20,6 +20,7 @@ const actorOf = ({ id, email }: { id: string; email: string }) => ({ id, email }
 
 export const setUserRole = actionFor("admin")
   .inputSchema(roleChangeSchema)
+  .metadata({ name: "setUserRole" })
   .action(async ({ parsedInput, ctx }) => {
     await changeRole(db, actorOf(ctx.user), parsedInput.id, parsedInput.role);
     return { role: parsedInput.role };
@@ -27,6 +28,7 @@ export const setUserRole = actionFor("admin")
 
 export const giveCourtesy = actionFor("admin")
   .inputSchema(courtesySchema)
+  .metadata({ name: "giveCourtesy" })
   .action(async ({ parsedInput, ctx }) => {
     await grantCourtesy(db, actorOf(ctx.user), parsedInput.id, parsedInput.reason);
     return { granted: true };
@@ -34,6 +36,7 @@ export const giveCourtesy = actionFor("admin")
 
 export const takeCourtesyBack = actionFor("admin")
   .inputSchema(userIdSchema)
+  .metadata({ name: "takeCourtesyBack" })
   .action(async ({ parsedInput, ctx }) => {
     await revokeCourtesy(db, actorOf(ctx.user), parsedInput.id);
     return { revoked: true };
@@ -41,6 +44,7 @@ export const takeCourtesyBack = actionFor("admin")
 
 export const refundUser = actionFor("admin")
   .inputSchema(userIdSchema)
+  .metadata({ name: "refundUser" })
   .action(async ({ parsedInput, ctx }) => {
     const gateway = await requireGateway();
     await refundLastPayment(db, actorOf(ctx.user), parsedInput.id, gateway.refundLastPayment);
@@ -49,6 +53,7 @@ export const refundUser = actionFor("admin")
 
 export const deleteUser = actionFor("admin")
   .inputSchema(userIdSchema)
+  .metadata({ name: "deleteUser" })
   .action(async ({ parsedInput, ctx }) => {
     await removeUser(db, accountDeletionSteps, actorOf(ctx.user), parsedInput.id);
     // The list is read per request, so only the admin's own screen needs to catch up.
@@ -58,6 +63,7 @@ export const deleteUser = actionFor("admin")
 
 export const inviteUser = actionFor("admin")
   .inputSchema(inviteSchema)
+  .metadata({ name: "inviteUser" })
   .action(async ({ parsedInput, ctx }) => {
     const actor = actorOf(ctx.user);
     await inviteByEmail(db, actor, parsedInput, {
@@ -76,6 +82,7 @@ export const inviteUser = actionFor("admin")
 
 export const withdrawInvite = actionFor("admin")
   .inputSchema(userIdSchema)
+  .metadata({ name: "withdrawInvite" })
   .action(async ({ parsedInput, ctx }) => {
     await revokeInvite(db, actorOf(ctx.user), parsedInput.id, currentInstant());
     return { revoked: true };

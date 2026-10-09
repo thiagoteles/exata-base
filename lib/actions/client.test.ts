@@ -5,6 +5,13 @@ import { z } from "@/lib/validation";
 const session = vi.hoisted(() => ({ role: null as null | "member" | "staff" | "admin" }));
 const limits = vi.hoisted(() => ({ over: false, subjects: [] as string[] }));
 const plan = vi.hoisted(() => ({ granted: true, asked: [] as string[] }));
+const logged = vi.hoisted(() => [] as { level: string; message: string; fields: unknown }[]);
+
+vi.mock("@/lib/ports/log", () => {
+  const line = (level: string) => (message: string, fields?: unknown) =>
+    logged.push({ level, message, fields });
+  return { logger: { info: line("info"), error: line("error"), warn: line("warn") } };
+});
 
 vi.mock("next/headers", () => ({
   headers: () => Promise.resolve(new Headers({ "x-request-id": "req-1" })),
@@ -55,23 +62,29 @@ vi.mock("@/lib/billing/guard", async () => {
 
 const { actionFor, limitedPublicAction } = await import("./client");
 
-const premiumOnly = actionFor("member", { feature: "premium" }).action(() =>
-  Promise.resolve({ done: true }),
-);
+const premiumOnly = actionFor("member", { feature: "premium" })
+  .metadata({ name: "premiumOnly" })
+  .action(() => Promise.resolve({ done: true }));
 
 const limited = actionFor("member", {
   rateLimit: { name: "test", limit: 1, windowSeconds: 60 },
-}).action(() => Promise.resolve({ done: true }));
-const visitorForm = limitedPublicAction({ name: "form", limit: 1, windowSeconds: 60 }).action(() =>
-  Promise.resolve({ done: true }),
-);
+})
+  .metadata({ name: "limited" })
+  .action(() => Promise.resolve({ done: true }));
+const visitorForm = limitedPublicAction({ name: "form", limit: 1, windowSeconds: 60 })
+  .metadata({ name: "visitorForm" })
+  .action(() => Promise.resolve({ done: true }));
 
 const staffEcho = actionFor("staff")
   .inputSchema(z.object({ note: z.string().min(3) }))
+  .metadata({ name: "staffEcho" })
   .action(({ ctx, parsedInput }) => Promise.resolve({ by: ctx.user.id, note: parsedInput.note }));
-const failing = actionFor("member").action(() =>
-  Promise.reject(new Error("database password leaked")),
-);
+const failing = actionFor("member")
+  .metadata({ name: "failing" })
+  .action(() => Promise.reject(new Error("database password leaked")));
+
+// @ts-expect-error an action without a name does not compile
+actionFor("member").action(() => Promise.resolve({ done: true }));
 
 beforeEach(() => {
   session.role = null;
@@ -79,6 +92,7 @@ beforeEach(() => {
   limits.subjects.length = 0;
   plan.granted = true;
   plan.asked.length = 0;
+  logged.length = 0;
 });
 
 describe("server actions", () => {
@@ -138,12 +152,30 @@ describe("server actions", () => {
     expect(plan.asked).toEqual(["u1:premium", "u1:premium"]);
   });
 
-  it("never expose an unexpected error", async () => {
+  it("never expose an unexpected error, and log it under the action's name", async () => {
     session.role = "member";
     expect((await failing())?.serverError).toEqual({
       status: 500,
       key: "internal",
       requestId: "req-1",
     });
+    expect(logged.find((line) => line.level === "error")?.fields).toMatchObject({
+      action: "failing",
+      requestId: "req-1",
+    });
+  });
+
+  it("log every action's duration under its name, with how it ended", async () => {
+    session.role = "staff";
+    await staffEcho({ note: "oi!" });
+    await staffEcho({ note: "x" });
+    session.role = null;
+    await staffEcho({ note: "oi!" });
+    const finished = logged.filter((line) => line.message === "action finished");
+    expect(finished.map((line) => line.fields)).toEqual([
+      { action: "staffEcho", ms: expect.any(Number), status: 200 },
+      { action: "staffEcho", ms: expect.any(Number), status: 400 },
+      { action: "staffEcho", ms: expect.any(Number), status: 401 },
+    ]);
   });
 });

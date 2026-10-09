@@ -13,6 +13,7 @@ import { cancellationSchema, checkoutSchema } from "./schema";
 /** Opens the provider's checkout for one plan and returns the address to send the person to. */
 export const startCheckout = actionFor("member")
   .inputSchema(checkoutSchema)
+  .metadata({ name: "startCheckout" })
   .action(async ({ parsedInput, ctx }) => {
     const gateway = await requireGateway();
     const priceId = priceIds[parsedInput.interval];
@@ -41,19 +42,22 @@ export const startCheckout = actionFor("member")
   });
 
 /** The customer portal, where the card and the invoices are managed. */
-export const openPortal = actionFor("member").action(async ({ ctx }) => {
-  const gateway = await requireGateway();
-  const plan = await readPlan(db, ctx.user.id);
-  if (plan?.providerCustomerId === null || plan === null) {
-    throw new DomainError(409, "noBillingAccount");
-  }
-  return {
-    url: await gateway.createPortal(plan.providerCustomerId, `${env.APP_URL}/account/plan`),
-  };
-});
+export const openPortal = actionFor("member")
+  .metadata({ name: "openPortal" })
+  .action(async ({ ctx }) => {
+    const gateway = await requireGateway();
+    const plan = await readPlan(db, ctx.user.id);
+    if (plan?.providerCustomerId === null || plan === null) {
+      throw new DomainError(409, "noBillingAccount");
+    }
+    return {
+      url: await gateway.createPortal(plan.providerCustomerId, `${env.APP_URL}/account/plan`),
+    };
+  });
 
 export const setCancellation = actionFor("member")
   .inputSchema(cancellationSchema)
+  .metadata({ name: "setCancellation" })
   .action(async ({ parsedInput, ctx }) => {
     const gateway = await requireGateway();
     await changeCancellation(db, ctx.user.id, parsedInput.cancel, gateway.setCancelAtPeriodEnd);

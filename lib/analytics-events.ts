@@ -5,7 +5,8 @@
  * internal account id reaches the analytics service.
  *
  * The standard funnel: page_view (Umami counts it), signup_completed, activated (the product decides
- * what activation is and sends it), paywall_viewed, checkout_started, payment_confirmed.
+ * what activation is and sends it), paywall_viewed, checkout_started, payment_confirmed. Beside it,
+ * web_vital measures how the pages feel.
  */
 
 type Value = string | number | boolean;
@@ -21,6 +22,8 @@ export type AnalyticsEvents = EventCatalog<{
   paywall_viewed: { source: string };
   checkout_started: { interval: string };
   payment_confirmed: { method: string; cents: number };
+  /** LCP, INP or CLS from a sample of page loads. Milliseconds, except CLS, which has no unit. */
+  web_vital: { metric: string; value: number; rating: string };
 }>;
 
 export type AnalyticsEvent = keyof AnalyticsEvents;

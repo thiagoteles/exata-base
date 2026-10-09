@@ -15,8 +15,9 @@ never reaches the billing rules as the provider's own type.
 2. **Read it in the adapter.** Add the `case` to `toPaymentEvent`. Anything missing that the rule
    needs (no user, no customer) becomes `{ kind: "ignored" }`, never a throw: a throw makes Stripe
    retry the same delivery for days.
-3. **Apply it in the service.** Add the `case` to `applyEvent`. The compiler stops at the `never`
-   branch until every variant is handled. Rules:
+3. **Apply it in the service.** Add the `case` to `applyEvent`, returning `null` unless it records a
+   payment for the first time (that one comes back as `newPayment`, which the route counts in the
+   funnel). The compiler stops at the `never` branch until every variant is handled. Rules:
    - The change happens inside the transaction that already holds the replay lock, so a delivery
      seen before does nothing and a failed change leaves the event unseen for the retry.
    - A call to the provider (such as ending a subscription) is made through the function handed in,

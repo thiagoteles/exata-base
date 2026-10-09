@@ -6,13 +6,14 @@ import { LOCALE_COOKIE } from "@/lib/i18n/locales";
 import { requireUser } from "@/lib/ports/auth";
 import { signInRedirect } from "@/lib/routes";
 import { ONE_YEAR_SECONDS, THEME_COOKIE } from "@/lib/theme";
+import { timedRoute } from "@/lib/timed-route";
 
 /*
  * Every sign-in, in both modes, ends here. The app has the person's row by now, so their saved
  * theme is copied to the cookie the first paint reads, and they go on to where they were headed.
  * The address is built from APP_URL, not from the request, which behind a proxy has the wrong host.
  */
-export async function GET(request: NextRequest) {
+export const GET = timedRoute("/auth/complete", async (request: NextRequest) => {
   const next = request.nextUrl.searchParams.get("next");
   try {
     const user = await requireUser();
@@ -39,4 +40,4 @@ export async function GET(request: NextRequest) {
     }
     throw error;
   }
-}
+});

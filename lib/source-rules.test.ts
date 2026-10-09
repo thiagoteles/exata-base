@@ -36,6 +36,24 @@ describe("source rules", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("times every route handler under its own pattern, except the uptime check", () => {
+    const bare = /^export (async )?function (GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/m;
+    const offenders = trackedSources()
+      .filter((file) => file.startsWith("app/") && file.endsWith("/route.ts"))
+      .filter((file) => file !== "app/health/route.ts")
+      .filter((file) => {
+        const pattern = `/${file
+          .slice("app/".length, -"/route.ts".length)
+          .split("/")
+          .filter((segment) => !segment.startsWith("("))
+          .join("/")}`;
+        const source = readFileSync(file, "utf8");
+        const timed = new RegExp(`timedRoute\\(\\s*"${RegExp.escape(pattern)}"`);
+        return bare.test(source) || !timed.test(source);
+      });
+    expect(offenders).toEqual([]);
+  });
+
   it("invalidates by tag, never by path, and caches with use cache, never unstable_cache", () => {
     const forbidden = /\b(revalidatePath|unstable_cache)\b/;
     const offenders = trackedSources()

@@ -12,13 +12,14 @@ import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/ports/log";
 import { consume } from "@/lib/rate-limit/service";
+import { timedRoute } from "@/lib/timed-route";
 
 const deduper = createDeduper();
 // A browser stuck in an error loop is cut off here, before its reports fill the log.
 const reportsPerAddress = { name: "client-errors", limit: 30, windowSeconds: 60 };
 
 /** Errors that happened in a person's browser, written to the log as errors so the alert sees them. */
-export async function POST(request: NextRequest) {
+export const POST = timedRoute("/api/client-errors", async (request: NextRequest) => {
   const declared = Number(request.headers.get("content-length") ?? "0");
   if (declared > MAX_REPORT_BYTES) {
     return new Response(null, { status: 413 });
@@ -48,4 +49,4 @@ export async function POST(request: NextRequest) {
     logger.error("browser error", { ...rest, errorMessage: message });
   }
   return new Response(null, { status: 204 });
-}
+});

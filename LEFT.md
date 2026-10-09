@@ -112,7 +112,7 @@ Tudo aqui se prova como a base já faz: eventos do Stripe assinados à mão e li
 
 - [x] **F7.1 Catálogo dividido.** `messages/pt-BR/<área>.json`, juntado por um comando num `messages/pt-BR.json` gerado, que continua sendo o tipo; o `pnpm check` confere que o gerado está em dia. A paridade entre idiomas continua. *Regras, item 1.*
 - [x] **F7.2 Extrator de textos.** Ao terminar, citar o extrator no passo 3 da skill `port-from-legacy`. `scripts/extract-text.ts` com `ts-morph`: acha literais em JSX e nas props `aria-label`, `placeholder`, `title` e `alt`, propõe a chave pelo caminho, grava no catálogo da área e troca por `t("chave")`; recusa travessão. Testado sobre um arquivo de exemplo.
-- [ ] **F7.3 Peso do catálogo.** Medir o typecheck do TS 7 com um catálogo sintético de 5 mil chaves e registrar o tempo no `BASE.md`. Se passar de 2× o atual, propor a mitigação no próprio registro.
+- [x] **F7.3 Peso do catálogo.** Medir o typecheck do TS 7 com um catálogo sintético de 5 mil chaves e registrar o tempo no `BASE.md`. Se passar de 2× o atual, propor a mitigação no próprio registro.
 
 ### F8. Capacidades sob demanda
 

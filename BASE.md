@@ -162,6 +162,8 @@ Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `n
 - **Um 301 fica guardado no navegador.** Renomear um caminho público depois de publicado exige manter o antigo no mapa (ou em `lib/redirects.ts`), senão quem já o visitou não chega mais ao novo.
 - **Deploy sem CI.** O Coolify observa a `main` e faz o deploy a cada push, sem passar por nenhuma Action. A barreira é o hook de `pre-push` (build e `check:prerender`) mais o `pnpm verify` antes de entregar uma fase; `--no-verify` é a única forma de pular.
 
+- **Peso do catálogo medido (2026-10-09).** O `tsc` do TS 7 leva cerca de 1,75 s com as 984 chaves de hoje e cerca de 1,8 s com 5 mil chaves a mais (catálogo sintético de 100 grupos de 50, medido duas vezes cada, nenhum erro). Não passa de 2× o atual, então nenhuma mitigação é necessária; se um produto passar de dezenas de milhares de chaves, o caminho é tipar só as chaves das áreas que o arquivo usa, e não o catálogo inteiro.
+
 ## 6. Estado
 
 As fases 0 a 12 do plano foram feitas e provadas (cada uma foi um commit `feat:`/`chore:` ... `for phase N`, hoje só no bundle da seção 8). Último estado provado, em 2026-10-08, num produto criado do zero com `create-next-app --example` contra o repositório público: `pnpm check` limpo com 215 testes de unidade, 102 de integração, 69 de 69 no Playwright no compose limpo (5 pulados: idioma e Clerk), 67 de 67 com Stripe e Cloud Storage ligados (7 pulados, os que só valem sem provedor), e 3 de 3 em `pnpm test:clerk`.

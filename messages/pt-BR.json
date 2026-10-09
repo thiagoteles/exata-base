@@ -182,6 +182,38 @@
       },
       "compact": { "legend": "Tamanho compacto", "a": "Primeira opção", "b": "Segunda opção" }
     },
+    "structure": {
+      "title": "Trilha, abas e seções",
+      "trail": "Você está aqui",
+      "crumbs": { "home": "Início", "catalog": "Catálogo", "current": "Estrutura" },
+      "tabs": {
+        "label": "Seções da conta",
+        "overview": "Resumo",
+        "overviewBody": "O painel escolhido ocupa o lugar dos outros, e a aba escolhida fica sublinhada em tinta.",
+        "activity": "Atividade",
+        "activityBody": "As setas movem e escolhem, e Home e End vão às pontas.",
+        "locked": "Bloqueada",
+        "settings": "Ajustes",
+        "settingsBody": "Uma aba desabilitada é pulada pelo teclado.",
+        "compact": "Seções compactas",
+        "one": "Primeira",
+        "oneBody": "Tamanho pequeno para espaços apertados.",
+        "two": "Segunda",
+        "twoBody": "O mesmo comportamento, em linha menor."
+      },
+      "accordion": {
+        "first": "Posso cancelar quando quiser?",
+        "firstBody": "Sim. O cancelamento vale ao fim do período já pago, sem multa.",
+        "second": "Como troco de plano?",
+        "secondBody": "Na página do plano, escolhendo outro. A diferença é calculada na hora.",
+        "third": "Onde ficam os recibos?",
+        "thirdBody": "Na conta, em Meu plano, e também no seu e-mail a cada cobrança.",
+        "a": "Vários abertos",
+        "aBody": "Neste modo cada linha abre e fecha por conta própria.",
+        "b": "Tamanho pequeno",
+        "bBody": "Linha menor para listas longas."
+      }
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",

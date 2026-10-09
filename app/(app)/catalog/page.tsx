@@ -18,6 +18,7 @@ import { RecordDemo } from "@/features/catalog/record-demo";
 import { SaveDemo } from "@/features/catalog/save-demo";
 import { CatalogSection } from "@/features/catalog/section";
 import { StatesDemo } from "@/features/catalog/states-demo";
+import { StructureDemo } from "@/features/catalog/structure-demo";
 import { UploadDemo } from "@/features/catalog/upload-demo";
 import { Wizard } from "@/features/catalog/wizard";
 import { db } from "@/lib/db/client";
@@ -65,6 +66,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection title={t("choices.title")}>
           <ChoicesDemo />
+        </CatalogSection>
+        <CatalogSection title={t("structure.title")}>
+          <StructureDemo />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

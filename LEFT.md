@@ -41,7 +41,7 @@ Este arquivo é o estado do trabalho. Uma sessão nova, ou a mesma depois de uma
 
 As fases seguem a dependência entre elas. Cada unidade aponta a seção que detalha o que fazer.
 
-### F1. Regras e arrumação
+### F1. Regras e arrumação (fase concluída, `pnpm verify` verde)
 
 - [x] **F1.1 Onde cada coisa vai.** (feito: linha `components/figures` e regra "Where a thing lives" no `AGENTS.md`) Escrever no `AGENTS.md`: cálculo puro em `domain/`, figuras SVG em `components/figures`, áudio e microfone em `domain/audio` importado só por componente cliente (ou port com adapter de navegador quando precisar de falso em teste); notação de domínio (nomes de nota, siglas) vem de funções do domínio e não é texto do catálogo. *Estrutura, Camada; Regras, item 1.* A validação de mover um módulo já está provada: `domain/billing` e `domain/charts` passam no check.
 - [x] **F1.2 Arquivos estáticos.** (feito: `public/` com o `COPY` no Dockerfile; o `pnpm verify` põe um `.wav` e um `.json` nela e confere 200 na imagem de produção, tipos que o matcher do proxy não nomeia; teste de fonte recusa `readFile`, `readFileSync`, `createReadStream` e `readdir` no código do app sem `turbopackIgnore`, com o adapter de disco como única exceção, por ler o diretório de storage fora do repositório; o upload do e2e falhou uma vez na primeira compilação e passou na rodada seguinte) Criar `public/` (com `.gitkeep`) e o `COPY` no Dockerfile, provado no `pnpm verify`. Teste de fonte que recusa `readFile`/`readFileSync` com caminho vindo de argumento sem o comentário `turbopackIgnore`. Arquivo pago fica atrás de rota com guarda: documentar o padrão com a rota de storage existente. *Estrutura, Arquivos estáticos.*

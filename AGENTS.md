@@ -30,7 +30,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 | `components/shell/` | The public and signed-in shells |
 | `emails/` | E-mail components and their builders |
 | `messages/pt-BR.json` | Every sentence a person reads. The file is the type of the catalog |
-| `ops/`, `scripts/` | Alarm definitions for Google Cloud, the token generator, repository checks |
+| `ops/`, `scripts/` | Alarm definitions for Google Cloud, the token generator, repository checks. A scheduled job has a line in `ops/gcp/heartbeats.json` and records each run with `recordJobRun`; the absence alarm and the admin health panel both read that window |
 
 ### Rules that do not bend
 

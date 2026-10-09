@@ -19,6 +19,7 @@ const PAGES = [
   "/account/plan",
   "/account/messages",
   "/admin/numbers",
+  "/admin/health",
   "/admin/users",
   "/admin/invites",
   "/admin/audit",

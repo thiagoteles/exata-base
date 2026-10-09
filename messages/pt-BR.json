@@ -338,7 +338,8 @@
       "users": "Usuários",
       "invites": "Convites",
       "audit": "Auditoria",
-      "numbers": "Números"
+      "numbers": "Números",
+      "health": "Saúde"
     },
     "contact": "Contato",
     "plans": "Planos",
@@ -831,6 +832,48 @@
       "table": "Ver os números em tabela",
       "day": "Dia",
       "value": "Valor"
+    },
+    "health": {
+      "title": "Saúde",
+      "subtitle": "Os trabalhos agendados, os webhooks e o banco, como estão agora.",
+      "release": "No ar",
+      "service": "Serviço",
+      "version": "Versão",
+      "unknownVersion": "Sem commit informado",
+      "database": "Banco",
+      "databaseUp": "Respondendo",
+      "answered": "Respondeu em {ms, number} ms",
+      "postgres": "Postgres",
+      "size": "Tamanho",
+      "migrations": "Migrations",
+      "migrationsApplied": "{count, plural, =0 {Nenhuma aplicada} one {# aplicada} other {# aplicadas}}",
+      "lastMigration": "A mais recente foi gerada em {date}",
+      "jobs": "Trabalhos agendados",
+      "jobsNote": "O prazo é o mesmo do alarme de ausência. Passou dele, o trabalho está atrasado.",
+      "job": "Trabalho",
+      "state": "Estado",
+      "lastRun": "Última execução",
+      "duration": "Duração",
+      "window": "Prazo",
+      "windowHours": "{hours, plural, one {# hora} other {# horas}}",
+      "failures": "{count, plural, one {# operação falhou} other {# operações falharam}}",
+      "neverRan": "Nunca rodou",
+      "states": {
+        "ok": "Em dia",
+        "failing": "Com falha",
+        "late": "Atrasado",
+        "never": "Sem registro"
+      },
+      "webhooks": "Webhooks",
+      "webhooksNote": "A última entrega recebida de cada provedor. Silêncio pode ser só falta de movimento.",
+      "source": "Origem",
+      "lastDelivery": "Última entrega",
+      "lastType": "Evento",
+      "noDelivery": "Nenhuma entrega",
+      "sources": {
+        "payments": "Pagamentos",
+        "accounts": "Contas"
+      }
     }
   },
   "articles": {

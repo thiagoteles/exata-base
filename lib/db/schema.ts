@@ -15,6 +15,7 @@ import {
 import { contactMessages, contactStatus, contactSubject } from "./schema/contact";
 import { files } from "./schema/files";
 import { invites } from "./schema/invites";
+import { jobRuns } from "./schema/operations";
 import { rateLimits } from "./schema/rate-limits";
 import { userRole, users } from "./schema/users";
 
@@ -40,6 +41,7 @@ export const schema = {
   contactStatus,
   files,
   rateLimits,
+  jobRuns,
   staffAuditLog,
   accountDeletions,
   deletionRequester,

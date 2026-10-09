@@ -24,6 +24,7 @@ for (const theme of themes) {
   }) => {
     const screens = [
       ["/admin/numbers", "Números"],
+      ["/admin/health", "Saúde"],
       ["/admin/users", "Usuários"],
       ["/admin/invites", "Convites"],
       ["/admin/audit", "Auditoria"],
@@ -128,7 +129,7 @@ test.describe("without a session", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test("a visitor is sent to sign-in from every admin screen", async ({ page }) => {
-    for (const path of ["/admin/users", "/admin/invites", "/admin/audit"]) {
+    for (const path of ["/admin/users", "/admin/invites", "/admin/audit", "/admin/health"]) {
       await page.goto(path);
       expect(new URL(page.url()).pathname).toBe("/sign-in");
     }
@@ -155,4 +156,20 @@ test("the numbers follow the chosen period and every chart has a table", async (
   await expect(signups.getByRole("button")).toHaveCount(90);
   await signups.getByText("Ver os números em tabela").click();
   await expect(signups.getByRole("table").getByRole("row")).toHaveCount(91);
+});
+
+test("the health panel shows the daily job on time right after the daily call", async ({
+  page,
+  request,
+}) => {
+  const ran = await request.post("/events", {
+    headers: { authorization: `Bearer ${CRON_SECRET}` },
+  });
+  expect(ran.status()).toBe(200);
+  await open(page, "/admin/health", "light", "Saúde");
+  const daily = page.getByRole("table", { name: "Trabalhos agendados" }).getByRole("row", {
+    name: /daily/,
+  });
+  await expect(daily.getByText("Em dia")).toBeVisible();
+  await expect(page.getByText("Respondendo")).toBeVisible();
 });

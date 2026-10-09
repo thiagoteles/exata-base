@@ -40,9 +40,13 @@ export function AppShell({ sidebar, bottomBar, userMenu, children }: AppShellPro
         <aside className="hidden w-sidebar shrink-0 overflow-y-auto border-r border-line bg-surface lg:block">
           {sidebar}
         </aside>
+        {/* Only the content scrolls, so it is a tab stop: a page with no link or button of its own
+            would otherwise never scroll from the keyboard. The skip link lands here too. */}
         <main
           id={contentId}
-          className="min-w-0 flex-1 overflow-y-auto px-4 pt-8 pb-24 md:px-8 lg:pb-8"
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrolling region must take focus to scroll by keyboard
+          tabIndex={0}
+          className="min-w-0 flex-1 overflow-y-auto px-4 pt-8 pb-24 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus md:px-8 lg:pb-8"
         >
           {children}
         </main>

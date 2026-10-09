@@ -1,4 +1,5 @@
 import type { Database } from "@/lib/db/database";
+import { recordJobRun } from "@/lib/operations/job-runs";
 import type { Logger } from "@/lib/ports/log/types";
 
 /*
@@ -45,6 +46,17 @@ export async function runDailyOperations(
     }
   }
   report.ms = Math.round(performance.now() - started);
+  try {
+    await recordJobRun(context.db, {
+      name: "daily",
+      ranAt: context.now,
+      failed: report.failed.length,
+      ms: report.ms,
+    });
+  } catch (error) {
+    // The run itself happened; only the panel's row is missing, and the heartbeat below still goes.
+    logger.error("daily run not recorded", { error });
+  }
   // The absence alarm watches this line: if it stops, the scheduler stopped calling, which no error
   // would ever say. Failures are errors of their own, above.
   logger.info("heartbeat", { job: "daily", failed: report.failed.length });

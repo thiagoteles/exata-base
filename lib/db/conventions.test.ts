@@ -20,6 +20,7 @@ const conventionExceptions: Record<string, string> = {
   staff_audit_log: "append-only, never updated",
   account_deletions: "append-only, never updated",
   rate_limits: "keyed by the hash of limit, subject and window; a row lives for one window",
+  job_runs: "one row per job, keyed by its name and overwritten on every run",
 };
 
 function userKeys(table: PgTable) {

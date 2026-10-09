@@ -363,12 +363,13 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 7. Painel "Saúde" no admin
 
-- [ ] Página em `(app)/admin` com:
-  - a última execução de cada trabalho;
-  - o último webhook recebido;
-  - a versão no ar;
-  - o estado do banco.
-- [ ] Substitui o `/status` com token do solmiza.
+- [x] Página `/admin/health` com:
+  - a última execução de cada trabalho (tabela `job_runs`, uma linha por trabalho, gravada pelo runner diário; um sync de produto grava com `recordJobRun`), com estado em dia, com falha, atrasado ou sem registro, contra o mesmo prazo do alarme de ausência (`ops/gcp/heartbeats.json`, regra em `domain/operations/job-health.ts`);
+  - o último webhook recebido de pagamentos e de contas;
+  - a versão no ar (`SOURCE_COMMIT`) e o serviço;
+  - o estado do banco (tempo de resposta, versão do Postgres, tamanho, migrations aplicadas).
+- [x] Substitui o `/status` com token do solmiza.
+- [x] De quebra: a área de conteúdo do shell virou parada de Tab, porque o axe mostrou que uma página sem link nem botão não rolava pelo teclado.
 
 ### 8. Catálogo tipado de eventos
 

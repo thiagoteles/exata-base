@@ -286,6 +286,46 @@
       "caption": "Uso do mês",
       "summary": "Uso do mês: {value, number} de {max, number}"
     },
+    "paidPatterns": {
+      "title": "Teste, passos e conquistas",
+      "trial": {
+        "title": "Teste gratuito",
+        "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para o fim do teste.",
+        "bar": "Dias do teste já usados",
+        "action": "Ver planos"
+      },
+      "checklist": {
+        "progress": "Progresso dos passos",
+        "count": "{done, number} de {total, number}",
+        "done": "(feito)",
+        "finish": "Marcar como feito",
+        "steps": {
+          "profile": {
+            "title": "Complete o perfil",
+            "help": "Nome e foto aparecem para quem você convida."
+          },
+          "import": {
+            "title": "Importe seus dados",
+            "help": "Traga o que você já tem de uma planilha."
+          },
+          "invite": {
+            "title": "Convide alguém",
+            "help": "Quem entra pelo seu link já chega com tudo pronto."
+          }
+        }
+      },
+      "achievements": {
+        "earned": "Conquistada",
+        "locked": "A conquistar",
+        "first": { "title": "Primeira ficha", "body": "Cadastre a primeira ficha." },
+        "ten": {
+          "title": "Dez fichas",
+          "body": "Cadastre dez fichas.",
+          "bar": "Fichas cadastradas"
+        },
+        "streak": { "title": "Sete dias seguidos", "body": "Volte sete dias seguidos." }
+      }
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",
@@ -437,9 +477,12 @@
     "paid": {
       "title": "Plano pago",
       "unlocked": "Seu plano é pago, então este bloco abre. A guarda que o protege é requirePaidPlan().",
-      "locked": "Este bloco é do plano pago. Quem está no plano gratuito vê esta mensagem no lugar.",
-      "plans": "Ver planos",
-      "lockedStamp": "Bloqueado",
+      "closedTitle": "Este bloco é do plano pago",
+      "locked": "Quem está no plano gratuito vê esta porta no lugar do conteúdo, com o que o plano abre e um caminho para os planos.",
+      "benefits": {
+        "one": "Conteúdo e recursos pagos",
+        "two": "Tudo o que o plano gratuito já tem"
+      },
       "unlockedStamp": "Aberto"
     }
   },
@@ -813,6 +856,7 @@
     "freePrice": "Grátis",
     "freeUnit": "sem prazo",
     "features": { "premium": "Conteúdo e recursos pagos" },
+    "paywall": { "label": "Conteúdo de plano pago", "action": "Ver planos" },
     "faq": {
       "title": "Sobre cobrança",
       "intro": "O que mais se pergunta antes de assinar.",

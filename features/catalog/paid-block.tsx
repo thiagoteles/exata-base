@@ -1,35 +1,38 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { Gate } from "@/components/patterns/gate";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
-import { requireFeature } from "@/lib/billing/guard";
-import { DomainError } from "@/lib/errors";
+import { hasFeature } from "@/lib/billing/guard";
 import { publicHref } from "@/lib/i18n/public-paths";
 
-/** A block that only a paid plan opens, to show the guard at work. Everyone else sees why not. */
+/** A block that only a paid plan opens, to show the gate at work. Everyone else sees the paywall. */
 export async function PaidBlock() {
-  const t = await getTranslations("catalog.paid");
-  try {
-    await requireFeature("premium");
-  } catch (error) {
-    if (error instanceof DomainError && error.status === 403) {
-      return (
-        <Panel className="flex flex-col items-start gap-4">
-          <Stamp tone="neutral">{t("lockedStamp")}</Stamp>
-          <p className="max-w-[52ch] text-body text-ink">{t("locked")}</p>
-          <Link href={publicHref("/plans")} className={buttonClasses("secondary")}>
-            {t("plans")}
-          </Link>
-        </Panel>
-      );
-    }
-    throw error;
-  }
+  const [t, p] = await Promise.all([
+    getTranslations("catalog.paid"),
+    getTranslations("plans.paywall"),
+  ]);
   return (
-    <Panel level="highlight" className="flex flex-col items-start gap-4">
-      <Stamp tone="done">{t("unlockedStamp")}</Stamp>
-      <p className="max-w-[52ch] text-body text-ink">{t("unlocked")}</p>
-    </Panel>
+    <Gate
+      open={await hasFeature("premium")}
+      source="catalog"
+      label={p("label")}
+      closed={{
+        title: t("closedTitle"),
+        body: t("locked"),
+        benefits: [t("benefits.one"), t("benefits.two")],
+      }}
+      action={
+        <Link href={publicHref("/plans")} className={buttonClasses("secondary")}>
+          {p("action")}
+        </Link>
+      }
+    >
+      <Panel level="highlight" className="flex flex-col items-start gap-4">
+        <Stamp tone="done">{t("unlockedStamp")}</Stamp>
+        <p className="max-w-[52ch] text-body text-ink">{t("unlocked")}</p>
+      </Panel>
+    </Gate>
   );
 }

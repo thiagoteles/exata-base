@@ -261,6 +261,12 @@ The rest of this file describes the `instrument` values; the table below is what
 - `warning` asks for attention without blocking.
 - Colored text always uses the role's `-ink` token, never the full tone.
 
+**Paid product patterns.** What a paid product shows around the plan, all in `components/patterns` and all given their data by props.
+- **Gate and paywall.** `Gate` shows its content to a plan that has the feature and `Paywall` to one that has not. Whether it is open is a plan question the caller answers with `hasFeature(feature)`, the same guard `requireFeature` is, so the door and the data behind it open and shut together. The paywall says what is closed, what the plan opens (a few lines) and gives one way forward, to the plans. It never blurs the content behind it and never nags. Seeing it sends `paywall_viewed` with a `source`, once per place.
+- **Trial.** `TrialNotice` is a strip where the plan is the subject, not a banner that follows the person: the words (days left, said by the caller) and a bar of the days used. The standing comes from `trialStanding` in `domain/billing/trial.ts` (days round up: ten minutes left is one day), with the clock handed in.
+- **Checklist.** `Checklist` is the rail for any short list worked through: a bar, a line with a marker per step, the open step in full with its one control, finished steps shrunk to a line. The first steps of an account use it.
+- **Achievements.** `Achievements` is a ruled list of what is earned (trophy, stamp) and what is ahead (lock, and a bar when there is a count). Locked ones are shown on purpose. No motion celebrates.
+
 **Figures.** A figure is a drawing the product needs that is neither a chart nor a control: a dial, a diagram, an instrument, a ball on a board. It lives in `components/figures`, and these rules hold for every one.
 - The numbers are not the figure's. Geometry and values come from `domain/` (see `domain/figures/arc.ts` for the dial's), so they are tested without a screen; the figure only draws what it is handed.
 - Text inside the drawing is `<SvgText>`: a catalog key (`messageKey`, typed from the catalog file, with `values` for its arguments) for a sentence, or `text` for notation that a domain function produced. A figure never writes a sentence, and never a size: the variant is one of the interface's roles (`label`, `data`, `body-small`). `halo` puts a surface-colored stroke behind letters that cross a mark.

@@ -17,6 +17,7 @@ import { LayersDemo } from "@/features/catalog/layers-demo";
 import { MeasuresDemo } from "@/features/catalog/measures-demo";
 import { OrdersList } from "@/features/catalog/orders-list";
 import { PaidBlock } from "@/features/catalog/paid-block";
+import { PaidPatternsDemo } from "@/features/catalog/paid-patterns-demo";
 import { PaletteDemo } from "@/features/catalog/palette-demo";
 import { PickersDemo } from "@/features/catalog/pickers-demo";
 import { PublicDemo } from "@/features/catalog/public-demo";
@@ -89,6 +90,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection title={t("figures.title")}>
           <FiguresDemo />
+        </CatalogSection>
+        <CatalogSection title={t("paidPatterns.title")}>
+          <PaidPatternsDemo now={currentInstant().toISOString()} />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

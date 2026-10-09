@@ -22,9 +22,31 @@ export async function assertFeature(holderId: string, feature: Feature): Promise
   }
 }
 
-/** The signed-in user when their plan grants the feature; otherwise a 401 or a 403. */
+/**
+ * The signed-in user when their plan grants the feature; otherwise a 401 or a 403. The guard for a page or a
+ * route that is wholly paid; a screen that shows one thing or another uses `hasFeature`.
+ *
+ * @public
+ */
 export async function requireFeature(feature: Feature) {
   const user = await requireUser();
   await assertFeature(user.id, feature);
   return user;
+}
+
+/**
+ * Whether the signed-in person's plan grants the feature, for a screen that shows one thing or
+ * another instead of failing. It is the same guard, so what a screen shows and what a route allows
+ * cannot disagree. Not signed in is still a 401: a visitor never reaches a gate.
+ */
+export async function hasFeature(feature: Feature): Promise<boolean> {
+  try {
+    await requireFeature(feature);
+    return true;
+  } catch (error) {
+    if (error instanceof DomainError && error.status === 403) {
+      return false;
+    }
+    throw error;
+  }
 }

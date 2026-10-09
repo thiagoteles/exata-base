@@ -75,7 +75,7 @@ test("the catalog's paid block stays shut for the free plan and points to the pl
   const block = page.locator("section", {
     has: page.getByRole("heading", { name: "Plano pago" }),
   });
-  await expect(block.getByText("Bloqueado")).toBeVisible();
+  await expect(block.getByRole("heading", { name: "Este bloco é do plano pago" })).toBeVisible();
   await expect(block.getByRole("link", { name: "Ver planos" })).toHaveAttribute("href", "/planos");
 });
 

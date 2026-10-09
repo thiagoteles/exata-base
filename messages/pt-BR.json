@@ -251,6 +251,35 @@
       "window": "Retirada, a partir de hoje",
       "windowHelp": "A semana começa na segunda e dias passados não valem."
     },
+    "publicPatterns": {
+      "title": "Tabela de preços e perguntas",
+      "caption": "Planos de exemplo",
+      "compare": "O que está incluso",
+      "included": "Incluído",
+      "notIncluded": "Não incluído",
+      "features": {
+        "reports": "Relatórios",
+        "export": "Exportação dos dados",
+        "support": "Suporte por e-mail"
+      },
+      "plans": { "free": "Gratuito", "monthly": "Mensal", "yearly": "Anual" },
+      "free": "Grátis",
+      "noEnd": "sem prazo",
+      "perMonth": "por mês",
+      "perYear": "por ano",
+      "yearlyNote": "Dois meses de graça em relação ao mensal.",
+      "subscribe": "Assinar",
+      "faq": {
+        "trial": {
+          "question": "Existe período de teste?",
+          "answer": "Existe, e a conta gratuita não vence: você usa o quanto quiser antes de decidir."
+        },
+        "switch": {
+          "question": "Posso trocar de plano depois?",
+          "answer": "Pode, na página do seu plano. A troca vale na hora."
+        }
+      }
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",
@@ -449,6 +478,43 @@
     "articles": "Artigos"
   },
   "home": {
+    "eyebrow": "Texto de exemplo",
+    "steps": {
+      "title": "Como funciona",
+      "intro": "Três passos, na ordem em que acontecem. Troque pelos do seu produto.",
+      "items": {
+        "create": {
+          "title": "Crie sua conta",
+          "body": "Leva um minuto e só pede o que é preciso. Você confirma o e-mail e já entra."
+        },
+        "fill": {
+          "title": "Cadastre o que você já tem",
+          "body": "Digite ou importe. O que for pessoal fica só com você e pode ser exportado a qualquer hora."
+        },
+        "follow": {
+          "title": "Acompanhe sem esforço",
+          "body": "Tudo o que importa fica numa tela só, com avisos que você mesmo escolhe receber."
+        }
+      }
+    },
+    "faq": {
+      "title": "Perguntas frequentes",
+      "intro": "Respostas curtas para o que mais se pergunta antes de começar.",
+      "items": {
+        "start": {
+          "question": "Preciso pagar para começar?",
+          "answer": "Não. A conta gratuita já traz o essencial, e você só assina se quiser mais."
+        },
+        "data": {
+          "question": "O que acontece com os meus dados?",
+          "answer": "Ficam na sua conta. Você baixa uma cópia quando quiser e apaga tudo com um botão, sem pedir a ninguém."
+        },
+        "cancel": {
+          "question": "Posso cancelar quando quiser?",
+          "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa e sem ligação."
+        }
+      }
+    },
     "title": "O dia a dia organizado, sem enfeite",
     "subtitle": "Texto de exemplo. Troque esta frase pela proposta do seu produto, em um parágrafo curto.",
     "primary": "Criar conta",
@@ -734,6 +800,31 @@
     "title": "Planos",
     "subtitle": "Escolha como quer usar o produto. Você pode mudar depois.",
     "none": "Os planos ainda não estão à venda.",
+    "productName": "Plano pago",
+    "compare": "O que está incluso",
+    "included": "Incluído",
+    "notIncluded": "Não incluído",
+    "freePrice": "Grátis",
+    "freeUnit": "sem prazo",
+    "features": { "premium": "Conteúdo e recursos pagos" },
+    "faq": {
+      "title": "Sobre cobrança",
+      "intro": "O que mais se pergunta antes de assinar.",
+      "items": {
+        "cancel": {
+          "question": "Posso cancelar quando quiser?",
+          "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa."
+        },
+        "refund": {
+          "question": "Posso pedir o dinheiro de volta?",
+          "answer": "Nas compras online você tem sete dias para desistir. Escreva para o suporte e devolvemos o valor."
+        },
+        "invoice": {
+          "question": "Recebo recibo de cada cobrança?",
+          "answer": "Sim. Ele chega por e-mail a cada pagamento e fica guardado na sua conta."
+        }
+      }
+    },
     "perMonth": "por mês",
     "perYear": "por ano",
     "once": "pagamento único",
@@ -1040,7 +1131,8 @@
     "published": "Publicado em {date}",
     "updated": "Atualizado em {date}",
     "by": "Por {author}",
-    "all": "Todos os artigos"
+    "trail": "Você está aqui",
+    "home": "Início"
   },
   "onboarding": {
     "title": "Primeiros passos",

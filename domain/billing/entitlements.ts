@@ -45,6 +45,9 @@ function resolve(tier: Tier, seen: ReadonlySet<Tier> = new Set()): Omit<Entitlem
   };
 }
 
+/** Every feature a tier grants, the ones it inherits included. For screens that compare plans. */
+export const featuresOfTier = (tier: Tier): ReadonlySet<Feature> => resolve(tier).features;
+
 function grantedTier(plan: PlanState | null, now: Date): Tier {
   if (plan === null || plan.status === "pending" || plan.status === "canceled") {
     return "free";

@@ -18,6 +18,7 @@ import { OrdersList } from "@/features/catalog/orders-list";
 import { PaidBlock } from "@/features/catalog/paid-block";
 import { PaletteDemo } from "@/features/catalog/palette-demo";
 import { PickersDemo } from "@/features/catalog/pickers-demo";
+import { PublicDemo } from "@/features/catalog/public-demo";
 import { RecordDemo } from "@/features/catalog/record-demo";
 import { SaveDemo } from "@/features/catalog/save-demo";
 import { CatalogSection } from "@/features/catalog/section";
@@ -81,6 +82,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection title={t("composition.title")}>
           <CompositionDemo today={dateInSaoPaulo(currentInstant())} />
+        </CatalogSection>
+        <CatalogSection title={t("publicPatterns.title")}>
+          <PublicDemo />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

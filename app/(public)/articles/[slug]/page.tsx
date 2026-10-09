@@ -1,11 +1,11 @@
 import type { MDXContent } from "mdx/types";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { JsonLd } from "@/components/json-ld";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { findArticle } from "@/lib/content/articles";
 import { articles } from "@/lib/content/articles-index";
 import { frontmatterSchema } from "@/lib/content/frontmatter";
@@ -13,7 +13,7 @@ import { formatDate, type IsoDate } from "@/lib/date";
 import { env } from "@/lib/env";
 import { publicHref, publicPathOf } from "@/lib/i18n/public-paths";
 import { buildSocialMetadata } from "@/lib/social-metadata";
-import { structuredArticle } from "@/lib/structured-data";
+import { breadcrumbData, structuredArticle } from "@/lib/structured-data";
 import { z } from "@/lib/validation";
 
 // Every article in the index is prerendered; the proxy answers any other slug with a real 404.
@@ -73,12 +73,14 @@ async function Article({ params }: { params: PageProps<"/articles/[slug]">["para
   ]);
   return (
     <main className="mx-auto flex w-full max-w-170 flex-col gap-8 px-4 py-12 md:py-18">
-      <Link
-        href={publicHref("/articles")}
-        className="text-body-small text-brand-ink hover:underline"
-      >
-        {t("all")}
-      </Link>
+      <Breadcrumb
+        label={t("trail")}
+        items={[
+          { label: t("home"), href: "/" },
+          { label: t("title"), href: publicHref("/articles") },
+          { label: frontmatter.title },
+        ]}
+      />
       <article className="flex flex-col gap-8">
         <header className="flex flex-col gap-3">
           <h1 className="text-page-title text-ink">{frontmatter.title}</h1>
@@ -113,6 +115,18 @@ async function ArticleData({ slug }: { slug: string }) {
   if (article === undefined) {
     return null;
   }
+  const t = await getTranslations("articles");
   const path = publicPathOf(`/articles/${slug}`) ?? `/articles/${slug}`;
-  return <JsonLd data={structuredArticle(new URL(path, env.APP_URL).toString(), article)} />;
+  return (
+    <>
+      <JsonLd data={structuredArticle(new URL(path, env.APP_URL).toString(), article)} />
+      <JsonLd
+        data={breadcrumbData(env.APP_URL, [
+          { name: t("home"), path: publicPathOf("/") ?? "/" },
+          { name: t("title"), path: publicPathOf("/articles") ?? "/articles" },
+          { name: article.title },
+        ])}
+      />
+    </>
+  );
 }

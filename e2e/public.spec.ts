@@ -138,13 +138,47 @@ test("links and the canonical use the public address", async ({ page }) => {
   );
 });
 
-test("the home page describes the organization to search engines", async ({ page }) => {
-  await page.goto("/");
+async function structuredData(page: Page) {
   const data = await page
     .locator('script[type="application/ld+json"]')
     .evaluateAll((scripts) => scripts.map((script) => JSON.parse(script.textContent ?? "{}")));
-  expect(data.map((item) => item["@type"])).toEqual(["Organization", "WebSite"]);
-  expect(data[0]?.url).toBe("http://localhost:3300/");
+  return data as { "@type": string; [key: string]: unknown }[];
+}
+
+test("the home page describes the organization and its questions to search engines", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const data = await structuredData(page);
+  expect(data.map((item) => item["@type"]).sort((a, b) => a.localeCompare(b))).toEqual([
+    "FAQPage",
+    "Organization",
+    "WebSite",
+  ]);
+  expect(data.find((item) => item["@type"] === "Organization")?.["url"]).toBe(
+    "http://localhost:3300/",
+  );
+  // What the page shows is what it declares: every question is on screen, and opens to its answer.
+  const faq = data.find((item) => item["@type"] === "FAQPage") as unknown as {
+    mainEntity: { name: string; acceptedAnswer: { text: string } }[];
+  };
+  expect(faq.mainEntity.length).toBeGreaterThan(0);
+  for (const question of faq.mainEntity) {
+    const trigger = page.getByRole("button", { name: question.name });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+    await expect(page.getByText(question.acceptedAnswer.text)).toBeVisible();
+  }
+});
+
+test("a plans page declares its questions, and an article its trail", async ({ page }) => {
+  await page.goto("/planos");
+  expect((await structuredData(page)).map((item) => item["@type"])).toContain("FAQPage");
+  await page.goto("/artigos/como-escrever-um-artigo");
+  const kinds = (await structuredData(page)).map((item) => item["@type"]);
+  expect(kinds).toContain("Article");
+  expect(kinds).toContain("BreadcrumbList");
+  await expect(page.getByRole("navigation", { name: "Você está aqui" })).toBeVisible();
 });
 
 test("articles list, open with their reading layout, and a missing one is a real 404", async ({

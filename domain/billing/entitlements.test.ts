@@ -38,3 +38,11 @@ describe("entitlements", () => {
     expect(isPaidTier("free")).toBe(false);
   });
 });
+
+describe("featuresOfTier", () => {
+  it("lists what a tier grants, the inherited features included, and nothing for free", async () => {
+    const { featuresOfTier } = await import("./entitlements");
+    expect([...featuresOfTier("free")]).toEqual([]);
+    expect(featuresOfTier("paid").has("premium")).toBe(true);
+  });
+});

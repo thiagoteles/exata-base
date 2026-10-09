@@ -91,7 +91,7 @@ test("the share image, the icons and the manifest exist, with an absolute image 
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "http://localhost:3300/privacy",
+    "http://localhost:3300/privacidade",
   );
 });
 

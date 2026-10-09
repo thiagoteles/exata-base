@@ -35,6 +35,11 @@ const classRules: { pattern: RegExp; reason: string }[] = [
     reason: "hand-written color value; use a color token from DESIGN.md",
   },
   {
+    // A mix is allowed over the tokens (a track, a tint), never over a value written by hand.
+    pattern: /color-mix\([^)]*(?:#[0-9a-f]{3,8}|\b(?:oklch|oklab|rgb|hsl|hwb|lab|lch)\()/gi,
+    reason: "color-mix over a hand-written color; mix only var(--color-*) tokens",
+  },
+  {
     pattern: /(?<![\w-])rounded(?:-[a-z]{1,2})?(?:-(?:xs|sm|md|lg|xl|[2-4]xl))?(?![\w-])/g,
     reason: "stock radius; use stamp, control, cell, panel, dialog or full",
   },

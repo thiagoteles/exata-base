@@ -261,6 +261,14 @@ The rest of this file describes the `instrument` values; the table below is what
 - `warning` asks for attention without blocking.
 - Colored text always uses the role's `-ink` token, never the full tone.
 
+**Figures.** A figure is a drawing the product needs that is neither a chart nor a control: a dial, a diagram, an instrument, a ball on a board. It lives in `components/figures`, and these rules hold for every one.
+- The numbers are not the figure's. Geometry and values come from `domain/` (see `domain/figures/arc.ts` for the dial's), so they are tested without a screen; the figure only draws what it is handed.
+- Text inside the drawing is `<SvgText>`: a catalog key (`messageKey`, typed from the catalog file, with `values` for its arguments) for a sentence, or `text` for notation that a domain function produced. A figure never writes a sentence, and never a size: the variant is one of the interface's roles (`label`, `data`, `body-small`). `halo` puts a surface-colored stroke behind letters that cross a mark.
+- Colors are tokens, as classes (`stroke-brand`, `fill-ink-muted`). A faint share of a token is a mix over it: `stroke-[color-mix(in_oklch,var(--color-ink)_12%,transparent)]`. A mix over a hand-written color is refused by `pnpm lint:tokens`, and never over an accent (see below).
+- One figure is one picture for assistive technology: `role="img"` with a summary that carries the reading, and every mark inside is decoration. When the reading matters, the screen also shows it as text beside the figure.
+- It is drawn at the size it is shown, one unit to one pixel, with a `viewBox` and a width and no height: the interface's text sizes then read right inside it, and a narrower box scales the whole drawing down together. A figure drawn small and scaled up makes its text huge and clips it.
+- The neutral example is the dial `ArcGauge`, shown in the catalog.
+
 **Named palettes.** A product's own categories (sectors, levels, kinds of record) get a palette in `design.json` under `palettes`, as `palettes.<group>.<name>` with a hue, a chroma and an optional lightness. Each color becomes two tokens: `<group>-<name>` for marks (a fill that holds 3:1 against the surface and background, in both themes) and `<group>-<name>-ink` for text (4.5:1 on every ground). The classes are `bg-<group>-<name>`, `text-<group>-<name>-ink`, and so on; `AccentName`'s sibling `paletteNames` in `lib/palettes.ts` lists what exists, and the typecheck fails a screen that spells out one that was removed.
 - The group is verified as a set in the order declared: neighbors must be 15 apart (Oklab, times 100) for normal vision and 8 apart under protan, deutan and tritan vision. A group that fails is refused by name, with the pair and the vision. The fix is a hue or a lightness, never shipping it.
 - Color never carries the category alone: pair it with a name, a label or a shape. Nine or more categories are a table or a facet, not more colors.

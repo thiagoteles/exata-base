@@ -11,6 +11,7 @@ import { CatalogHeader } from "@/features/catalog/catalog-header";
 import { ChoicesDemo } from "@/features/catalog/choices-demo";
 import { CompositionDemo } from "@/features/catalog/composition-demo";
 import { FieldsDemo } from "@/features/catalog/fields-demo";
+import { FiguresDemo } from "@/features/catalog/figures-demo";
 import { FilesList } from "@/features/catalog/files-list";
 import { LayersDemo } from "@/features/catalog/layers-demo";
 import { MeasuresDemo } from "@/features/catalog/measures-demo";
@@ -85,6 +86,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection title={t("publicPatterns.title")}>
           <PublicDemo />
+        </CatalogSection>
+        <CatalogSection title={t("figures.title")}>
+          <FiguresDemo />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

@@ -280,6 +280,12 @@
         }
       }
     },
+    "figures": {
+      "title": "Figuras",
+      "help": "Uma figura só desenha o que o domínio calculou. O texto vem do catálogo ou de uma função de notação, a trilha é a tinta numa fração fraca e o valor é a marca, então os dois acompanham o tema.",
+      "caption": "Uso do mês",
+      "summary": "Uso do mês: {value, number} de {max, number}"
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",

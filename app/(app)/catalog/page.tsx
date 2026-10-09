@@ -10,6 +10,7 @@ import { ChoicesDemo } from "@/features/catalog/choices-demo";
 import { FieldsDemo } from "@/features/catalog/fields-demo";
 import { FilesList } from "@/features/catalog/files-list";
 import { LayersDemo } from "@/features/catalog/layers-demo";
+import { MeasuresDemo } from "@/features/catalog/measures-demo";
 import { OrdersList } from "@/features/catalog/orders-list";
 import { PaidBlock } from "@/features/catalog/paid-block";
 import { PaletteDemo } from "@/features/catalog/palette-demo";
@@ -69,6 +70,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection title={t("structure.title")}>
           <StructureDemo />
+        </CatalogSection>
+        <CatalogSection title={t("measures.title")}>
+          <MeasuresDemo />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

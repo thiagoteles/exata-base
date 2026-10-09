@@ -214,6 +214,22 @@
         "bBody": "Linha menor para listas longas."
       }
     },
+    "measures": {
+      "title": "Medidas e espera",
+      "upload": "Envio do arquivo",
+      "compact": "Importação, tamanho pequeno",
+      "failing": "Tentativa com falhas",
+      "storage": "Armazenamento",
+      "storageText": "{used, number} GB de {total, number} GB",
+      "quota": "Cota do mês",
+      "quotaText": "Quase no limite da cota.",
+      "volume": "Volume",
+      "range": "Faixa de preço",
+      "from": "De",
+      "until": "Até",
+      "rangeText": "De R$ {from, number} até R$ {until, number}",
+      "loading": "Carregando o perfil"
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",

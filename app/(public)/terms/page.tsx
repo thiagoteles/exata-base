@@ -5,7 +5,7 @@ import { buildSocialMetadata } from "@/lib/social-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("terms");
-  return buildSocialMetadata({ title: t("title"), description: t("notice"), path: "/terms" });
+  return await buildSocialMetadata({ title: t("title"), description: t("notice"), path: "/terms" });
 }
 
 export default async function TermsPage() {

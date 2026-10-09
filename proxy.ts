@@ -7,6 +7,11 @@ import { authProxy } from "@/lib/ports/auth/proxy";
 import { REQUEST_ID_HEADER, requestIdFrom } from "@/lib/request-id";
 
 const PERMANENT = 301;
+// Marks a request this proxy already rewrote. In production Next passes a rewritten request through
+// the proxy again to resume a prerendered page, now at the route address; without the mark that
+// second pass would answer the route address with the redirect, and the page would never load. A
+// caller who sends the mark only skips the redirect and still gets the same page.
+const REWRITTEN_HEADER = "x-public-address";
 
 export function proxy(request: NextRequest, event: NextFetchEvent) {
   const requestId = requestIdFrom(request.headers);
@@ -21,7 +26,8 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   // A route address that has a public twin is sent there, so only one address is indexed. Only
   // page loads move; a form posted to the old address is still answered where it was sent.
   const twin = publicPathOf(unprefixed);
-  if (twin !== null && (request.method === "GET" || request.method === "HEAD")) {
+  const isPageLoad = request.method === "GET" || request.method === "HEAD";
+  if (twin !== null && isPageLoad && !request.headers.has(REWRITTEN_HEADER)) {
     const target = new URL(`${prefix}${twin}`, env.APP_URL);
     target.search = request.nextUrl.search;
     return NextResponse.redirect(target, PERMANENT);
@@ -36,6 +42,9 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   return authProxy(seen, event, (forwarded) => {
     const headers = new Headers(forwarded.headers);
     headers.set(REQUEST_ID_HEADER, requestId);
+    if (rewritten) {
+      headers.set(REWRITTEN_HEADER, visible);
+    }
     if (decision !== null) {
       headers.set(LOCALE_HEADER, decision.locale);
     }

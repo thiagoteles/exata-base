@@ -7,7 +7,11 @@ import { buildSocialMetadata } from "@/lib/social-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("contact");
-  return buildSocialMetadata({ title: t("title"), description: t("subtitle"), path: "/contact" });
+  return await buildSocialMetadata({
+    title: t("title"),
+    description: t("subtitle"),
+    path: "/contact",
+  });
 }
 
 export default async function ContactPage() {

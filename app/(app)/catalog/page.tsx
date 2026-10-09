@@ -28,7 +28,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("catalog");
   // The catalog is a working tool for the team, never a page for search engines.
   return {
-    ...buildSocialMetadata({ title: t("title"), description: t("subtitle"), path: "/catalog" }),
+    ...(await buildSocialMetadata({
+      title: t("title"),
+      description: t("subtitle"),
+      path: "/catalog",
+    })),
     robots: { index: false, follow: false },
   };
 }

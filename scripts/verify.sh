@@ -66,6 +66,18 @@ if ! wait_for "http://localhost:${image_port}/health" 90; then
   exit 1
 fi
 curl -fsS "http://localhost:${image_port}/" > /dev/null
+# What only production shows: a prerendered page resumed through the proxy, and metadata built
+# with the address the container runs at, not the one the image was built with.
+page="$(curl -fsS "http://localhost:${image_port}/termos")"
+if ! grep -q "<link rel=\"canonical\" href=\"http://localhost:${image_port}/termos\"" <<< "$page"; then
+  echo "The public page does not carry the runtime address in its canonical." >&2
+  exit 1
+fi
+moved="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://localhost:${image_port}/terms")"
+if [ "$moved" != "301 http://localhost:${image_port}/termos" ]; then
+  echo "The route address did not move to the public one: $moved" >&2
+  exit 1
+fi
 docker rm -f "${name}-app" "${name}-db" > /dev/null
 docker network rm "${name}-net" > /dev/null
 docker image rm "${name}:local" > /dev/null

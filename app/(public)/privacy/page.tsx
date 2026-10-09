@@ -5,7 +5,11 @@ import { buildSocialMetadata } from "@/lib/social-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("privacy");
-  return buildSocialMetadata({ title: t("title"), description: t("notice"), path: "/privacy" });
+  return await buildSocialMetadata({
+    title: t("title"),
+    description: t("notice"),
+    path: "/privacy",
+  });
 }
 
 export default async function PrivacyPage() {

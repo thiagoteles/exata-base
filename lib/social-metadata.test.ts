@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { buildSocialMetadata } from "./social-metadata";
 
+vi.mock("next/server", () => ({ connection: () => Promise.resolve() }));
+
 describe("social metadata", () => {
-  it("always carries an absolute image, even when the page sets none", () => {
-    const metadata = buildSocialMetadata({
+  it("always carries an absolute image, even when the page sets none", async () => {
+    const metadata = await buildSocialMetadata({
       title: "Planos",
       description: "Preços",
       path: "/plans",

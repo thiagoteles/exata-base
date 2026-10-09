@@ -9,7 +9,7 @@ import { buildSocialMetadata } from "@/lib/social-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations();
-  return buildSocialMetadata({
+  return await buildSocialMetadata({
     title: t("site.name"),
     description: t("site.description"),
     path: "/",

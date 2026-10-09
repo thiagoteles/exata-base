@@ -20,7 +20,11 @@ import { buildSocialMetadata } from "@/lib/social-metadata";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("plans");
   return {
-    ...buildSocialMetadata({ title: t("title"), description: t("subtitle"), path: "/plans" }),
+    ...(await buildSocialMetadata({
+      title: t("title"),
+      description: t("subtitle"),
+      path: "/plans",
+    })),
     // With no price on sale there is nothing here for a search engine to list.
     ...(offeredIntervals().length === 0 ? { robots: { index: false } } : {}),
   };

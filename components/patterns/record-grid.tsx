@@ -47,9 +47,9 @@ export function RecordCell({ label, children, wide = false, stamp }: RecordCellP
 /** The main number of a record: mono, tabular, with the currency mark small and raised. */
 export function Figure({ prefix, children }: { prefix?: string; children: string }) {
   return (
-    <span className="font-mono text-figure tabular-nums">
+    <span className="inline-flex items-start gap-1 font-mono text-figure tabular-nums">
       {prefix === undefined ? null : (
-        <sup className="mr-1 align-top text-[0.6em] text-ink-muted">{prefix}</sup>
+        <sup className="pt-[0.3em] text-[0.6em] leading-none text-ink-muted">{prefix}</sup>
       )}
       {children}
     </span>

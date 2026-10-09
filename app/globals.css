@@ -177,8 +177,17 @@
   }
 }
 
-/* Waiting indicators only show after 180ms, so a fast answer never flashes. */
+/*
+ * Waiting indicators only show after 180ms, so a fast answer never flashes. The keyframes name
+ * their end: fade-in ends at the element's own opacity, which here is the hidden 0.
+ */
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
 @utility appear-after {
   opacity: 0;
-  animation: fade-in 120ms var(--ease-enter) 180ms forwards;
+  animation: appear 120ms var(--ease-enter) 180ms forwards;
 }

@@ -27,6 +27,15 @@ for (const theme of themes) {
   });
 }
 
+test("a waiting indicator shows once its delay has passed", async ({ page }) => {
+  await openCatalog(page, "light");
+  // toBeVisible accepts opacity 0, so the opacity itself is what proves the indicator appeared.
+  const indicator = page.locator('button[aria-busy="true"] .appear-after').first();
+  await expect
+    .poll(() => indicator.evaluate((element) => getComputedStyle(element).opacity))
+    .toBe("1");
+});
+
 test("the theme from the cookie is applied before the first paint", async ({ page }) => {
   await page.context().addCookies([{ name: "theme", value: "dark", url: "http://localhost:3300" }]);
   await page.addInitScript(() => {

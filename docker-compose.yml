@@ -5,6 +5,9 @@ services:
   app:
     image: node:24-alpine
     working_dir: /app
+    # The development server compiles routes on as many threads as it is given, and each thread
+    # holds memory while it works; two keep the peak under what the machine running Docker has.
+    cpus: 2
     command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm dev --hostname 0.0.0.0 --port 3000"
     ports:
       - "3300:3000"

@@ -14,16 +14,18 @@ Arquivo temporário. Lista o que falta na base para que produtos como o lottery 
 - **Só o mecanismo na base.** Cores oficiais de terceiros, figuras e paletas de um domínio vivem no produto. A base traz o mecanismo com exemplos neutros, e a conferência de higiene do `BASE.md` continua passando.
 - **Presets visuais:** a proposta de valores de cada preset é feita no `/catalog`, com capturas nos dois temas, e aprovada antes de virar padrão.
 
-### Provas técnicas primeiro
+### Provas técnicas (feitas em 2026-10-09)
 
-Cada uma num branch descartável. Se falhar, a decisão correspondente muda antes de qualquer código.
+Cada uma num branch descartável (`spike/*`, fora da `main`). Todas passaram e nenhuma decisão mudou; o que cada uma ensinou está na seção correspondente.
 
-- [ ] `typedRoutes` com o mapa de URLs públicas e o prefetch do `<Link>` sobre o endereço reescrito (SEO, item 1).
-- [ ] `data-accent` com variáveis CSS sob o `@theme` do Tailwind 4, e o `next/font` aceitando um arquivo de fontes gerado (Design system).
-- [ ] `@next/mdx` com Turbopack no Next 16.4 (SEO, item 9).
-- [ ] `@react-pdf/renderer` com React 19.3 no servidor (PDF e QR).
-- [ ] Plugin GritQL barrando relógio e aleatoriedade no Biome 2.5 (Regras, item 3).
-- [ ] `outputFileTracingIncludes` sob `cacheComponents` (Arquivos estáticos).
+- [x] `typedRoutes` com o mapa de URLs públicas e o prefetch do `<Link>` sobre o endereço reescrito (SEO, item 1). `spike/public-paths`.
+- [x] `data-accent` com variáveis CSS sob o `@theme` do Tailwind 4, e o `next/font` aceitando um arquivo de fontes gerado (Design system). `spike/accent-fonts`.
+- [x] `@next/mdx` com Turbopack no Next 16.4 (SEO, item 9). `spike/mdx`.
+- [x] `@react-pdf/renderer` com React 19.3 no servidor (PDF e QR). `spike/pdf-files`.
+- [x] Plugin GritQL barrando relógio e aleatoriedade no Biome 2.5 (Regras, item 2). `spike/gritql-clock`.
+- [x] `outputFileTracingIncludes` sob `cacheComponents` (Arquivos estáticos). `spike/pdf-files`.
+
+Achado que vale para o produto inteiro: sob `cacheComponents` com `partialPrefetching`, uma rota dinâmica com slug inexistente responde **200** com `noindex` e a tela de não encontrado, porque a casca já saiu. Um 404 de verdade exige checar o slug no `proxy.ts` (ver SEO, item 2).
 
 ### Ordem entre seções
 
@@ -66,9 +68,13 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 | Grande ou enviado por usuário | port de storage | |
 
 - [ ] A base não tem `public/` e o Dockerfile não a copia. Se usar, adicionar o `COPY`.
-- [ ] As chaves de `outputFileTracingIncludes` são globs de rota. Páginas totalmente estáticas e rotas Edge não recebem os arquivos. Confirmar que a rota que lê tem trace de servidor sob `cacheComponents`.
+- [x] Provado em dev, standalone e Docker, sem mudar o Dockerfile:
+  - caminho fixo (`join(process.cwd(), "assets/fonts/x.ttf")`) é rastreado sozinho pelo Turbopack, sem configuração;
+  - **um helper que recebe o caminho como argumento faz o Turbopack copiar o repositório inteiro** para o standalone, só com um aviso. Nesse caso: `join(/* turbopackIgnore: true */ process.cwd(), rel)` mais `outputFileTracingIncludes`;
+  - as chaves do `outputFileTracingIncludes` são rotas, e a da imagem OG aninhada leva um sufixo de hash (`/terms/opengraph-image-1810ec`): usar curinga (`"/terms/*"`);
+  - o arquivo precisa ir sempre, mesmo para imagem OG estática: a página carrega o módulo da imagem para os metadados.
 - [ ] Arquivos pagos (WAVs do solmiza) não vão para `public/`. Ficam atrás de uma rota com guarda.
-- [ ] **Validar:** `pnpm build`, conferir os arquivos em `.next/standalone/` e subir a imagem Docker.
+- [ ] Uma regra (Biome ou teste) que recusa `readFile` com caminho vindo de argumento sem o `turbopackIgnore`.
 
 ### Rate limit
 
@@ -165,10 +171,14 @@ Combinações completas e testadas. O produto escolhe um preset mais as sementes
 5. Primitivos e padrões que faltam.
 6. Presets, catálogo e snapshots.
 
-- [ ] **Validar com uma prova pequena antes:**
-  - se `data-accent` com variáveis CSS funciona bem com o `@theme` do Tailwind 4;
-  - se o `next/font` aceita o arquivo de fontes gerado pelo setup;
-  - se o gerador acha variantes legíveis no tema escuro para cores oficiais saturadas e claras (amarelo, verde-limão, laranja).
+- [x] **Accent com escopo, provado** (claro, escuro, aninhado, dev e produção):
+  - usar `@theme` simples, **nunca `@theme inline`**: o inline grava a cor na classe e o escopo deixa de trocá-la;
+  - os quatro valores padrão no `@theme`, e o gerador escreve um bloco por accent em `@layer base`, nos três seletores de tema (`[data-accent=x]`, `:root[data-theme="dark"] [data-accent=x]` e o `prefers-color-scheme`);
+  - nenhum token derivado de outro (`color-mix(var(--color-accent) …)`): é calculado uma vez na raiz e não segue o escopo. O gerador escreve os quatro valores em cada escopo;
+  - verdes entre os matizes 140 e 150 ficaram abaixo de 4,5:1 no texto sobre o accent cheio; o gerador corrige movendo o preenchimento;
+  - o Next converte `oklch` para `lab()` no build: testes de navegador comparam cores por distância, não por texto.
+- [x] **Fontes geradas, provado:** um script escreve `app/fonts.ts` a partir do par escolhido, com chamadas literais no topo do módulo e opções literais (o `next/font` recusa variável). As variáveis CSS têm nomes estáveis (`--font-face-sans`, `--font-face-serif`, `--font-face-mono`), e trocar o par só regenera o arquivo.
+- [ ] **Validar:** se o gerador acha variantes legíveis no tema escuro para cores oficiais saturadas e claras (amarelo, verde-limão, laranja).
 
 ## Cobrança
 
@@ -444,7 +454,14 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [ ] Com segundo idioma, o mesmo mapa ganha os caminhos em inglês (`/en/plans`), sem exigir a pasta `[locale]`.
 - [ ] O lottery mantém as URLs de hoje declarando-as no mapa. A área logada continua em inglês.
 - [ ] Atualizar a regra no `BASE.md` e no `AGENTS.md`.
-- [ ] **Validar:** o `typedRoutes` com o helper e o prefetch do `<Link>` com o endereço reescrito.
+- [x] **Provado em build de produção:** endereço em português servido da pré-renderização, 301 do endereço interno (mantendo a query, só em GET e HEAD), navegação no cliente, prefetch igual ao de uma rota sem tradução e casca estática mantida. Forma que funcionou:
+  - mapa `as const` cujas chaves são conferidas contra as páginas, com os params tipados a partir delas;
+  - o proxy roda depois da etapa de idioma e reescreve com `NextResponse.rewrite`. A guarda de auth vê o caminho interno, então os prefixos protegidos continuam em inglês;
+  - `publicHref("/examples/[slug]", { slug })` é o único lugar com cast para `Route`.
+- [ ] Nunca usar `as` no `<Link>`: no App Router ele ignora o `href` e aceita qualquer texto.
+- [ ] Link com o caminho interno funciona, mas perde o prefetch (bate no 301) e custa uma viagem a mais. Regra de lint obrigando `publicHref` para rotas do mapa, e trocar os links atuais (rodapé, plano, bloco pago, retorno do login).
+- [ ] Sitemap e o `cancelUrl` do Stripe passam por `publicPathOf`.
+- [ ] Um 301 fica guardado no navegador: renomear um caminho público depois exige manter o antigo no mapa.
 - Alternativa descartada, mas mais barata: permitir pastas em pt-BR só em `app/(public)`. Não serve se houver segundo idioma.
 
 ### 2. Metadados completos
@@ -454,6 +471,7 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [ ] Opção `index: false` para buscas filtradas, páginas paginadas além da primeira e páginas sem conteúdo.
 - [ ] `canonical` normalizado, sem parâmetros de filtro ou de rastreamento.
 - [ ] `GOOGLE_SITE_VERIFICATION` em `lib/env.ts` para o Search Console.
+- [ ] **404 de verdade em rota dinâmica:** sob `cacheComponents`, slug inexistente responde 200 com `noindex`. O `proxy.ts` confere o slug contra uma lista gerada no build (ou uma consulta barata) e responde 404 antes da casca. `dynamicParams = false` é recusado sob `cacheComponents`.
 
 ### 3. Sitemap por fontes
 
@@ -471,8 +489,8 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 - [ ] Modelo compartilhado (título, subtítulo, marca) usado pelos `opengraph-image.tsx` de cada rota.
 - [ ] Paleta em hex gerada pelo gerador de tokens, como a do e-mail: o Satori do `ImageResponse` não suporta `oklch`.
-- [ ] Fontes TTF lidas do disco com `outputFileTracingIncludes` (ver "Arquivos estáticos").
-- [ ] Ficam em cache por padrão; as que dependem de parâmetro são geradas na primeira visita.
+- [ ] Fontes TTF lidas do disco **no topo do módulo**: um `readFile` dentro da função conta como I/O sem cache e torna a imagem dinâmica (ver "Arquivos estáticos").
+- [ ] Sem I/O sem cache, a imagem é pré-renderizada no build. Uma imagem que lê dado por parâmetro é dinâmica e não fica guardada depois da primeira visita: para cachear, a leitura vai numa função `'use cache'`.
 
 ### 6. Cache e invalidação
 
@@ -499,7 +517,9 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [ ] Conteúdo longo em `content/<locale>/<área>/*.mdx`, com frontmatter validado por zod (título, descrição, datas, autor) e o layout de leitura do design system.
 - [ ] Atende `/aprenda`, FAQ e glossário do lottery, e glossário e referência do solmiza.
 - [ ] Declarar a exceção à regra do catálogo no `AGENTS.md`.
-- [ ] **Validar:** `@next/mdx` com Turbopack no Next 16.4, e a regra de travessão aplicada aos `.mdx`.
+- [x] **Provado em dev e build:** `@next/mdx` com Turbopack, frontmatter YAML por `remark-frontmatter` e `remark-mdx-frontmatter` passados por nome (texto), o módulo importado como `unknown` e validado inteiro por zod. Frontmatter inválido derruba o build daquela página. A página sai como pré-renderização parcial.
+- [x] Conferência de travessão nos `.mdx` (caractere e entidades HTML, frontmatter incluso), no `pnpm check`.
+- [ ] Mensagens de erro do zod saem como a chave do catálogo (`{"key":"required"}`), com o caminho do campo: legível para quem escreve, mas pode ganhar um formatador próprio para conteúdo.
 
 ### 10. Testes de SEO
 
@@ -628,7 +648,11 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 - [ ] Plugin GritQL do Biome barrando `new Date()` sem argumento, `Date.now()` e `Math.random()` em `domain/`, `lib/`, `features/` e `components/`.
 - [ ] Exceções: o módulo de relógio e o de aleatoriedade com semente, ambos em `domain/`.
-- [ ] **Validar:** os plugins GritQL na versão do Biome usada.
+- [x] **Provado no Biome 2.5.15:** pega as três chamadas, aponta linha e coluna e não custa tempo mensurável no lint. `Date.now` passado como valor também é recusado.
+  - Escopo por `plugins` dentro de um `overrides` (com `!` para os testes e as duas exceções). O `includes` por plugin na lista do topo não casa globs de pasta.
+  - Não pega `globalThis.Date.now()`, `Date["now"]()` nem desestruturação. Aceitável.
+  - `biome-ignore lint/plugin` silencia a regra: uma conferência do repositório recusa esse comentário.
+- [ ] 11 violações hoje em 9 arquivos, quase todas `now = new Date()` como padrão de parâmetro em `lib/accounts`, `lib/contact`, `lib/client-errors` e nos adapters de storage: tirar o padrão e passar o relógio de quem chama. O `$onUpdate` de `lib/db/columns.ts` passa a usar o `now()` do banco.
 
 ### 3. Convenções do banco
 
@@ -759,11 +783,11 @@ Hoje há só server actions. O `app/api` tem webhooks e o relatório de erros.
 ### 3. PDF e QR
 
 - [ ] Módulo `lib/documents` com `@react-pdf/renderer`, gerando em route handler. Uma regra do Biome limita o import da biblioteca a essa pasta.
-- [ ] `qrcode` para QR em SVG.
+- [ ] `qrcode` para o QR: no PDF, como PNG em data URI (`toDataURL`) dentro do `<Image>`; SVG só redesenhado com os componentes `Svg` do react-pdf. Na página web, SVG.
 - [ ] Fontes TTF do disco (ver "Arquivos estáticos") e cores da paleta em hex do gerador de tokens.
 - [ ] Documento verificável: slug assinado, página pública de verificação e QR apontando para ela.
 - [ ] Usos: certificado do solmiza, recibo de pagamento (a partir de `payments`) e relatórios.
-- [ ] **Validar:** `@react-pdf/renderer` com React 19 e Next 16.4 no servidor. Pode precisar de `serverExternalPackages`.
+- [x] **Provado em dev, standalone e Docker** (`@react-pdf/renderer` 4.9.0, React 19.3): fonte própria embutida por `Font.register` com caminho do disco, texto acentuado recuperável. Não precisa de `serverExternalPackages`: o pacote já está na lista de externos do Next. Cores em hex, como na imagem OG (o Satori recusa `oklch`).
 
 ### 4. Segundo idioma
 

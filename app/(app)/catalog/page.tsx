@@ -11,6 +11,7 @@ import { FilesList } from "@/features/catalog/files-list";
 import { LayersDemo } from "@/features/catalog/layers-demo";
 import { OrdersList } from "@/features/catalog/orders-list";
 import { PaidBlock } from "@/features/catalog/paid-block";
+import { PaletteDemo } from "@/features/catalog/palette-demo";
 import { PickersDemo } from "@/features/catalog/pickers-demo";
 import { RecordDemo } from "@/features/catalog/record-demo";
 import { SaveDemo } from "@/features/catalog/save-demo";
@@ -57,6 +58,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
       <div className="flex flex-col gap-16">
         <CatalogSection title={t("accent.title")}>
           <AccentDemo />
+        </CatalogSection>
+        <CatalogSection title={t("palettes.title")}>
+          <PaletteDemo />
         </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />

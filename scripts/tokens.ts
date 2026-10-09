@@ -3,6 +3,7 @@ import process from "node:process";
 import { generateAccent, parseAccents } from "./tokens/accent";
 import { generateDataPalette } from "./tokens/data";
 import { generateTheme, parseSeeds } from "./tokens/generate";
+import { generatePalettes, parsePalettes } from "./tokens/palettes";
 import {
   describeChoices,
   elevationOf,
@@ -19,6 +20,7 @@ import {
   renderDesignTables,
   renderEmailPalette,
   renderFrontmatterColors,
+  renderPaletteNames,
   renderPresetTables,
   renderTokensCss,
   replaceBetween,
@@ -48,6 +50,12 @@ const stronger =
         light: generateTheme("light", seeds, { ...look, contrast: "reinforced" }).palette,
         dark: generateTheme("dark", seeds, { ...look, contrast: "reinforced" }).palette,
       };
+
+const paletteGroups = parsePalettes(input);
+const palettes = {
+  light: generatePalettes("light", paletteGroups, light.palette),
+  dark: generatePalettes("dark", paletteGroups, dark.palette),
+};
 
 const accentSeeds = Object.entries({ brand: seeds.brand, ...parseAccents(input) });
 const generated = accentSeeds.map(([name, seed]) => ({
@@ -102,6 +110,7 @@ const outputs: ReadonlyArray<readonly [string, string]> = [
           light: generateDataPalette("light", seeds.brand.hue),
           dark: generateDataPalette("dark", seeds.brand.hue),
         },
+        palettes: { light: palettes.light.colors, dark: palettes.dark.colors },
       },
       accents,
       elevationOf(choices),
@@ -112,6 +121,7 @@ const outputs: ReadonlyArray<readonly [string, string]> = [
   ["app/fonts.ts", renderFonts(choices)],
   ["lib/typeface.ts", renderTypeface(choices)],
   ["lib/accents.ts", renderAccentNames(accents.map((a) => a.name))],
+  ["lib/palettes.ts", renderPaletteNames(palettes.light.colors)],
   ["emails/palette.ts", renderEmailPalette(light.palette)],
   ["DESIGN.md", design],
 ];

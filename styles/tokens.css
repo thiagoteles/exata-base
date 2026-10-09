@@ -51,6 +51,16 @@
   --color-chart-negative: oklch(62.3% 0.191 24.9);
   --color-chart-middle: oklch(94% 0.004 91.4);
   --color-chart-positive: oklch(57.5% 0.163 255.5);
+  --color-category-alpha: oklch(55% 0.16 255);
+  --color-category-alpha-ink: oklch(44% 0.144 255);
+  --color-category-beta: oklch(66% 0.155 60);
+  --color-category-beta-ink: oklch(44% 0.103 60);
+  --color-category-gamma: oklch(45% 0.102 160);
+  --color-category-gamma-ink: oklch(44% 0.1 160);
+  --color-category-delta: oklch(40% 0.14 295);
+  --color-category-delta-ink: oklch(44% 0.126 295);
+  --color-category-epsilon: oklch(62% 0.17 20);
+  --color-category-epsilon-ink: oklch(44% 0.153 20);
   --color-scrim: oklch(0% 0 0 / 0.5);
 
   --shadow-*: initial;
@@ -109,6 +119,16 @@
     --color-chart-negative: oklch(66.9% 0.159 22.3);
     --color-chart-middle: oklch(34.7% 0.005 106.7);
     --color-chart-positive: oklch(62.2% 0.161 255.1);
+    --color-category-alpha: oklch(55% 0.16 255);
+    --color-category-alpha-ink: oklch(80% 0.102 255);
+    --color-category-beta: oklch(75% 0.17 60);
+    --color-category-beta-ink: oklch(80% 0.119 60);
+    --color-category-gamma: oklch(49% 0.102 160);
+    --color-category-gamma-ink: oklch(80% 0.098 160);
+    --color-category-delta: oklch(51.5% 0.14 295);
+    --color-category-delta-ink: oklch(80% 0.098 295);
+    --color-category-epsilon: oklch(62% 0.17 20);
+    --color-category-epsilon-ink: oklch(80% 0.115 20);
     --shadow-layer: 0 0 0 1px var(--color-line-strong);
   }
 
@@ -160,6 +180,16 @@
       --color-chart-negative: oklch(66.9% 0.159 22.3);
       --color-chart-middle: oklch(34.7% 0.005 106.7);
       --color-chart-positive: oklch(62.2% 0.161 255.1);
+      --color-category-alpha: oklch(55% 0.16 255);
+      --color-category-alpha-ink: oklch(80% 0.102 255);
+      --color-category-beta: oklch(75% 0.17 60);
+      --color-category-beta-ink: oklch(80% 0.119 60);
+      --color-category-gamma: oklch(49% 0.102 160);
+      --color-category-gamma-ink: oklch(80% 0.098 160);
+      --color-category-delta: oklch(51.5% 0.14 295);
+      --color-category-delta-ink: oklch(80% 0.098 295);
+      --color-category-epsilon: oklch(62% 0.17 20);
+      --color-category-epsilon-ink: oklch(80% 0.115 20);
       --shadow-layer: 0 0 0 1px var(--color-line-strong);
     }
   }

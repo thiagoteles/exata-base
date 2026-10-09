@@ -3,6 +3,13 @@
  * lists drift from it, so `cn` always knows which classes conflict.
  */
 
+import { paletteNames } from "@/lib/palettes";
+
+/** Each color of a named palette is a fill token and an ink token, from the generated names. */
+const paletteTokens = Object.entries(paletteNames).flatMap(([group, names]) =>
+  names.flatMap((name) => [`${group}-${name}`, `${group}-${name}-ink`]),
+);
+
 export const colorTokens = [
   "background",
   "surface",
@@ -50,6 +57,7 @@ export const colorTokens = [
   "chart-middle",
   "chart-positive",
   "scrim",
+  ...paletteTokens,
 ] as const;
 
 export const textTokens = [

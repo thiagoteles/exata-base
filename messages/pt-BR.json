@@ -154,6 +154,19 @@
       "ink": "Texto no tom",
       "nested": "Um tom dentro de outro vence o de fora, e a marca devolve o tom de fora de todos os escopos."
     },
+    "palettes": {
+      "title": "Paletas de categorias",
+      "help": "Cada categoria do produto tem uma cor própria, na ordem em que o gerador mediu: vizinhas se distinguem por quem enxerga bem e por quem tem daltonismo.",
+      "barLabel": "Barra dividida entre cinco categorias de exemplo",
+      "share": "{value, number}%",
+      "names": {
+        "alpha": "Primeira categoria",
+        "beta": "Segunda categoria",
+        "gamma": "Terceira categoria",
+        "delta": "Quarta categoria",
+        "epsilon": "Quinta categoria"
+      }
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",

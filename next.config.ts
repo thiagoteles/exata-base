@@ -2,6 +2,7 @@ import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { locales } from "./lib/i18n/locales";
+import { movedAddresses } from "./lib/redirects";
 
 const withNextIntl = createNextIntlPlugin({
   requestConfig: "./lib/i18n/request.ts",
@@ -25,6 +26,7 @@ const nextConfig: NextConfig = {
   },
   // The image ships only the traced server, not the whole node_modules.
   output: "standalone",
+  redirects: () => Promise.resolve(movedAddresses.map((moved) => ({ ...moved, permanent: true }))),
   turbopack: {
     rules: {
       "*.css": {

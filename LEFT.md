@@ -506,13 +506,13 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 7. Redirects
 
-- [ ] Lista tipada no `next.config.ts` com `permanent: true`.
-- [ ] Teste que impede cadeias (nenhum destino aponta para outro redirect).
+- [x] Lista tipada (`lib/redirects.ts`) aplicada no `next.config.ts` com `permanent: true`.
+- [x] Teste que impede cadeias (nenhum destino aponta para outro redirect).
 
 ### 8. Feeds e aviso de URL nova
 
-- [ ] Construtor de RSS/Atom para route handlers (`feed.xml`), com escape correto.
-- [ ] Port `indexing` com adapter IndexNow e o arquivo de chave servido na raiz.
+- [x] Construtor de RSS para route handlers, com escape correto; `/feed.xml` com os artigos.
+- [ ] Port `indexing` com adapter IndexNow e o arquivo de chave servido na raiz. Entra com o primeiro conteúdo que muda sem deploy (resultados do lottery); hoje não teria quem o chamasse.
 - [ ] A base não usa a Google Indexing API. Pela política do Google ela só serve para `JobPosting` e `BroadcastEvent`. Para o Google, valem o sitemap com `lastModified` real e o Search Console.
 
 ### 9. Conteúdo editorial em MDX
@@ -527,7 +527,7 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 10. Testes de SEO
 
-- [ ] Suíte do Playwright que percorre o sitemap e confere em cada página pública:
+- [x] Suíte do Playwright (`e2e/seo.spec.ts`) que percorre o sitemap e confere em cada página pública:
   - `title` e `description` únicos;
   - `canonical` igual ao próprio endereço;
   - um único `h1`;

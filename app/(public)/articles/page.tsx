@@ -3,16 +3,25 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { articles } from "@/lib/content/articles-index";
 import { formatDate, type IsoDate } from "@/lib/date";
+import { env } from "@/lib/env";
 import { publicHref } from "@/lib/i18n/public-paths";
 import { buildSocialMetadata } from "@/lib/social-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("articles");
-  return await buildSocialMetadata({
+  const metadata = await buildSocialMetadata({
     title: t("title"),
     description: t("subtitle"),
     path: "/articles",
   });
+  // Readers find the feed from the list page.
+  return {
+    ...metadata,
+    alternates: {
+      ...metadata.alternates,
+      types: { "application/rss+xml": new URL("/feed.xml", env.APP_URL).toString() },
+    },
+  };
 }
 
 /** Every article, newest first: the title is the link, the date sits on its own line in mono. */

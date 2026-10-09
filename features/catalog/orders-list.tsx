@@ -34,9 +34,9 @@ const sortChoices = [
 
 const tones: Record<OrderStatus, StampTone> = {
   new: "neutral",
-  progress: "progress",
-  paid: "done",
-  refused: "refused",
+  progress: "info",
+  paid: "success",
+  refused: "danger",
 };
 
 /** Reads the list's state from the address, on the server, and renders exactly that page. */

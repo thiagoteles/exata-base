@@ -2,7 +2,7 @@
 
 import { Slider as Primitive } from "radix-ui";
 import { cn } from "@/lib/cn";
-import type { Size, Tone } from "./styles";
+import type { ControlTone, Size } from "./styles";
 
 type SliderProps = {
   /** Names the control. With two values it names the range, and the thumbs are "from" and "to". */
@@ -14,14 +14,14 @@ type SliderProps = {
   step?: number;
   disabled?: boolean;
   size?: Size;
-  tone?: Tone;
+  tone?: ControlTone;
   /** Names each thumb for a screen reader, in order, such as ["De", "Até"]. Alone, a thumb takes the name of the slider. */
   thumbLabels?: readonly string[];
 };
 
 const tracks: Record<Size, string> = { sm: "h-1.5", md: "h-2.5" };
 const thumbs: Record<Size, string> = { sm: "size-4", md: "size-5" };
-const ranges: Record<Tone, string> = { neutral: "bg-action", danger: "bg-danger" };
+const ranges: Record<ControlTone, string> = { neutral: "bg-action", danger: "bg-danger" };
 
 /**
  * One value or a range on a line. The arrow keys move a thumb by one step, Page keys by ten, and

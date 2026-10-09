@@ -261,6 +261,12 @@ The rest of this file describes the `instrument` values; the table below is what
 - `warning` asks for attention without blocking.
 - Colored text always uses the role's `-ink` token, never the full tone.
 
+**Tone and size.** Every primitive that varies in color or footprint takes the same two words, typed in `components/ui/styles.ts`, so nothing is spelled twice.
+- `size` is `sm` or `md`; `md` is the default and the size the interface was drawn at.
+- `tone` is `neutral`, `info`, `success`, `warning` or `danger`: plain, pointing, confirming, asking for care, refusing or destroying. A primitive honors only the tones that make sense for it, as a subset: a button, a checkbox, a radio, a slider, a progress bar and a chip take `neutral` and `danger` (`ControlTone`); a panel takes `neutral`, `info` and `danger`; a stamp and a toast take the whole set (a toast has no `neutral`).
+- A button's hierarchy is its `variant` (`primary` or `secondary`), what it does to the person's data is its `tone`: `<Button tone="danger">` is the filled destructive one, `<Button variant="secondary" tone="danger">` the quiet one.
+- A stamp's tone follows the state it states: a done thing is `success`, a thing under way is `info`, one that needs care is `warning`, a refused one is `danger`, anything else is `neutral`.
+
 **Paid product patterns.** What a paid product shows around the plan, all in `components/patterns` and all given their data by props.
 - **Gate and paywall.** `Gate` shows its content to a plan that has the feature and `Paywall` to one that has not. Whether it is open is a plan question the caller answers with `hasFeature(feature)`, the same guard `requireFeature` is, so the door and the data behind it open and shut together. The paywall says what is closed, what the plan opens (a few lines) and gives one way forward, to the plans. It never blurs the content behind it and never nags. Seeing it sends `paywall_viewed` with a `source`, once per place.
 - **Trial.** `TrialNotice` is a strip where the plan is the subject, not a banner that follows the person: the words (days left, said by the caller) and a bar of the days used. The standing comes from `trialStanding` in `domain/billing/trial.ts` (days round up: ten minutes left is one day), with the clock handed in.

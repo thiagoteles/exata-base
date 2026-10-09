@@ -147,7 +147,7 @@ async function AccountContent() {
           </a>
         </Panel>
 
-        <Panel level="danger" className="flex flex-col gap-4">
+        <Panel tone="danger" className="flex flex-col gap-4">
           <h2 className="text-block-title text-ink">{t("delete.title")}</h2>
           <p className="max-w-[52ch] text-body text-ink">{t("delete.body")}</p>
           <div className="self-start">

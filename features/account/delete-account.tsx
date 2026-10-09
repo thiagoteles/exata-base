@@ -28,7 +28,7 @@ export function DeleteAccount() {
 
   return (
     <ConfirmDialog
-      trigger={<Button variant="danger">{t("title")}</Button>}
+      trigger={<Button tone="danger">{t("title")}</Button>}
       title={t("confirmTitle")}
       consequence={t("confirmBody")}
       confirmLabel={t("confirm")}

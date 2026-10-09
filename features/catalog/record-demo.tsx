@@ -20,7 +20,7 @@ export function RecordDemo() {
       <RecordGrid>
         <RecordCell
           label={t("record.customer")}
-          stamp={<Stamp tone="done">{t("statuses.paid")}</Stamp>}
+          stamp={<Stamp tone="success">{t("statuses.paid")}</Stamp>}
         >
           {customerName}
         </RecordCell>
@@ -37,11 +37,11 @@ export function RecordDemo() {
           {t("record.noteValue")}
         </RecordCell>
       </RecordGrid>
-      <Panel level="danger" className="flex flex-col gap-3">
+      <Panel tone="danger" className="flex flex-col gap-3">
         <h3 className="text-block-title">{t("record.dangerTitle")}</h3>
         <p className="text-body">{t("record.dangerBody")}</p>
         <Button
-          variant="danger"
+          tone="danger"
           className="self-start"
           icon={<IconTrash className="size-5" aria-hidden="true" />}
         >

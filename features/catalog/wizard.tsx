@@ -33,7 +33,7 @@ function Review({ output }: { output: WizardOutput }) {
   const t = useTranslations("catalog.wizard");
   return (
     <div className="flex flex-col gap-4">
-      <Stamp tone="done" className="animate-stamp self-start">
+      <Stamp tone="success" className="animate-stamp self-start">
         {t("checked")}
       </Stamp>
       <RecordGrid>

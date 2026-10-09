@@ -38,7 +38,7 @@ export async function UserRecord({
         <RecordCell
           label={t("plan")}
           stamp={
-            <Stamp tone={paid ? "done" : "neutral"}>
+            <Stamp tone={paid ? "success" : "neutral"}>
               {courtesy ? plans("courtesy") : plans(plan.tier)}
             </Stamp>
           }

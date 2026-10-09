@@ -4,9 +4,9 @@ import type { ContactStatus, Scope } from "@/lib/contact/service";
 
 /** A new message asks for attention, one being worked is in progress, an answered one is done. */
 export const contactStatusTone: Record<ContactStatus, StampTone> = {
-  new: "attention",
-  in_progress: "progress",
-  answered: "done",
+  new: "warning",
+  in_progress: "info",
+  answered: "success",
   archived: "neutral",
 };
 

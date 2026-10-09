@@ -15,19 +15,19 @@ const stroke = {
 } as const;
 
 const tones = {
-  done: {
+  success: {
     classes: "border-success-ink text-success-ink",
     shape: <path d="M2 6.5 5 9.5 10 3" {...stroke} />,
   },
-  progress: {
+  info: {
     classes: "border-brand-ink text-brand-ink",
     shape: <path d="M6 1 11 6 6 11 1 6Z" fill="currentColor" />,
   },
-  attention: {
+  warning: {
     classes: "border-warning-ink text-warning-ink",
     shape: <path d="M6 1.5 11 10.5H1Z" fill="currentColor" />,
   },
-  refused: {
+  danger: {
     classes: "border-danger-ink text-danger-ink",
     shape: <path d="M2.5 2.5 9.5 9.5M9.5 2.5 2.5 9.5" {...stroke} />,
   },

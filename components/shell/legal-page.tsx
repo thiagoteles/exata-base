@@ -13,7 +13,7 @@ export function LegalPage({ title, notice, sections }: LegalPageProps) {
     <article className="mx-auto w-full max-w-170 px-4 py-12 md:py-18">
       <RuntimeMarker />
       <h1 className="text-page-title text-ink">{title}</h1>
-      <Panel level="highlight" className="mt-6">
+      <Panel tone="info" className="mt-6">
         <p className="text-body-small text-ink">{notice}</p>
       </Panel>
       <div className="mt-8 flex flex-col gap-8">

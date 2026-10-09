@@ -16,8 +16,8 @@ export function planState(plan: Plan | null): PlanState {
 
 export const planStateTone: Record<PlanState, StampTone> = {
   free: "neutral",
-  active: "done",
-  pastDue: "attention",
-  endsSoon: "attention",
+  active: "success",
+  pastDue: "warning",
+  endsSoon: "warning",
   ended: "neutral",
 };

@@ -62,7 +62,7 @@ export default async function HomePage() {
           <RecordGrid aria-label={t("sampleLabel")} className="md:grid-cols-2 xl:grid-cols-2">
             <RecordCell
               label={t("sampleCustomer")}
-              stamp={<Stamp tone="done">{t("sampleStatus")}</Stamp>}
+              stamp={<Stamp tone="success">{t("sampleStatus")}</Stamp>}
             >
               {t("sampleName")}
             </RecordCell>

@@ -38,7 +38,7 @@ export function LayersDemo() {
       </Dialog>
 
       <ConfirmDialog
-        trigger={<Button variant="danger">{t("layers.confirm")}</Button>}
+        trigger={<Button tone="danger">{t("layers.confirm")}</Button>}
         title={t("layers.confirmTitle")}
         consequence={t("layers.confirmBody")}
         confirmLabel={t("layers.confirmAction")}

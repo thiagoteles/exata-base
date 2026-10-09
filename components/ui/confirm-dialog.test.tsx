@@ -9,7 +9,7 @@ import { ConfirmDialog } from "./confirm-dialog";
 function setup(onConfirm = vi.fn()) {
   renderWithIntl(
     <ConfirmDialog
-      trigger={<Button variant="danger">Excluir</Button>}
+      trigger={<Button tone="danger">Excluir</Button>}
       title="Excluir 3 pedidos?"
       consequence="Os 3 pedidos serão apagados e não voltam."
       confirmLabel="Excluir 3 pedidos"

@@ -91,7 +91,7 @@ async function Offers() {
       );
     }
     if (plan !== null && isPaidTier(plan.tier) && plan.billingInterval === interval) {
-      return <Stamp tone="done">{t("current")}</Stamp>;
+      return <Stamp tone="success">{t("current")}</Stamp>;
     }
     if (!canBuy(plan, interval)) {
       return null;

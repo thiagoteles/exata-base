@@ -14,7 +14,7 @@ export function RefundPayment({ id }: { id: string }) {
   const { run, pending } = useRun(failed("failed"));
   return (
     <ConfirmDialog
-      trigger={<Button variant="danger">{t("title")}</Button>}
+      trigger={<Button tone="danger">{t("title")}</Button>}
       title={t("confirmTitle")}
       consequence={t("confirmBody")}
       confirmLabel={t("confirm")}
@@ -33,7 +33,7 @@ export function DeleteUser({ id }: { id: string }) {
   const { run, pending } = useRun(failed("failed"));
   return (
     <ConfirmDialog
-      trigger={<Button variant="danger">{t("title")}</Button>}
+      trigger={<Button tone="danger">{t("title")}</Button>}
       title={t("confirmTitle")}
       consequence={t("confirmBody")}
       confirmLabel={t("confirm")}

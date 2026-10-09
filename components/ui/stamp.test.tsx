@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { renderWithIntl } from "@/tests/render";
 import { Stamp, type StampTone } from "./stamp";
 
-const tones: StampTone[] = ["done", "progress", "attention", "refused", "neutral"];
+const tones: StampTone[] = ["success", "info", "warning", "danger", "neutral"];
 
 describe("Stamp", () => {
   it("always carries the state as text, with a shape that is not the same for two states", () => {

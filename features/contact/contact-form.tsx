@@ -67,7 +67,7 @@ export function ContactForm({ signedIn, draft }: ContactFormProps) {
   if (sent) {
     return (
       <Panel className="flex flex-col items-start gap-4">
-        <Stamp tone="done">{t("sentTitle")}</Stamp>
+        <Stamp tone="success">{t("sentTitle")}</Stamp>
         <p role="status" className="text-body text-ink">
           {t("sentBody")}
         </p>

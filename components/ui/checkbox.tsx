@@ -4,7 +4,7 @@ import { IconCheck, IconMinus } from "@tabler/icons-react";
 import { Checkbox as Primitive } from "radix-ui";
 import { type ReactNode, useId } from "react";
 import { cn } from "@/lib/cn";
-import { chosenClasses, type Size, type Tone } from "./styles";
+import { type ControlTone, chosenClasses, type Size } from "./styles";
 
 type CheckboxProps = {
   label: string;
@@ -15,7 +15,7 @@ type CheckboxProps = {
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
   size?: Size;
-  tone?: Tone;
+  tone?: ControlTone;
 };
 
 const boxes: Record<Size, string> = { sm: "size-4", md: "size-5" };

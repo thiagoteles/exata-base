@@ -29,7 +29,7 @@ export function SaveBar({ status, onSave, onDiscard }: SaveBarProps) {
         {status === "saved" ? "" : t("unsaved")}
       </p>
       {status === "saved" ? (
-        <Stamp tone="done" className="animate-stamp">
+        <Stamp tone="success" className="animate-stamp">
           {t("saved")}
         </Stamp>
       ) : (

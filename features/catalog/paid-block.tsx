@@ -29,8 +29,8 @@ export async function PaidBlock() {
         </Link>
       }
     >
-      <Panel level="highlight" className="flex flex-col items-start gap-4">
-        <Stamp tone="done">{t("unlockedStamp")}</Stamp>
+      <Panel tone="info" className="flex flex-col items-start gap-4">
+        <Stamp tone="success">{t("unlockedStamp")}</Stamp>
         <p className="max-w-[52ch] text-body text-ink">{t("unlocked")}</p>
       </Panel>
     </Gate>

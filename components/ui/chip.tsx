@@ -3,7 +3,7 @@
 import { IconX } from "@tabler/icons-react";
 import type { KeyboardEvent } from "react";
 import { cn } from "@/lib/cn";
-import type { Size, Tone } from "./styles";
+import type { ControlTone, Size } from "./styles";
 
 type ChipProps = {
   label: string;
@@ -11,11 +11,11 @@ type ChipProps = {
   removeLabel: string;
   onRemove: () => void;
   size?: Size;
-  tone?: Tone;
+  tone?: ControlTone;
 };
 
 const sizes: Record<Size, string> = { sm: "h-segment text-label", md: "h-chip text-label" };
-const tones: Record<Tone, string> = {
+const tones: Record<ControlTone, string> = {
   neutral: "border-line-strong text-ink hover:border-ink",
   danger: "border-danger text-danger-ink",
 };

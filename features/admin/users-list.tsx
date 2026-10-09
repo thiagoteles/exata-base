@@ -67,7 +67,7 @@ export async function UsersList({
       header: t("plan"),
       kind: "status",
       cell: (row) => (
-        <Stamp tone={isPaidTier(row.tier) ? "done" : "neutral"}>
+        <Stamp tone={isPaidTier(row.tier) ? "success" : "neutral"}>
           {row.courtesy ? plans("courtesy") : plans(row.tier)}
         </Stamp>
       ),

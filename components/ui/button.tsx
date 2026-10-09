@@ -3,10 +3,13 @@
 import type { ComponentProps, MouseEvent, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Spinner } from "./spinner";
-import { type ButtonVariant, buttonClasses } from "./styles";
+import { type ButtonVariant, buttonClasses, type ControlTone, type Size } from "./styles";
 
 type ButtonProps = ComponentProps<"button"> & {
   variant?: ButtonVariant;
+  /** `danger` for what destroys; it keeps the variant's hierarchy. */
+  tone?: ControlTone;
+  size?: Size;
   /** Keeps the label and width, swaps the icon for an indicator, and ignores clicks. */
   loading?: boolean;
   icon?: ReactNode;
@@ -14,6 +17,8 @@ type ButtonProps = ComponentProps<"button"> & {
 
 export function Button({
   variant = "primary",
+  tone = "neutral",
+  size = "md",
   loading = false,
   icon,
   type = "button",
@@ -34,7 +39,7 @@ export function Button({
     <button
       type={type}
       aria-busy={loading || undefined}
-      className={cn(buttonClasses(variant), className)}
+      className={cn(buttonClasses(variant, { tone, size }), className)}
       onClick={ignoreWhileLoading}
       {...props}
     >

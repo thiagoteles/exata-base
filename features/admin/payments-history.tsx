@@ -6,8 +6,8 @@ import { formatInstantDate } from "@/lib/date";
 import { formatPrice, toCents } from "@/lib/money";
 
 const statusTone: Record<Payment["status"], StampTone> = {
-  paid: "done",
-  partially_refunded: "attention",
+  paid: "success",
+  partially_refunded: "warning",
   refunded: "neutral",
 };
 

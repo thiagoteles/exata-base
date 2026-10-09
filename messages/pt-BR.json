@@ -330,6 +330,8 @@
       "title": "Botões",
       "primary": "Salvar",
       "secondary": "Cancelar",
+      "small": "Pequeno",
+      "dangerQuiet": "Excluir sem alarde",
       "danger": "Excluir 3 pedidos",
       "loading": "Enviando",
       "disabled": "Indisponível",

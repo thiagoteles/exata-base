@@ -1,19 +1,23 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
+import type { Tone } from "./styles";
 
-/* Three levels and no fourth. A panel never holds another panel. */
-const levels = {
-  default: "border border-line bg-surface",
-  highlight: "bg-brand-wash",
+/*
+ * A panel speaks in one of three tones and there is no fourth: plain, pointing (the brand wash) or
+ * the one that holds what destroys. A panel never holds another panel.
+ */
+const tones = {
+  neutral: "border border-line bg-surface",
+  info: "bg-brand-wash",
   danger: "border border-dashed border-danger-ink bg-surface",
-} as const;
+} as const satisfies Partial<Record<Tone, string>>;
 
 export function Panel({
-  level = "default",
+  tone = "neutral",
   className,
   ...props
-}: ComponentProps<"section"> & { level?: keyof typeof levels }) {
+}: ComponentProps<"section"> & { tone?: keyof typeof tones }) {
   return (
-    <section className={cn("rounded-panel p-panel-inset", levels[level], className)} {...props} />
+    <section className={cn("rounded-panel p-panel-inset", tones[tone], className)} {...props} />
   );
 }

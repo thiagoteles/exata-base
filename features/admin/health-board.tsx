@@ -6,9 +6,9 @@ import type { JobState } from "@/domain/operations/job-health";
 import type { Health, JobHealth, WebhookHealth } from "@/lib/admin/health";
 
 const stateTone: Record<JobState, StampTone> = {
-  ok: "done",
-  failing: "refused",
-  late: "attention",
+  ok: "success",
+  failing: "danger",
+  late: "warning",
   never: "neutral",
 };
 
@@ -136,7 +136,7 @@ export async function HealthBoard({
           </RecordCell>
           <RecordCell
             label={t("database")}
-            stamp={<Stamp tone="done">{t("databaseUp")}</Stamp>}
+            stamp={<Stamp tone="success">{t("databaseUp")}</Stamp>}
             wide
           >
             {t("answered", { ms: database.latencyMs })}

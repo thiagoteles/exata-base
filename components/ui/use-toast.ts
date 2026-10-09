@@ -1,9 +1,10 @@
 import { createContext, use } from "react";
+import type { Tone } from "./styles";
 
 export type ToastInput = {
   title: string;
   description?: string | undefined;
-  tone?: "success" | "warning" | "danger" | "info";
+  tone?: Exclude<Tone, "neutral">;
   action?: { label: string; onAction: () => void };
 };
 

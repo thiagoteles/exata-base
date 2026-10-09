@@ -48,7 +48,7 @@ async function PlanContent({ searchParams }: Props) {
       <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
       <div className="flex flex-col gap-8">
         {query.checkout === "success" && !paid ? (
-          <Panel level="highlight" role="status">
+          <Panel tone="info" role="status">
             <p className="text-body text-ink">{t("confirming")}</p>
           </Panel>
         ) : null}

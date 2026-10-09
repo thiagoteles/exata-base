@@ -51,7 +51,7 @@ export function ConfirmDialog({
             </AlertDialog.Cancel>
             <AlertDialog.Action asChild={true}>
               <Button
-                variant={destructive ? "danger" : "primary"}
+                tone={destructive ? "danger" : "neutral"}
                 loading={pending}
                 onClick={onConfirm}
               >

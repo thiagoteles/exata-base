@@ -57,7 +57,7 @@ export function Achievements({ items, earnedText, lockedText }: AchievementsProp
                 </div>
               )}
             </div>
-            <Stamp tone={item.earned ? "done" : "neutral"}>{status}</Stamp>
+            <Stamp tone={item.earned ? "success" : "neutral"}>{status}</Stamp>
           </li>
         );
       })}

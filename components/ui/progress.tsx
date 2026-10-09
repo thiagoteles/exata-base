@@ -2,7 +2,7 @@
 
 import { Progress as Primitive } from "radix-ui";
 import { cn } from "@/lib/cn";
-import type { Size, Tone } from "./styles";
+import type { ControlTone, Size } from "./styles";
 
 type ProgressProps = {
   /** What is being measured, for a screen reader and, with `showValue`, for everyone. */
@@ -12,11 +12,11 @@ type ProgressProps = {
   /** Writes "value of max" beside the bar. */
   showValue?: boolean;
   size?: Size;
-  tone?: Tone;
+  tone?: ControlTone;
 };
 
 const tracks: Record<Size, string> = { sm: "h-1.5", md: "h-2.5" };
-const fills: Record<Tone, string> = { neutral: "bg-action", danger: "bg-danger" };
+const fills: Record<ControlTone, string> = { neutral: "bg-action", danger: "bg-danger" };
 
 /**
  * How far a task has got, a thing that is going somewhere. Use `Meter` for a quantity that just is

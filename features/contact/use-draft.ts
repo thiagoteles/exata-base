@@ -23,6 +23,9 @@ export function useDraft(
   save: (draft: Draft | null) => Promise<unknown>,
 ) {
   const last = useRef<string>("");
+  // The caller passes a new function on every render; the timer must not restart because of that.
+  const saveRef = useRef(save);
+  saveRef.current = save;
 
   // A visitor's draft comes back once the page has mounted, if the form is still empty.
   useEffect(() => {
@@ -48,7 +51,7 @@ export function useDraft(
       last.current = current;
       const empty = body.trim() === "" && subject === "";
       if (signedIn) {
-        save(empty ? null : { subject, body }).catch(() => undefined);
+        saveRef.current(empty ? null : { subject, body }).catch(() => undefined);
       } else if (empty) {
         clearVisitorValue(KEY);
       } else {
@@ -56,13 +59,13 @@ export function useDraft(
       }
     }, SAVE_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [subject, body, signedIn, save]);
+  }, [subject, body, signedIn]);
 
   /** After the message is sent: nothing is left to resume. */
   return () => {
     last.current = "";
     if (signedIn) {
-      save(null).catch(() => undefined);
+      saveRef.current(null).catch(() => undefined);
     } else {
       clearVisitorValue(KEY);
     }

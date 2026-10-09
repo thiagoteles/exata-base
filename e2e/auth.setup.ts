@@ -25,6 +25,12 @@ const PAGES = [
   "/admin/audit",
   "/staff/contacts",
   "/catalog",
+  // Routes with no page: a GET compiles them, whatever it answers, so no test waits for the compiler.
+  "/catalog/upload",
+  "/descadastrar",
+  "/api/unsubscribe",
+  "/api/ingest/job-run",
+  "/events/daily",
 ];
 
 /* The seeded admin of the local compose signs in through the auth API; the session is saved. */

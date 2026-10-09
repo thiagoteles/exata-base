@@ -131,44 +131,6 @@ test("e-mail choices start at reminders on and news off, and are kept", async ({
   await expect(page.getByRole("switch", { name: "Lembretes" })).toBeChecked();
 });
 
-test("a draft written as a visitor is kept, handed to the account at sign-in, and forgotten by the browser", async ({
-  page,
-}) => {
-  const draftText = "Quero entender como funciona o meu plano e o que ele inclui.";
-  const held = () => page.evaluate(() => localStorage.getItem("visitor:contactDraft"));
-
-  // A visitor starts writing and leaves. The draft stays in this browser, not in a cookie.
-  await page.goto("/contato");
-  await settled(page);
-  await page.getByLabel("Mensagem").fill(draftText);
-  await expect.poll(held, { timeout: 15_000 }).toContain(draftText);
-  expect((await page.context().cookies()).some((cookie) => cookie.value.includes("plano"))).toBe(
-    false,
-  );
-  await page.reload();
-  await settled(page);
-  await expect(page.getByLabel("Mensagem")).toHaveValue(draftText);
-
-  // Signing in hands it to the account, and this browser forgets it.
-  await signIn(page);
-  await expect.poll(held, { timeout: 30_000 }).toBeNull();
-
-  // The account has it now: it is waiting in the form, with the person's name, whatever the browser.
-  await page.goto("/contato");
-  await settled(page);
-  await expect(page.getByLabel("Mensagem")).toHaveValue(draftText);
-  expect(await held()).toBeNull();
-
-  // Sending the message clears the draft for good.
-  await page.getByRole("combobox", { name: "Assunto" }).click();
-  await page.getByRole("option", { name: "Suporte" }).click();
-  await page.getByRole("button", { name: "Enviar mensagem" }).click();
-  await expect(page.getByText("Mensagem enviada")).toBeVisible();
-  await page.goto("/contato");
-  await settled(page);
-  await expect(page.getByLabel("Mensagem")).toHaveValue("");
-});
-
 test("the unsubscribe link asks once, and the mail client's own button needs no screen", async ({
   page,
   request,

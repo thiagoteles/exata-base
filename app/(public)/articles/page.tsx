@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { RuntimeMarker } from "@/components/runtime-marker";
 import { articles } from "@/lib/content/articles-index";
 import { formatDate, type IsoDate } from "@/lib/date";
 import { env } from "@/lib/env";
@@ -29,6 +30,7 @@ export default async function ArticlesPage() {
   const t = await getTranslations("articles");
   return (
     <main className="mx-auto flex w-full max-w-170 flex-col gap-10 px-4 py-12 md:py-18">
+      <RuntimeMarker />
       <header className="flex flex-col gap-3">
         <h1 className="text-page-title text-ink">{t("title")}</h1>
         <p className="text-body text-ink-muted">{t("subtitle")}</p>

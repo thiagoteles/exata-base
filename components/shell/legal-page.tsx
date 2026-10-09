@@ -1,3 +1,4 @@
+import { RuntimeMarker } from "@/components/runtime-marker";
 import { Panel } from "@/components/ui/panel";
 
 type LegalPageProps = {
@@ -10,6 +11,7 @@ type LegalPageProps = {
 export function LegalPage({ title, notice, sections }: LegalPageProps) {
   return (
     <article className="mx-auto w-full max-w-170 px-4 py-12 md:py-18">
+      <RuntimeMarker />
       <h1 className="text-page-title text-ink">{title}</h1>
       <Panel level="highlight" className="mt-6">
         <p className="text-body-small text-ink">{notice}</p>

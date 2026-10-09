@@ -56,7 +56,16 @@ export async function generateMetadata({
   });
 }
 
-export default async function ArticlePage({ params }: PageProps<"/articles/[slug]">) {
+export default function ArticlePage({ params }: PageProps<"/articles/[slug]">) {
+  return (
+    <Suspense>
+      <Article params={params} />
+    </Suspense>
+  );
+}
+
+/** Reads the address, so it streams in behind the shell instead of blocking it. */
+async function Article({ params }: { params: PageProps<"/articles/[slug]">["params"] }) {
   const { slug } = await params;
   const [{ Content, frontmatter }, t] = await Promise.all([
     load(slug),

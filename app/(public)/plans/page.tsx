@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { Figure } from "@/components/patterns/record-grid";
+import { RuntimeMarker } from "@/components/runtime-marker";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
 import { isPaidTier } from "@/domain/billing/entitlements";
@@ -36,6 +37,7 @@ export default async function PlansPage() {
   const t = await getTranslations("plans");
   return (
     <main className="mx-auto w-full max-w-310 px-4 py-12 md:px-8 md:py-18">
+      <RuntimeMarker />
       <h1 className="text-page-title text-ink">{t("title")}</h1>
       <p className="mt-2 mb-10 max-w-[52ch] text-body text-ink-muted">{t("subtitle")}</p>
       <Suspense fallback={<div className="h-64 rounded-cell bg-sunken" />}>

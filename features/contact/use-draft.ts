@@ -61,9 +61,15 @@ export function useDraft(
     return () => clearTimeout(timer);
   }, [subject, body, signedIn]);
 
-  /** After the message is sent: nothing is left to resume. */
+  /**
+   * After the message is sent: nothing is left to resume. The form is emptied too, because it
+   * stays mounted behind the confirmation, and its text would otherwise be saved again at the next
+   * pause as if it were a new draft.
+   */
   return () => {
-    last.current = "";
+    form.setValue("subject", "");
+    form.setValue("body", "");
+    last.current = JSON.stringify({ subject: "", body: "" });
     if (signedIn) {
       saveRef.current(null).catch(() => undefined);
     } else {

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { ContactForm } from "@/features/contact/contact-form";
 import { getCurrentUser } from "@/lib/ports/auth";
+import { resolvePreferences } from "@/lib/preferences/resolve";
 import { buildSocialMetadata } from "@/lib/social-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -30,5 +31,10 @@ export default async function ContactPage() {
 /** Reads the session, so it streams in; a signed-in person arrives with name and e-mail filled in. */
 async function Form() {
   const user = await getCurrentUser();
-  return <ContactForm signedIn={user === null ? null : { name: user.name, email: user.email }} />;
+  return (
+    <ContactForm
+      signedIn={user === null ? null : { name: user.name, email: user.email }}
+      draft={user === null ? null : resolvePreferences(user.options).contactDraft}
+    />
+  );
 }

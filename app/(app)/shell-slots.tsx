@@ -4,6 +4,7 @@ import { BottomBar } from "@/components/shell/bottom-bar";
 import type { ShellGroup, ShellItem } from "@/components/shell/nav-types";
 import { Sidebar } from "@/components/shell/sidebar";
 import { UserMenu } from "@/components/shell/user-menu";
+import { ClaimVisitorData } from "@/features/account/claim-visitor-data";
 import { ReportTimeZone } from "@/features/account/report-time-zone";
 import { env } from "@/lib/env";
 import { groupNav, type NavItem, splitForBar, visibleNav } from "@/lib/navigation";
@@ -72,6 +73,7 @@ export async function UserMenuSlot() {
   return (
     <>
       <ReportTimeZone saved={resolvePreferences(user.options).timeZone} />
+      <ClaimVisitorData />
       {env.UMAMI_WEBSITE_ID === undefined ? null : <IdentifyAccount accountId={user.id} />}
       <UserMenu
         name={user.name}

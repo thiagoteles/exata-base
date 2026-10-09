@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { rememberOption } from "./actions";
+import { rememberOption } from "@/lib/preferences/actions";
 
 const REPORTED = "reported-time-zone";
 

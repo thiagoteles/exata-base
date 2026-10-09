@@ -145,6 +145,7 @@ const defaults = {
   contrast: "system",
   timeZone: "America/Sao_Paulo",
   email: { reminders: true, news: false },
+  contactDraft: null,
   locale: "pt-BR",
 };
 

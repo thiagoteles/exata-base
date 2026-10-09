@@ -75,11 +75,20 @@ export function parsePreference<K extends PreferenceKey>(
   return parsed.data as PreferenceValue<K>;
 }
 
-/** The cookie that carries a value: set, or cleared when the value is the one the page assumes. */
+const isBrowserOnly = (key: PreferenceKey) =>
+  (preferences[key] as { browser?: true }).browser === true;
+
+/**
+ * The cookie that carries a value: set, or cleared when the value is the one the page assumes.
+ * A preference kept in the browser's own storage has none.
+ */
 export function cookieFor<K extends PreferenceKey>(
   key: K,
   value: PreferenceValue<K>,
-): CookieChange {
+): CookieChange | null {
+  if (isBrowserOnly(key)) {
+    return null;
+  }
   const spec = cookieSpec(key);
   return { name: spec.name, value: spec.encode(value) };
 }
@@ -95,15 +104,17 @@ export function carryAtSignIn(
 ): { save: Carried[]; cookies: CookieChange[] } {
   const save: Carried[] = [];
   const cookies: CookieChange[] = [];
-  for (const key of preferenceKeys) {
+  // What is kept in the browser's own storage has no cookie to carry either way; the page claims it.
+  for (const key of preferenceKeys.filter((candidate) => !isBrowserOnly(candidate))) {
     const saved = savedPreference(stored, key);
     const spec = cookieSpec(key);
     const raw = Object.hasOwn(browser, spec.name) ? browser[spec.name] : undefined;
     const held =
       raw === undefined ? undefined : preferences[key].schema.safeParse(spec.decode(raw));
-    if (saved !== undefined) {
-      cookies.push(cookieFor(key, saved));
-    } else if (held?.success) {
+    const change = saved === undefined ? null : cookieFor(key, saved);
+    if (change !== null) {
+      cookies.push(change);
+    } else if (saved === undefined && held?.success) {
       save.push({ key, value: held.data });
     }
   }

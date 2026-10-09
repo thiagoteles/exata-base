@@ -24,6 +24,12 @@ import { z } from "@/lib/validation";
 export type PreferenceDefinition<T> = {
   schema: z.ZodType<T>;
   fallback: T;
+  /**
+   * Kept in the browser's own storage while the person is a visitor, and never in a cookie, which
+   * rides every request and holds 4 KB: for what is too big for that, such as a draft. It is saved to
+   * the account when they sign in (see `claimVisitorValues`). The schema is its size limit.
+   */
+  browser?: true;
   /** A cookie that something other than the registry reads. `encode` returning null clears it. */
   cookie?: { name: string; encode: (value: T) => string | null; decode: (raw: string) => unknown };
 };
@@ -70,6 +76,12 @@ export const preferences = {
       decode: (raw) => raw,
     },
   }),
+  // The message a visitor started writing in the contact form and did not send.
+  contactDraft: definePreference<{ subject: string; body: string } | null>({
+    schema: z.object({ subject: z.string().max(40), body: z.string().max(5000) }).nullable(),
+    fallback: null,
+    browser: true,
+  }),
   // Reported by the browser at sign-in and when it changes; a person who travels follows the clock.
   timeZone: definePreference<string>({
     schema: z.string().refine(isTimeZone),
@@ -92,3 +104,8 @@ export type PreferenceValue<K extends PreferenceKey> = z.output<(typeof preferen
 export type Preferences = { [K in PreferenceKey]: PreferenceValue<K> };
 
 export const preferenceKeys = Object.keys(preferences) as [PreferenceKey, ...PreferenceKey[]];
+
+/** The preferences a visitor keeps in the browser's own storage instead of a cookie. */
+export const browserPreferenceKeys = preferenceKeys.filter(
+  (key) => (preferences[key] as { browser?: true }).browser === true,
+);

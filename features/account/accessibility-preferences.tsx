@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Segmented } from "@/components/ui/segmented";
 import { useToast } from "@/components/ui/use-toast";
+import { rememberOption } from "@/lib/preferences/actions";
 import type { Preferences } from "@/lib/preferences/definitions";
-import { rememberOption } from "./actions";
 import { applyPageAttribute } from "./page-attribute";
 
 type Choices = Pick<Preferences, "fontScale" | "motion" | "contrast">;

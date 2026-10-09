@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { preferenceKeys, preferences } from "./definitions";
+import { browserPreferenceKeys, preferenceKeys, preferences } from "./definitions";
 import {
   carryAtSignIn,
   cookieFor,
@@ -16,6 +16,7 @@ const defaults = {
   contrast: "system",
   timeZone: "America/Sao_Paulo",
   email: { reminders: true, news: false },
+  contactDraft: null,
   locale: "pt-BR",
 };
 
@@ -91,5 +92,27 @@ describe("resolving what is stored", () => {
     expect(spec.decode("{broken")).toBeUndefined();
     const own = { name: "theme", encode: () => null, decode: (raw: string) => raw };
     expect(specFor("theme", own)).toBe(own);
+  });
+
+  it("keeps what is too big for a cookie out of cookies: a draft has none, either way", () => {
+    expect(browserPreferenceKeys).toEqual(["contactDraft"]);
+    expect(cookieFor("contactDraft", { subject: "support", body: "Oi" })).toBeNull();
+    expect(carryAtSignIn({ contactDraft: { subject: "", body: "Oi" } }, {})).toEqual({
+      save: [],
+      cookies: [],
+    });
+    // Even a cookie of that name, which the registry never wrote, is not read as a draft.
+    expect(carryAtSignIn({}, { "pref-contactDraft": '{"subject":"","body":"x"}' }).save).toEqual(
+      [],
+    );
+  });
+
+  it("limits a draft to what the schema says, and lets it be cleared with null", () => {
+    expect(parsePreference("contactDraft", null)).toBeNull();
+    expect(parsePreference("contactDraft", { subject: "", body: "x".repeat(5000) })).toBeDefined();
+    expect(() =>
+      parsePreference("contactDraft", { subject: "", body: "x".repeat(5001) }),
+    ).toThrow();
+    expect(() => parsePreference("contactDraft", { body: "sem assunto" })).toThrow();
   });
 });

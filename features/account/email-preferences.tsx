@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import type { EmailPreferences } from "@/domain/email/consent";
-import { rememberOption } from "./actions";
+import { rememberOption } from "@/lib/preferences/actions";
 
 /**
  * What the person lets us e-mail beyond what their account needs. Each switch saves at once with

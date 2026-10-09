@@ -13,10 +13,12 @@ import { Select } from "@/components/ui/select";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
 import { contactSubjects } from "@/lib/contact/options";
+import { rememberOption } from "@/lib/preferences/actions";
 import { useErrorText } from "@/lib/use-error-text";
 import { useValidationText } from "@/lib/use-validation-text";
 import { sendContact } from "./actions";
 import { contactSchema } from "./schema";
+import { type Draft, useDraft } from "./use-draft";
 
 type ContactValues = {
   name: string;
@@ -28,9 +30,11 @@ type ContactValues = {
 type ContactFormProps = {
   /** Set when a person is signed in: their name and e-mail arrive filled in, and the e-mail is theirs. */
   signedIn: { name: string; email: string } | null;
+  /** What the signed-in person had started writing, saved in their account. */
+  draft: Draft | null;
 };
 
-export function ContactForm({ signedIn }: ContactFormProps) {
+export function ContactForm({ signedIn, draft }: ContactFormProps) {
   const t = useTranslations("contact");
   const text = useValidationText();
   const describe = useErrorText();
@@ -41,15 +45,19 @@ export function ContactForm({ signedIn }: ContactFormProps) {
     defaultValues: {
       name: signedIn?.name ?? "",
       email: signedIn?.email ?? "",
-      subject: "",
-      body: "",
+      subject: (draft?.subject ?? "") as ContactValues["subject"],
+      body: draft?.body ?? "",
     },
   });
+  const clearDraft = useDraft(form as never, signedIn !== null, (next) =>
+    rememberOption({ key: "contactDraft", value: next }),
+  );
 
   const submit = form.handleSubmit(async (values) => {
     setFailure(undefined);
     const result = await sendContact(values as never);
     if (result?.data !== undefined) {
+      clearDraft();
       setSent(true);
       return;
     }

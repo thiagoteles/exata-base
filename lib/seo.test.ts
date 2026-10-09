@@ -5,7 +5,10 @@ import { robotsFor, sitemapFor } from "./seo";
 describe("sitemap", () => {
   it("lists every public page with an absolute URL, and nothing behind sign-in", () => {
     const urls = sitemapFor("https://app.test").map((entry) => entry.url);
-    expect(urls).toEqual(publicRoutes.map((path) => new URL(path, "https://app.test").toString()));
+    expect(urls).toHaveLength(publicRoutes.length);
+    expect(urls).toContain("https://app.test/");
+    expect(urls).toContain("https://app.test/contato");
+    expect(urls).not.toContain("https://app.test/contact");
     expect(urls.some((url) => /\/(account|admin|staff|catalog)/.test(url))).toBe(false);
   });
 });

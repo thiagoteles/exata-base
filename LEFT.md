@@ -450,19 +450,19 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 **Decisão:** mapa de caminhos. As pastas em `app/` continuam em inglês, e um mapa tipado traduz o endereço visto pelo visitante.
 
-- [ ] Mapa de caminhos públicos por idioma, com padrões para segmentos dinâmicos: `"/plans": "/planos"`, `"/lotteries/[game]/results/[draw]": "/loterias/[game]/resultado/[draw]"`.
-- [ ] O `proxy.ts` reescreve o endereço público para a rota interna e responde 301 quando alguém acessa o endereço interno.
-- [ ] Helper `publicHref()` para os links. Sitemap e `canonical` sempre com o endereço público.
+- [x] Mapa de caminhos públicos por idioma, com padrões para segmentos dinâmicos: `"/plans": "/planos"`, `"/lotteries/[game]/results/[draw]": "/loterias/[game]/resultado/[draw]"`.
+- [x] O `proxy.ts` reescreve o endereço público para a rota interna e responde 301 quando alguém acessa o endereço interno.
+- [x] Helper `publicHref()` para os links. Sitemap e `canonical` sempre com o endereço público.
 - [ ] Com segundo idioma, o mesmo mapa ganha os caminhos em inglês (`/en/plans`), sem exigir a pasta `[locale]`.
 - [ ] O lottery mantém as URLs de hoje declarando-as no mapa. A área logada continua em inglês.
-- [ ] Atualizar a regra no `BASE.md` e no `AGENTS.md`.
+- [x] Atualizar a regra no `BASE.md` e no `AGENTS.md`.
 - [x] **Provado em build de produção:** endereço em português servido da pré-renderização, 301 do endereço interno (mantendo a query, só em GET e HEAD), navegação no cliente, prefetch igual ao de uma rota sem tradução e casca estática mantida. Forma que funcionou:
   - mapa `as const` cujas chaves são conferidas contra as páginas, com os params tipados a partir delas;
   - o proxy roda depois da etapa de idioma e reescreve com `NextResponse.rewrite`. A guarda de auth vê o caminho interno, então os prefixos protegidos continuam em inglês;
   - `publicHref("/examples/[slug]", { slug })` é o único lugar com cast para `Route`.
 - [ ] Nunca usar `as` no `<Link>`: no App Router ele ignora o `href` e aceita qualquer texto.
-- [ ] Link com o caminho interno funciona, mas perde o prefetch (bate no 301) e custa uma viagem a mais. Regra de lint obrigando `publicHref` para rotas do mapa, e trocar os links atuais (rodapé, plano, bloco pago, retorno do login).
-- [ ] Sitemap e o `cancelUrl` do Stripe passam por `publicPathOf`.
+- [x] Link com o caminho interno funciona, mas perde o prefetch (bate no 301) e custa uma viagem a mais. Um teste recusa `href` com a rota escrita à mão; os links atuais foram trocados.
+- [x] Sitemap e o `cancelUrl` do Stripe passam por `publicPathOf`.
 - [ ] Um 301 fica guardado no navegador: renomear um caminho público depois exige manter o antigo no mapa.
 - Alternativa descartada, mas mais barata: permitir pastas em pt-BR só em `app/(public)`. Não serve se houver segundo idioma.
 

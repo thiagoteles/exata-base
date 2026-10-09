@@ -14,6 +14,7 @@ import { planState, planStateTone } from "@/features/billing/presentation";
 import { isCourtesy, type Plan, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
+import { publicHref } from "@/lib/i18n/public-paths";
 import { requirePageRole } from "@/lib/page-guard";
 import { paymentGateway } from "@/lib/ports/payment";
 
@@ -102,7 +103,7 @@ async function PlanActions({ plan }: { plan: Plan | null }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       {plan !== null && isPaidTier(plan.tier) ? null : (
-        <Link href="/plans" className={buttonClasses("primary")}>
+        <Link href={publicHref("/plans")} className={buttonClasses("primary")}>
           {t("seePlans")}
         </Link>
       )}

@@ -10,6 +10,7 @@ describe("social metadata", () => {
     });
     expect(metadata.openGraph?.images).toEqual([{ url: "http://localhost:3300/opengraph-image" }]);
     expect(metadata.twitter?.images).toEqual(["http://localhost:3300/opengraph-image"]);
-    expect(metadata.alternates?.canonical).toBe("http://localhost:3300/plans");
+    // The page passes its route; the canonical is the public address.
+    expect(metadata.alternates?.canonical).toBe("http://localhost:3300/planos");
   });
 });

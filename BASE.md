@@ -30,7 +30,7 @@ O `exata-ui` não foi tocado. Lottery e brb continuam nele.
 - **GCP para arquivo e log** (Cloud Storage privado com URL assinada, Cloud Logging), sem S3. Sem chave: disco e stdout. Erro de produção é log com alarme; Sentry não entra.
 - **E-mail sai na hora,** sem fila nem nova tentativa. Produção: Email API do Mailtrap. Local: Mailpit.
 - **Agendamento é um endpoint só, `/events`,** chamado uma vez por dia pelo Coolify com `CRON_SECRET`. Sem fila, worker ou cron no container.
-- **Tudo que viaja é em inglês** (código, comentário, tabela, coluna, valor guardado, rota, env, README, AGENTS, DESIGN, skills). Só `messages/pt-BR.json` é em português, e é o único idioma. Valores do banco ficam em inglês e o catálogo os traduz (`member` aparece como "Membro").
+- **Tudo que viaja é em inglês** (código, comentário, tabela, coluna, valor guardado, rota, env, README, AGENTS, DESIGN, skills). Exceção desde 2026-10-09: o endereço público visto pelo visitante, que vem do mapa `lib/i18n/public-paths.ts` (as pastas continuam em inglês; o proxy reescreve, e o endereço da rota responde 301 para o público). Só `messages/pt-BR.json` é em português, e é o único idioma. Valores do banco ficam em inglês e o catálogo os traduz (`member` aparece como "Membro").
 - **pnpm é o único gerenciador. Node 24.** Dependências em versão exata, com `minimumReleaseAge` de uma semana (o `next` é a exceção).
 - **Qualidade estrita desde a linha 1:** TypeScript estrito, Biome preset `all` com `--error-on-warnings` e fronteiras de import, knip para código morto, React Compiler, lefthook rodando `pnpm check` em todo commit. Sem ESLint.
 - **Interação é Radix,** importado só em `components/ui`. O visual vem do `DESIGN.md`.

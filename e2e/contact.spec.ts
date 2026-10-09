@@ -28,7 +28,7 @@ async function chooseSubject(page: Page, label: string) {
 }
 
 async function openForm(page: Page) {
-  await page.goto("/contact");
+  await page.goto("/contato");
   await expect(page.getByRole("heading", { level: 1, name: "Fale com a gente" })).toBeVisible();
   await page.waitForLoadState("networkidle");
 }
@@ -191,7 +191,7 @@ for (const theme of ["light", "dark"] as const) {
     page,
   }) => {
     await page.context().addCookies([{ name: "theme", value: theme, url: baseURL }]);
-    for (const path of ["/contact", "/staff/contacts", `/staff/contacts/${visitorMessageId}`]) {
+    for (const path of ["/contato", "/staff/contacts", `/staff/contacts/${visitorMessageId}`]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await page.waitForLoadState("networkidle");

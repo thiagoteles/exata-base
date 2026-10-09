@@ -25,6 +25,7 @@ import {
 } from "@/lib/contact/service";
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
+import { publicHref } from "@/lib/i18n/public-paths";
 import { listParsers } from "@/lib/list-params";
 import { contactStatusTone, recordHref } from "./presentation";
 
@@ -105,7 +106,7 @@ export async function ContactList({ viewer, scope, searchParams }: ContactListPr
         ];
 
   const emptyAction = mine ? (
-    <Link href="/contact" className={buttonClasses("primary")}>
+    <Link href={publicHref("/contact")} className={buttonClasses("primary")}>
       {tMine("emptyAction")}
     </Link>
   ) : undefined;

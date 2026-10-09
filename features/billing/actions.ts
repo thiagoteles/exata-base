@@ -5,6 +5,7 @@ import { canBuy, changeCancellation, readPlan } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
+import { publicHref } from "@/lib/i18n/public-paths";
 import { priceIds, requireGateway } from "@/lib/ports/payment";
 import { cancellationSchema, checkoutSchema } from "./schema";
 
@@ -28,7 +29,7 @@ export const startCheckout = actionFor("member")
       interval: parsedInput.interval,
       priceId,
       successUrl: `${env.APP_URL}/account/plan?checkout=success`,
-      cancelUrl: `${env.APP_URL}/plans`,
+      cancelUrl: `${env.APP_URL}${publicHref("/plans")}`,
     });
     return { url };
   });

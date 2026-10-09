@@ -9,6 +9,7 @@ import { isPaidTier } from "@/domain/billing/entitlements";
 import { BuyButton } from "@/features/billing/buy-button";
 import { canBuy, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
+import { publicHref } from "@/lib/i18n/public-paths";
 import { formatPrice, toCents } from "@/lib/money";
 import { getCurrentUser } from "@/lib/ports/auth";
 import { offeredIntervals, readPrices } from "@/lib/ports/payment";
@@ -56,7 +57,10 @@ async function Offers() {
   const action = (interval: Interval) => {
     if (user === null) {
       return (
-        <Link href={signInRedirect("/plans", "") as never} className={buttonClasses("primary")}>
+        <Link
+          href={signInRedirect(publicHref("/plans"), "") as never}
+          className={buttonClasses("primary")}
+        >
           {t("signIn")}
         </Link>
       );

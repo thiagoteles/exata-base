@@ -8,10 +8,10 @@ const WARM_UP_TOTAL_MS = 600_000;
 // for, and a test waits for the app, not for the compiler.
 const PAGES = [
   "/",
-  "/plans",
-  "/contact",
-  "/privacy",
-  "/terms",
+  "/planos",
+  "/contato",
+  "/privacidade",
+  "/termos",
   "/sign-in",
   "/sign-up",
   "/forgot-password",

@@ -16,8 +16,8 @@ async function violations(page: Page) {
 
 const pages = [
   { path: "/", heading: "O dia a dia organizado, sem enfeite" },
-  { path: "/privacy", heading: "Política de privacidade" },
-  { path: "/terms", heading: "Termos de uso" },
+  { path: "/privacidade", heading: "Política de privacidade" },
+  { path: "/termos", heading: "Termos de uso" },
   { path: "/sign-in", heading: "Entrar" },
   { path: "/sign-up", heading: "Criar conta" },
   { path: "/forgot-password", heading: "Recuperar senha" },
@@ -63,7 +63,7 @@ test("search engines are told to stay out of everything outside production", asy
 
 test("the sitemap lists the public pages and nothing behind sign-in", async ({ request }) => {
   const sitemap = await (await request.get("/sitemap.xml")).text();
-  for (const path of ["/", "/privacy", "/terms"]) {
+  for (const path of ["/", "/privacidade", "/termos"]) {
     expect(sitemap).toContain(`<loc>http://localhost:3300${path}</loc>`);
   }
   expect(sitemap).not.toMatch(/\/(account|admin|staff|catalog)/);
@@ -84,7 +84,7 @@ test("the share image, the icons and the manifest exist, with an absolute image 
   };
   expect(manifest).toMatchObject({ name: "Meu produto", display: "standalone" });
 
-  await page.goto("/privacy");
+  await page.goto("/privacidade");
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     "content",
     /^http:\/\/localhost:3300\/opengraph-image/,
@@ -112,4 +112,28 @@ test("the sign-in form says which field is missing, and what is wrong with an e-
   await page.getByLabel("E-mail").fill("sem-arroba");
   await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
   await expect(page.getByText("Preencha este campo.")).toHaveCount(1);
+});
+
+test("a public page answers at its Portuguese address and the route address moves there", async ({
+  request,
+}) => {
+  const page = await request.get("/planos");
+  expect(page.status()).toBe(200);
+  const moved = await request.get("/plans?ref=x", { maxRedirects: 0 });
+  expect(moved.status()).toBe(301);
+  expect(new URL(moved.headers()["location"] ?? "").pathname).toBe("/planos");
+  expect(new URL(moved.headers()["location"] ?? "").search).toBe("?ref=x");
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  expect(sitemap).toContain("/contato</loc>");
+  expect(sitemap).not.toContain("/contact</loc>");
+});
+
+test("links and the canonical use the public address", async ({ page }) => {
+  await page.goto("/contato");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /\/contato$/);
+  const footer = page.getByRole("contentinfo");
+  await expect(footer.getByRole("link", { name: "Termos de uso" })).toHaveAttribute(
+    "href",
+    "/termos",
+  );
 });

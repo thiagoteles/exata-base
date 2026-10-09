@@ -5,6 +5,7 @@ import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
 import { requireFeature } from "@/lib/billing/guard";
 import { DomainError } from "@/lib/errors";
+import { publicHref } from "@/lib/i18n/public-paths";
 
 /** A block that only a paid plan opens, to show the guard at work. Everyone else sees why not. */
 export async function PaidBlock() {
@@ -17,7 +18,7 @@ export async function PaidBlock() {
         <Panel className="flex flex-col items-start gap-4">
           <Stamp tone="neutral">{t("lockedStamp")}</Stamp>
           <p className="max-w-[52ch] text-body text-ink">{t("locked")}</p>
-          <Link href="/plans" className={buttonClasses("secondary")}>
+          <Link href={publicHref("/plans")} className={buttonClasses("secondary")}>
             {t("plans")}
           </Link>
         </Panel>

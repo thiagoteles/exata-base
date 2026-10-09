@@ -10,3 +10,4 @@ docs
 .env*
 Dockerfile
 docker-compose*.yml
+tools

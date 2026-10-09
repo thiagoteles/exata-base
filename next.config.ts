@@ -24,6 +24,9 @@ const nextConfig: NextConfig = {
     // The proxy buffers a request body up to this size. It matches the largest UPLOAD_MAX_MB the
     // environment accepts, plus room for the form around the file.
     proxyClientMaxBodySize: "101mb",
+    // The development server hands compiled routes back to disk after each save, so warming dozens
+    // of routes does not hold them all in memory at once.
+    turbopackMemoryEviction: "full",
   },
   // The image ships only the traced server, not the whole node_modules.
   output: "standalone",

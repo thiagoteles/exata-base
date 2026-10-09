@@ -140,14 +140,14 @@ test("the unsubscribe link asks once, and the mail client's own button needs no 
 
   // A link that is not one of ours is refused, with the way to the account.
   await page.goto("/descadastrar?token=nao-vale");
-  await expect(page.getByText("Este link não vale")).toBeVisible();
+  await expect(page.getByText("Este link não vale").first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Ir para Minha conta" })).toBeVisible();
 
   // A real one says what it will do, and does it only after the person says yes.
   await page.goto(`/descadastrar?token=${token("news")}`);
-  await expect(page.getByText(`Parar de enviar novidades para ${email}?`)).toBeVisible();
+  await expect(page.getByText(`Parar de enviar novidades para ${email}?`).first()).toBeVisible();
   await page.getByRole("button", { name: "Parar de enviar" }).click();
-  await expect(page.getByText("não receberá mais novidades")).toBeVisible();
+  await expect(page.getByText("não receberá mais novidades").first()).toBeVisible();
 
   // The mail client calls the address itself with a POST, and a bad token is refused.
   const refused = await request.post("/api/unsubscribe?token=nao-vale");

@@ -98,6 +98,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `FILE_URL_SECRET` | without a bucket | At least 32 characters. Signs file links when files are on disk |
 | `UMAMI_WEBSITE_ID`, `UMAMI_SCRIPT_URL` | no | Together. Turns on analytics |
 | `GOOGLE_SITE_VERIFICATION` | no | The token of Search Console's meta tag method; shown on the home page |
+| `SOURCE_COMMIT`, `SERVICE_NAME` | no | The deployed commit (Coolify fills it) and the service name (`app`); Error Reporting groups errors by both |
 | `UPLOAD_MAX_MB`, `UPLOAD_TYPES` | no | Upload limit (10) and accepted types |
 
 ## Backup and restore
@@ -110,6 +111,16 @@ The database is backed up by the hosting platform: in Coolify, a scheduled backu
 1. Restore the backup into a new Postgres resource and point the app's `DATABASE_URL` at it. The app migrates it on start.
 2. Accounts deleted after the backup was taken are back. List their former ids: from the failed database, `select former_user_id from account_deletions where created_at > '<backup time>'`; if it is gone, from Cloud Logging, the lines whose message is `account deleted` (`jsonPayload.formerUserId`).
 3. Put one id per line in a file and run `APP_URL=... CRON_SECRET=... pnpm restore:reapply ids.txt`. The app deletes each again with its usual steps and records it in the deletion trail as the restore.
+
+## Alarms
+
+`pnpm gcp:alerts` (with `GCP_PROJECT`, `ALERT_EMAIL` and `APP_URL`) creates or updates, in Google Cloud:
+- **Error Reporting** reads the ERROR lines, groups them by stack (or by message when there is none) and per deployed version (`SOURCE_COMMIT`). Turn its notifications on in the console: it writes once per new kind of error, and again when a resolved one comes back.
+- **Error storm:** an e-mail when more than 20 errors arrive in five minutes.
+- **Job stopped:** one per job in `ops/gcp/heartbeats.json`, when a job's `heartbeat` line is missing for longer than its window. A product that adds a scheduled job adds a line there.
+- **App down:** `/health` checked every minute from three regions.
+
+`DRY_RUN=1` prints the gcloud commands without running them.
 
 ## Daily operations
 

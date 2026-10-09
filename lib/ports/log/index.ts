@@ -22,4 +22,5 @@ function destination(): pino.DestinationStream | undefined {
 export const logger: Logger = createStdoutLogger({
   level: levels[env.NODE_ENV],
   destination: destination(),
+  service: { service: env.SERVICE_NAME, version: env.SOURCE_COMMIT?.slice(0, 12) ?? "unknown" },
 });

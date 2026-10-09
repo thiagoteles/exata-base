@@ -76,6 +76,10 @@ const server = {
   UMAMI_SCRIPT_URL: z.url().optional(),
   // The token Search Console gives for the meta tag method; it goes on the home page only.
   GOOGLE_SITE_VERIFICATION: z.string().min(1).optional(),
+  // The deployed commit, which Coolify passes to the container; errors are grouped per version.
+  SOURCE_COMMIT: z.string().min(1).optional(),
+  // The service name errors are reported under, when several products share one Google project.
+  SERVICE_NAME: z.string().min(1).default("app"),
 
   STORAGE_DIR: z.string().min(1).default(".storage"),
   FILE_URL_SECRET: z.string().min(32).default("local-development-file-url-secret"),

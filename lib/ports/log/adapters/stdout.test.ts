@@ -43,4 +43,31 @@ describe("stdout log", () => {
       expect(written).not.toContain(secret);
     }
   });
+
+  it("writes errors in the Error Reporting shape, with the stack or a location", () => {
+    const lines: Record<string, unknown>[] = [];
+    const logger = createStdoutLogger({
+      level: "debug",
+      service: { service: "loja", version: "abc123" },
+      destination: new Writable({
+        write(chunk: Buffer, _encoding, done) {
+          lines.push(JSON.parse(chunk.toString()) as Record<string, unknown>);
+          done();
+        },
+      }),
+    });
+    logger.error("route failed", { error: new Error("boom"), requestId: "req-1" });
+    logger.error("browser error", { path: "/conta" });
+    logger.warn("slow");
+    expect(lines[0]).toMatchObject({
+      "@type": "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
+      serviceContext: { service: "loja", version: "abc123" },
+      requestId: "req-1",
+    });
+    expect(String(lines[0]?.["stack_trace"])).toMatch(/^Error: boom\n\s+at /);
+    expect(lines[1]).toMatchObject({
+      context: { reportLocation: { functionName: "browser error" } },
+    });
+    expect(lines[2]).not.toHaveProperty("@type");
+  });
 });

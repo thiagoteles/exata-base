@@ -67,6 +67,16 @@ describe("running the registry", () => {
     expect(report.ran[0]?.result).toEqual({ done: 1 });
   });
 
+  it("ends with a heartbeat, even after a failure, which the absence alarm watches", async () => {
+    const lines: { message: string; fields: unknown }[] = [];
+    const logger = recordingLogger();
+    logger.info = (message, fields) => {
+      lines.push({ message, fields });
+    };
+    await runDailyOperations([broken("first"), ok("second")], { db, now }, logger);
+    expect(lines.at(-1)).toEqual({ message: "heartbeat", fields: { job: "daily", failed: 1 } });
+  });
+
   it("goes on after a failure, reports it by name only and logs it as an error", async () => {
     const errors: string[] = [];
     const report = await runDailyOperations(

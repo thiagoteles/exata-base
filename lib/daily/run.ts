@@ -45,5 +45,8 @@ export async function runDailyOperations(
     }
   }
   report.ms = Math.round(performance.now() - started);
+  // The absence alarm watches this line: if it stops, the scheduler stopped calling, which no error
+  // would ever say. Failures are errors of their own, above.
+  logger.info("heartbeat", { job: "daily", failed: report.failed.length });
   return report;
 }

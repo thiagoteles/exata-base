@@ -37,6 +37,9 @@ services:
       UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
       UMAMI_SCRIPT_URL: ${UMAMI_SCRIPT_URL:-}
       GOOGLE_SITE_VERIFICATION: ${GOOGLE_SITE_VERIFICATION:-}
+      # Coolify fills SOURCE_COMMIT with the deployed commit; errors are grouped per version.
+      SOURCE_COMMIT: ${SOURCE_COMMIT:-}
+      SERVICE_NAME: ${SERVICE_NAME:-app}
       STORAGE_DIR: /data/files
       FILE_URL_SECRET: ${FILE_URL_SECRET:-}
       UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-10}

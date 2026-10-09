@@ -1,0 +1,11 @@
+{
+  "name": "app_heartbeats",
+  "description": "Heartbeat lines the app writes at the end of each scheduled job, by job",
+  "filter": "logName:\"/logs/app\" AND jsonPayload.message=\"heartbeat\"",
+  "labelExtractors": { "job": "EXTRACT(jsonPayload.job)" },
+  "metricDescriptor": {
+    "metricKind": "DELTA",
+    "valueType": "INT64",
+    "labels": [{ "key": "job", "valueType": "STRING" }]
+  }
+}

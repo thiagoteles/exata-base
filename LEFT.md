@@ -318,13 +318,13 @@ A documentação do Stripe diz que uma conta Stripe brasileira aceita Pix **só 
 
 ### 1. Error Reporting do GCP no lugar do Sentry
 
-- [ ] Logs de erro no formato do Cloud Error Reporting (pilha na mensagem e `serviceContext` com o serviço e a versão). O GCP passa a:
+- [x] Logs de erro no formato do Cloud Error Reporting (`@type`, pilha em `stack_trace` ou local pela mensagem, e `serviceContext` com o serviço e a versão). O GCP passa a:
   - agrupar por assinatura;
   - avisar só quando aparece um grupo novo ou quando um grupo resolvido volta;
   - mostrar a contagem e a primeira e a última vez de cada grupo.
-- [ ] Versão vinda de `SOURCE_COMMIT`, lido no `lib/env.ts`.
-- [ ] Manter o alarme `app_errors` como rede de segurança, com limiar maior.
-- [ ] Documentar no `BASE.md` como o substituto do Sentry.
+- [x] Versão vinda de `SOURCE_COMMIT`, lido no `lib/env.ts`.
+- [x] Manter o alarme `app_errors` como rede de segurança, com limiar maior (mais de 20 em 5 minutos).
+- [x] Documentar no `BASE.md` como o substituto do Sentry.
 
 ### 2. Pilhas do navegador
 
@@ -332,13 +332,13 @@ A documentação do Stripe diz que uma conta Stripe brasileira aceita Pix **só 
 
 ### 3. Batimentos e alarmes de ausência
 
-- [ ] Uma linha de log `heartbeat` com o nome do trabalho, gravada por cada operação diária, pela sincronização e pelo processamento de webhook.
-- [ ] Uma métrica por log e um alarme de ausência por trabalho: `daily` em 26 horas, `sync` em 15 minutos dentro da janela de sorteio.
-- [ ] Em `ops/gcp`, aplicado pelo `pnpm gcp:alerts`.
+- [x] Uma linha de log `heartbeat` com o nome do trabalho, gravada ao fim da chamada diária (a sincronização de um produto grava a sua). Webhook não ganhou batimento: a falta dele não é falha.
+- [x] Uma métrica por log (`app_heartbeats`, com o rótulo `job`) e um alarme por trabalho em `ops/gcp/heartbeats.json`. Condição de limiar com dado ausente contando como violação, porque a janela de alerta vai até cerca de 25 horas: o `daily` usa 24,5 horas.
+- [x] Em `ops/gcp`, aplicado pelo `pnpm gcp:alerts` (com `DRY_RUN=1` para conferir). **Não aplicado num projeto real ainda.**
 
 ### 4. Checagem externa
 
-- [ ] Uptime check do GCP no `/health`, a cada minuto, de mais de uma região, com alarme. Em `ops/gcp`.
+- [x] Uptime check do GCP no `/health`, a cada minuto, de três regiões, com alarme, no `pnpm gcp:alerts`. **Não aplicado num projeto real ainda.**
 
 ### 5. Log de acesso (Marco Civil, art. 15)
 

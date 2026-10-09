@@ -1,22 +1,31 @@
 {
   "displayName": "App errors",
   "documentation": {
-    "content": "The app logged an error. Open Logs Explorer and filter by severity ERROR on the app log.",
+    "content": "A burst of errors: more than 20 in five minutes. Each new kind of error is already reported once by Error Reporting; this alarm is the net for a storm. Open Logs Explorer and filter by severity ERROR on the app log.",
     "mimeType": "text/markdown"
   },
   "combiner": "OR",
   "conditions": [
     {
-      "displayName": "Any error in five minutes",
+      "displayName": "More than 20 errors in five minutes",
       "conditionThreshold": {
         "filter": "metric.type=\"logging.googleapis.com/user/app_errors\" AND resource.type=\"global\"",
         "comparison": "COMPARISON_GT",
-        "thresholdValue": 0,
+        "thresholdValue": 20,
         "duration": "0s",
-        "aggregations": [{ "alignmentPeriod": "300s", "perSeriesAligner": "ALIGN_SUM" }],
-        "trigger": { "count": 1 }
+        "aggregations": [
+          {
+            "alignmentPeriod": "300s",
+            "perSeriesAligner": "ALIGN_SUM"
+          }
+        ],
+        "trigger": {
+          "count": 1
+        }
       }
     }
   ],
-  "alertStrategy": { "autoClose": "1800s" }
+  "alertStrategy": {
+    "autoClose": "1800s"
+  }
 }

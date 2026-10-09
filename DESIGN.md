@@ -203,6 +203,13 @@ components:
 - `warning` asks for attention without blocking.
 - Colored text always uses the role's `-ink` token, never the full tone.
 
+**Scoped accent.** A second tone that marks a category, never a place or an action: a game, a level, a sector, a client. Four tokens, `accent`, `accent-wash`, `accent-ink` and `on-accent`, that a container redefines with `data-accent="<name>"`; everything inside reads the same classes (`bg-accent`, `text-accent-ink`) and takes that tone. A nested container wins over its parent, and `data-accent="brand"` restores the brand inside any scope. Outside every scope the accent is the brand.
+- The product declares accents in `colors.json` under `accents`, each a hue (0 to 360) and a chroma (0.04 to 0.2). The name is lowercase words; `brand` is reserved.
+- The generator uses the brand's lightness plan, measures every accent against the grounds of both themes, moves the fill when the text on it falls short, and refuses an accent that still fails. `pnpm tokens` also writes the list of names (`AccentName`), so code knows which scopes exist.
+- The text on a filled accent is the neutral end that reads best on it, the same for every accent of a theme.
+- The accent never replaces a state color, never paints a button, and, like every color here, confirms what text and shape already say.
+- Tailwind's `@theme` stays plain, never `inline`: an inline theme writes the color into the class and a scope could no longer change it. No token is derived from an accent with `color-mix`: it would be computed once at the root and ignore the scope.
+
 **Dark theme.** Not an inversion. Surfaces get lighter with depth: `sunken` 14.5%, `background` 16.5%, `surface` 20.5%, `layer` 23.5%. `line` 31%, `line-strong` 62%, `ink` 95%, `ink-muted` 75%. The brand rises to 74% with chroma at 85%. `brand-wash` 28%, `brand-ink` 80%. State text sits at 82% (success), 84% (warning) and 76% (danger). The generator measures every pair, and the table below shows the result.
 
 **Generated values.** This table is written by `pnpm tokens`, never by hand. `pnpm check` fails when it is out of date with `colors.json`.
@@ -306,6 +313,36 @@ components:
 | dark | `on-action` on `action` | 16.7:1 | 4.5:1 |
 | dark | `focus` on `surface` | 7.8:1 | 3:1 |
 | dark | `focus` on `background` | 8.4:1 | 3:1 |
+
+| Accent | Token | Light | Dark |
+|--------|-------|-------|------|
+| brand | `accent` | `oklch(55% 0.13 245)` | `oklch(74% 0.111 245)` |
+| brand | `accent-wash` | `oklch(94.5% 0.028 245)` | `oklch(28% 0.039 245)` |
+| brand | `accent-ink` | `oklch(44% 0.111 245)` | `oklch(80% 0.091 245)` |
+| brand | `on-accent` | `oklch(99.5% 0.002 245)` | `oklch(16.5% 0.01 245)` |
+| coral | `accent` | `oklch(55% 0.16 32)` | `oklch(74% 0.136 32)` |
+| coral | `accent-wash` | `oklch(94.5% 0.028 32)` | `oklch(28% 0.048 32)` |
+| coral | `accent-ink` | `oklch(44% 0.144 32)` | `oklch(80% 0.112 32)` |
+| coral | `on-accent` | `oklch(99.5% 0.002 245)` | `oklch(16.5% 0.01 245)` |
+| teal | `accent` | `oklch(55% 0.094 195)` | `oklch(74% 0.085 195)` |
+| teal | `accent-wash` | `oklch(94.5% 0.027 195)` | `oklch(28% 0.03 195)` |
+| teal | `accent-ink` | `oklch(44% 0.075 195)` | `oklch(80% 0.07 195)` |
+| teal | `on-accent` | `oklch(99.5% 0.002 245)` | `oklch(16.5% 0.01 245)` |
+| plum | `accent` | `oklch(55% 0.14 330)` | `oklch(74% 0.119 330)` |
+| plum | `accent-wash` | `oklch(94.5% 0.038 330)` | `oklch(28% 0.042 330)` |
+| plum | `accent-ink` | `oklch(44% 0.126 330)` | `oklch(80% 0.098 330)` |
+| plum | `on-accent` | `oklch(99.5% 0.002 245)` | `oklch(16.5% 0.01 245)` |
+
+| Accent | Theme | Fill on surface (3:1) | Text on fill (4.5:1) | Ink, lowest (4.5:1) |
+|--------|-------|-----------------------|----------------------|---------------------|
+| brand | light | 4.7:1 | 4.7:1 | 6.6:1 |
+| brand | dark | 7.8:1 | 8.4:1 | 7.9:1 |
+| coral | light | 5.2:1 | 5.2:1 | 7.0:1 |
+| coral | dark | 7.4:1 | 7.9:1 | 7.6:1 |
+| teal | light | 4.6:1 | 4.6:1 | 6.4:1 |
+| teal | dark | 8.0:1 | 8.7:1 | 7.9:1 |
+| plum | light | 5.2:1 | 5.2:1 | 7.0:1 |
+| plum | dark | 7.4:1 | 7.9:1 | 7.6:1 |
 <!-- tokens:end -->
 
 **Forbidden:** loose hex or `oklch()` outside the generated tokens. Gradients on buttons, text or screen backgrounds.

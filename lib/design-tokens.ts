@@ -27,6 +27,10 @@ export const colorTokens = [
   "danger",
   "danger-wash",
   "danger-ink",
+  "accent",
+  "accent-wash",
+  "accent-ink",
+  "on-accent",
   "scrim",
 ] as const;
 

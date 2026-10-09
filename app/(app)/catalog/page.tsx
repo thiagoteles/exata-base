@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
+import { AccentDemo } from "@/features/catalog/accent-demo";
 import { ButtonsDemo } from "@/features/catalog/buttons-demo";
 import { CatalogHeader } from "@/features/catalog/catalog-header";
 import { FieldsDemo } from "@/features/catalog/fields-demo";
@@ -50,6 +51,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
     <>
       <CatalogHeader />
       <div className="flex flex-col gap-16">
+        <CatalogSection title={t("accent.title")}>
+          <AccentDemo />
+        </CatalogSection>
         <CatalogSection title={t("buttons.title")}>
           <ButtonsDemo />
         </CatalogSection>

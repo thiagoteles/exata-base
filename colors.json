@@ -1,4 +1,9 @@
 {
   "brand": { "hue": 245, "chroma": 0.13 },
-  "neutral": { "offset": 0 }
+  "neutral": { "offset": 0 },
+  "accents": {
+    "coral": { "hue": 32, "chroma": 0.16 },
+    "teal": { "hue": 195, "chroma": 0.1 },
+    "plum": { "hue": 330, "chroma": 0.14 }
+  }
 }

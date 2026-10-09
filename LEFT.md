@@ -104,14 +104,14 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 | Tokens semânticos | `ink`, `surface`, `brand`, `accent`, `control-height`, `radius-panel`… gerados e medidos | O gerador, nunca à mão |
 | Componentes | Consomem só tokens semânticos | A base |
 
-- [ ] **Tokenizar as dimensões** que hoje estão escritas nos componentes: altura de controle, de linha e de campo, padding de painel, largura de diálogo. É pré-requisito de densidade e forma.
+- [x] **Tokenizar as dimensões** que hoje estão escritas nos componentes: altura de controle, de linha e de campo, padding de painel, largura de diálogo. É pré-requisito de densidade e forma.
 
 ### 2. Botões
 
 - [ ] **Cor**
   - Manter as sementes brand e neutral.
   - Adicionar a **temperatura do neutro** (mais chroma e offset para papel quente).
-- [ ] **Accent com escopo**
+- [x] **Accent com escopo**
   - Tokens `accent`, `accent-wash`, `accent-ink` e `on-accent`. Um `data-accent="<nome>"` no contêiner troca o tom ali dentro.
   - Usos: o jogo no lottery; a função harmônica ou o nível no solmiza; categoria, setor ou cliente em outros produtos.
 - [ ] **Cor oficial fixa como entrada** (a cor de marca de um terceiro, que o produto não pode alterar):

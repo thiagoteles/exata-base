@@ -143,6 +143,12 @@
       "title": "Aviso de exemplo",
       "description": "Fora da tela atual, some em 6 segundos."
     },
+    "accent": {
+      "title": "Tons com escopo",
+      "fill": "Preenchido",
+      "ink": "Texto no tom",
+      "nested": "Um tom dentro de outro vence o de fora, e a marca devolve o tom de fora de todos os escopos."
+    },
     "buttons": {
       "title": "Botões",
       "primary": "Salvar",

@@ -29,6 +29,10 @@
   --color-danger: oklch(54% 0.19 25);
   --color-danger-wash: oklch(95.5% 0.022 25);
   --color-danger-ink: oklch(48% 0.17 25);
+  --color-accent: oklch(55% 0.13 245);
+  --color-accent-wash: oklch(94.5% 0.028 245);
+  --color-accent-ink: oklch(44% 0.111 245);
+  --color-on-accent: oklch(99.5% 0.002 245);
   --color-scrim: oklch(0% 0 0 / 0.5);
 
   --shadow-*: initial;
@@ -65,6 +69,10 @@
     --color-danger: oklch(68% 0.17 25);
     --color-danger-wash: oklch(27% 0.05 25);
     --color-danger-ink: oklch(76% 0.13 25);
+    --color-accent: oklch(74% 0.111 245);
+    --color-accent-wash: oklch(28% 0.039 245);
+    --color-accent-ink: oklch(80% 0.091 245);
+    --color-on-accent: oklch(16.5% 0.01 245);
     --shadow-layer: 0 0 0 1px var(--color-line-strong);
   }
 
@@ -94,7 +102,99 @@
       --color-danger: oklch(68% 0.17 25);
       --color-danger-wash: oklch(27% 0.05 25);
       --color-danger-ink: oklch(76% 0.13 25);
+      --color-accent: oklch(74% 0.111 245);
+      --color-accent-wash: oklch(28% 0.039 245);
+      --color-accent-ink: oklch(80% 0.091 245);
+      --color-on-accent: oklch(16.5% 0.01 245);
       --shadow-layer: 0 0 0 1px var(--color-line-strong);
+    }
+  }
+}
+
+@layer base {
+  [data-accent="brand"] {
+    --color-accent: oklch(55% 0.13 245);
+    --color-accent-wash: oklch(94.5% 0.028 245);
+    --color-accent-ink: oklch(44% 0.111 245);
+    --color-on-accent: oklch(99.5% 0.002 245);
+  }
+
+  [data-accent="coral"] {
+    --color-accent: oklch(55% 0.16 32);
+    --color-accent-wash: oklch(94.5% 0.028 32);
+    --color-accent-ink: oklch(44% 0.144 32);
+    --color-on-accent: oklch(99.5% 0.002 245);
+  }
+
+  [data-accent="teal"] {
+    --color-accent: oklch(55% 0.094 195);
+    --color-accent-wash: oklch(94.5% 0.027 195);
+    --color-accent-ink: oklch(44% 0.075 195);
+    --color-on-accent: oklch(99.5% 0.002 245);
+  }
+
+  [data-accent="plum"] {
+    --color-accent: oklch(55% 0.14 330);
+    --color-accent-wash: oklch(94.5% 0.038 330);
+    --color-accent-ink: oklch(44% 0.126 330);
+    --color-on-accent: oklch(99.5% 0.002 245);
+  }
+
+  :root[data-theme="dark"] [data-accent="brand"] {
+    --color-accent: oklch(74% 0.111 245);
+    --color-accent-wash: oklch(28% 0.039 245);
+    --color-accent-ink: oklch(80% 0.091 245);
+    --color-on-accent: oklch(16.5% 0.01 245);
+  }
+
+  :root[data-theme="dark"] [data-accent="coral"] {
+    --color-accent: oklch(74% 0.136 32);
+    --color-accent-wash: oklch(28% 0.048 32);
+    --color-accent-ink: oklch(80% 0.112 32);
+    --color-on-accent: oklch(16.5% 0.01 245);
+  }
+
+  :root[data-theme="dark"] [data-accent="teal"] {
+    --color-accent: oklch(74% 0.085 195);
+    --color-accent-wash: oklch(28% 0.03 195);
+    --color-accent-ink: oklch(80% 0.07 195);
+    --color-on-accent: oklch(16.5% 0.01 245);
+  }
+
+  :root[data-theme="dark"] [data-accent="plum"] {
+    --color-accent: oklch(74% 0.119 330);
+    --color-accent-wash: oklch(28% 0.042 330);
+    --color-accent-ink: oklch(80% 0.098 330);
+    --color-on-accent: oklch(16.5% 0.01 245);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) [data-accent="brand"] {
+      --color-accent: oklch(74% 0.111 245);
+      --color-accent-wash: oklch(28% 0.039 245);
+      --color-accent-ink: oklch(80% 0.091 245);
+      --color-on-accent: oklch(16.5% 0.01 245);
+    }
+
+    :root:not([data-theme="light"]) [data-accent="coral"] {
+      --color-accent: oklch(74% 0.136 32);
+      --color-accent-wash: oklch(28% 0.048 32);
+      --color-accent-ink: oklch(80% 0.112 32);
+      --color-on-accent: oklch(16.5% 0.01 245);
+    }
+
+    :root:not([data-theme="light"]) [data-accent="teal"] {
+      --color-accent: oklch(74% 0.085 195);
+      --color-accent-wash: oklch(28% 0.03 195);
+      --color-accent-ink: oklch(80% 0.07 195);
+      --color-on-accent: oklch(16.5% 0.01 245);
+    }
+
+    :root:not([data-theme="light"]) [data-accent="plum"] {
+      --color-accent: oklch(74% 0.119 330);
+      --color-accent-wash: oklch(28% 0.042 330);
+      --color-accent-ink: oklch(80% 0.098 330);
+      --color-on-accent: oklch(16.5% 0.01 245);
     }
   }
 }

@@ -738,11 +738,11 @@ Hoje há o backup agendado do Coolify. A restauração nunca foi provada, e não
 
 ### 4. Estratégia de testes do domínio
 
-- [ ] Testes por propriedade com `fast-check` onde há invariantes:
+- [x] Testes por propriedade com `fast-check` onde há invariantes (na base: escala de eixo e mapa de caminhos, como exemplo):
   - a soma do rateio é igual ao total;
   - um fechamento cobre o que promete;
   - transpor e voltar devolve a mesma nota.
-- [ ] Cobertura mínima de 90% para `domain/` no `vitest.config`. O resto do código continua sem meta.
+- [x] Cobertura mínima de 90% para `domain/` no `vitest.config`, medida em todo `pnpm test`. O resto do código continua sem meta.
 - [ ] Opcional: mutation testing (Stryker) só na matemática de prêmios.
 
 ### Decisões

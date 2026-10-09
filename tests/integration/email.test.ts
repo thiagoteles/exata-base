@@ -51,4 +51,32 @@ describe("SMTP to Mailpit", () => {
     expect(message.HTML).toContain("<p>Olá</p>");
     expect(message.Text.trim()).toBe("Olá");
   });
+
+  it("carries the unsubscribe headers a mail client reads", async () => {
+    const host = mailpit.getHost();
+    const sender = createSmtpSender(
+      `smtp://${host}:${mailpit.getMappedPort(SMTP_PORT)}`,
+      "no-reply@app.local",
+    );
+    await sender.send({
+      to: "bia@example.com",
+      category: "reminder",
+      subject: "Lembrete",
+      html: "<p>Oi</p>",
+      text: "Oi",
+      headers: {
+        "List-Unsubscribe": "<https://app.test/api/unsubscribe?token=t>",
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
+    });
+    const api = `http://${host}:${mailpit.getMappedPort(API_PORT)}/api/v1`;
+    const list = (await (await fetch(`${api}/search?query=subject:Lembrete`)).json()) as {
+      messages: { ID: string }[];
+    };
+    const headers = (await (
+      await fetch(`${api}/message/${list.messages[0]?.ID}/headers`)
+    ).json()) as Record<string, string[]>;
+    expect(headers["List-Unsubscribe"]).toEqual(["<https://app.test/api/unsubscribe?token=t>"]);
+    expect(headers["List-Unsubscribe-Post"]).toEqual(["List-Unsubscribe=One-Click"]);
+  });
 });

@@ -258,6 +258,7 @@ export function withGeneratedSecrets(values: Values, random: () => string): Valu
     }
   };
   fill("CRON_SECRET");
+  fill("UNSUBSCRIBE_SECRET");
   if (next["AUTH_PROVIDER"] === "local") {
     fill("BETTER_AUTH_SECRET");
   }
@@ -277,6 +278,7 @@ const order = [
   "TRUSTED_PROXY",
   "ACCESS_LOG",
   "CRON_SECRET",
+  "UNSUBSCRIBE_SECRET",
   "FILE_URL_SECRET",
 ];
 

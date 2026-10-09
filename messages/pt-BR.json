@@ -42,7 +42,11 @@
   },
   "emails": {
     "layout": {
-      "footer": "Este é um e-mail automático. Não é preciso responder."
+      "footer": "Este é um e-mail automático. Não é preciso responder.",
+      "unsubscribe": {
+        "reason": "Você recebe esta mensagem porque ligou esse aviso na sua conta.",
+        "action": "Parar de receber"
+      }
     },
     "verifyEmail": {
       "subject": "Confirme seu e-mail",
@@ -898,5 +902,20 @@
     "updated": "Atualizado em {date}",
     "by": "Por {author}",
     "all": "Todos os artigos"
+  },
+  "unsubscribe": {
+    "title": "Cancelar inscrição",
+    "confirm": {
+      "reminder": "Parar de enviar lembretes para {address}?",
+      "news": "Parar de enviar novidades para {address}?"
+    },
+    "action": "Parar de enviar",
+    "done": {
+      "reminder": "Pronto. {address} não receberá mais lembretes.",
+      "news": "Pronto. {address} não receberá mais novidades."
+    },
+    "changeLater": "Você pode mudar isso quando quiser, em Minha conta.",
+    "invalid": "Este link não vale. Use o da mensagem mais recente, ou ajuste suas escolhas em Minha conta.",
+    "toAccount": "Ir para Minha conta"
   }
 }

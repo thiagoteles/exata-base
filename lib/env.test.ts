@@ -59,11 +59,27 @@ describe("environment rules", () => {
       BETTER_AUTH_SECRET: "s",
       MAILTRAP_TOKEN: "t",
       FILE_URL_SECRET: "f",
+      UNSUBSCRIBE_SECRET: "u",
       SMTP_LOCAL_URL: "smtp://mailpit:1025",
     };
     expect(environmentIssues(local, raw, true)).toEqual([
       "EMAIL_FROM is required in production",
       "SMTP_LOCAL_URL is for the local compose only and must not be set in production",
     ]);
+  });
+
+  it("require the secret that signs unsubscribe links as soon as production sends real mail", () => {
+    const raw = {
+      APP_URL: "https://a.b",
+      DATABASE_URL: "postgres://x",
+      BETTER_AUTH_SECRET: "s",
+      MAILTRAP_TOKEN: "t",
+      EMAIL_FROM: "no-reply@a.b",
+      FILE_URL_SECRET: "f",
+    };
+    expect(environmentIssues(local, raw, true)).toEqual([
+      "UNSUBSCRIBE_SECRET is required in production",
+    ]);
+    expect(environmentIssues(local, { ...raw, UNSUBSCRIBE_SECRET: "u" }, true)).toEqual([]);
   });
 });

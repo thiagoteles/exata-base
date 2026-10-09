@@ -96,13 +96,14 @@ describe("validating the integrations", () => {
 });
 
 describe("generated secrets", () => {
-  it("adds the daily-call and file-link secrets, and the sign-in secret only for local sign-in", () => {
+  it("adds the scheduled-call, unsubscribe and file-link secrets, and the sign-in secret only for local sign-in", () => {
     const next = withGeneratedSecrets({ AUTH_PROVIDER: "local" }, () => "x".repeat(32));
     expect(Object.keys(next).sort((a, b) => a.localeCompare(b))).toEqual([
       "AUTH_PROVIDER",
       "BETTER_AUTH_SECRET",
       "CRON_SECRET",
       "FILE_URL_SECRET",
+      "UNSUBSCRIBE_SECRET",
     ]);
     expect(Object.keys(withGeneratedSecrets({ AUTH_PROVIDER: "clerk" }, () => "x"))).not.toContain(
       "BETTER_AUTH_SECRET",

@@ -13,6 +13,7 @@ export const publicPaths = {
   "/contact": "/contato",
   "/privacy": "/privacidade",
   "/terms": "/termos",
+  "/unsubscribe": "/descadastrar",
   "/articles": "/artigos",
   "/articles/[slug]": "/artigos/[slug]",
 } as const;

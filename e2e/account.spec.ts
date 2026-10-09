@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { unzipSync } from "fflate";
+import { signUnsubscribe } from "../lib/unsubscribe/token";
 import { linkSentTo } from "./mail";
 
 /*
@@ -11,6 +12,8 @@ import { linkSentTo } from "./mail";
 test.use({ storageState: { cookies: [], origins: [] } });
 test.describe.configure({ mode: "serial" });
 
+// The compose runs with the local default of the secret that signs unsubscribe links.
+const UNSUBSCRIBE_SECRET = "local-development-unsubscribe-secret";
 const email = `ana-${Date.now()}@example.com`;
 const password = "uma-senha-bem-longa";
 
@@ -117,10 +120,52 @@ test("e-mail choices start at reminders on and news off, and are kept", async ({
   await reminders.click();
   await expect(reminders).not.toBeChecked();
   await answer;
+  answer = saved();
+  await reminders.click();
+  await expect(reminders).toBeChecked();
+  await answer;
 
-  // Both answers survive a reload, each as it was left.
+  // Both answers survive a reload. The next step starts from both on.
   await page.reload();
   await expect(page.getByRole("switch", { name: "Novidades" })).toBeChecked();
+  await expect(page.getByRole("switch", { name: "Lembretes" })).toBeChecked();
+});
+
+test("the unsubscribe link asks once, and the mail client's own button needs no screen", async ({
+  page,
+  request,
+}) => {
+  const token = (category: "reminder" | "news") =>
+    encodeURIComponent(signUnsubscribe(UNSUBSCRIBE_SECRET, { address: email, category }));
+
+  // A link that is not one of ours is refused, with the way to the account.
+  await page.goto("/descadastrar?token=nao-vale");
+  await expect(page.getByText("Este link não vale")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Ir para Minha conta" })).toBeVisible();
+
+  // A real one says what it will do, and does it only after the person says yes.
+  await page.goto(`/descadastrar?token=${token("news")}`);
+  await expect(page.getByText(`Parar de enviar novidades para ${email}?`)).toBeVisible();
+  await page.getByRole("button", { name: "Parar de enviar" }).click();
+  await expect(page.getByText("não receberá mais novidades")).toBeVisible();
+
+  // The mail client calls the address itself with a POST, and a bad token is refused.
+  const refused = await request.post("/api/unsubscribe?token=nao-vale");
+  expect(refused.status()).toBe(400);
+  const oneClick = await request.post(`/api/unsubscribe?token=${token("reminder")}`, {
+    form: { "List-Unsubscribe": "One-Click" },
+  });
+  expect(oneClick.status()).toBe(200);
+  expect(await oneClick.json()).toEqual({ done: true });
+
+  // A client that cannot POST is sent to the page that asks.
+  const opened = await request.get(`/api/unsubscribe?token=${token("news")}`, { maxRedirects: 0 });
+  expect(opened.status()).toBe(303);
+  expect(opened.headers()["location"]).toContain("/descadastrar?token=");
+
+  // Both are off in the account, and the person can turn either back on there.
+  await signIn(page);
+  await expect(page.getByRole("switch", { name: "Novidades" })).not.toBeChecked();
   await expect(page.getByRole("switch", { name: "Lembretes" })).not.toBeChecked();
 });
 

@@ -101,6 +101,8 @@ const server = {
 
   STORAGE_DIR: z.string().min(1).default(".storage"),
   FILE_URL_SECRET: z.string().min(32).default("local-development-file-url-secret"),
+  // Signs the unsubscribe link in reminders and newsletters; see lib/unsubscribe.
+  UNSUBSCRIBE_SECRET: z.string().min(32).default("local-development-unsubscribe-secret"),
   UPLOAD_MAX_MB: z.coerce.number().int().positive().max(100).default(10),
   UPLOAD_TYPES: csv
     .pipe(z.array(z.string().regex(/^[a-z]+\/[a-z0-9.+-]+$/)).min(1))
@@ -151,7 +153,8 @@ export function environmentIssues(
     required.push("CLERK_PUBLISHABLE_KEY", "CLERK_SECRET_KEY", "CLERK_WEBHOOK_SECRET");
   }
   if (isSet(raw, "MAILTRAP_TOKEN")) {
-    required.push("EMAIL_FROM");
+    // Real mail means reminders and news can exist, and each carries a link only this secret signs.
+    required.push("EMAIL_FROM", "UNSUBSCRIBE_SECRET");
   }
   // Files on disk open through URLs this secret signs; with Cloud Storage, Google signs them.
   if (!isSet(raw, "GCS_BUCKET")) {

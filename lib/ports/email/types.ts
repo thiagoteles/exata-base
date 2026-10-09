@@ -8,6 +8,7 @@ export type EmailMessage = {
   html: string;
   text: string;
   replyTo?: string;
+  headers?: Readonly<Record<string, string>>;
 };
 
 /** The shape every e-mail destination implements. `send` rejects when the message was not accepted. */

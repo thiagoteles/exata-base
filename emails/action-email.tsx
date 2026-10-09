@@ -1,5 +1,5 @@
 import { Button, Heading, Text } from "@react-email/components";
-import { EmailLayout } from "./layout";
+import { EmailLayout, type UnsubscribeNotice } from "./layout";
 import { emailPalette } from "./palette";
 
 type ActionEmailProps = {
@@ -10,6 +10,8 @@ type ActionEmailProps = {
   url: string;
   ignore: string;
   footer: string;
+  /** Only on reminders and newsletters: a message the person needs has no way out. */
+  unsubscribe?: UnsubscribeNotice;
 };
 
 /** An e-mail whose whole point is one link: confirm, reset, accept. */
@@ -21,9 +23,14 @@ export function ActionEmail({
   url,
   ignore,
   footer,
+  unsubscribe,
 }: ActionEmailProps) {
   return (
-    <EmailLayout preview={preview} footer={footer}>
+    <EmailLayout
+      preview={preview}
+      footer={footer}
+      {...(unsubscribe === undefined ? {} : { unsubscribe })}
+    >
       <Heading as="h1" style={{ fontSize: "22px", lineHeight: "28px", margin: "0 0 16px" }}>
         {greeting}
       </Heading>

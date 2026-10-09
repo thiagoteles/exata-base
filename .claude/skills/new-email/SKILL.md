@@ -18,8 +18,18 @@ The references are `emails/contact-emails.tsx` (a notice and a reply) and `email
    `emailTranslator()`.
 4. **The sender** in `lib/<area>/mailer.ts`: render with `renderEmail(element)` (HTML and plain
    text) and send with `sendEmail` from the e-mail port. It sends at once; there is no outbox and no
-   retry. `sendEmail` resolves to `false` when nothing went out, and the reason is already in the log.
-   Decide what that means for the flow: a notice can be skipped, a reply must not be recorded as sent.
+   retry. `sendEmail` resolves to `"sent"`, `"declined"` or `"failed"`; the reason for a failure is
+   already in the log. Decide what each means for the flow: a notice can be skipped, a reply must
+   not be recorded as sent.
+5. **The category.** Every message declares one: `transactional` for what the person needs to use
+   their account (confirmation, reset, receipt, a reply to what they wrote), which is always sent;
+   `reminder` for what is about their activity and they may turn off; `news` for anything that
+   promotes, which only goes to those who turned it on. The port leaves out whoever said no and
+   answers `declined` when nobody is left, which is not an error. A `reminder` or `news` message
+   also carries a way out: pass `unsubscribe` (the `reason` and the `action` text, under
+   `emails.layout.unsubscribe`) to `ActionEmail` or `EmailLayout`, and the port gives each
+   recipient a copy with their own link and the `List-Unsubscribe` headers. Never send a `reminder`
+   from a path that has no account to read the choice from.
 
 Also:
 

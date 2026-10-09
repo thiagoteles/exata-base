@@ -1,8 +1,10 @@
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/ports/log";
+import { unsubscribeLinks } from "@/lib/unsubscribe/links";
 import { allowedRecipients } from "./consent";
 import type { EmailMessage, EmailSender, SendResult } from "./types";
+import { withUnsubscribe } from "./unsubscribe";
 
 /*
  * The e-mail port. A message is sent at once, inside the action: there is no outbox and no retry.
@@ -43,7 +45,18 @@ export async function sendEmail(message: EmailMessage): Promise<SendResult> {
     return "failed";
   }
   try {
-    await destination.send({ ...message, to: recipients });
+    if (message.category === "transactional") {
+      await destination.send({ ...message, to: recipients });
+    } else {
+      // Each recipient gets a copy with a link of their own, so the link says whose it is.
+      const { category } = message;
+      for (const address of recipients) {
+        // biome-ignore lint/performance/noAwaitInLoops: one copy after another keeps the order and the provider's rate
+        await destination.send(
+          withUnsubscribe(message, address, unsubscribeLinks(address, category)),
+        );
+      }
+    }
     return "sent";
   } catch (error) {
     logger.error("email not sent", { subject: message.subject, error });

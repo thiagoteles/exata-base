@@ -35,6 +35,7 @@ export function createMailtrapSender({
           html: message.html,
           text: message.text,
           ...(message.replyTo === undefined ? {} : { reply_to: { email: message.replyTo } }),
+          ...(message.headers === undefined ? {} : { headers: message.headers }),
         }),
       });
       if (!response.ok) {

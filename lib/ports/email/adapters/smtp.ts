@@ -13,6 +13,7 @@ export function createSmtpSender(url: string, from: string): EmailSender {
         html: message.html,
         text: message.text,
         ...(message.replyTo === undefined ? {} : { replyTo: message.replyTo }),
+        ...(message.headers === undefined ? {} : { headers: { ...message.headers } }),
       });
     },
   };

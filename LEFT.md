@@ -491,9 +491,9 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 5. Imagem OG por página
 
-- [ ] Modelo compartilhado (título, subtítulo, marca) usado pelos `opengraph-image.tsx` de cada rota.
-- [ ] Paleta em hex gerada pelo gerador de tokens, como a do e-mail: o Satori do `ImageResponse` não suporta `oklch`.
-- [ ] Fontes TTF lidas do disco **no topo do módulo**: um `readFile` dentro da função conta como I/O sem cache e torna a imagem dinâmica (ver "Arquivos estáticos").
+- [x] Modelo compartilhado (título, subtítulo, marca) usado pelos `opengraph-image.tsx` de cada rota (`lib/og/share-image.tsx`).
+- [x] Paleta em hex gerada pelo gerador de tokens, como a do e-mail: o Satori do `ImageResponse` não suporta `oklch`.
+- [x] **Mudou:** as fontes vêm do Google Fonts (TTF), buscadas uma vez em `'use cache'` com `cacheLife("max")`, pela família que o preset gera em `lib/typeface.ts`. Com presets, guardar o TTF de cada tipografia no repositório pesaria cerca de 1,5 MB; o build já depende de rede pelo `next/font`. Sem rede, a imagem sai na fonte padrão. A imagem continua estática.
 - [ ] Sem I/O sem cache, a imagem é pré-renderizada no build. Uma imagem que lê dado por parâmetro é dinâmica e não fica guardada depois da primeira visita: para cachear, a leitura vai numa função `'use cache'`.
 
 ### 6. Cache e invalidação

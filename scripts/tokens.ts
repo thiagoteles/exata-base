@@ -10,6 +10,7 @@ import {
   presetVariables,
   renderFonts,
   renderPresetCss,
+  renderTypeface,
   temperatureOf,
 } from "./tokens/preset";
 import {
@@ -99,6 +100,7 @@ const outputs: ReadonlyArray<readonly [string, string]> = [
   ],
   ["styles/preset.css", renderPresetCss(preset, choices)],
   ["app/fonts.ts", renderFonts(choices)],
+  ["lib/typeface.ts", renderTypeface(choices)],
   ["lib/accents.ts", renderAccentNames(accents.map((a) => a.name))],
   ["emails/palette.ts", renderEmailPalette(light.palette)],
   ["DESIGN.md", design],

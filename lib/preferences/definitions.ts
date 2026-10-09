@@ -1,5 +1,6 @@
 import { isTimeZone } from "@/domain/calendar";
 import { defaultEmailPreferences, type EmailPreferences } from "@/domain/email/consent";
+import { MAX_STEP_ID_LENGTH, MAX_STEPS } from "@/domain/onboarding/steps";
 import { defaultLocale, LOCALE_COOKIE, locales, timeZone } from "@/lib/i18n/locales";
 import {
   CONTRAST_COOKIE,
@@ -91,6 +92,11 @@ export const preferences = {
   email: definePreference<EmailPreferences>({
     schema: z.object({ reminders: z.boolean(), news: z.boolean() }).strict(),
     fallback: defaultEmailPreferences,
+  }),
+  // The first steps the person has finished. See `domain/onboarding/steps.ts`.
+  onboarding: definePreference<string[]>({
+    schema: z.array(z.string().min(1).max(MAX_STEP_ID_LENGTH)).max(MAX_STEPS),
+    fallback: [],
   }),
   locale: definePreference<(typeof locales)[number]>({
     schema: z.enum(locales),

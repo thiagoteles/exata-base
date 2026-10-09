@@ -12,9 +12,11 @@ import { EmailPreferencesPanel } from "@/features/account/email-preferences";
 import { ReferralLink } from "@/features/account/referral-link";
 import { ThemePicker } from "@/features/account/theme-picker";
 import { LanguageSwitcher } from "@/features/language/language-switcher";
+import { FirstSteps } from "@/features/onboarding/first-steps";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { isMultilingual } from "@/lib/i18n/locales";
+import { readOnboarding } from "@/lib/onboarding/service";
 import { requirePageRole } from "@/lib/page-guard";
 import { readPreferences } from "@/lib/preferences/service";
 import { referralSummary } from "@/lib/referral/service";
@@ -38,9 +40,11 @@ async function AccountContent() {
   const t = await getTranslations("account");
   const user = await requirePageRole("member", "/account");
   // Read fresh: the cached current user can be minutes behind a theme the person just chose.
-  const [preferences, referral] = await Promise.all([
+  const [preferences, referral, onboarding, steps] = await Promise.all([
     readPreferences(db, user.id),
     referralSummary(db, user.id),
+    readOnboarding(db, user.id),
+    getTranslations("onboarding"),
   ]);
   return (
     <>
@@ -57,6 +61,14 @@ async function AccountContent() {
             <span className="font-mono text-data">{preferences.timeZone}</span>
           </RecordCell>
         </RecordGrid>
+
+        {onboarding.complete ? null : (
+          <Panel className="flex flex-col gap-4">
+            <h2 className="text-block-title text-ink">{steps("title")}</h2>
+            <p className="max-w-[52ch] text-body-small text-ink-muted">{steps("subtitle")}</p>
+            <FirstSteps progress={onboarding} />
+          </Panel>
+        )}
 
         <Panel className="flex flex-col gap-4">
           <h2 className="text-block-title text-ink">{t("theme.title")}</h2>

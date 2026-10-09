@@ -17,6 +17,7 @@ const defaults = {
   timeZone: "America/Sao_Paulo",
   email: { reminders: true, news: false },
   contactDraft: null,
+  onboarding: [],
   locale: "pt-BR",
 };
 

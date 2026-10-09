@@ -932,6 +932,29 @@
     "by": "Por {author}",
     "all": "Todos os artigos"
   },
+  "onboarding": {
+    "title": "Primeiros passos",
+    "subtitle": "Três coisas para deixar a conta do seu jeito.",
+    "progressLabel": "Progresso dos primeiros passos",
+    "count": "{done, number} de {total, number}",
+    "done": "(feito)",
+    "finish": "Marcar como feito",
+    "failed": "Não foi possível salvar este passo. Tente de novo.",
+    "steps": {
+      "look": {
+        "title": "Escolha como a tela aparece",
+        "help": "Tema claro ou escuro, tamanho do texto e contraste ficam na seção de aparência abaixo."
+      },
+      "email": {
+        "title": "Diga o que podemos enviar por e-mail",
+        "help": "Lembretes e novidades são escolha sua. Os avisos da conta sempre chegam."
+      },
+      "invite": {
+        "title": "Convide alguém",
+        "help": "Copie o seu link na seção de convites e mande para quem quiser."
+      }
+    }
+  },
   "unsubscribe": {
     "title": "Cancelar inscrição",
     "confirm": {

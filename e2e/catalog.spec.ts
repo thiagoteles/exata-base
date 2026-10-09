@@ -129,7 +129,8 @@ test("the upload takes a PDF, refuses the wrong type and a file that is too big"
     buffer: Buffer.from("%PDF-1.4 recibo"),
   });
   await files.getByRole("button", { name: "Enviar" }).click();
-  await expect(files.getByText("Arquivo enviado.")).toBeVisible();
+  // The first upload compiles the upload action on a development server, which takes its time.
+  await expect(files.getByText("Arquivo enviado.")).toBeVisible({ timeout: 60_000 });
   await expect(files.getByRole("list", { name: "Seus arquivos" }).getByText(name)).toBeVisible();
 
   await files.getByLabel("Arquivo", { exact: true }).setInputFiles({

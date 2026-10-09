@@ -11,7 +11,7 @@ import { env } from "@/lib/env";
 import { defaultLocale } from "@/lib/i18n/locales";
 import { readCurrentUser } from "@/lib/ports/auth";
 import { chooseLocale, requestLocale } from "@/lib/ports/email/locale";
-import { savedLocaleOfUser } from "@/lib/preferences/service";
+import { savedLocaleOfUser, savePreference } from "@/lib/preferences/service";
 import { z } from "@/lib/validation";
 import { contactSchema, replySchema } from "./schema";
 
@@ -31,6 +31,11 @@ export const sendContact = limitedPublicAction({ name: "contact", limit: 20, win
       user === null ? null : { id: user.id, email: user.email },
       (row) => notifyTeam(row, { subject: t(`subjects.${row.subject}`) }, env.CONTACT_EMAIL),
     );
+    // The draft this message came from is spent. Clearing it here, with the send, means it cannot
+    // survive a page that leaves before the browser's own call to clear it gets through.
+    if (user !== null) {
+      await savePreference(db, user.id, "contactDraft", null);
+    }
     return { sent: true };
   });
 

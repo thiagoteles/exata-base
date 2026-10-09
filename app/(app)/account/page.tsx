@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { buttonClasses } from "@/components/ui/styles";
+import { AccessibilityPreferences } from "@/features/account/accessibility-preferences";
 import { DeleteAccount } from "@/features/account/delete-account";
 import { EmailPreferencesPanel } from "@/features/account/email-preferences";
 import { ThemePicker } from "@/features/account/theme-picker";
@@ -56,6 +57,18 @@ async function AccountContent() {
           <ThemePicker initial={preferences.theme} />
           <p className="max-w-[52ch] text-body-small text-ink-muted">{t("theme.help")}</p>
           {isMultilingual ? <LanguageSwitcher /> : null}
+        </Panel>
+
+        <Panel className="flex flex-col gap-4">
+          <h2 className="text-block-title text-ink">{t("accessibility.title")}</h2>
+          <AccessibilityPreferences
+            initial={{
+              fontScale: preferences.fontScale,
+              motion: preferences.motion,
+              contrast: preferences.contrast,
+            }}
+          />
+          <p className="max-w-[52ch] text-body-small text-ink-muted">{t("accessibility.help")}</p>
         </Panel>
 
         <Panel className="flex flex-col gap-4">

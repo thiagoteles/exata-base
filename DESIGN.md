@@ -202,7 +202,7 @@ The options of each knob:
 - **Elevation:** `shadow`, `hairline`, `deep`. In the dark theme every option is a 1px outline.
 - **Motion:** `calm`, `minimal`, `lively`. Only `lively` has a small overshoot; reduced motion still jumps to the end.
 - **Neutral temperature:** `cool` and `tinted` follow the brand hue, `warm` is a paper tone at hue 75.
-- **Contrast:** `standard`, or `reinforced`, which raises muted text to 7:1 and control borders to 4.5:1.
+- **Contrast:** `standard`, or `reinforced`, which raises muted text to 7:1 and control borders to 4.5:1. A preset that is `standard` still carries the reinforced values as an overlay (`data-contrast="more"` on the page): a person turns it on from their account, or gets it when their system asks for more contrast. The overlay lists only the roles the reinforced palette moves, in both themes, and the accent scopes keep their own colors.
 
 The rest of this file describes the `instrument` values; the table below is what the chosen preset changes, written by `pnpm tokens`.
 
@@ -582,7 +582,7 @@ Charts follow one method: pick the form first (a single number is a stat tile, n
 - **Duration:** micro 120ms (hover, press), standard 200ms (menu, popover, the save bar rising 8px), layer 280ms (dialog, sheet). Exit is 30% shorter than enter.
 - **Waiting:** loading states and indicators only appear after 180ms. A fast response never flashes.
 - **Hover:** hover hints and keyboard shortcuts only appear under `(hover: hover) and (pointer: fine)`.
-- **Reduced motion:** everything jumps to the final frame, with a 0.01ms duration and no delay. The resting state of every animation is the base style itself, so nothing is left halfway.
+- **Reduced motion:** everything jumps to the final frame, with a 0.01ms duration and no delay. It applies when the system asks for it and also when the person chose it in their account (`data-motion="reduce"`). The resting state of every animation is the base style itself, so nothing is left halfway.
 - **The one authored moment:** the "Salvo" (Saved) stamp. It scales from 1.06 to 1 together with opacity, in 120ms, with no bounce. It is the only animation with personality in the system.
 
 ## Decisions Log

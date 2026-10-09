@@ -81,6 +81,33 @@
     line-height: var(--text-body--line-height);
   }
 
+  /*
+   * The text size a person chose scales the root, so every size written in rem follows it: type,
+   * spacing and the named sizes alike. Sizes in pixels, like the bars, stay as they are.
+   */
+  :root[data-font-scale="large"] {
+    font-size: 112.5%;
+  }
+
+  :root[data-font-scale="larger"] {
+    font-size: 125%;
+  }
+
+  /*
+   * Reduced motion chosen from the account: the same rule as the system's, for a person whose
+   * system does not ask but who wants the page still.
+   */
+  :root[data-motion="reduce"] *,
+  :root[data-motion="reduce"] *::before,
+  :root[data-motion="reduce"] *::after {
+    /* biome-ignore-start lint/complexity/noImportantStyles: must override every component transition */
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    /* biome-ignore-end lint/complexity/noImportantStyles: must override every component transition */
+  }
+
   /* Reduced motion jumps every animation to its final frame, so it must win over utility classes. */
   @media (prefers-reduced-motion: reduce) {
     *,

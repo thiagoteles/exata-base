@@ -4,24 +4,11 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Segmented } from "@/components/ui/segmented";
 import { useToast } from "@/components/ui/use-toast";
-import { isTheme, ONE_YEAR_SECONDS, THEME_COOKIE, type ThemeChoice } from "@/lib/theme";
+import { isTheme, type ThemeChoice } from "@/lib/theme";
 import { rememberOption } from "./actions";
+import { applyPageAttribute } from "./page-attribute";
 
 const SYSTEM = "system";
-
-/** Applies a theme at once: the attribute for this page, and the cookie for the next first paint. */
-function applyTheme(theme: ThemeChoice) {
-  const root = document.documentElement;
-  if (!isTheme(theme)) {
-    root.removeAttribute("data-theme");
-    // biome-ignore lint/suspicious/noDocumentCookie: the theme cookie is read by the script before the first paint
-    document.cookie = `${THEME_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
-    return;
-  }
-  root.setAttribute("data-theme", theme);
-  // biome-ignore lint/suspicious/noDocumentCookie: the theme cookie is read by the script before the first paint
-  document.cookie = `${THEME_COOKIE}=${theme}; Path=/; Max-Age=${ONE_YEAR_SECONDS}; SameSite=Lax`;
-}
 
 /**
  * The theme choice. The account page knows what was saved and passes it; on a public page, whose
@@ -48,11 +35,11 @@ export function ThemePicker({ initial }: { initial?: ThemeChoice }) {
     const previous: ThemeChoice = value;
     const choice: ThemeChoice = isTheme(next) ? next : SYSTEM;
     setValue(choice);
-    applyTheme(choice);
+    applyPageAttribute("theme", choice);
     const result = await rememberOption({ key: "theme", value: choice });
     if (result?.data === undefined) {
       setValue(previous);
-      applyTheme(previous);
+      applyPageAttribute("theme", previous);
       notify({ title: t("failed"), tone: "danger" });
     }
   };

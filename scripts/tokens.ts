@@ -39,6 +39,15 @@ const { preset, choices } = parseDesign(input);
 const look = { temperature: temperatureOf(choices), contrast: choices.contrast };
 const light = generateTheme("light", seeds, look);
 const dark = generateTheme("dark", seeds, look);
+// A preset that is already reinforced has nothing stronger to offer; any other gets the overlay a
+// person turns on from their account.
+const stronger =
+  look.contrast === "reinforced"
+    ? null
+    : {
+        light: generateTheme("light", seeds, { ...look, contrast: "reinforced" }).palette,
+        dark: generateTheme("dark", seeds, { ...look, contrast: "reinforced" }).palette,
+      };
 
 const accentSeeds = Object.entries({ brand: seeds.brand, ...parseAccents(input) });
 const generated = accentSeeds.map(([name, seed]) => ({
@@ -96,6 +105,7 @@ const outputs: ReadonlyArray<readonly [string, string]> = [
       },
       accents,
       elevationOf(choices),
+      stronger,
     ),
   ],
   ["styles/preset.css", renderPresetCss(preset, choices)],

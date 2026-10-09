@@ -1,7 +1,13 @@
 import { isTimeZone } from "@/domain/calendar";
 import { defaultEmailPreferences, type EmailPreferences } from "@/domain/email/consent";
 import { defaultLocale, LOCALE_COOKIE, locales, timeZone } from "@/lib/i18n/locales";
-import { THEME_COOKIE, themes } from "@/lib/theme";
+import {
+  CONTRAST_COOKIE,
+  FONT_SCALE_COOKIE,
+  MOTION_COOKIE,
+  THEME_COOKIE,
+  themes,
+} from "@/lib/theme";
 import { z } from "@/lib/validation";
 
 /*
@@ -31,6 +37,35 @@ export const preferences = {
     fallback: "system",
     cookie: {
       name: THEME_COOKIE,
+      encode: (value) => (value === "system" ? null : value),
+      decode: (raw) => raw,
+    },
+  }),
+  // How the page looks to someone who needs it different. Each sets an attribute on <html> before
+  // the first paint (see lib/theme.ts); the default leaves it off and clears the cookie.
+  fontScale: definePreference<"default" | "large" | "larger">({
+    schema: z.enum(["default", "large", "larger"]),
+    fallback: "default",
+    cookie: {
+      name: FONT_SCALE_COOKIE,
+      encode: (value) => (value === "default" ? null : value),
+      decode: (raw) => raw,
+    },
+  }),
+  motion: definePreference<"system" | "reduce">({
+    schema: z.enum(["system", "reduce"]),
+    fallback: "system",
+    cookie: {
+      name: MOTION_COOKIE,
+      encode: (value) => (value === "system" ? null : value),
+      decode: (raw) => raw,
+    },
+  }),
+  contrast: definePreference<"system" | "more">({
+    schema: z.enum(["system", "more"]),
+    fallback: "system",
+    cookie: {
+      name: CONTRAST_COOKIE,
       encode: (value) => (value === "system" ? null : value),
       decode: (raw) => raw,
     },

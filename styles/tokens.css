@@ -166,6 +166,25 @@
 }
 
 @layer base {
+  :root[data-contrast="more"] {
+    --color-line-strong: oklch(54.5% 0.02 245);
+    --color-ink-muted: oklch(42.5% 0.02 245);
+  }
+
+  :root[data-theme="dark"][data-contrast="more"] {
+    --color-line-strong: oklch(62% 0.02 245);
+    --color-ink-muted: oklch(75% 0.015 245);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"])[data-contrast="more"] {
+      --color-line-strong: oklch(62% 0.02 245);
+      --color-ink-muted: oklch(75% 0.015 245);
+    }
+  }
+}
+
+@layer base {
   [data-accent="brand"] {
     --color-accent: oklch(55% 0.13 245);
     --color-accent-wash: oklch(94.5% 0.028 245);

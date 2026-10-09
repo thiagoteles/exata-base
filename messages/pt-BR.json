@@ -491,6 +491,27 @@
       "help": "Vale neste navegador e nos outros em que você entrar.",
       "failed": "Não foi possível salvar o tema."
     },
+    "accessibility": {
+      "title": "Acessibilidade",
+      "fontScale": {
+        "label": "Tamanho do texto",
+        "default": "Padrão",
+        "large": "Grande",
+        "larger": "Maior"
+      },
+      "motion": {
+        "label": "Movimento",
+        "system": "Do sistema",
+        "reduce": "Reduzir"
+      },
+      "contrast": {
+        "label": "Contraste",
+        "system": "Do sistema",
+        "more": "Reforçado"
+      },
+      "help": "Vale neste navegador e nos outros em que você entrar.",
+      "failed": "Não foi possível salvar a sua escolha."
+    },
     "email": {
       "title": "E-mails",
       "reminders": {

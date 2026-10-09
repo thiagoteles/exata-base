@@ -9,6 +9,16 @@ import {
   specFor,
 } from "./resolve";
 
+const defaults = {
+  theme: "system",
+  fontScale: "default",
+  motion: "system",
+  contrast: "system",
+  timeZone: "America/Sao_Paulo",
+  email: { reminders: true, news: false },
+  locale: "pt-BR",
+};
+
 describe("the preference registry", () => {
   it("gives every preference a fallback its own schema accepts", () => {
     for (const key of preferenceKeys) {
@@ -27,19 +37,11 @@ describe("the preference registry", () => {
 
 describe("resolving what is stored", () => {
   it("uses the saved value, the fallback when there is none, and the fallback for a stale one", () => {
-    expect(resolvePreferences({})).toEqual({
-      theme: "system",
-      timeZone: "America/Sao_Paulo",
-      email: { reminders: true, news: false },
-      locale: "pt-BR",
-    });
+    expect(resolvePreferences({})).toEqual(defaults);
     expect(resolvePreferences({ theme: "dark" }).theme).toBe("dark");
-    expect(resolvePreferences({ theme: "sepia", locale: 3, timeZone: "Mars/Base" })).toEqual({
-      theme: "system",
-      timeZone: "America/Sao_Paulo",
-      email: { reminders: true, news: false },
-      locale: "pt-BR",
-    });
+    expect(resolvePreferences({ theme: "sepia", locale: 3, timeZone: "Mars/Base" })).toEqual(
+      defaults,
+    );
     expect(savedPreference({ theme: "sepia" }, "theme")).toBeUndefined();
     expect(savedPreference({}, "theme")).toBeUndefined();
   });

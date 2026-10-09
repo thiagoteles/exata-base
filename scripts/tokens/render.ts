@@ -46,6 +46,54 @@ ${rules((name) => `:root:not([data-theme="light"]) ${scope(name)}`, "dark", "   
 const dataDeclarations = (palette: DataPalette, indent: string) =>
   palette.map(([name, color]) => `${indent}--color-${name}: ${css(color)};`).join("\n");
 
+/**
+ * What a person's choice of stronger contrast changes. Only the roles the reinforced palette moves
+ * are written, so the rule stays short, and it wins over the theme's own block by one more
+ * attribute in the selector. The accent scopes keep their own colors.
+ */
+export type ContrastOverlay = { light: Palette; dark: Palette };
+
+/** The roles the reinforced palette moves in either theme. Each theme restates all of them. */
+const moved = (base: { light: Palette; dark: Palette }, stronger: ContrastOverlay) =>
+  tokenNames.filter(
+    (name) =>
+      css(base.light[name]) !== css(stronger.light[name]) ||
+      css(base.dark[name]) !== css(stronger.dark[name]),
+  );
+
+/*
+ * Both themes list the same roles. If only the one that moved were written, the light rule, which
+ * is as specific as the dark theme's own block, would paint light colors over a dark page.
+ */
+export function renderContrastOverlay(
+  base: { light: Palette; dark: Palette },
+  stronger: ContrastOverlay,
+): string {
+  const names = moved(base, stronger);
+  if (names.length === 0) {
+    return "";
+  }
+  const lines = (palette: Palette, indent: string) =>
+    names.map((name) => `${indent}--color-${name}: ${css(palette[name])};`).join("\n");
+  return `
+@layer base {
+  :root[data-contrast="more"] {
+${lines(stronger.light, "    ")}
+  }
+
+  :root[data-theme="dark"][data-contrast="more"] {
+${lines(stronger.dark, "    ")}
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"])[data-contrast="more"] {
+${lines(stronger.dark, "      ")}
+    }
+  }
+}
+`;
+}
+
 export type ThemePalettes = {
   light: Palette;
   dark: Palette;
@@ -56,6 +104,7 @@ export function renderTokensCss(
   { light, dark, data }: ThemePalettes,
   accents: readonly [RenderedAccent, ...RenderedAccent[]],
   elevation: Elevation,
+  stronger: ContrastOverlay | null,
 ): string {
   const [brand] = accents;
   const { rim, offset, blur, spread, opacity } = elevation;
@@ -101,7 +150,7 @@ ${dataDeclarations(data.dark, "      ")}
     }
   }
 }
-${renderAccentScopes(accents)}`;
+${stronger === null ? "" : renderContrastOverlay({ light, dark }, stronger)}${renderAccentScopes(accents)}`;
 }
 
 const LINE_WIDTH = 100;

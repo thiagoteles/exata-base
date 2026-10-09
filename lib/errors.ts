@@ -2,12 +2,12 @@ import type messages from "@/messages/pt-BR.json";
 
 /*
  * The single shape of a domain error. Code that refuses a request throws a DomainError with one
- * of five statuses and a catalog key; routes and actions turn it into the same body, always with
+ * of six statuses and a catalog key; routes and actions turn it into the same body, always with
  * the request id. Anything that is not a DomainError is a 500 and is logged, never shown.
  */
 
 export type ErrorKey = keyof (typeof messages)["errors"];
-export type ErrorStatus = 400 | 401 | 403 | 404 | 409;
+export type ErrorStatus = 400 | 401 | 403 | 404 | 409 | 429;
 
 const defaultKeys: Readonly<Record<ErrorStatus, ErrorKey>> = {
   400: "badRequest",
@@ -15,6 +15,7 @@ const defaultKeys: Readonly<Record<ErrorStatus, ErrorKey>> = {
   403: "forbidden",
   404: "notFound",
   409: "conflict",
+  429: "tooManyRequests",
 };
 
 export class DomainError extends Error {

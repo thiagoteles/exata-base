@@ -3,7 +3,7 @@
 import { getTranslations } from "next-intl/server";
 import { currentInstant } from "@/domain/clock";
 import { savedLocaleOfUser } from "@/lib/accounts/options";
-import { actionFor, publicAction } from "@/lib/actions/client";
+import { actionFor, limitedPublicAction } from "@/lib/actions/client";
 import { notifyTeam, sendReply } from "@/lib/contact/mailer";
 import { contactStatuses } from "@/lib/contact/options";
 import { changeContactStatus, replyToContact, submitContact } from "@/lib/contact/service";
@@ -16,7 +16,7 @@ import { z } from "@/lib/validation";
 import { contactSchema, replySchema } from "./schema";
 
 /** The public form. A signed-in person is recognized; a visitor is welcome too. */
-export const sendContact = publicAction
+export const sendContact = limitedPublicAction({ name: "contact", limit: 20, windowSeconds: 3600 })
   .inputSchema(contactSchema)
   .action(async ({ parsedInput }) => {
     const [t, user, locale] = await Promise.all([

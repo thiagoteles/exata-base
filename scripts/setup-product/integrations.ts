@@ -41,6 +41,8 @@ const emailList = (value: string) =>
     : "must be a comma list of e-mail addresses";
 const url = (value: string) =>
   URL.canParse(value) ? null : "must be a full address, like https://example.com";
+const proxy = (value: string) =>
+  value === "traefik" || value === "cloudflare" ? null : "must be traefik or cloudflare";
 const nonEmpty = (value: string) => (value.trim().length > 0 ? null : "cannot be empty");
 const digits = (value: string) => (DIGITS.test(value) ? null : "must be only digits");
 const uuid = (value: string) => (UUID.test(value) ? null : "must be a UUID");
@@ -161,6 +163,12 @@ export const basics: readonly Field[] = [
     check: emailList,
     optional: true,
   },
+  {
+    name: "TRUSTED_PROXY",
+    label: "Proxy in front of the app: traefik (Coolify alone) or cloudflare",
+    check: proxy,
+    optional: true,
+  },
 ];
 
 const fieldByName = new Map(
@@ -269,6 +277,7 @@ const order = [
   ...integrations.flatMap((item) => item.fields.map((field) => field.name)),
   "ADMIN_EMAILS",
   "CONTACT_EMAIL",
+  "TRUSTED_PROXY",
   "CRON_SECRET",
   "FILE_URL_SECRET",
 ];

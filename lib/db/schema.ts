@@ -6,6 +6,7 @@ import { billingInterval, planStatus, plans, planTier, stripeEvents } from "./sc
 import { contactMessages, contactStatus, contactSubject } from "./schema/contact";
 import { files } from "./schema/files";
 import { invites } from "./schema/invites";
+import { rateLimits } from "./schema/rate-limits";
 import { userRole, users } from "./schema/users";
 
 /** Every table and enum. A new table is added here and in the personal data registry. */
@@ -26,6 +27,7 @@ export const schema = {
   contactSubject,
   contactStatus,
   files,
+  rateLimits,
   staffAuditLog,
   accountDeletions,
   deletionRequester,

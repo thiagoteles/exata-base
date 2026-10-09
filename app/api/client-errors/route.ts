@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
-import { currentEpochMs } from "@/domain/clock";
+import { currentEpochMs, currentInstant } from "@/domain/clock";
+import { clientAddress } from "@/lib/client-address";
 import {
   browserKey,
   clientErrorSchema,
@@ -7,9 +8,14 @@ import {
   fingerprint,
   MAX_REPORT_BYTES,
 } from "@/lib/client-errors";
+import { db } from "@/lib/db/client";
+import { env } from "@/lib/env";
 import { logger } from "@/lib/ports/log";
+import { consume } from "@/lib/rate-limit/service";
 
 const deduper = createDeduper();
+// A browser stuck in an error loop is cut off here, before its reports fill the log.
+const reportsPerAddress = { name: "client-errors", limit: 30, windowSeconds: 60 };
 
 /** Errors that happened in a person's browser, written to the log as errors so the alert sees them. */
 export async function POST(request: NextRequest) {
@@ -31,7 +37,10 @@ export async function POST(request: NextRequest) {
   if (!report.success) {
     return new Response(null, { status: 400 });
   }
-  const address = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
+  const address = clientAddress(request.headers, env.TRUSTED_PROXY) ?? "unknown";
+  if (!(await consume(db, reportsPerAddress, `address:${address}`, currentInstant())).allowed) {
+    return new Response(null, { status: 429 });
+  }
   const browser = browserKey(address, request.headers.get("user-agent") ?? "");
   if (deduper.firstTime(fingerprint(browser, report.data), currentEpochMs())) {
     // The report's own `message` would collide with the log line's, so it is logged as `errorMessage`.

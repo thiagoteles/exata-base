@@ -4,6 +4,8 @@ import type { Role } from "@/lib/accounts/roles";
 import { type ErrorBody, errorBody } from "@/lib/errors";
 import { requireRole } from "@/lib/ports/auth";
 import { logger } from "@/lib/ports/log";
+import { enforceRateLimit, requestAddressSubject } from "@/lib/rate-limit/guard";
+import type { RateLimit } from "@/lib/rate-limit/service";
 import { REQUEST_ID_HEADER } from "@/lib/request-id";
 
 /*
@@ -27,7 +29,24 @@ const action = createSafeActionClient({
 /** The action client for screens a visitor can use before signing in. */
 export const publicAction = action;
 
-/** The action client for a minimum role. The signed-in user arrives as `ctx.user`. */
-export function actionFor(minimum: Role) {
-  return action.use(async ({ next }) => next({ ctx: { user: await requireRole(minimum) } }));
+/** A public action counted per address, for anything a visitor can repeat: forms, sign-ups. */
+export function limitedPublicAction(rateLimit: RateLimit) {
+  return action.use(async ({ next }) => {
+    await enforceRateLimit(rateLimit, await requestAddressSubject());
+    return next();
+  });
+}
+
+/**
+ * The action client for a minimum role. The signed-in user arrives as `ctx.user`. With
+ * `rateLimit`, each person is counted by id after the role check.
+ */
+export function actionFor(minimum: Role, options: { rateLimit?: RateLimit } = {}) {
+  return action.use(async ({ next }) => {
+    const user = await requireRole(minimum);
+    if (options.rateLimit !== undefined) {
+      await enforceRateLimit(options.rateLimit, `user:${user.id}`);
+    }
+    return next({ ctx: { user } });
+  });
 }

@@ -83,9 +83,10 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 - Redis, que é infraestrutura nova;
 - só na borda, que não sabe de plano nem de usuário.
 
-- [ ] A mesma tabela serve aos limites de uso por plano (`usage` do lottery).
-- [ ] Uma operação diária apaga as janelas antigas.
-- [ ] Helper confiável de IP do cliente. Hoje `app/api/client-errors` pega o **primeiro** valor do `X-Forwarded-For`, que quem chama controla. O helper lê `TRUSTED_PROXY`: `cloudflare` usa o `CF-Connecting-IP`, `traefik` usa o último valor do `X-Forwarded-For`. Com `cloudflare`, o README documenta o firewall aceitando só os IPs da Cloudflare.
+- [x] Tabela, serviço, guardas (`limitedPublicAction`, `actionFor(papel, { rateLimit })`, `enforceRateLimit`) e erro 429. Aplicado ao contato público e a `/api/client-errors`.
+- [ ] A mesma tabela serve aos limites de uso por plano (`usage` do lottery). Entra com o catálogo de planos.
+- [x] Uma operação diária apaga as janelas antigas.
+- [x] Helper confiável de IP do cliente. Hoje `app/api/client-errors` pega o **primeiro** valor do `X-Forwarded-For`, que quem chama controla. O helper lê `TRUSTED_PROXY`: `cloudflare` usa o `CF-Connecting-IP`, `traefik` usa o último valor do `X-Forwarded-For`. Com `cloudflare`, o README documenta o firewall aceitando só os IPs da Cloudflare.
 - [ ] **Validar:** o IP real nos dois modos, o número de réplicas e o custo de uma escrita por requisição nas rotas públicas mais acessadas. Se pesar, colocar limite na borda como primeira barreira.
 
 ## Design system

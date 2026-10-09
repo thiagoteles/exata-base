@@ -3,6 +3,7 @@ import { DomainError } from "@/lib/errors";
 import { z } from "@/lib/validation";
 
 const session = vi.hoisted(() => ({ role: null as null | "member" | "staff" | "admin" }));
+const limits = vi.hoisted(() => ({ over: false, subjects: [] as string[] }));
 
 vi.mock("next/headers", () => ({
   headers: () => Promise.resolve(new Headers({ "x-request-id": "req-1" })),
@@ -28,7 +29,25 @@ vi.mock("@/lib/ports/auth", async () => {
   };
 });
 
-const { actionFor } = await import("./client");
+vi.mock("@/lib/rate-limit/guard", async () => {
+  const { DomainError: Refusal } = await import("@/lib/errors");
+  return {
+    requestAddressSubject: () => Promise.resolve("address:203.0.113.9"),
+    enforceRateLimit: (_rule: unknown, subject: string) => {
+      limits.subjects.push(subject);
+      return limits.over ? Promise.reject(new Refusal(429)) : Promise.resolve();
+    },
+  };
+});
+
+const { actionFor, limitedPublicAction } = await import("./client");
+
+const limited = actionFor("member", {
+  rateLimit: { name: "test", limit: 1, windowSeconds: 60 },
+}).action(() => Promise.resolve({ done: true }));
+const visitorForm = limitedPublicAction({ name: "form", limit: 1, windowSeconds: 60 }).action(() =>
+  Promise.resolve({ done: true }),
+);
 
 const staffEcho = actionFor("staff")
   .inputSchema(z.object({ note: z.string().min(3) }))
@@ -39,6 +58,8 @@ const failing = actionFor("member").action(() =>
 
 beforeEach(() => {
   session.role = null;
+  limits.over = false;
+  limits.subjects.length = 0;
 });
 
 describe("server actions", () => {
@@ -68,6 +89,21 @@ describe("server actions", () => {
       key: "tooShort",
       values: { minimum: 3 },
     });
+  });
+
+  it("count a signed-in person by id and a visitor by address, and refuse over the limit", async () => {
+    session.role = "member";
+    expect((await limited())?.data).toEqual({ done: true });
+    expect((await visitorForm())?.data).toEqual({ done: true });
+    expect(limits.subjects).toEqual(["user:u1", "address:203.0.113.9"]);
+    limits.over = true;
+    expect((await limited())?.serverError).toMatchObject({ status: 429, key: "tooManyRequests" });
+    expect((await visitorForm())?.serverError).toMatchObject({ status: 429 });
+  });
+
+  it("check the role before counting, so a refused visitor never spends the limit", async () => {
+    expect((await limited())?.serverError).toMatchObject({ status: 401 });
+    expect(limits.subjects).toEqual([]);
   });
 
   it("never expose an unexpected error", async () => {

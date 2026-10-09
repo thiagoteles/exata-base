@@ -5,6 +5,7 @@
     "forbidden": "Você não tem permissão para fazer isso.",
     "notFound": "Não encontramos o que você procurou.",
     "conflict": "Isso já foi feito ou mudou enquanto você editava. Atualize a página e tente de novo.",
+    "tooManyRequests": "Muitas tentativas em pouco tempo. Espere um pouco e tente de novo.",
     "internal": "Algo deu errado do nosso lado. Tente de novo em instantes.",
     "requestId": "Código do pedido: {requestId}",
     "fileTooLarge": "O arquivo é maior que o limite de {maxMb, number} MB.",

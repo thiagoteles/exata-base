@@ -43,6 +43,9 @@ const server = {
   // biome-ignore lint/security/noSecrets: the local compose credentials are public by design
   DATABASE_URL: z.url().default("postgres://app:app@localhost:5440/app"),
   ADMIN_EMAILS: csv.pipe(z.array(z.email())).default([]),
+  // Which proxy writes the client address: Traefik (Coolify) appends it to X-Forwarded-For,
+  // Cloudflare sends CF-Connecting-IP. Only that value is trusted, never one the caller wrote.
+  TRUSTED_PROXY: z.enum(["traefik", "cloudflare"]).default("traefik"),
 
   BETTER_AUTH_SECRET: z.string().min(32).default("local-development-secret-not-for-production"),
   CLERK_PUBLISHABLE_KEY: z.string().startsWith("pk_").optional(),

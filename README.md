@@ -88,6 +88,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `BETTER_AUTH_SECRET` | with `local` | At least 32 characters |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | no | Together; turns on Google in `local` mode |
 | `ADMIN_EMAILS` | no | Comma list. These addresses become `admin` when confirmed |
+| `TRUSTED_PROXY` | no | `traefik` (default, Coolify alone) or `cloudflare` (Cloudflare in front). Decides which header carries the client address for rate limits. With `cloudflare`, let only Cloudflare's addresses reach the server |
 | `MAILTRAP_TOKEN`, `MAILTRAP_INBOX`, `EMAIL_FROM` | no | Without a token nothing is sent and each send is logged as an error. `EMAIL_FROM` is required with the token |
 | `CONTACT_EMAIL` | no | Comma list that is told about new contact messages |
 | `CRON_SECRET` | no | At least 32 characters. Without it `/events` refuses everything |
@@ -100,7 +101,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 
 ## Daily operations
 
-`/events` runs every operation in `lib/daily/registry.ts`, one at a time. One failing is logged and does not stop the others. Each operation is idempotent, so running the call twice is safe. The first one deletes invites that were never accepted and expired more than 30 days ago. A new one is a new entry in the registry (see the `new-daily-operation` skill), never a new route.
+`/events` runs every operation in `lib/daily/registry.ts`, one at a time. One failing is logged and does not stop the others. Each operation is idempotent, so running the call twice is safe. The first one deletes invites that were never accepted and expired more than 30 days ago; the second deletes the rate limit counters of windows that already ended. A new one is a new entry in the registry (see the `new-daily-operation` skill), never a new route.
 
 ## Errors
 

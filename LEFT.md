@@ -1,6 +1,39 @@
-# Pendências comuns (lottery e solmiza)
+# Pendências da base
 
-Arquivo temporário. Lista o que falta na base e serve para portar tanto o lottery quanto o solmiza.
+Arquivo temporário. Lista o que falta na base para que produtos como o lottery e o solmiza, e os próximos, nasçam dela. O foco é técnico: a migração operacional de cada produto (dados, assinantes, corte) fica no repositório do produto.
+
+## Antes de começar
+
+### Decisões tomadas (2026-10-08)
+
+- **Proxy confiável por produto.** O helper de IP lê `TRUSTED_PROXY` (`cloudflare | traefik`) em `lib/env.ts`. Com `cloudflare`, o IP vem do `CF-Connecting-IP`; com `traefik`, do último valor do `X-Forwarded-For`. O `setup:product` pergunta.
+- **Retenção do backup por produto.** Padrão de 7 dias; o `setup:product` pergunta e escreve o valor no README e na política de privacidade.
+- **Auth por produto.** Clerk ou login próprio continua sendo a flag `AUTH_PROVIDER`. A base não traz scripts de migração de usuários.
+- **Sem CI no GitHub** (sem cota). As checagens pesadas rodam nos hooks e num comando local (ver "Infraestrutura e qualidade").
+- **Migração operacional fora do LEFT.md.** Backfill de usuários, mapa de enums, conversão de valores e tabelas de equivalência ficam em cada produto.
+- **Só o mecanismo na base.** Cores oficiais de terceiros, figuras e paletas de um domínio vivem no produto. A base traz o mecanismo com exemplos neutros, e a conferência de higiene do `BASE.md` continua passando.
+- **Presets visuais:** a proposta de valores de cada preset é feita no `/catalog`, com capturas nos dois temas, e aprovada antes de virar padrão.
+
+### Provas técnicas primeiro
+
+Cada uma num branch descartável. Se falhar, a decisão correspondente muda antes de qualquer código.
+
+- [ ] `typedRoutes` com o mapa de URLs públicas e o prefetch do `<Link>` sobre o endereço reescrito (SEO, item 1).
+- [ ] `data-accent` com variáveis CSS sob o `@theme` do Tailwind 4, e o `next/font` aceitando um arquivo de fontes gerado (Design system).
+- [ ] `@next/mdx` com Turbopack no Next 16.4 (SEO, item 9).
+- [ ] `@react-pdf/renderer` com React 19.3 no servidor (PDF e QR).
+- [ ] Plugin GritQL barrando relógio e aleatoriedade no Biome 2.5 (Regras, item 3).
+- [ ] `outputFileTracingIncludes` sob `cacheComponents` (Arquivos estáticos).
+
+### Ordem entre seções
+
+1. Provas técnicas.
+2. `domain/`, relógio e aleatoriedade, hooks locais.
+3. Tokenizar as dimensões; accent com escopo; presets propostos no `/catalog`.
+4. Rate limit e helper de IP.
+5. Estado neutro de provedor, catálogo de planos e guardas (dependem de `domain/` e do rate limit).
+6. `payments`, paleta de dados e gráficos, e então a página "Números".
+7. O resto de cada seção, na ordem dela.
 
 ## Estrutura
 
@@ -46,8 +79,8 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 
 - [ ] A mesma tabela serve aos limites de uso por plano (`usage` do lottery).
 - [ ] Uma operação diária apaga as janelas antigas.
-- [ ] Helper confiável de IP do cliente. Hoje `app/api/client-errors` pega o **primeiro** valor do `X-Forwarded-For`, que quem chama controla. É preciso o valor acrescentado pelo proxy de confiança (o Traefik do Coolify), normalmente o último.
-- [ ] **Validar:** o IP real no Coolify, o número de réplicas e o custo de uma escrita por requisição nas rotas públicas mais acessadas. Se pesar, colocar limite na borda como primeira barreira.
+- [ ] Helper confiável de IP do cliente. Hoje `app/api/client-errors` pega o **primeiro** valor do `X-Forwarded-For`, que quem chama controla. O helper lê `TRUSTED_PROXY`: `cloudflare` usa o `CF-Connecting-IP`, `traefik` usa o último valor do `X-Forwarded-For`. Com `cloudflare`, o README documenta o firewall aceitando só os IPs da Cloudflare.
+- [ ] **Validar:** o IP real nos dois modos, o número de réplicas e o custo de uma escrita por requisição nas rotas públicas mais acessadas. Se pesar, colocar limite na borda como primeira barreira.
 
 ## Design system
 
@@ -75,13 +108,14 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 - [ ] **Accent com escopo**
   - Tokens `accent`, `accent-wash`, `accent-ink` e `on-accent`. Um `data-accent="<nome>"` no contêiner troca o tom ali dentro.
   - Usos: o jogo no lottery; a função harmônica ou o nível no solmiza; categoria, setor ou cliente em outros produtos.
-- [ ] **Cor oficial fixa como entrada** (hex da Caixa):
+- [ ] **Cor oficial fixa como entrada** (a cor de marca de um terceiro, que o produto não pode alterar):
   - o tom puro só como decoração;
   - o gerador calcula `-ink` e `on-accent` com contraste medido nos dois temas;
-  - isso resolve a exceção da Timemania sem escrever nada à mão.
-- [ ] **Paletas de domínio nomeadas** (`material.wood`, `material.string`, `tone.tonic`, `tone.dominant`):
+  - uma cor oficial clara demais para texto deixa de exigir exceção escrita à mão.
+- [ ] **Paletas de domínio nomeadas** (o produto declara grupos como `category.*` ou `material.*`):
   - cada cor passa pelo verificador e vira token;
-  - o `check-design-tokens` passa a aceitar essas classes.
+  - o `check-design-tokens` passa a aceitar essas classes;
+  - na base, só um exemplo neutro no `/catalog`.
 - [ ] **Paleta de dados:** categórica (cerca de 8 tons com luminosidade equilibrada, distinguíveis por quem tem daltonismo), sequencial e divergente, nos dois temas.
 - [ ] **Tipografia:**
   - par de fontes de uma lista curada (sans neutra, humanista, serifada editorial, hiperlegível), mais a mono para números;
@@ -98,6 +132,8 @@ Matemática de prêmios, fechamentos e gerador no lottery; teoria musical, exerc
 
 Combinações completas e testadas. O produto escolhe um preset mais as sementes e pode ajustar um botão ou outro.
 
+- [ ] Proposta dos valores de cada preset (par de fontes, escala de raios, densidade, elevação, movimento) renderizada no `/catalog`, com capturas nos dois temas, aprovada antes de virar padrão.
+
 - [ ] **Instrumento:** o atual, operacional e denso.
 - [ ] **Editorial:** serifado, neutro quente, raios suaves e mais respiro. Serve ao solmiza, a conteúdo e a cursos.
 - [ ] **Acessível:** hiperlegível, corpo 18, alvos maiores e contraste reforçado. Serve ao lottery e a públicos amplos.
@@ -109,7 +145,7 @@ Combinações completas e testadas. O produto escolhe um preset mais as sementes
 - [ ] **Primitivos** sobre Radix em `components/ui`: tabs, stepper, date picker, slider, progress/meter, accordion, checkbox, radio e switch (se faltarem), skeleton, chip removível e breadcrumb.
 - [ ] **Padrões do site público:** hero, seções de conteúdo, tabela de preços, FAQ e um **layout de leitura (prose)** com tokens próprios (`/aprenda` do lottery, glossário do solmiza).
 - [ ] **Gráficos em SVG** (`components/charts`): barras, linha, sparkline, heatmap e stat tile, usando a paleta de dados, sem biblioteca pesada.
-- [ ] **Figuras de domínio** (`components/figures`): fretboard, bolas e volante, com `color-mix(in oklch, var(--color-x) N%, transparent)` permitido sobre tokens.
+- [ ] **Figuras de domínio** (`components/figures`): a família existe na base com as regras e um exemplo neutro; as figuras de cada produto (diagramas, bolas, instrumentos) vivem no produto. `color-mix(in oklch, var(--color-x) N%, transparent)` permitido sobre tokens.
 - [ ] **Texto dentro de SVG** (`<text>`) vindo do catálogo, sem esbarrar no `noJsxLiterals`.
 - [ ] **Padrões de produto pago:** paywall e gate, estado de trial, progresso, conquistas e onboarding.
 - [ ] **API uniforme:** todo componente com `tone` (neutral, brand, accent, success…) e `size`, tipados.
@@ -132,7 +168,7 @@ Combinações completas e testadas. O produto escolhe um preset mais as sementes
 - [ ] **Validar com uma prova pequena antes:**
   - se `data-accent` com variáveis CSS funciona bem com o `@theme` do Tailwind 4;
   - se o `next/font` aceita o arquivo de fontes gerado pelo setup;
-  - se o gerador acha variantes legíveis no tema escuro para todas as cores oficiais da Caixa.
+  - se o gerador acha variantes legíveis no tema escuro para cores oficiais saturadas e claras (amarelo, verde-limão, laranja).
 
 ## Cobrança
 
@@ -153,7 +189,7 @@ Combinações completas e testadas. O produto escolhe um preset mais as sementes
 - não há trial nem estado pendente;
 - não há registro local de pagamentos, rastro de checkout, cupom ou cobrança por organização.
 
-Fora de escopo: nota fiscal (resolvida fora da base) e a migração das assinaturas do Mercado Pago do lottery (outro problema).
+Fora de escopo: nota fiscal (resolvida fora da base) e a migração de assinaturas de outros provedores, que é operação de cada produto.
 
 ### 1. Catálogo de planos e direitos
 
@@ -304,8 +340,8 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
   - o log `access` excluído do bucket padrão;
   - os dois em `ops/gcp`.
 - [ ] Fora do GCP, a linha vai só para o stdout. Fica documentado que a retenção é responsabilidade do operador.
-- [ ] Usar o helper de IP confiável do rate limit.
-- [ ] **Validar:** se o Traefik do Coolify consegue repassar a porta de origem do cliente, que é necessária por causa do CGNAT.
+- [ ] Usar o helper de IP confiável do rate limit (`TRUSTED_PROXY`).
+- [ ] **Validar:** a porta de origem do cliente, necessária por causa do CGNAT, nos dois modos: o Traefik do Coolify consegue repassá-la? A Cloudflare manda o `CF-Connecting-Port`?
 
 ### 6. Desempenho
 
@@ -455,7 +491,7 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 - [ ] Construtor de RSS/Atom para route handlers (`feed.xml`), com escape correto.
 - [ ] Port `indexing` com adapter IndexNow e o arquivo de chave servido na raiz.
-- [ ] Remover a Google Indexing API do lottery. Pela política do Google ela só serve para `JobPosting` e `BroadcastEvent`. Para o Google, valem o sitemap com `lastModified` real e o Search Console.
+- [ ] A base não usa a Google Indexing API. Pela política do Google ela só serve para `JobPosting` e `BroadcastEvent`. Para o Google, valem o sitemap com `lastModified` real e o Search Console.
 
 ### 9. Conteúdo editorial em MDX
 
@@ -543,12 +579,7 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [ ] Teste do fluxo.
 - [ ] Atende o conferidor anônimo do lottery e o progresso de visitante do solmiza.
 
-### 7. Migração de usuários existentes
-
-- [ ] Script de backfill que lista os usuários da instância do Clerk e cria as linhas em `users` antes do lançamento. Sem isso, o admin só vê quem fizer login de novo.
-- [ ] Migrações de dados indexadas pelo `clerkId` e traduzidas para `users.id` (os dados do lottery no Firestore usam o id do Clerk).
-
-### 8. Pontos menores
+### 7. Pontos menores
 
 - [ ] Sessões e dispositivos: listar e encerrar sessões. Baixa prioridade; o Clerk já oferece, e o better-auth tem as sessões no modo local.
 - [ ] Onboarding: `onboardedAt` ou passos em `options`, ligado ao evento `activated` do funil.
@@ -563,13 +594,12 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 1. Registro de opções tipadas, com a cópia de visitante para conta.
 2. Preferências de e-mail e descadastro com um clique.
 3. Fuso horário.
-4. Backfill de usuários do Clerk.
-5. Reivindicação de dados de visitante e indicações.
-6. Acessibilidade, sessões e onboarding.
+4. Reivindicação de dados de visitante e indicações.
+5. Acessibilidade, sessões e onboarding.
 
 ## Regras da base a reconciliar
 
-**Diagnóstico:** quase tudo aqui é trabalho de portar cada produto, e a maior parte já é verificada pela base. O que falta são ferramentas para o porte ser mecânico e verificável.
+**Diagnóstico:** a maior parte das regras já é verificada pela base. O que falta é verificar as que ainda são só convenção e dar ferramentas para que trazer código de fora seja mecânico.
 
 | Regra | Como a base aplica | Situação |
 |---|---|---|
@@ -581,94 +611,72 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 | Dinheiro em centavos, instantes em `timestamptz` | Helpers de coluna e convenção | Parcial |
 | Feature não importa feature | `noRestrictedImports` | Já verificado |
 
-### 1. Porte limpo
-
-**Decisão:** porte limpo de uma vez. Cada arquivo só entra quando passa em todas as regras; não há isenções nem catraca. O produto só funciona no fim do porte, então o produto antigo continua no ar até lá.
-
-- [ ] O porte acontece num branch, área por área, com o `pnpm check` verde a cada passo.
-- [ ] A troca do produto antigo pelo novo é um único corte, depois da migração de dados (ver "Contas e preferências", migração de usuários).
-
-### 2. Textos para o catálogo
+### 1. Textos para o catálogo
 
 - [ ] Extrator `scripts/extract-text.ts` (com `ts-morph`):
   - acha literais em JSX e nas props `aria-label`, `placeholder`, `title` e `alt`;
   - propõe uma chave pelo caminho do arquivo e grava no catálogo;
   - troca o literal por `t("chave")`;
   - recusa travessão; o diff passa por revisão humana.
-- [ ] Catálogo dividido em `messages/pt-BR/<área>.json` e juntado num catálogo único no build, que continua sendo o tipo. A paridade de chaves continua valendo. Resolve os 332 arquivos do solmiza.
+- [ ] Catálogo dividido em `messages/pt-BR/<área>.json` e juntado num catálogo único no build, que continua sendo o tipo. A paridade de chaves continua valendo. Necessário para produtos com centenas de telas.
 - [ ] Conteúdo editorial em MDX (ver SEO), não no catálogo.
 - [ ] Dados com texto (planos, FAQs em arrays TS) viram chaves do catálogo referenciadas pelo dado, ou MDX.
-- [ ] Notação não é texto: nomes de nota (`C#`, `Dm7`) e números de bola vêm de funções do domínio. Escrever isso no `AGENTS.md`.
-- [ ] **Validar:** quanto tempo o TS 7 leva para checar tipos com um catálogo do tamanho do do solmiza.
+- [ ] Notação não é texto: símbolos e códigos do domínio (nomes de nota, números, siglas técnicas) vêm de funções do domínio. Escrever isso no `AGENTS.md`.
+- [ ] **Validar:** quanto tempo o TS 7 leva para checar tipos com um catálogo de alguns milhares de chaves.
 
-### 3. Relógio e aleatoriedade
+### 2. Relógio e aleatoriedade
 
 - [ ] Plugin GritQL do Biome barrando `new Date()` sem argumento, `Date.now()` e `Math.random()` em `domain/`, `lib/`, `features/` e `components/`.
 - [ ] Exceções: o módulo de relógio e o de aleatoriedade com semente, ambos em `domain/`.
 - [ ] **Validar:** os plugins GritQL na versão do Biome usada.
 
-### 4. Variáveis `NEXT_PUBLIC_`
+### 3. Convenções do banco
 
-- [ ] Nada a fazer na base:
-  - a chave do Clerk vai como prop;
-  - o id do Umami é lido no servidor;
-  - a URL do app vem do `APP_URL`.
-- [ ] No porte, renomear as variáveis. A tabela de equivalência de cada produto entra no roteiro de porte.
-
-### 5. Valores guardados, dinheiro e datas
-
-- [ ] Enums em inglês por um mapa de cada produto (`gasto` → `expense`, `premio` → `prize`, `organizador` → `organizer`) aplicado no script de migração. O catálogo traduz na tela.
-- [ ] Reais em ponto flutuante viram centavos inteiros na migração, com arredondamento explícito e um relatório das diferenças.
-- [ ] Timestamps do Firestore viram `timestamptz`.
 - [ ] `lib/db/conventions.test.ts` passa a recusar colunas `real`, `double` ou `numeric` com nome de dinheiro, e `timestamp` sem fuso.
+- [ ] Enums guardados só com valores em inglês, conferidos pelo mesmo teste (sem acento, em `snake_case`).
 
-### 6. Toolchain
+### 4. Ferramentas de fora do app
 
-- [ ] pnpm, Node 24, Vitest 5 e as regras do ESLint traduzidas para Biome.
-- [ ] Os guardas do solmiza usam a API de compilador do TypeScript, que mudou no TS 7 (nativo). Reescrever como regras do Biome (GritQL) ou testes do Vitest sobre o código-fonte.
-- [ ] Rodar a checagem do TS 7 cedo no porte, antes de mover código: ele pode acusar erros que o TS 5 deixava passar.
-
-### 7. Ferramentas e pacotes de fora
-
-- [ ] **Decisão:** pasta `tools/` no repositório do produto (gerador em Rust, análises em Python, extensão do Chrome, vídeo).
+- [ ] **Decisão:** pasta `tools/` no repositório do produto (geradores em outras linguagens, análises, extensões de navegador, vídeo).
   - Na base, a pasta tem só um `tools/README.md` explicando que as ferramentas de fora do app vão para lá.
   - `tools/` fica fora do lint, do knip e do `tsconfig`.
-- [ ] O pacote privado `exata-ui` sai. Os componentes são refeitos sobre os primitivos da base, com o design system novo.
 
-### 8. Roteiro de porte como skill
+### 5. Roteiro de porte como skill
 
-- [ ] Skill `port-from-legacy` com a ordem para cada arquivo:
+- [ ] Skill `port-from-legacy`, genérica, com a ordem para cada arquivo trazido de outro projeto:
   1. mover para a camada certa (`domain`, `lib`, `features`, `components`);
   2. extrair os textos;
   3. tirar relógio e aleatoriedade;
   4. passar no `pnpm check` antes do commit.
-- [ ] Tabelas de equivalência de cada produto na skill: variáveis de ambiente, enums e rotas.
+- [ ] Tabelas de equivalência (variáveis, enums, rotas) e scripts de migração de dados ficam no repositório de cada produto, fora da base.
 
 ### Decisões
 
-- Porte limpo de uma vez, sem catraca.
 - Catálogo dividido por área, juntado no build.
 - Pasta `tools/` no repositório, com só um README na base.
+- Migração operacional de cada produto fora da base.
 
 ### Ordem
 
 1. Plugin de relógio e aleatoriedade.
 2. Catálogo dividido e extrator de textos.
 3. Regras novas no teste de convenções do banco.
-4. Skill `port-from-legacy`, com as tabelas de cada produto.
+4. Skill `port-from-legacy`.
 5. `tools/README.md` e a exclusão da pasta no lint, no knip e no `tsconfig`.
 
 ## Infraestrutura e qualidade
 
-### 1. CI
+### 1. Checagens locais no lugar do CI
 
-Hoje o `.github/workflows/ci.yml` existe (`pnpm check` e integração), mas só roda manualmente. A única barreira é o hook de commit, que o `--no-verify` pula.
+**Decisão:** sem CI no GitHub (sem cota de Actions). O `.github/workflows/ci.yml` continua só manual. As barreiras ficam nos hooks do lefthook e num comando local, e o `--no-verify` continua sendo a única forma de pular.
 
-- [ ] Ligar em `push` na `main` e em `pull_request`.
-- [ ] Job de build e imagem Docker, para pegar erros do standalone (arquivo fora do trace, prerender quebrado).
-- [ ] e2e (Playwright contra o compose) toda noite ou em PR com label.
-- [ ] **Decisão:** o Coolify continua observando a `main` e faz o deploy a cada push. O CI roda em paralelo, então um commit que só falha no CI pode chegar à produção; o hook de commit continua sendo a primeira barreira.
-- [ ] Renovate ou Dependabot em lotes semanais, respeitando versões exatas.
+- [ ] Commit: `pnpm check`, como hoje.
+- [ ] Push (hook novo de `pre-push`):
+  - `next build` com saída standalone;
+  - `check:prerender`: confere que as páginas que deviam ser estáticas foram pré-renderizadas e que os arquivos esperados estão em `.next/standalone/` (arquivo fora do trace, prerender quebrado).
+- [ ] `pnpm verify`, rodado antes de entregar uma fase: `pnpm check`, integração, build da imagem Docker de produção, compose limpo e e2e (a receita de prova em cópia limpa do `BASE.md`, como script).
+- [ ] O Coolify continua observando a `main` e faz o deploy a cada push; o hook de push é a barreira antes dele.
+- [ ] Atualizações de dependências: Renovate como app hospedado (não consome Actions), em lotes semanais e respeitando versões exatas. Opcional.
 
 ### 2. Cabeçalhos de segurança e CSP
 
@@ -696,8 +704,8 @@ Hoje há o backup agendado do Coolify. A restauração nunca foi provada, e não
   - roda as migrações e contagens de sanidade;
   - roda uma vez por mês, no CI ou à mão.
 - [ ] Versionamento ou *soft delete* no bucket GCS dos arquivos.
-- [ ] **Decisão:** backup diário, guardado por 30 dias. Perde no máximo um dia.
-- [ ] Configurar o backup agendado do Coolify com essa frequência e retenção, e documentar no README.
+- [ ] **Decisão:** backup diário, com a retenção escolhida pelo produto (padrão de 7 dias). Perde no máximo um dia.
+- [ ] O `setup:product` pergunta a retenção e escreve o valor no README (configuração do backup agendado do Coolify) e na política de privacidade.
 - [ ] LGPD: depois de qualquer restauração, um script reaplica as exclusões registradas na auditoria desde a data do dump.
 
 ### 4. Estratégia de testes do domínio
@@ -706,19 +714,18 @@ Hoje há o backup agendado do Coolify. A restauração nunca foi provada, e não
   - a soma do rateio é igual ao total;
   - um fechamento cobre o que promete;
   - transpor e voltar devolve a mesma nota.
-- [ ] Testes de paridade no porte: a implementação antiga gera saídas para um conjunto grande de entradas, que viram fixtures, e a nova precisa reproduzir todas antes de a antiga ser apagada.
 - [ ] Cobertura mínima de 90% para `domain/` no `vitest.config`. O resto do código continua sem meta.
 - [ ] Opcional: mutation testing (Stryker) só na matemática de prêmios.
 
 ### Decisões
 
-- O Coolify continua observando a `main`; o CI roda em paralelo.
+- Sem CI no GitHub: build e prerender no hook de push, imagem e e2e no `pnpm verify`.
 - CSP sem nonce, em modo relatório primeiro.
-- Backup diário, 30 dias de retenção.
+- Backup diário, retenção por produto, padrão de 7 dias.
 
 ### Ordem
 
-1. CI ligado, com build e imagem.
+1. Hook de push e `pnpm verify`.
 2. Cabeçalhos de segurança, e CSP em relatório.
 3. Ensaio de restauração e reaplicação de exclusões.
 4. Estratégia de testes de `domain/`, antes do primeiro porte.
@@ -733,7 +740,7 @@ Hoje há um `/events` diário, autorizado por `CRON_SECRET`, com um registro de 
 - [ ] Continua sem fila e sem worker: HTTP, autorizado, idempotente.
 - [ ] `pg_try_advisory_lock` por operação, para que uma execução lenta não rode duas vezes ao mesmo tempo.
 - [ ] Batimento gravado a cada execução (ver "Observabilidade e analytics").
-- [ ] Endpoint de ingestão para o worker residencial do lottery, com segredo próprio e payload validado por zod. A regra fica no servidor; o worker só busca e entrega.
+- [ ] Endpoint de ingestão para workers externos (por exemplo, um coletor rodando fora do servidor), com segredo próprio e payload validado por zod. A regra fica no servidor; o worker só busca e entrega.
 - [ ] Atualizar o `BASE.md`: "agendamento é HTTP chamado de fora, por grupo de cadência", no lugar de "uma chamada diária".
 
 ### 2. API JSON para clientes de fora
@@ -771,14 +778,30 @@ O mecanismo já está provado: catálogo por idioma, paridade de chaves, prefixo
 - [ ] `hreflang` e URLs traduzidas ficam na seção de SEO.
 - [ ] Aceitar o custo da casca dinâmica com mais de um idioma. A alternativa (`app/[locale]`) perde o `typedRoutes` sem prefixo.
 
+### 5. Páginas de impressão
+
+Folhas impressas na hora: entregas do acolhimento, dossiê do brb, financeiro do bike.
+
+**Decisão:** impressão por CSS para o que a pessoa imprime na hora (ficha, folha de entrega, relatório da tela). PDF (ver "PDF e QR") para o que é anexado, arquivado ou verificado. Os dois leem os mesmos serviços.
+
+- [ ] Grupo de rotas `app/(print)` com casca própria: sem navegação, tema claro forçado, folha A4 com `@page` e margens em tokens.
+- [ ] Tokens de impressão gerados pelo `pnpm tokens`: tinta sobre papel, bordas finas, sem fundo de cor. `print-color-adjust: exact` só onde a cor carrega sentido (selo de estado).
+- [ ] Componentes em `components/print`: folha, cabeçalho com a marca e a data, rodapé, tabela que repete o cabeçalho a cada página e bloco que não quebra no meio (`break-inside: avoid`).
+- [ ] Nas páginas comuns, a variante `print:` esconde a casca, para que imprimir uma ficha qualquer também saia limpo.
+- [ ] Botão "Imprimir" (`window.print`) como componente cliente.
+- [ ] A página de impressão usa a mesma guarda e o mesmo serviço da tela de origem. Nenhum caminho novo de leitura.
+- [ ] Teste no Playwright com `emulateMedia({ media: "print" })` e `page.pdf()`, conferindo o número de páginas e que a casca não aparece.
+- [ ] **Validar:** numeração de página com `counter(page)` nas margens do `@page` no Chrome, no Safari e no Firefox. Se não funcionar nos três, a numeração fica para o PDF.
+
 ### Decisões
 
 - Agendamento por grupos de cadência, mudando a regra do `/events`.
 - Tokens pessoais na API.
+- Impressão por CSS para o que se imprime na hora; PDF para o que se guarda.
 
 ### Ordem
 
 1. Agendamento por cadência e endpoint de ingestão.
 2. API v1 com tokens.
-3. PDF e QR.
+3. PDF e QR, e páginas de impressão.
 4. Tradução parcial e formato por idioma.

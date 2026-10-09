@@ -1,18 +1,26 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { eq } from "drizzle-orm";
 import { unzipSync } from "fflate";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { type DeletionSteps, deleteAccount, hashEmail } from "@/lib/accounts/delete";
+import { endSubscriptionOf } from "@/lib/accounts/end-subscription";
 import { exportAccount } from "@/lib/accounts/export";
 import { accountDeletions } from "@/lib/db/schema/audit";
+import { payments } from "@/lib/db/schema/billing";
 import { contactMessages } from "@/lib/db/schema/contact";
 import { files } from "@/lib/db/schema/files";
+import { referrals } from "@/lib/db/schema/referrals";
 import { users } from "@/lib/db/schema/users";
+import type { PaymentGateway } from "@/lib/ports/payment/types";
 import { createDiskStorage } from "@/lib/ports/storage/adapters/disk";
 import type { FileStorage } from "@/lib/ports/storage/types";
+import { recordReferral, referralSummary } from "@/lib/referral/service";
+import { billingFixture } from "./billing-fixture";
 import { testDatabase } from "./database";
 import { createUser, recordingLogger } from "./factories";
+import { chargeSucceeded } from "./stripe-events";
 
 const db = testDatabase();
 let directory = "";
@@ -179,5 +187,89 @@ describe("account deletion", () => {
       false,
     );
     expect(await db.select().from(accountDeletions)).toEqual([]);
+  });
+});
+
+describe("account deletion and the money", () => {
+  const { subscriber, deliver } = billingFixture(db);
+
+  it("ends the active subscription at the provider before anything is deleted", async () => {
+    const member = await subscriber("ana@example.com");
+    const cancelled: string[] = [];
+    const provider = {
+      cancelSubscription: (id: string) => {
+        cancelled.push(id);
+        return Promise.resolve();
+      },
+    };
+    const run = steps({
+      cancelBilling: (userId) =>
+        endSubscriptionOf(db, () => Promise.resolve(provider as PaymentGateway), userId),
+    });
+    expect(await deleteAccount(db, run, { userId: member.id, requestedBy: "self" })).toBe(true);
+    expect(cancelled).toEqual([`sub_${member.id}`]);
+  });
+
+  it("keeps the payments with the payer's e-mail and no link to the person", async () => {
+    const member = await subscriber("ana@example.com");
+    await deliver(
+      chargeSucceeded(`evt_charge_${member.id}`, {
+        id: `ch_${member.id}`,
+        customer: `cus_${member.id}`,
+        email: "ana@example.com",
+      }),
+    );
+    const before = await db.select().from(payments).where(eq(payments.payerId, member.id));
+    expect(before).toHaveLength(1);
+    const provider = { cancelSubscription: () => Promise.resolve() };
+    const run = steps({
+      cancelBilling: (userId) =>
+        endSubscriptionOf(db, () => Promise.resolve(provider as unknown as PaymentGateway), userId),
+    });
+    await deleteAccount(db, run, { userId: member.id, requestedBy: "self" });
+    const after = await db.select().from(payments);
+    expect(after).toHaveLength(1);
+    expect(after[0]).toMatchObject({ payerId: null, payerEmail: "ana@example.com" });
+    expect(after[0]?.providerPaymentId).toBe(before[0]?.providerPaymentId);
+  });
+
+  it("stops before deleting when there is a subscription and billing is off", async () => {
+    const member = await subscriber("bia@example.com");
+    const run = steps({
+      cancelBilling: (userId) => endSubscriptionOf(db, () => Promise.resolve(null), userId),
+    });
+    await expect(
+      deleteAccount(db, run, { userId: member.id, requestedBy: "self" }),
+    ).rejects.toThrow("billing is off");
+    expect(await db.select().from(users)).toHaveLength(1);
+  });
+
+  it("keeps who invited whom when the inviter leaves, and drops the row when the invited leaves", async () => {
+    const inviter = await createUser(db, "ana@example.com");
+    const guest = await createUser(db, "caio@example.com");
+    const other = await createUser(db, "dani@example.com");
+    const now = new Date();
+    await recordReferral(db, {
+      referredId: guest.id,
+      rawCode: (await referralSummary(db, inviter.id)).code,
+      now,
+    });
+    await recordReferral(db, {
+      referredId: other.id,
+      rawCode: (await referralSummary(db, inviter.id)).code,
+      now,
+    });
+
+    await deleteAccount(db, steps(), { userId: inviter.id, requestedBy: "self" });
+    const kept = await db.select().from(referrals);
+    expect(kept).toHaveLength(2);
+    expect(
+      kept.every((row) => row.referrerId === null && row.referrerEmail === "ana@example.com"),
+    ).toBe(true);
+
+    await deleteAccount(db, steps(), { userId: guest.id, requestedBy: "self" });
+    const left = await db.select().from(referrals);
+    expect(left).toHaveLength(1);
+    expect(left[0]?.referredId).toBe(other.id);
   });
 });

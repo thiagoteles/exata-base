@@ -10,6 +10,7 @@ type PaymentProvider = (typeof paymentProvider.enumValues)[number];
 export type PaymentEvent = { id: string; type: string; provider: PaymentProvider } & (
   | {
       kind: "checkout_paid";
+      sessionId: string;
       userId: string;
       customerId: string | null;
       subscriptionId: string | null;
@@ -20,9 +21,9 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
       trialEndsAt: Date | null;
     }
   /** The checkout was completed but the money has not arrived (Pix, a bank slip): nothing is granted yet. */
-  | { kind: "checkout_pending"; userId: string; interval: Interval }
+  | { kind: "checkout_pending"; sessionId: string; userId: string; interval: Interval }
   /** A pending payment will not arrive: the code expired, or the bank refused it. */
-  | { kind: "checkout_failed"; userId: string }
+  | { kind: "checkout_failed"; sessionId: string; userId: string; expired: boolean }
   /** The customer's bank questioned a charge: the money is held and a reply is owed to the provider. */
   | { kind: "dispute_created"; paymentId: string; amountCents: number; reason: string }
   /** The trial of a subscription is about to end and the first charge is near. */
@@ -79,7 +80,8 @@ export type PriceTag = {
 export type PaymentGateway = {
   /** Checks the signature on the raw body and reads the event. Throws when it does not match. */
   readEvent: (body: string, signature: string) => PaymentEvent;
-  createCheckout: (request: CheckoutRequest) => Promise<string>;
+  /** Opens a checkout and answers with where to send the person and the provider's id for the session. */
+  createCheckout: (request: CheckoutRequest) => Promise<{ url: string; sessionId: string }>;
   createPortal: (customerId: string, returnUrl: string) => Promise<string>;
   setCancelAtPeriodEnd: (subscriptionId: string, cancel: boolean) => Promise<void>;
   /** Ends a subscription now, with no credit for the unused time. A subscription already gone is fine. */

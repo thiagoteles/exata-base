@@ -45,6 +45,7 @@ describe("the Umami report plan", () => {
       { type: "event", value: "activated" },
       { type: "event", value: "paywall_viewed" },
       { type: "event", value: "checkout_started" },
+      { type: "event", value: "checkout_completed" },
       { type: "event", value: "payment_confirmed" },
     ]);
   });

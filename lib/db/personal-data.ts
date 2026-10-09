@@ -1,6 +1,6 @@
 import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
 import { accounts, sessions } from "./schema/auth";
-import { payments, plans } from "./schema/billing";
+import { checkoutSessions, payments, plans } from "./schema/billing";
 import { contactMessages } from "./schema/contact";
 import { files } from "./schema/files";
 import { referrals } from "./schema/referrals";
@@ -26,5 +26,10 @@ export const exportedData: readonly Exported[] = [
 export const notExportedData: readonly NotExported[] = [
   { table: sessions, reason: "short-lived sign-in sessions, deleted with the account" },
   { table: accounts, reason: "credentials and provider tokens, never handed out" },
+  {
+    table: checkoutSessions,
+    reason:
+      "a trail of the person's own attempts to buy; what was bought is in the plan and the payments, which are exported",
+  },
   { table: referrals, reason: "records who invited the person, which names someone else" },
 ];

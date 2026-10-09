@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Gate } from "@/components/patterns/gate";
@@ -24,7 +25,10 @@ export async function PaidBlock() {
         benefits: [t("benefits.one"), t("benefits.two")],
       }}
       action={
-        <Link href={publicHref("/plans")} className={buttonClasses("secondary")}>
+        <Link
+          href={`${publicHref("/plans")}?source=catalog` as Route}
+          className={buttonClasses("secondary")}
+        >
           {p("action")}
         </Link>
       }

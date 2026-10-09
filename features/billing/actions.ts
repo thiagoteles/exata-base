@@ -6,6 +6,7 @@ import { trialDaysFor } from "@/domain/billing/trial";
 import { actionFor } from "@/lib/actions/client";
 import { canBuy, changeCancellation, readPlan } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
+import { checkoutSessions } from "@/lib/db/schema/billing";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
 import { publicHref } from "@/lib/i18n/public-paths";
@@ -40,7 +41,7 @@ export const startCheckout = actionFor("member")
       interval: parsedInput.interval,
       trialUsedAt: plan?.trialUsedAt ?? null,
     });
-    const url = await gateway.createCheckout({
+    const opened = await gateway.createCheckout({
       userId: ctx.user.id,
       email: ctx.user.email,
       customerId: plan?.providerCustomerId ?? null,
@@ -51,12 +52,21 @@ export const startCheckout = actionFor("member")
       successUrl: `${env.APP_URL}/account/plan?checkout=success`,
       cancelUrl: `${env.APP_URL}${publicHref("/plans")}`,
     });
+    await db.insert(checkoutSessions).values({
+      userId: ctx.user.id,
+      provider: "stripe",
+      providerSessionId: opened.sessionId,
+      interval: parsedInput.interval,
+      source: parsedInput.source,
+      currency: currency ?? price.currency,
+      trialDays,
+    });
     sendEvent({
       name: "checkout_started",
       accountId: ctx.user.id,
-      data: { interval: parsedInput.interval },
+      data: { interval: parsedInput.interval, source: parsedInput.source },
     });
-    return { url };
+    return { url: opened.url };
   });
 
 /** The customer portal, where the card and the invoices are managed. */

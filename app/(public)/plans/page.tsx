@@ -16,6 +16,7 @@ import { featuresOfTier, isPaidTier } from "@/domain/billing/entitlements";
 import { trialDaysFor } from "@/domain/billing/trial";
 import { BuyButton } from "@/features/billing/buy-button";
 import { CurrencySwitch } from "@/features/billing/currency-switch";
+import { sourceOf } from "@/features/billing/schema";
 import { canBuy, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
@@ -51,7 +52,11 @@ const unitKey = {
 const faqIds = ["cancel", "refund", "invoice"] as const;
 const features = [...featuresOfTier(catalog.paidTier)];
 
-export default async function PlansPage() {
+export default async function PlansPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ source?: string | string[] }>;
+}) {
   const t = await getTranslations("plans");
   const faq = faqIds.map((id) => ({
     id,
@@ -65,7 +70,7 @@ export default async function PlansPage() {
         <h1 className="text-page-title text-ink">{t("title")}</h1>
         <p className="mt-2 mb-10 max-w-[52ch] text-body text-ink-muted">{t("subtitle")}</p>
         <Suspense fallback={<div className="h-64 rounded-cell bg-sunken" />}>
-          <Offers />
+          <Offers searchParams={searchParams} />
         </Suspense>
       </section>
       <ContentSection marker="FAQ" title={t("faq.title")} intro={t("faq.intro")}>
@@ -85,6 +90,7 @@ type ActionContext = {
   user: Awaited<ReturnType<typeof getCurrentUser>>;
   plan: Awaited<ReturnType<typeof readPlan>>;
   currency: string;
+  source: string;
   t: Awaited<ReturnType<typeof getTranslations<"plans">>>;
 };
 
@@ -103,7 +109,7 @@ function noteFor(input: {
 }
 
 /** What a person can do about one way of buying: sign in, see it is theirs, wait for it, or buy it. */
-function intervalAction({ interval, user, plan, currency, t }: ActionContext) {
+function intervalAction({ interval, user, plan, currency, source, t }: ActionContext) {
   const trialDays = trialDaysOf(plan, interval);
   if (user === null) {
     return (
@@ -129,13 +135,15 @@ function intervalAction({ interval, user, plan, currency, t }: ActionContext) {
       interval={interval}
       currency={currency}
       trialDays={trialDays}
+      source={source}
       replacesSubscription={interval === "lifetime" && subscriptionOf(plan) !== null}
     />
   );
 }
 
-async function Offers() {
+async function Offers({ searchParams }: { searchParams: Promise<{ source?: string | string[] }> }) {
   const t = await getTranslations("plans");
+  const source = sourceOf((await searchParams).source);
   const [intervals, prices, user] = await Promise.all([
     offeredIntervals(),
     readPrices(),
@@ -189,7 +197,7 @@ async function Offers() {
           highlighted: interval === highlighted,
           ...(note === undefined ? {} : { note }),
           has: features.map((feature) => paidHas.has(feature)),
-          action: intervalAction({ interval, user, plan, currency, t }),
+          action: intervalAction({ interval, user, plan, currency, source, t }),
         },
       ];
     }),

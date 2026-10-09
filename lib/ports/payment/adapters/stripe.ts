@@ -66,11 +66,12 @@ function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): P
   // An asynchronous payment (Pix, a bank slip) completes the session before the money arrives. It is
   // recorded as waiting; the matching succeeded event is the one that grants the plan.
   if (session.payment_status === "unpaid") {
-    return { ...base, kind: "checkout_pending", userId, interval };
+    return { ...base, kind: "checkout_pending", sessionId: session.id, userId, interval };
   }
   return {
     ...base,
     kind: "checkout_paid",
+    sessionId: session.id,
     userId,
     customerId: idOf(session.customer),
     subscriptionId: idOf(session.subscription),
@@ -125,10 +126,16 @@ function toPaymentEvent(event: Stripe.Event): PaymentEvent {
       return checkoutEvent(event, event.data.object);
     case "checkout.session.async_payment_failed":
     case "checkout.session.expired": {
-      const userId = event.data.object.client_reference_id;
+      const { client_reference_id: userId, id: sessionId } = event.data.object;
       return userId === null
         ? { ...base, kind: "ignored" }
-        : { ...base, kind: "checkout_failed", userId };
+        : {
+            ...base,
+            kind: "checkout_failed",
+            sessionId,
+            userId,
+            expired: event.type === "checkout.session.expired",
+          };
     }
     case "charge.dispute.created": {
       const paymentId = idOf(event.data.object.charge);
@@ -213,7 +220,7 @@ export function createStripeGateway({ secretKey, webhookSecret }: Options): Paym
       if (session.url === null) {
         throw new Error("the checkout session has no address");
       }
-      return session.url;
+      return { url: session.url, sessionId: session.id };
     },
 
     async createPortal(customerId, returnUrl) {

@@ -64,6 +64,40 @@ export const plans = pgTable(
   ],
 );
 
+export const checkoutStatus = pgEnum("checkout_status", [
+  "open",
+  "pending",
+  "paid",
+  "expired",
+  "failed",
+]);
+
+/*
+ * Every checkout a person opened, and how it ended. It is the trail that says where purchases are
+ * lost: opened and never paid, expired, failed. `source` is the screen or block that showed the offer
+ * when the person chose to buy, so conversion can be read by where the offer was. The row goes with the
+ * account; what was bought lives in the plan and the payments.
+ */
+export const checkoutSessions = pgTable(
+  "checkout_sessions",
+  {
+    id: id(),
+    userId: ownedBy().notNull(),
+    provider: paymentProvider().notNull(),
+    providerSessionId: text().notNull().unique(),
+    interval: billingInterval().notNull(),
+    status: checkoutStatus().notNull().default("open"),
+    source: text().notNull(),
+    currency: text(),
+    trialDays: integer().notNull().default(0),
+    /* When it stopped being open: paid, expired or failed. */
+    closedAt: instant(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [index().on(table.userId), index().on(table.status, table.createdAt)],
+);
+
 /* Provider webhook deliveries. Inserting the id is the replay lock: a second delivery conflicts. */
 export const paymentEvents = pgTable("payment_events", {
   id: text().primaryKey(),

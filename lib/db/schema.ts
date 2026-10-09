@@ -4,6 +4,8 @@ import { accountDeletions, deletionRequester, staffAuditLog } from "./schema/aud
 import { accounts, clerkEvents, sessions, verifications } from "./schema/auth";
 import {
   billingInterval,
+  checkoutSessions,
+  checkoutStatus,
   paymentEvents,
   paymentProvider,
   paymentStatus,
@@ -33,6 +35,8 @@ export const schema = {
   planTier,
   planStatus,
   billingInterval,
+  checkoutSessions,
+  checkoutStatus,
   paymentEvents,
   paymentProvider,
   payments,

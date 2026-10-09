@@ -1,8 +1,8 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import { catalog } from "@/domain/billing/catalog";
 import { isFixedTerm, oneYearAfter } from "@/domain/billing/term";
 import type { Database } from "@/lib/db/database";
-import { paymentEvents, plans } from "@/lib/db/schema/billing";
+import { checkoutSessions, paymentEvents, plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
 import type { PaymentEvent } from "@/lib/ports/payment/types";
 import {
@@ -113,6 +113,8 @@ export type Effects = {
   refund: NewRefund | null;
   trialEnding: { userId: string; email: string; name: string; endsAt: Date } | null;
   dispute: NewDispute | null;
+  /** The checkout this payment closed, with the screen that started it, for the funnel. */
+  checkoutCompleted: { userId: string; interval: string; source: string } | null;
 };
 
 const none: Effects = {
@@ -121,7 +123,33 @@ const none: Effects = {
   refund: null,
   trialEnding: null,
   dispute: null,
+  checkoutCompleted: null,
 };
+
+type TrailStatus = "pending" | "paid" | "expired" | "failed";
+
+/**
+ * Moves a checkout's trail to where it ended. Only a checkout that was still open or waiting moves, so a
+ * late or repeated event cannot take a paid one back. The time is the database's own.
+ */
+async function moveTrail(tx: Transaction, sessionId: string, status: TrailStatus) {
+  const closes = status !== "pending";
+  const [row] = await tx
+    .update(checkoutSessions)
+    .set({ status, ...(closes ? { closedAt: sql`now()` } : {}) })
+    .where(
+      and(
+        eq(checkoutSessions.providerSessionId, sessionId),
+        inArray(checkoutSessions.status, ["open", "pending"]),
+      ),
+    )
+    .returning({
+      userId: checkoutSessions.userId,
+      interval: checkoutSessions.interval,
+      source: checkoutSessions.source,
+    });
+  return row ?? null;
+}
 
 /** Who is to be told their trial is about to end: the person whose plan is still trialing on that subscription. */
 async function trialEndingOf(
@@ -150,6 +178,7 @@ async function applyEvent(
         ...none,
         trialStarted:
           event.trialEndsAt === null ? null : { userId: event.userId, interval: event.interval },
+        checkoutCompleted: await moveTrail(tx, event.sessionId, "paid"),
       };
     case "checkout_pending":
       // Only an account with nothing paid waits: a person who already has a plan keeps it, and the
@@ -162,6 +191,7 @@ async function applyEvent(
           priceKey: `${catalog.paidTier}.${event.interval}`,
         })
         .where(and(eq(plans.userId, event.userId), eq(plans.tier, "free")));
+      await moveTrail(tx, event.sessionId, "pending");
       return none;
     case "checkout_failed":
       // What was waiting is not coming: the account is an ordinary free one again.
@@ -171,6 +201,7 @@ async function applyEvent(
         .where(
           and(eq(plans.userId, event.userId), eq(plans.tier, "free"), eq(plans.status, "pending")),
         );
+      await moveTrail(tx, event.sessionId, event.expired ? "expired" : "failed");
       return none;
     case "invoice_paid":
       await tx

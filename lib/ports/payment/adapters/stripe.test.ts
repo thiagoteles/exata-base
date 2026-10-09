@@ -20,7 +20,7 @@ vi.mock("stripe", () => {
           sessions: {
             create: (params: Record<string, unknown>) => {
               calls.sessions.push(params);
-              return Promise.resolve({ url: "https://pay.example/session" });
+              return Promise.resolve({ id: "cs_test_1", url: "https://pay.example/session" });
             },
           },
         },
@@ -49,8 +49,12 @@ beforeEach(() => {
 
 describe("creating a checkout", () => {
   it("takes a one-off payment for the lifetime plan and always creates the customer", async () => {
-    const url = await gateway.createCheckout({ ...base, customerId: null, interval: "lifetime" });
-    expect(url).toBe("https://pay.example/session");
+    const opened = await gateway.createCheckout({
+      ...base,
+      customerId: null,
+      interval: "lifetime",
+    });
+    expect(opened).toEqual({ url: "https://pay.example/session", sessionId: "cs_test_1" });
     expect(calls.sessions[0]).toMatchObject({
       mode: "payment",
       customer_creation: "always",

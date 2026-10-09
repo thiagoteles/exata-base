@@ -20,7 +20,10 @@ export type AnalyticsEvents = EventCatalog<{
   signup_completed: Record<string, never>;
   activated: Record<string, never>;
   paywall_viewed: { source: string };
-  checkout_started: { interval: string };
+  /** The person chose to buy and a checkout opened. `source` is the screen that showed the offer. */
+  checkout_started: { interval: string; source: string };
+  /** The checkout was paid (or its trial began), with the same `source` it started from. */
+  checkout_completed: { interval: string; source: string };
   /** A free trial began: the plan is on and the first charge is days away. */
   trial_started: { interval: string };
   /** Money went back to a customer, in cents of the currency it was paid in. */
@@ -39,6 +42,7 @@ export const funnel = [
   "activated",
   "paywall_viewed",
   "checkout_started",
+  "checkout_completed",
   "payment_confirmed",
 ] as const satisfies readonly AnalyticsEvent[];
 

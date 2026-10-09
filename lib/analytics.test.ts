@@ -24,10 +24,10 @@ describe("analytics", () => {
         identify: (id: string) => calls.push(["identify", id]),
       },
     };
-    track("checkout_started", { interval: "yearly" });
+    track("checkout_started", { interval: "yearly", source: "plans" });
     identify("u1");
     expect(calls).toEqual([
-      ["track", "checkout_started", { interval: "yearly" }],
+      ["track", "checkout_started", { interval: "yearly", source: "plans" }],
       ["identify", "u1"],
     ]);
   });

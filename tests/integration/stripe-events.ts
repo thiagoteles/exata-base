@@ -40,11 +40,13 @@ export const checkoutCompleted = (
     paymentStatus?: string;
     /** Free days the checkout asked for, as the app writes them into the session. */
     trialDays?: number;
+    /** The checkout session this belongs to, when two events are about the same one. */
+    sessionId?: string;
   },
   type = "checkout.session.completed",
 ) =>
   event(id, type, {
-    id: `cs_${id}`,
+    id: session.sessionId ?? `cs_${id}`,
     object: "checkout.session",
     client_reference_id: session.userId,
     metadata: {
@@ -115,9 +117,10 @@ export const checkoutFailed = (
   type:
     | "checkout.session.async_payment_failed"
     | "checkout.session.expired" = "checkout.session.async_payment_failed",
+  sessionId = `cs_${id}`,
 ) =>
   event(id, type, {
-    id: `cs_${id}`,
+    id: sessionId,
     object: "checkout.session",
     client_reference_id: userId,
     metadata: { interval: "yearly_once" },

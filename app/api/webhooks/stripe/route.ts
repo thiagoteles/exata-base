@@ -22,6 +22,14 @@ async function announce(effects: Effects): Promise<void> {
       recorded: effects.dispute.known,
     });
   }
+  if (effects.checkoutCompleted !== null) {
+    const { userId, interval, source } = effects.checkoutCompleted;
+    sendEvent({
+      name: "checkout_completed",
+      accountId: userId,
+      data: { interval, source },
+    });
+  }
   if (effects.trialStarted !== null) {
     sendEvent({
       name: "trial_started",

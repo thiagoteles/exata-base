@@ -2,7 +2,7 @@ import { track } from "./analytics";
 import type { EventCatalog } from "./analytics-events";
 
 // Compiled by the typecheck only: each expected error proves the catalog refuses a wrong call.
-track("checkout_started", { interval: "monthly" });
+track("checkout_started", { interval: "monthly", source: "plans" });
 track("signup_completed");
 
 // @ts-expect-error an event that is not in the catalog

@@ -1,5 +1,5 @@
-import { index, pgTable, text } from "drizzle-orm/pg-core";
-import { createdAt, id, updatedAt } from "../columns";
+import { index, integer, pgTable, text } from "drizzle-orm/pg-core";
+import { createdAt, id, instant, updatedAt } from "../columns";
 import { authoredBy, ownedBy } from "./user-references";
 
 /*
@@ -14,6 +14,10 @@ export const referrals = pgTable(
     referredId: ownedBy().notNull().unique(),
     referrerId: authoredBy(),
     referrerEmail: text().notNull(),
+    /* When the inviter was credited for this arrival, so it happens once; null until then. */
+    rewardedAt: instant(),
+    rewardCents: integer(),
+    rewardCurrency: text(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

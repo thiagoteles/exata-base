@@ -1,5 +1,6 @@
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
+import { currentInstant } from "@/domain/clock";
 import { applyPaymentEvent, type Effects } from "@/lib/billing/events";
 import { sendTrialEnding } from "@/lib/billing/mailer";
 import { cacheTags } from "@/lib/cache-tags";
@@ -8,11 +9,13 @@ import { db } from "@/lib/db/client";
 import { sendEvent } from "@/lib/ports/analytics";
 import { logger } from "@/lib/ports/log";
 import { paymentGateway } from "@/lib/ports/payment";
+import type { PaymentGateway } from "@/lib/ports/payment/types";
 import { readPreferences } from "@/lib/preferences/service";
+import { grantReferralCredits } from "@/lib/referral/credit";
 import { timedRoute } from "@/lib/timed-route";
 
 /** What a delivery caused, done once it is committed: events to count, an e-mail to send. */
-async function announce(effects: Effects): Promise<void> {
+async function announce(effects: Effects, gateway: PaymentGateway): Promise<void> {
   if (effects.dispute !== null) {
     // An error on purpose: the error reporter turns it into an alert, and a dispute has a deadline.
     logger.error("payment disputed", {
@@ -29,6 +32,14 @@ async function announce(effects: Effects): Promise<void> {
       accountId: userId,
       data: { interval, source },
     });
+  }
+  const payer = effects.newPayment?.payerId;
+  if (payer !== null && payer !== undefined) {
+    // An invited person's first payment earns their inviter a credit. A failure is only logged: the
+    // daily call tries again, and the payment itself is already recorded.
+    await grantReferralCredits(db, gateway, { now: currentInstant(), referredId: payer }).catch(
+      (error: unknown) => logger.error("referral credit not granted", { error }),
+    );
   }
   if (effects.trialStarted !== null) {
     sendEvent({
@@ -98,6 +109,6 @@ export const POST = timedRoute("/api/webhooks/stripe", async (request: NextReque
       },
     });
   }
-  await announce(effects);
+  await announce(effects, gateway);
   return Response.json({ result: status });
 });

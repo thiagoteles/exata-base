@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { buttonClasses } from "@/components/ui/styles";
+import { catalog } from "@/domain/billing/catalog";
 import { currentInstant } from "@/domain/clock";
 import { AccessibilityPreferences } from "@/features/account/accessibility-preferences";
 import { DeleteAccount } from "@/features/account/delete-account";
@@ -19,10 +20,12 @@ import { FirstSteps } from "@/features/onboarding/first-steps";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { isMultilingual } from "@/lib/i18n/locales";
+import { formatPrice, toCents } from "@/lib/money";
 import { readOnboarding } from "@/lib/onboarding/service";
 import { requirePageRole } from "@/lib/page-guard";
 import { sessionAccess } from "@/lib/ports/auth";
 import { readPreferences } from "@/lib/preferences/service";
+import { earnedCredit } from "@/lib/referral/credit";
 import { referralSummary } from "@/lib/referral/service";
 import { listDeviceSessions } from "@/lib/sessions/service";
 
@@ -47,9 +50,10 @@ async function AccountContent() {
   const user = await requirePageRole("member", "/account");
   // Read fresh: the cached current user can be minutes behind a theme the person just chose.
   const access = await sessionAccess();
-  const [preferences, referral, onboarding, steps, devices] = await Promise.all([
+  const [preferences, referral, earned, onboarding, steps, devices] = await Promise.all([
     readPreferences(db, user.id),
     referralSummary(db, user.id),
+    earnedCredit(db, user.id),
     readOnboarding(db, user.id),
     getTranslations("onboarding"),
     access.kind === "own"
@@ -104,6 +108,13 @@ async function AccountContent() {
           <p className="max-w-[52ch] text-body-small text-ink-muted">{t("referral.help")}</p>
           <ReferralLink url={`${env.APP_URL}/?ref=${referral.code}`} />
           <p className="text-body text-ink">{t("referral.count", { count: referral.invited })}</p>
+          {earned > 0 ? (
+            <p className="text-body text-ink">
+              {t("referral.earned", {
+                amount: formatPrice(toCents(earned), catalog.currencies.default),
+              })}
+            </p>
+          ) : null}
         </Panel>
 
         <Panel className="flex flex-col gap-4">

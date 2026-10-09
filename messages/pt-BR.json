@@ -799,6 +799,7 @@
       "linkLabel": "Seu link",
       "copy": "Copiar link",
       "copied": "Link copiado.",
+      "earned": "Crédito ganho com convites: {amount}, abatido da sua próxima fatura.",
       "count": "{count, plural, =0 {Ninguém criou conta pelo seu link ainda.} one {# pessoa criou conta pelo seu link.} other {# pessoas criaram conta pelo seu link.}}"
     },
     "data": {

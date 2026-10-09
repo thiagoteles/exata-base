@@ -51,6 +51,13 @@ export const catalog = {
    * subscription can have one). `days: 0` turns it off. Each account gets one, ever.
    */
   trial: { days: 14, intervals: ["monthly", "yearly"] },
+  /**
+   * What an invitation earns the person who made it, when the invited person pays for the first time:
+   * a credit on their next invoice, in the default currency. `cents: 0` turns it off.
+   */
+  referralCredit: { cents: 1000 },
+  /** Lets a person type a promotion code (made in the provider's dashboard) at checkout. */
+  allowPromotionCodes: true,
   /** The tier the checkout sells and a courtesy grants, until prices name their own tier. */
   paidTier: "paid",
 } as const satisfies {
@@ -58,6 +65,8 @@ export const catalog = {
   prices: Readonly<Record<string, string>>;
   currencies: { default: string; offered: readonly string[] };
   trial: { days: number; intervals: readonly string[] };
+  referralCredit: { cents: number };
+  allowPromotionCodes: boolean;
   paidTier: string;
 };
 

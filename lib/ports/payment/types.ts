@@ -67,6 +67,16 @@ type CheckoutRequest = {
   cancelUrl: string;
 };
 
+type CreditRequest = {
+  customerId: string | null;
+  email: string;
+  userId: string;
+  cents: number;
+  currency: string;
+  description: string;
+  idempotencyKey: string;
+};
+
 export type PriceTag = {
   priceId: string;
   lookupKey: string;
@@ -88,6 +98,11 @@ export type PaymentGateway = {
   cancelSubscription: (subscriptionId: string) => Promise<void>;
   /** Refunds the customer's latest paid charge in full. The key makes a repeated request one refund. */
   refundLastPayment: (customerId: string, idempotencyKey: string) => Promise<void>;
+  /**
+   * Puts money on a customer's balance, which is taken off their next invoice. With no customer yet,
+   * one is made from the e-mail. The key makes a repeated request one credit. Answers with the customer.
+   */
+  grantCredit: (request: CreditRequest) => Promise<{ customerId: string }>;
   /** The active prices that carry these lookup keys. A key with no price is simply absent. */
   readPrices: (lookupKeys: readonly string[]) => Promise<PriceTag[]>;
 };

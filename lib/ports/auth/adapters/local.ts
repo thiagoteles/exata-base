@@ -29,6 +29,8 @@ export type LocalAuthOptions = {
   google?: { clientId: string; clientSecret: string } | undefined;
   sendVerificationEmail: (email: AccountEmail) => Promise<void>;
   sendResetPasswordEmail: (email: AccountEmail) => Promise<void>;
+  /** The account is confirmed and usable: the moment a sign-up counts. */
+  onSignedUp: (userId: string) => void;
 };
 
 export function createLocalAuth(options: LocalAuthOptions) {
@@ -54,8 +56,10 @@ export function createLocalAuth(options: LocalAuthOptions) {
       autoSignInAfterVerification: true,
       sendVerificationEmail: ({ user, url }) =>
         options.sendVerificationEmail({ to: user.email, name: user.name, url }),
-      afterEmailVerification: (user) =>
-        applyConfirmedEmail(db, user.id, adminEmails, currentInstant()),
+      afterEmailVerification: async (user) => {
+        await applyConfirmedEmail(db, user.id, adminEmails, currentInstant());
+        options.onSignedUp(user.id);
+      },
     },
     ...(options.google === undefined ? {} : { socialProviders: { google: options.google } }),
     databaseHooks: {
@@ -65,6 +69,7 @@ export function createLocalAuth(options: LocalAuthOptions) {
           after: async (user) => {
             if (user.emailVerified) {
               await applyConfirmedEmail(db, user.id, adminEmails, currentInstant());
+              options.onSignedUp(user.id);
             }
           },
         },

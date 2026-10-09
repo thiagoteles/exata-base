@@ -22,7 +22,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 | `features/<area>/` | The screens and actions of one area (client forms, lists, record pages, `actions.ts`, `schema.ts`). A feature never imports another feature |
 | `domain/<area>/` | Pure rules with no database, React, Next or Node: calculations, engines, value types. The lowest layer; `lib`, `features` and `components` import it, never the reverse. Held to 90% coverage on every `pnpm test`; an invariant gets a property test with `fast-check` (`*.property.test.ts`) |
 | `lib/<area>/` | The rules of one area, against the database only, tested with an integration test. Services take the database and the actor as arguments |
-| `lib/ports/<port>/` | Everything that leaves the process: `auth`, `email`, `storage`, `log`, `cep`, `payment`. Vendor SDKs are imported only in `adapters/` |
+| `lib/ports/<port>/` | Everything that leaves the process: `auth`, `email`, `storage`, `log`, `cep`, `payment`, `analytics`. Vendor SDKs are imported only in `adapters/` |
 | `lib/db/schema/` | One file per area. Migrations are generated into `lib/db/migrations`, never edited |
 | `components/ui/` | Primitives. The only place that imports Radix |
 | `components/patterns/` | Lists, record grids, page header, save bar. Components receive data by props and never import the database or a port |
@@ -34,6 +34,7 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 
 ### Rules that do not bend
 
+- **Analytics events are declared in `lib/analytics-events.ts`** with the properties each one carries; `track` in the browser and `sendEvent` on the server accept only those. A property named after personal data does not compile. Only the internal account id identifies a person.
 - **Text is a key in `messages/pt-BR.json`**, in screens, e-mails, errors and metadata. The one exception is long editorial text: MDX in `content/<locale>/<area>/`, with frontmatter checked by `pnpm content`, which writes the index the app reads (the list, the sitemap and the proxy's 404). A public dynamic route registers in `lib/known-pages.ts`, so a missing page is a real 404. No sentence in JSX. No em dash in interface text. Another language is a second catalog with the same keys and a line in `lib/i18n/locales.ts`; `pnpm check` compares them (see the README).
 - **Colors and sizes are tokens.** `design.json` names a curated preset (with optional curated swaps under `adjust`), the color seeds and the accents; `pnpm tokens` regenerates the palette, the preset theme, the font module, the e-mail palette and the generated parts of `DESIGN.md`. No stock Tailwind color, hand-written value or free font.
 - **Roles.** Pages use `requirePageRole(role, path)`, actions use `actionFor(role)`, routes use `requireRole`.

@@ -50,9 +50,16 @@ describe("the payment record", () => {
 
   it("counts a charge once, whatever event delivers it again", async () => {
     const user = await subscriber();
-    await deliver(chargeSucceeded("evt_a", { id: "ch_1", customer: `cus_${user.id}` }));
-    await deliver(chargeSucceeded("evt_b", { id: "ch_1", customer: `cus_${user.id}` }));
+    const first = await deliver(
+      chargeSucceeded("evt_a", { id: "ch_1", customer: `cus_${user.id}` }),
+    );
+    const again = await deliver(
+      chargeSucceeded("evt_b", { id: "ch_1", customer: `cus_${user.id}` }),
+    );
     expect(await db.select().from(payments)).toHaveLength(1);
+    // Only the first recording is reported, so the funnel counts the payment once.
+    expect(first.newPayment).toEqual({ payerId: user.id, method: "card", cents: 1000 });
+    expect(again.newPayment).toBeNull();
   });
 
   it("marks a partial refund and then a full one on the same charge", async () => {

@@ -22,15 +22,19 @@ const deletion: DeletionSteps = {
   deleteProviderUser: () => Promise.reject(new Error("must not be called")),
   logger: recordingLogger(),
 };
-const deps = { adminEmails: [], deletion, now: new Date() };
+const deps = { adminEmails: [], deletion, now: new Date(), onSignedUp: () => undefined };
 const profile = { clerkId: "user_1", email: "ana@example.com", name: "Ana", image: null };
 
 describe("Clerk webhook", () => {
   it("processes a delivery once, and acknowledges a replay without writing", async () => {
     const created = { type: "user.created" as const, id: "msg_1", profile };
-    expect(await processClerkEvent(db, created, deps)).toBe("processed");
+    const signedUp: string[] = [];
+    const counting = { ...deps, onSignedUp: (id: string) => signedUp.push(id) };
+    expect(await processClerkEvent(db, created, counting)).toBe("processed");
+    expect(signedUp).toHaveLength(1);
     await db.delete(users);
-    expect(await processClerkEvent(db, created, deps)).toBe("duplicate");
+    expect(await processClerkEvent(db, created, counting)).toBe("duplicate");
+    expect(signedUp).toHaveLength(1);
     expect(await db.select().from(users)).toEqual([]);
     expect(await db.select().from(clerkEvents)).toHaveLength(1);
   });

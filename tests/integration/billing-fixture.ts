@@ -15,10 +15,8 @@ export function billingFixture(db: Database) {
     cancel = vi.fn(() => Promise.resolve()),
   ) {
     const { body, signature } = sign(payload);
-    return {
-      result: await applyPaymentEvent(db, gateway.readEvent(body, signature), cancel),
-      cancel,
-    };
+    const outcome = await applyPaymentEvent(db, gateway.readEvent(body, signature), cancel);
+    return { result: outcome.status, newPayment: outcome.newPayment, cancel };
   }
 
   async function subscriber(email = "ana@example.com", interval = "monthly") {

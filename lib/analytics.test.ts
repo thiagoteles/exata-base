@@ -11,7 +11,7 @@ describe("analytics", () => {
   it("does nothing without the Umami script", () => {
     holder.window = {};
     expect(() => {
-      track("signup");
+      track("signup_completed");
       identify("u1");
     }).not.toThrow();
   });
@@ -24,10 +24,10 @@ describe("analytics", () => {
         identify: (id: string) => calls.push(["identify", id]),
       },
     };
-    track("checkout", { plan: "yearly" });
+    track("checkout_started", { interval: "yearly" });
     identify("u1");
     expect(calls).toEqual([
-      ["track", "checkout", { plan: "yearly" }],
+      ["track", "checkout_started", { interval: "yearly" }],
       ["identify", "u1"],
     ]);
   });

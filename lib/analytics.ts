@@ -4,14 +4,19 @@
  * name or anything a person typed.
  */
 
-type EventData = Readonly<Record<string, string | number | boolean>>;
-type Umami = { track: (event: string, data?: EventData) => void; identify: (id: string) => void };
+import type { AnalyticsEvent, AnalyticsEvents, EventData } from "./analytics-events";
+
+type Umami = {
+  track: (event: string, data?: AnalyticsEvents[AnalyticsEvent]) => void;
+  identify: (id: string) => void;
+};
 
 function umami(): Umami | undefined {
   return (globalThis as { window?: { umami?: Umami } }).window?.umami;
 }
 
-export function track(event: string, data?: EventData): void {
+/** Sends one event of the catalog from the browser. */
+export function track<E extends AnalyticsEvent>(event: E, ...[data]: EventData<E>): void {
   umami()?.track(event, data);
 }
 

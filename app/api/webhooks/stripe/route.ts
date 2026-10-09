@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { applyPaymentEvent } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
+import { sendEvent } from "@/lib/ports/analytics";
 import { logger } from "@/lib/ports/log";
 import { paymentGateway } from "@/lib/ports/payment";
 
@@ -19,6 +20,14 @@ export async function POST(request: NextRequest) {
     logger.warn("payment webhook refused: invalid signature", { error });
     return new Response(null, { status: 400 });
   }
-  const result = await applyPaymentEvent(db, event, gateway.cancelSubscription);
-  return Response.json({ result });
+  const { status, newPayment } = await applyPaymentEvent(db, event, gateway.cancelSubscription);
+  // A payment counts in the funnel once, when it is first recorded, and only when it has an account.
+  if (newPayment !== null && newPayment.payerId !== null) {
+    sendEvent({
+      name: "payment_confirmed",
+      accountId: newPayment.payerId,
+      data: { method: newPayment.method ?? "unknown", cents: newPayment.cents },
+    });
+  }
+  return Response.json({ result: status });
 }

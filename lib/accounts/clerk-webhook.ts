@@ -19,7 +19,12 @@ export type ClerkEvent =
 export async function processClerkEvent(
   db: Database,
   event: ClerkEvent,
-  deps: { adminEmails: readonly string[]; deletion: DeletionSteps; now: Date },
+  deps: {
+    adminEmails: readonly string[];
+    deletion: DeletionSteps;
+    now: Date;
+    onSignedUp: (userId: string) => void;
+  },
 ): Promise<"processed" | "duplicate"> {
   const [seen] = await db
     .select({ id: clerkEvents.id })
@@ -30,7 +35,10 @@ export async function processClerkEvent(
   }
 
   if (event.type === "user.created" || event.type === "user.updated") {
-    await upsertClerkUser(db, event.profile, deps.adminEmails, deps.now);
+    const stored = await upsertClerkUser(db, event.profile, deps.adminEmails, deps.now);
+    if (stored.created) {
+      deps.onSignedUp(stored.id);
+    }
   } else if (event.type === "user.deleted") {
     const [user] = await db
       .select({ id: users.id })

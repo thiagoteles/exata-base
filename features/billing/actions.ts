@@ -6,6 +6,7 @@ import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
 import { publicHref } from "@/lib/i18n/public-paths";
+import { sendEvent } from "@/lib/ports/analytics";
 import { priceIds, requireGateway } from "@/lib/ports/payment";
 import { cancellationSchema, checkoutSchema } from "./schema";
 
@@ -30,6 +31,11 @@ export const startCheckout = actionFor("member")
       priceId,
       successUrl: `${env.APP_URL}/account/plan?checkout=success`,
       cancelUrl: `${env.APP_URL}${publicHref("/plans")}`,
+    });
+    sendEvent({
+      name: "checkout_started",
+      accountId: ctx.user.id,
+      data: { interval: parsedInput.interval },
     });
     return { url };
   });

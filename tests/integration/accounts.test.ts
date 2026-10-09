@@ -91,7 +91,8 @@ describe("Clerk sync", () => {
       ["ana@example.com"],
       new Date(),
     );
-    expect(second).toBe(first);
+    expect(first.created).toBe(true);
+    expect(second).toEqual({ id: first.id, created: false });
     const rows = await db.select().from(users);
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
@@ -104,7 +105,10 @@ describe("Clerk sync", () => {
 
   it("links an existing row with the same e-mail instead of duplicating it", async () => {
     const seeded = await createUser(db, "ana@example.com", "admin");
-    expect(await upsertClerkUser(db, profile, [], new Date())).toBe(seeded.id);
+    expect(await upsertClerkUser(db, profile, [], new Date())).toEqual({
+      id: seeded.id,
+      created: false,
+    });
     expect((await db.select().from(users))[0]?.clerkId).toBe("user_1");
   });
 });

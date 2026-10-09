@@ -9,6 +9,7 @@ import { db } from "@/lib/db/client";
 import { users } from "@/lib/db/schema/users";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
+import { sendEvent } from "@/lib/ports/analytics";
 import { sendEmail } from "@/lib/ports/email";
 import { chooseLocale, requestLocale } from "@/lib/ports/email/locale";
 import { type EmailTranslator, emailTranslatorFor, renderEmail } from "@/lib/ports/email/render";
@@ -33,12 +34,19 @@ async function sendAccountEmail(to: string, build: (t: EmailTranslator) => Accou
   }
 }
 
+function signedUp(accountId: string): void {
+  sendEvent({ name: "signup_completed", accountId, data: {} });
+}
+
 async function loadAdapter(): Promise<AuthAdapter> {
   if (env.AUTH_PROVIDER === "clerk") {
     const { clerkAdapter } = await import("./adapters/clerk");
-    return clerkAdapter((profile) =>
-      upsertClerkUser(db, profile, env.ADMIN_EMAILS, currentInstant()),
-    );
+    return clerkAdapter(async (profile) => {
+      const stored = await upsertClerkUser(db, profile, env.ADMIN_EMAILS, currentInstant());
+      if (stored.created) {
+        signedUp(stored.id);
+      }
+    });
   }
   const [{ localAdapter }, auth] = await Promise.all([import("./adapters/local"), localAuth()]);
   return localAdapter(auth);
@@ -60,6 +68,7 @@ async function createLocal() {
       env.GOOGLE_CLIENT_ID === undefined || env.GOOGLE_CLIENT_SECRET === undefined
         ? undefined
         : { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET },
+    onSignedUp: signedUp,
     sendVerificationEmail: ({ to, name, url }) =>
       sendAccountEmail(to, (t) => verifyEmailMessage({ name, url }, t)),
     sendResetPasswordEmail: ({ to, name, url }) =>

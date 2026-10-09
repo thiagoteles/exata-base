@@ -310,9 +310,9 @@ A documentação do Stripe diz que uma conta Stripe brasileira aceita Pix **só 
   - não há log de acesso do Marco Civil;
   - não há medida de desempenho.
 - **Analytics:**
-  - eventos são strings livres;
-  - não há envio pelo servidor;
-  - não há funil padrão;
+  - ~~eventos são strings livres~~ (catálogo tipado);
+  - ~~não há envio pelo servidor~~ (port `analytics`);
+  - ~~não há funil padrão~~ (declarado e emitido);
   - não há números de negócio;
   - não há experimentos.
 
@@ -372,22 +372,25 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 ### 8. Catálogo tipado de eventos
 
-- [ ] Eventos e propriedades de cada um declarados num lugar só. `track("checkout_started", { priceKey })` checado pelo TypeScript.
-- [ ] Propriedades com nomes como `email`, `name` ou `cpf` recusadas pelo tipo, com um teste confirmando.
+- [x] Eventos e propriedades de cada um declarados num lugar só (`lib/analytics-events.ts`). `track("checkout_started", { interval })` checado pelo TypeScript: evento fora do catálogo, propriedade não declarada e propriedade obrigatória ausente não compilam.
+- [x] Propriedades com nomes como `email`, `name`, `cpf`, `cnpj`, `phone`, `address` ou `password` recusadas pelo tipo do catálogo, com um type-test (`lib/analytics-events.type-test.ts`) que o typecheck compila. Provado: tirar um `@ts-expect-error` quebra o typecheck.
 
 ### 9. Analytics no servidor
 
-- [ ] Port `analytics` com adapter Umami via `fetch` (`/api/send`), usando o mesmo id interno do `identify`.
-- [ ] Usos: pagamento confirmado, reembolso, trial iniciado e conclusões.
-- [ ] **Validar:**
-  - que a versão do Umami usada aceita o id da pessoa;
-  - que eventos vindos do servidor não são descartados como robô por causa do `User-Agent`.
+- [x] Port `analytics` (`lib/ports/analytics`) com adapter Umami via `fetch` (`/api/send`, sem SDK), com o id interno da conta no `id` do payload, o mesmo do `identify`. Sai depois da resposta (`after`), com prazo de 2 segundos; falha vira aviso no log, nunca erro. Sem as variáveis do Umami, não faz nada.
+- [x] Usos: pagamento confirmado (só na primeira gravação da cobrança, mesmo que dois eventos a entreguem, e só com conta), checkout iniciado e cadastro concluído.
+- [ ] Reembolso e trial iniciado: entram com o trial e quando um produto pedir.
+- [ ] **Validar** num Umami real:
+  - que a versão usada aceita o id da pessoa (o `id` do payload, Umami 2.18 ou mais novo);
+  - que eventos vindos do servidor não são descartados como robô por causa do `User-Agent` (o adapter manda um `Mozilla/5.0 (compatible; ...)`).
 
 ### 10. Funil padrão
 
-- [ ] Eventos que todo produto emite: `page_view` → `signup_completed` → `activated` → `paywall_viewed` → `checkout_started` → `payment_confirmed`.
-- [ ] `activated` é definido pelo produto (primeiro jogo salvo no lottery, primeira lição concluída no solmiza).
-- [ ] Funil e metas configurados no Umami por um script, como o `gcp:alerts`.
+- [x] Eventos que todo produto emite: `page_view` (o próprio Umami) → `signup_completed` → `activated` → `paywall_viewed` → `checkout_started` → `payment_confirmed`, todos no catálogo.
+- [x] `signup_completed` sai quando a conta fica utilizável: no login próprio, na confirmação do e-mail (ou na criação, quando o Google já entrega o e-mail confirmado); no Clerk, quando a linha é inserida (o `xmax = 0` do upsert distingue inserção de ligação a uma linha existente, então o seed ligado não conta).
+- [x] `checkout_started` na action de compra; `payment_confirmed` no webhook.
+- [x] `activated` e `paywall_viewed` ficam declarados; quem emite é o produto (primeiro jogo salvo no lottery, primeira lição concluída no solmiza; o paywall, onde ele aparecer).
+- [ ] Funil e metas configurados no Umami por um script, como o `gcp:alerts`. Precisa de um Umami com usuário de API para provar.
 
 ### 11. Números de negócio no admin
 

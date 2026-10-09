@@ -15,6 +15,7 @@ function localAuth() {
     sent.push({ to, url });
     return Promise.resolve();
   };
+  const signedUp: string[] = [];
   const auth = createLocalAuth({
     db,
     appUrl: "http://localhost:3300",
@@ -22,8 +23,9 @@ function localAuth() {
     adminEmails: ["boss@example.com"],
     sendVerificationEmail: capture,
     sendResetPasswordEmail: capture,
+    onSignedUp: (id) => signedUp.push(id),
   });
-  return { auth, sent };
+  return { auth, sent, signedUp };
 }
 
 const signUp = { email: "Boss@Example.com", password: "a-long-password", name: "Boss" };
@@ -42,6 +44,16 @@ describe("local auth", () => {
         .where(eq(plans.userId, user?.id ?? "")),
     ).toHaveLength(1);
     expect(sent.map(({ to }) => to)).toEqual(["boss@example.com"]);
+  });
+
+  it("counts the sign-up when the e-mail is confirmed, not when the form is sent", async () => {
+    const { auth, sent, signedUp } = localAuth();
+    await auth.api.signUpEmail({ body: signUp });
+    expect(signedUp).toEqual([]);
+    const token = new URL(sent[0]?.url ?? "").searchParams.get("token") ?? "";
+    await auth.api.verifyEmail({ query: { token } });
+    const [user] = await db.select().from(users);
+    expect(signedUp).toEqual([user?.id]);
   });
 
   it("refuses sign-in until the e-mail is confirmed, and promotes on confirmation", async () => {

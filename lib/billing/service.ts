@@ -11,7 +11,7 @@ import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
 import { DomainError } from "@/lib/errors";
 import type { Interval, PaymentEvent } from "@/lib/ports/payment/types";
-import { linkPayments, recordPayment, recordRefund } from "./payments";
+import { linkPayments, type NewPayment, recordPayment, recordRefund } from "./payments";
 
 /*
  * The billing rules, against the database only. Money moves in the payment provider; this module
@@ -147,10 +147,11 @@ async function applyEvent(
   tx: Transaction,
   event: PaymentEvent,
   cancel: CancelSubscription,
-): Promise<void> {
+): Promise<NewPayment | null> {
   switch (event.kind) {
     case "checkout_paid":
-      return applyCheckout(tx, event, cancel);
+      await applyCheckout(tx, event, cancel);
+      return null;
     case "invoice_paid":
       await tx
         .update(plans)
@@ -159,27 +160,28 @@ async function applyEvent(
           ...(event.periodEnd === null ? {} : { currentPeriodEnd: event.periodEnd }),
         })
         .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
-      return;
+      return null;
     case "invoice_failed":
       await tx
         .update(plans)
         .set({ status: "past_due" })
         .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
-      return;
+      return null;
     case "subscription_deleted":
       // A subscription replaced by the lifetime plan no longer matches any row, so it is ignored.
       await tx
         .update(plans)
         .set(freePlan)
         .where(eq(plans.providerSubscriptionId, event.subscriptionId));
-      return;
+      return null;
     case "payment_succeeded":
       return recordPayment(tx, event);
     case "charge_refunded":
       await recordRefund(tx, event);
-      return applyRefund(tx, event, cancel);
+      await applyRefund(tx, event, cancel);
+      return null;
     case "ignored":
-      return;
+      return null;
     default:
       return event satisfies never;
   }
@@ -188,13 +190,14 @@ async function applyEvent(
 /**
  * Applies one provider event. Inserting the event id is the replay lock: a delivery seen before
  * conflicts and does nothing. The lock and the change commit together, so a failed change leaves
- * the event unseen and the provider's retry applies it.
+ * the event unseen and the provider's retry applies it. A payment the event recorded for the first
+ * time comes back with the outcome, so the caller can count it once it is committed.
  */
 export function applyPaymentEvent(
   db: Database,
   event: PaymentEvent,
   cancel: CancelSubscription,
-): Promise<"applied" | "duplicate"> {
+): Promise<{ status: "applied" | "duplicate"; newPayment: NewPayment | null }> {
   return db.transaction(async (tx) => {
     const locked = await tx
       .insert(paymentEvents)
@@ -202,10 +205,9 @@ export function applyPaymentEvent(
       .onConflictDoNothing()
       .returning({ id: paymentEvents.id });
     if (locked.length === 0) {
-      return "duplicate";
+      return { status: "duplicate", newPayment: null };
     }
-    await applyEvent(tx, event, cancel);
-    return "applied";
+    return { status: "applied", newPayment: await applyEvent(tx, event, cancel) };
   });
 }
 

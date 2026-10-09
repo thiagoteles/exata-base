@@ -4,6 +4,7 @@ import { processClerkEvent } from "@/lib/accounts/clerk-webhook";
 import { accountDeletionSteps } from "@/lib/accounts/deletion-steps";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
+import { sendEvent } from "@/lib/ports/analytics";
 import { readClerkWebhookRequest } from "@/lib/ports/auth";
 import { logger } from "@/lib/ports/log";
 
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
     adminEmails: env.ADMIN_EMAILS,
     deletion: accountDeletionSteps,
     now: currentInstant(),
+    onSignedUp: (accountId) => sendEvent({ name: "signup_completed", accountId, data: {} }),
   });
   return Response.json({ result });
 }

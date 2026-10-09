@@ -25,12 +25,15 @@ async function personOfCustomer(tx: Transaction, customerId: string | null) {
   return person ?? null;
 }
 
+/** A payment recorded for the first time, which is when it counts in the funnel. */
+export type NewPayment = { payerId: string | null; method: string | null; cents: number };
+
 export async function recordPayment(
   tx: Transaction,
   event: Extract<PaymentEvent, { kind: "payment_succeeded" }>,
-): Promise<void> {
+): Promise<NewPayment | null> {
   const person = await personOfCustomer(tx, event.customerId);
-  await tx
+  const [recorded] = await tx
     .insert(payments)
     .values({
       provider: event.provider,
@@ -43,7 +46,11 @@ export async function recordPayment(
       method: event.method,
       paidAt: event.paidAt,
     })
-    .onConflictDoNothing({ target: payments.providerPaymentId });
+    .onConflictDoNothing({ target: payments.providerPaymentId })
+    .returning({ payerId: payments.payerId });
+  return recorded === undefined
+    ? null
+    : { payerId: recorded.payerId, method: event.method, cents: event.amountCents };
 }
 
 export async function recordRefund(

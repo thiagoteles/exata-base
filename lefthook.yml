@@ -2,3 +2,10 @@ pre-commit:
   jobs:
     - name: check
       run: pnpm check
+
+# With no CI, the push is the last barrier before the deploy that watches main: the production
+# build must pass, and every page must still leave it prerendered.
+pre-push:
+  jobs:
+    - name: build
+      run: pnpm build && pnpm check:prerender

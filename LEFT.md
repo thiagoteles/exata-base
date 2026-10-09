@@ -694,11 +694,11 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 
 **Decisão:** sem CI no GitHub (sem cota de Actions). O `.github/workflows/ci.yml` continua só manual. As barreiras ficam nos hooks do lefthook e num comando local, e o `--no-verify` continua sendo a única forma de pular.
 
-- [ ] Commit: `pnpm check`, como hoje.
-- [ ] Push (hook novo de `pre-push`):
+- [x] Commit: `pnpm check`, como hoje.
+- [x] Push (hook novo de `pre-push`):
   - `next build` com saída standalone;
   - `check:prerender`: confere que as páginas que deviam ser estáticas foram pré-renderizadas e que os arquivos esperados estão em `.next/standalone/` (arquivo fora do trace, prerender quebrado).
-- [ ] `pnpm verify`, rodado antes de entregar uma fase: `pnpm check`, integração, build da imagem Docker de produção, compose limpo e e2e (a receita de prova em cópia limpa do `BASE.md`, como script).
+- [x] `pnpm verify`, rodado antes de entregar uma fase: `pnpm check`, integração, build da imagem Docker de produção, compose limpo e e2e (a receita de prova em cópia limpa do `BASE.md`, como script).
 - [ ] O Coolify continua observando a `main` e faz o deploy a cada push; o hook de push é a barreira antes dele.
 - [ ] Atualizações de dependências: Renovate como app hospedado (não consome Actions), em lotes semanais e respeitando versões exatas. Opcional.
 

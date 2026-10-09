@@ -45,6 +45,8 @@ A Next.js product with a typed, closed foundation: strict TypeScript, Biome with
 
 - `docker compose up` starts the app on http://localhost:3300 with Postgres and a mail catcher on http://localhost:8030. The seeded admin is `admin@app.local` with the password `admin-local`.
 - `pnpm check` is typecheck, lint, tokens, migrations, unused code and unit tests. It runs on every commit.
+- Every push runs the production build and `pnpm check:prerender` (every page still prerendered and in the standalone output). There is no CI.
+- `pnpm verify` is the full proof before delivering a phase: check, integration, the production image booting against a throwaway Postgres, and the browser suite on a clean compose. Stop the local compose first.
 - `pnpm test:integration` runs the rules against a real Postgres. `pnpm test:e2e` runs the browser suite against the running compose.
 - `pnpm db:generate` writes a migration after a schema change.
 

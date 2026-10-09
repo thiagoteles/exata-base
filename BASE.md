@@ -68,6 +68,8 @@ Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `n
 ## 4. Como se prova
 
 - `pnpm check`: tipos (`next typegen` incluso), Biome, tokens, migrations, knip, testes de unidade. Não use só `tsc --noEmit`: ele perde o `next typegen`.
+- **Sem CI** (sem cota de Actions no GitHub). O hook de commit roda o `pnpm check`; o de push roda `pnpm build` e `pnpm check:prerender` (toda página continua pré-renderizada e com o HTML no standalone).
+- `pnpm verify` (`scripts/verify.sh`): a receita de prova em cópia limpa como script. Roda check, integração, constrói a imagem de produção e a sobe contra um Postgres descartável (porta 3399), copia a árvore de trabalho para uma pasta temporária, sobe o compose limpo e roda o Playwright. Apaga tudo no fim, mesmo com falha. Recusa começar se as portas do compose local estiverem ocupadas. Provado em 2026-10-09: 216 de unidade, 102 de integração, imagem respondendo `/health`, 69 de 69 no Playwright (5 pulados).
 - `pnpm test:integration`: regras contra Postgres real (testcontainers). Webhooks do Stripe com eventos assinados à mão (HMAC igual ao do Stripe) lidos pelo adaptador real.
 - `pnpm test:e2e`: Playwright contra o compose já de pé, com axe (WCAG 2.0/2.1/2.2 A e AA) nos dois temas. `pnpm test:clerk`: modo Clerk, com chaves de desenvolvimento (a suíte pula sem elas).
 - **Receita de prova em cópia limpa** (usada em cada fase): copiar o repo para uma pasta temporária com `git archive HEAD | tar -x -C pasta` (ou `git ls-files -co --exclude-standard`), `docker compose -p <nome> up -d` nela, esperar `/health`, rodar o Playwright do repo, depois `docker compose -p <nome> down -v` e apagar a pasta pelo caminho literal.
@@ -104,9 +106,8 @@ As fases 0 a 12 do plano foram feitas e provadas (cada uma foi um commit `feat:`
 - **`create-next-app --example`**: o produto novo nasce sem `origin`, o `BASE.md` sai num commit próprio como o `AGENTS.md` manda, e `docker compose up` sobe sem `.env`.
 
 **Só o dono pode fazer:**
-1. Ligar o workflow `.github/workflows/ci.yml` (hoje só `workflow_dispatch`) e ver o primeiro resultado.
-2. Construir e subir a imagem de produção (`docker-compose.production.yml`) com um banco de verdade. Nunca foi exercitada de ponta a ponta.
-3. Provar o alarme de ponta a ponta: gerar um erro no app com o Cloud Logging ligado e ver o e-mail chegar. O `pnpm gcp:alerts` cria os recursos, mas o disparo nunca foi observado.
+1. Subir a imagem de produção no Coolify com um banco de verdade. A imagem já é provada localmente pelo `pnpm verify` (sobe e responde contra um Postgres descartável); falta o caminho no Coolify.
+2. Provar o alarme de ponta a ponta: gerar um erro no app com o Cloud Logging ligado e ver o e-mail chegar. O `pnpm gcp:alerts` cria os recursos, mas o disparo nunca foi observado.
 
 **Já feito:** a `main` foi enviada ao GitHub e, depois, o histórico dela foi reescrito para um único commit (veja a seção 8). Os commits antigos, com os documentos de trabalho, deixaram de existir no branch publicado; o bundle guarda tudo.
 

@@ -21,7 +21,8 @@ export function CatalogSection({ name, title, snapshot = true, children }: Catal
       <h2 id={titleId} className="text-section text-ink">
         {title}
       </h2>
-      {children}
+      {/* A flex item grows to its content unless it may shrink: a wide table must scroll in its own frame. */}
+      <div className="min-w-0">{children}</div>
     </section>
   );
 }

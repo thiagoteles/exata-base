@@ -47,8 +47,9 @@ export function PricingTable({
   excludedLabel,
   featuresLabel,
 }: PricingTableProps) {
+  // The frame is positioned, so the visually hidden labels in the cells are clipped by it and do not widen the page.
   return (
-    <div className="overflow-x-auto rounded-cell border border-line">
+    <div className="relative overflow-x-auto rounded-cell border border-line">
       <table className="w-full min-w-xl border-collapse text-start">
         <caption className="sr-only">{caption}</caption>
         <thead>

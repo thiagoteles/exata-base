@@ -13,8 +13,9 @@ export default defineConfig({
   testDir: "e2e",
   testIgnore: /clerk\//,
   fullyParallel: true,
-  // Two browsers share one development server; more of them starve it on a busy machine.
-  workers: 2,
+  // One browser at a time. Two of them reaching routes for the first time together made the
+  // development server go silent for fifteen minutes on a busy machine; the cost is a longer run.
+  workers: 1,
   forbidOnly: true,
   retries: 0,
   reporter: "list",

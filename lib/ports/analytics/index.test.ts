@@ -3,11 +3,11 @@ import { umamiSink } from "./adapters/umami";
 
 type Sent = { url: string; init: RequestInit };
 
-function recording(status: number) {
+function recording(status: number, body = '{"sessionId":"s"}') {
   const sent: Sent[] = [];
   const fetch = ((url: URL, init: RequestInit) => {
     sent.push({ url: url.toString(), init });
-    return Promise.resolve(new Response(null, { status }));
+    return Promise.resolve(new Response(body, { status }));
   }) as unknown as typeof globalThis.fetch;
   return { sent, fetch };
 }
@@ -41,8 +41,20 @@ describe("Umami sink", () => {
         id: "acc_1",
       },
     });
-    expect(new Headers(sent[0]?.init.headers).get("user-agent")).toContain("Mozilla");
+    // Empty on purpose: Umami drops "node" and any server name as a robot.
+    expect(new Headers(sent[0]?.init.headers).get("user-agent")).toBe("");
     expect(failures).toEqual([]);
+  });
+
+  it("reports an event Umami discarded as a robot, though it answered 200", async () => {
+    const failures: string[] = [];
+    const sink = umamiSink({
+      ...base,
+      fetch: recording(200, '{"beep":"boop"}').fetch,
+      onFailure: (reason) => failures.push(reason),
+    });
+    await sink({ name: "signup_completed", accountId: "a", data: {} });
+    expect(failures).toEqual(["Umami discarded the event as a robot"]);
   });
 
   it("reports a refusal or an outage instead of throwing", async () => {

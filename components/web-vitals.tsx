@@ -12,13 +12,26 @@ const reported = new Set(["LCP", "INP", "CLS"]);
 const CLS_DIGITS = 1000;
 
 /*
- * Defined once, outside the component: the hook reports again to every new function it is handed.
- * Each metric has a fresh id per page load, which is the sampling key.
+ * The sample is decided per page load, so its three metrics are kept or dropped together. The key
+ * is the moment this document started, which every page load has its own of; a metric's id would
+ * not do, because each listener draws a fresh one.
  */
+const pageLoad = typeof performance === "undefined" ? "" : String(performance.timeOrigin);
+
+/*
+ * A metric is sent once per navigation. In development React mounts effects twice, so the hook
+ * listens twice and each metric arrives twice under different ids; doubled, it would skew the
+ * averages. A client-side navigation has its own start, so it still counts on its own.
+ */
+const sent = new Set<string>();
+
+/** Defined once, outside the component: the hook reports again to every new function it is handed. */
 function report(metric: Metric): void {
-  if (!(reported.has(metric.name) && isSampled(metric.id, SAMPLE_RATE))) {
+  const once = `${metric.name} ${metric.navigationURL ?? ""} ${metric.navigationStartTime ?? 0}`;
+  if (!(reported.has(metric.name) && isSampled(pageLoad, SAMPLE_RATE)) || sent.has(once)) {
     return;
   }
+  sent.add(once);
   track("web_vital", {
     metric: metric.name,
     value:

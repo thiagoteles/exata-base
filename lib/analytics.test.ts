@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { identify, track } from "./analytics";
 
 const holder = globalThis as { window?: unknown };
@@ -12,7 +12,7 @@ describe("analytics", () => {
     holder.window = {};
     expect(() => {
       track("signup_completed");
-      identify("u1");
+      identify("u1", { attempts: 1, everyMs: 10 })();
     }).not.toThrow();
   });
 
@@ -30,5 +30,23 @@ describe("analytics", () => {
       ["track", "checkout_started", { interval: "yearly" }],
       ["identify", "u1"],
     ]);
+  });
+
+  it("waits for the script to load before identifying, and gives up after the last attempt", () => {
+    vi.useFakeTimers();
+    const calls: string[] = [];
+    holder.window = {};
+    identify("u1", { attempts: 3, everyMs: 100 });
+    vi.advanceTimersByTime(100);
+    holder.window = { umami: { track: () => undefined, identify: (id: string) => calls.push(id) } };
+    vi.advanceTimersByTime(500);
+    expect(calls).toEqual(["u1"]);
+
+    holder.window = {};
+    const stop = identify("u2", { attempts: 3, everyMs: 100 });
+    vi.advanceTimersByTime(1000);
+    stop();
+    expect(vi.getTimerCount()).toBe(0);
+    vi.useRealTimers();
   });
 });

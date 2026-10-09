@@ -20,6 +20,28 @@ export function track<E extends AnalyticsEvent>(event: E, ...[data]: EventData<E
   umami()?.track(event, data);
 }
 
-export function identify(accountId: string): void {
-  umami()?.identify(accountId);
+const WAIT = { attempts: 40, everyMs: 250 };
+
+/**
+ * Ties this page load's events to the account. Umami keeps the id only until the page unloads, so
+ * a signed-in page calls this on every load. The script loads after the page is interactive, so
+ * the call waits for it (ten seconds at most) and returns a function that stops waiting.
+ */
+export function identify(accountId: string, wait = WAIT): () => void {
+  let left = wait.attempts;
+  const attempt = (): boolean => {
+    const tracker = umami();
+    tracker?.identify(accountId);
+    left -= 1;
+    return tracker !== undefined || left <= 0;
+  };
+  if (attempt()) {
+    return () => undefined;
+  }
+  const timer = setInterval(() => {
+    if (attempt()) {
+      clearInterval(timer);
+    }
+  }, wait.everyMs);
+  return () => clearInterval(timer);
 }

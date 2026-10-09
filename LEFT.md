@@ -358,7 +358,8 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 ### 6. Desempenho
 
 - [x] `useReportWebVitals` enviando LCP, INP e CLS como o evento `web_vital` do catálogo, numa amostra de 10% por id da métrica (`domain/analytics/sample.ts`, determinística, sem ler aleatoriedade; provada por propriedades e pela fração em 20 mil ids sequenciais). Só com o Umami ligado.
-- [ ] **Validar** num Umami real que o INP e o CLS, mandados quando a página é escondida, chegam (o rastreador do Umami usa `fetch` com `keepalive`).
+- [x] **Validado** no mesmo Umami: INP e CLS chegam (o rastreador usa `fetch` com `keepalive`). O teste achou a taxa em dobro no desenvolvimento: o efeito montado duas vezes cria dois observadores, cada um com seu id. Agora a amostra é por carregamento (`performance.timeOrigin`, então as três métricas entram ou saem juntas; o `navigationId` não serve porque Safari e Firefox não o dão) e cada métrica sai uma vez por navegação. Medido: 0,31 Web Vital por página, para 0,3 esperado.
+- [x] O `identify` não era chamado em lugar nenhum, e o Umami guarda o id só enquanto a página está aberta: o shell logado agora identifica a pessoa a cada carregamento, esperando o script carregar. Provado: a sessão do navegador ficou com o id da conta.
 - [x] Duração de cada action e route no log: `action finished` com o nome (`.metadata({ name })`, exigido pelo tipo), a duração e o status HTTP equivalente; `route finished` com o padrão da rota, o método, a duração e o status (`timedRoute`, conferido por um teste de fonte). O `/health` fica de fora: o uptime check o chama a cada minuto de três regiões. O nome da action também vai para o log de erro.
 - [x] Consultas acima de 250 ms no log (`slow query`), com o nome (comando e tabela principal, como `select users`) e o texto com os `$1`, nunca os valores. O cliente do postgres.js é envolvido num Proxy que mede o `unsafe`, inclusive dentro de transações e savepoints; provado contra o Postgres real.
 
@@ -382,9 +383,10 @@ Registros de acesso (IP, data e hora com fuso) guardados por 6 meses, em sigilo.
 - [x] Port `analytics` (`lib/ports/analytics`) com adapter Umami via `fetch` (`/api/send`, sem SDK), com o id interno da conta no `id` do payload, o mesmo do `identify`. Sai depois da resposta (`after`), com prazo de 2 segundos; falha vira aviso no log, nunca erro. Sem as variáveis do Umami, não faz nada.
 - [x] Usos: pagamento confirmado (só na primeira gravação da cobrança, mesmo que dois eventos a entreguem, e só com conta), checkout iniciado e cadastro concluído.
 - [ ] Reembolso e trial iniciado: entram com o trial e quando um produto pedir.
-- [ ] **Validar** num Umami real:
-  - que a versão usada aceita o id da pessoa (o `id` do payload, Umami 2.18 ou mais novo);
-  - que eventos vindos do servidor não são descartados como robô por causa do `User-Agent` (o adapter manda um `Mozilla/5.0 (compatible; ...)`).
+- [x] **Validado** no Umami do solmiza (site de teste próprio, 9/10/2026):
+  - o `id` do payload vira o `distinctId` da sessão, e as propriedades chegam (`method`, `cents`);
+  - o filtro de robôs descartava os eventos do servidor: o Umami responde `200 {"beep":"boop"}` a qualquer User-Agent que não seja de navegador (`node`, que o fetch manda por padrão, um nome de servidor, `Mozilla/5.0 (compatible; ...)`), e o adapter tomava isso por sucesso. Corrigido: User-Agent vazio, que passa, e `beep` tratado como falha no log;
+  - limite: um evento do servidor abre uma sessão própria (o Umami calcula a sessão por IP e User-Agent), ligada à do navegador só pelo `distinctId`, e o país sai o do servidor.
 
 ### 10. Funil padrão
 

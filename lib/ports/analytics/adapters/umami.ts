@@ -11,8 +11,14 @@ type UmamiOptions = {
 };
 
 const DEADLINE_MS = 2000;
-// Umami discards requests whose user agent reads as a robot, and a server has none of its own.
-const userAgent = "Mozilla/5.0 (compatible; ServerEvents/1.0)";
+/*
+ * Umami discards an event whose user agent reads as a robot, and it reads every agent that is not
+ * a browser that way: "node" (what fetch sends by default) and any honest server name alike. An
+ * empty agent passes, so the server says nothing about itself rather than pose as a browser.
+ */
+const userAgent = "";
+// What Umami answers, with a 200, to an event it discarded as a robot.
+const discarded = '"beep"';
 
 /*
  * Umami's collection endpoint, with no SDK. The payload's id is the distinct id the browser sets
@@ -41,6 +47,8 @@ export function umamiSink(options: UmamiOptions): AnalyticsSink {
       });
       if (!response.ok) {
         options.onFailure(`Umami answered ${response.status}`);
+      } else if ((await response.text()).includes(discarded)) {
+        options.onFailure("Umami discarded the event as a robot");
       }
     } catch (error) {
       options.onFailure(error instanceof Error ? error.message : String(error));

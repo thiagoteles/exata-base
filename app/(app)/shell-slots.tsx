@@ -1,8 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { IdentifyAccount } from "@/components/identify-account";
 import { BottomBar } from "@/components/shell/bottom-bar";
 import type { ShellGroup, ShellItem } from "@/components/shell/nav-types";
 import { Sidebar } from "@/components/shell/sidebar";
 import { UserMenu } from "@/components/shell/user-menu";
+import { env } from "@/lib/env";
 import { groupNav, type NavItem, splitForBar, visibleNav } from "@/lib/navigation";
 import { getCurrentUser } from "@/lib/ports/auth";
 import { SignOutControl } from "@/lib/ports/auth/screens";
@@ -66,13 +68,16 @@ export async function UserMenuSlot() {
     return null;
   }
   return (
-    <UserMenu
-      name={user.name}
-      email={user.email}
-      roleLabel={account(`roles.${user.role}`)}
-      menuLabel={nav("userMenu")}
-      accountLabel={nav("items.account")}
-      signOut={<SignOutControl className={signOutClasses} />}
-    />
+    <>
+      {env.UMAMI_WEBSITE_ID === undefined ? null : <IdentifyAccount accountId={user.id} />}
+      <UserMenu
+        name={user.name}
+        email={user.email}
+        roleLabel={account(`roles.${user.role}`)}
+        menuLabel={nav("userMenu")}
+        accountLabel={nav("items.account")}
+        signOut={<SignOutControl className={signOutClasses} />}
+      />
+    </>
   );
 }

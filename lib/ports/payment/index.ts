@@ -1,9 +1,6 @@
 import { cacheLife } from "next/cache";
-import { grantsAccess, readPlan } from "@/lib/billing/service";
-import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
-import { requireUser } from "@/lib/ports/auth";
 import type { Interval, PaymentGateway, PriceTag } from "./types";
 
 /*
@@ -54,19 +51,6 @@ export async function requireGateway(): Promise<PaymentGateway> {
     throw new DomainError(404, "billingOff");
   }
   return current;
-}
-
-async function hasPaidPlan(userId: string): Promise<boolean> {
-  return grantsAccess(await readPlan(db, userId));
-}
-
-/** The signed-in user when their plan is paid; otherwise a 401 or a 403 with its own message. */
-export async function requirePaidPlan() {
-  const user = await requireUser();
-  if (!(await hasPaidPlan(user.id))) {
-    throw new DomainError(403, "paidPlanRequired");
-  }
-  return user;
 }
 
 /** What each offered plan costs, read from the provider and kept for an hour. */

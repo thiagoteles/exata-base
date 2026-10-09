@@ -3,14 +3,14 @@ import { getTranslations } from "next-intl/server";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
+import { requireFeature } from "@/lib/billing/guard";
 import { DomainError } from "@/lib/errors";
-import { requirePaidPlan } from "@/lib/ports/payment";
 
 /** A block that only a paid plan opens, to show the guard at work. Everyone else sees why not. */
 export async function PaidBlock() {
   const t = await getTranslations("catalog.paid");
   try {
-    await requirePaidPlan();
+    await requireFeature("premium");
   } catch (error) {
     if (error instanceof DomainError && error.status === 403) {
       return (

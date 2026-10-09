@@ -204,9 +204,10 @@ Fora de escopo: nota fiscal (resolvida fora da base) e a migração de assinatur
 
 ### 1. Catálogo de planos e direitos
 
-- [ ] Catálogo tipado em `domain/billing/catalog.ts`, preenchido pelo produto: níveis com `features`, `limits` e `extends`, e preços apontando para `lookup_key` do Stripe (`"premium.monthly": "premium_monthly"`).
-- [ ] `entitlementsOf(plan, now)` devolve recursos e limites, e substitui o `grantsAccess`.
-- [ ] Guardas: `requireFeature("x")` em página e route, e `actionFor(role, { feature })` em action.
+- [x] Catálogo tipado em `domain/billing/catalog.ts`, preenchido pelo produto: níveis com `features`, `limits` e `extends`.
+- [ ] Preços do catálogo apontando para `lookup_key` do Stripe (`"premium.monthly": "premium_monthly"`). Entra com "Preços e moedas"; até lá, `catalog.paidTier` com os `STRIPE_PRICE_*`.
+- [x] `entitlementsOf(plan, now)` devolve recursos e limites, e substitui o `grantsAccess`.
+- [x] Guardas: `requireFeature("x")` em página e route, e `actionFor(role, { feature })` em action.
 - [ ] Os limites por plano usam a tabela de contadores do rate limit.
 - [ ] O acesso por nível do solmiza vira um recurso (`levels.all`) ou um limite (`maxLevel`), com o mesmo mecanismo.
 - [ ] **Paywall** como componente de padrão, apoiado nessa guarda do servidor.
@@ -277,7 +278,7 @@ A documentação do Stripe diz que uma conta Stripe brasileira aceita Pix **só 
 
 **Decisão:** preparar o titular agora, sem criar organizações.
 
-- [ ] `entitlementsOf` e as guardas recebem um "titular" (`{ kind: "user", id }`), que hoje é sempre a pessoa. Organizações e assentos entram depois sem mudar a assinatura das funções.
+- [x] `entitlementsOf` e as guardas recebem um "titular" (`{ kind: "user", id }`), que hoje é sempre a pessoa. Organizações e assentos entram depois sem mudar a assinatura das funções.
 
 ### Ordem
 

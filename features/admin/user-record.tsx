@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
+import { isPaidTier } from "@/domain/billing/entitlements";
 import type { UserRecord as Record } from "@/lib/admin/users";
 import { isCourtesy } from "@/lib/billing/service";
 import { formatInstantDate } from "@/lib/date";
@@ -18,7 +19,7 @@ export async function UserRecord({ record, viewerId }: { record: Record; viewerI
     getTranslations("admin.plans"),
   ]);
   const { user, plan } = record;
-  const paid = plan.tier === "paid";
+  const paid = isPaidTier(plan.tier);
   const courtesy = isCourtesy(plan);
   const canRefund =
     paid && !courtesy && plan.providerCustomerId !== null && (await paymentGateway()) !== null;

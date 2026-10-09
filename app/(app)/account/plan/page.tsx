@@ -8,6 +8,7 @@ import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
+import { isPaidTier } from "@/domain/billing/entitlements";
 import { CancellationControl, PortalButton } from "@/features/billing/plan-controls";
 import { planState, planStateTone } from "@/features/billing/presentation";
 import { isCourtesy, type Plan, readPlan, subscriptionOf } from "@/lib/billing/service";
@@ -39,7 +40,7 @@ async function PlanContent({ searchParams }: Props) {
   // Read fresh: the plan changes by webhook, away from this person's session.
   const plan = await readPlan(db, user.id);
   const state = planState(plan);
-  const paid = plan?.tier === "paid";
+  const paid = plan !== null && isPaidTier(plan.tier);
   return (
     <>
       <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
@@ -64,7 +65,7 @@ async function PlanContent({ searchParams }: Props) {
 async function PlanRecord({ plan }: { plan: Plan | null }) {
   const t = await getTranslations("plan");
   const state = planState(plan);
-  const paid = plan !== null && plan.tier === "paid";
+  const paid = plan !== null && isPaidTier(plan.tier);
   return (
     <RecordGrid>
       <RecordCell
@@ -97,10 +98,10 @@ async function PlanRecord({ plan }: { plan: Plan | null }) {
 async function PlanActions({ plan }: { plan: Plan | null }) {
   const t = await getTranslations("plan");
   const billingOn = (await paymentGateway()) !== null;
-  const subscribed = plan?.tier === "paid" && subscriptionOf(plan) !== null;
+  const subscribed = plan !== null && isPaidTier(plan.tier) && subscriptionOf(plan) !== null;
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {plan?.tier === "paid" ? null : (
+      {plan !== null && isPaidTier(plan.tier) ? null : (
         <Link href="/plans" className={buttonClasses("primary")}>
           {t("seePlans")}
         </Link>

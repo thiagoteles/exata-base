@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Figure } from "@/components/patterns/record-grid";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
+import { isPaidTier } from "@/domain/billing/entitlements";
 import { BuyButton } from "@/features/billing/buy-button";
 import { canBuy, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
@@ -60,7 +61,7 @@ async function Offers() {
         </Link>
       );
     }
-    if (plan?.tier === "paid" && plan.billingInterval === interval) {
+    if (plan !== null && isPaidTier(plan.tier) && plan.billingInterval === interval) {
       return <Stamp tone="done">{t("current")}</Stamp>;
     }
     if (!canBuy(plan, interval)) {

@@ -1,4 +1,11 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
+import { catalog } from "@/domain/billing/catalog";
+import {
+  type Entitlements,
+  entitlementsOf,
+  type Holder,
+  isPaidTier,
+} from "@/domain/billing/entitlements";
 import type { Database } from "@/lib/db/database";
 import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { DomainError } from "@/lib/errors";
@@ -13,9 +20,6 @@ import type { Interval, PaymentEvent } from "@/lib/ports/payment/types";
 export type Plan = typeof plans.$inferSelect;
 export type CancelSubscription = (subscriptionId: string) => Promise<void>;
 
-/** Access follows the tier. A failed charge keeps it (status `past_due`) until the subscription ends. */
-export const grantsAccess = (plan: Pick<Plan, "tier"> | null): boolean => plan?.tier === "paid";
-
 /** A sale rather than a gift: courtesy is told apart by who granted it. */
 export const isCourtesy = (plan: Pick<Plan, "courtesyGrantedByEmail">): boolean =>
   plan.courtesyGrantedByEmail !== null;
@@ -29,12 +33,21 @@ export async function readPlan(db: Database, userId: string): Promise<Plan | nul
   return plan ?? null;
 }
 
+/** What the holder may do now. The holder is a person today; the signature stays for organizations. */
+export async function entitlementsFor(
+  db: Database,
+  holder: Holder,
+  now: Date,
+): Promise<Entitlements> {
+  return entitlementsOf(await readPlan(db, holder.id), now);
+}
+
 /**
  * A free account may buy anything. Someone on a monthly or yearly subscription may buy the
  * lifetime plan, which replaces it. Everything else is changed in the customer portal.
  */
 export function canBuy(plan: Plan | null, interval: Interval): boolean {
-  if (plan === null || plan.tier === "free") {
+  if (plan === null || !isPaidTier(plan.tier)) {
     return true;
   }
   return interval === "lifetime" && plan.providerSubscriptionId !== null;
@@ -75,11 +88,11 @@ async function applyCheckout(
   await tx
     .update(plans)
     .set({
-      tier: "paid",
+      tier: catalog.paidTier,
       status: "active",
       billingInterval: event.interval,
       provider: event.provider,
-      priceKey: `paid.${event.interval}`,
+      priceKey: `${catalog.paidTier}.${event.interval}`,
       providerCustomerId: event.customerId ?? current.providerCustomerId,
       providerSubscriptionId: event.interval === "lifetime" ? null : event.subscriptionId,
       cancelAtPeriodEnd: false,
@@ -133,13 +146,13 @@ async function applyEvent(
           status: "active",
           ...(event.periodEnd === null ? {} : { currentPeriodEnd: event.periodEnd }),
         })
-        .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), eq(plans.tier, "paid")));
+        .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
       return;
     case "invoice_failed":
       await tx
         .update(plans)
         .set({ status: "past_due" })
-        .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), eq(plans.tier, "paid")));
+        .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
       return;
     case "subscription_deleted":
       // A subscription replaced by the lifetime plan no longer matches any row, so it is ignored.
@@ -189,7 +202,7 @@ export async function changeCancellation(
   setAtProvider: (subscriptionId: string, cancel: boolean) => Promise<void>,
 ): Promise<void> {
   const plan = await readPlan(db, userId);
-  if (plan === null || plan.tier !== "paid" || plan.providerSubscriptionId === null) {
+  if (plan === null || !isPaidTier(plan.tier) || plan.providerSubscriptionId === null) {
     throw new DomainError(409, "noSubscription");
   }
   await setAtProvider(plan.providerSubscriptionId, cancel);

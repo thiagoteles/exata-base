@@ -4,6 +4,7 @@ import { z } from "@/lib/validation";
 
 const session = vi.hoisted(() => ({ role: null as null | "member" | "staff" | "admin" }));
 const limits = vi.hoisted(() => ({ over: false, subjects: [] as string[] }));
+const plan = vi.hoisted(() => ({ granted: true, asked: [] as string[] }));
 
 vi.mock("next/headers", () => ({
   headers: () => Promise.resolve(new Headers({ "x-request-id": "req-1" })),
@@ -40,7 +41,23 @@ vi.mock("@/lib/rate-limit/guard", async () => {
   };
 });
 
+vi.mock("@/lib/billing/guard", async () => {
+  const { DomainError: Refusal } = await import("@/lib/errors");
+  return {
+    assertFeature: (holderId: string, feature: string) => {
+      plan.asked.push(`${holderId}:${feature}`);
+      return plan.granted
+        ? Promise.resolve()
+        : Promise.reject(new Refusal(403, "paidPlanRequired"));
+    },
+  };
+});
+
 const { actionFor, limitedPublicAction } = await import("./client");
+
+const premiumOnly = actionFor("member", { feature: "premium" }).action(() =>
+  Promise.resolve({ done: true }),
+);
 
 const limited = actionFor("member", {
   rateLimit: { name: "test", limit: 1, windowSeconds: 60 },
@@ -60,6 +77,8 @@ beforeEach(() => {
   session.role = null;
   limits.over = false;
   limits.subjects.length = 0;
+  plan.granted = true;
+  plan.asked.length = 0;
 });
 
 describe("server actions", () => {
@@ -104,6 +123,19 @@ describe("server actions", () => {
   it("check the role before counting, so a refused visitor never spends the limit", async () => {
     expect((await limited())?.serverError).toMatchObject({ status: 401 });
     expect(limits.subjects).toEqual([]);
+  });
+
+  it("ask the plan for the feature after the role, and refuse when it is not granted", async () => {
+    expect((await premiumOnly())?.serverError).toMatchObject({ status: 401 });
+    expect(plan.asked).toEqual([]);
+    session.role = "member";
+    expect((await premiumOnly())?.data).toEqual({ done: true });
+    plan.granted = false;
+    expect((await premiumOnly())?.serverError).toMatchObject({
+      status: 403,
+      key: "paidPlanRequired",
+    });
+    expect(plan.asked).toEqual(["u1:premium", "u1:premium"]);
   });
 
   it("never expose an unexpected error", async () => {

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
-import { grantsAccess, readPlan } from "@/lib/billing/service";
+import { entitlementsFor, readPlan } from "@/lib/billing/service";
 import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { billingFixture } from "./billing-fixture";
 import { testDatabase } from "./database";
@@ -8,6 +8,8 @@ import { createUser } from "./factories";
 import { checkoutCompleted, invoiceEvent, subscriptionDeleted } from "./stripe-events";
 
 const db = testDatabase();
+const premium = async (userId: string) =>
+  (await entitlementsFor(db, { kind: "user", id: userId }, new Date())).features.has("premium");
 const { deliver, subscriber } = billingFixture(db);
 
 describe("a purchase", () => {
@@ -15,7 +17,7 @@ describe("a purchase", () => {
     const user = await createUser(db, "ana@example.com");
     const plan = await readPlan(db, user.id);
     expect(plan).toMatchObject({ tier: "free", status: "active", billingInterval: null });
-    expect(grantsAccess(plan)).toBe(false);
+    expect(await premium(user.id)).toBe(false);
   });
 
   it("makes a subscription checkout a paid plan with the customer and subscription kept", async () => {
@@ -125,7 +127,7 @@ describe("a payment that fails", () => {
     await deliver(invoiceEvent("evt_f", "invoice.payment_failed", `sub_${user.id}`));
     const late = await readPlan(db, user.id);
     expect(late).toMatchObject({ tier: "paid", status: "past_due" });
-    expect(grantsAccess(late)).toBe(true);
+    expect(await premium(user.id)).toBe(true);
 
     await deliver(invoiceEvent("evt_ok", "invoice.payment_succeeded", `sub_${user.id}`));
     expect((await readPlan(db, user.id))?.status).toBe("active");
@@ -139,7 +141,7 @@ describe("a payment that fails", () => {
       billingInterval: null,
       providerSubscriptionId: null,
     });
-    expect(grantsAccess(ended)).toBe(false);
+    expect(await premium(user.id)).toBe(false);
   });
 
   it("leaves a lifetime plan alone when an old invoice fails", async () => {

@@ -13,6 +13,7 @@ import {
 } from "@/components/patterns/list-controls";
 import { ListEmpty } from "@/components/patterns/list-states";
 import { Stamp } from "@/components/ui/stamp";
+import { isPaidTier, tierNames } from "@/domain/billing/entitlements";
 import type { AdminViewer } from "@/lib/admin/guard";
 import { queryUsers, type UserRow } from "@/lib/admin/users";
 import { formatInstantDate } from "@/lib/date";
@@ -20,14 +21,12 @@ import { db } from "@/lib/db/client";
 import { userRole } from "@/lib/db/schema/users";
 import { listParsers } from "@/lib/list-params";
 
-const planTiers = ["free", "paid"] as const;
-
 const searchParamsCache = createSearchParamsCache({
   ...listParsers,
   sort: parseAsStringLiteral(["date", "name", "email", "role"] as const).withDefault("date"),
   dir: parseAsStringLiteral(["asc", "desc"] as const).withDefault("desc"),
   role: parseAsStringLiteral(userRole.enumValues),
-  plan: parseAsStringLiteral(planTiers),
+  plan: parseAsStringLiteral(tierNames),
 });
 
 const sortChoices = [
@@ -68,7 +67,7 @@ export async function UsersList({
       header: t("plan"),
       kind: "status",
       cell: (row) => (
-        <Stamp tone={row.tier === "paid" ? "done" : "neutral"}>
+        <Stamp tone={isPaidTier(row.tier) ? "done" : "neutral"}>
           {row.courtesy ? plans("courtesy") : plans(row.tier)}
         </Stamp>
       ),
@@ -104,7 +103,7 @@ export async function UsersList({
           param="plan"
           label={t("planFilter")}
           allLabel={t("allPlans")}
-          choices={planTiers.map((value) => ({ value, label: plans(value) }))}
+          choices={tierNames.map((value) => ({ value, label: plans(value) }))}
         />
         <ListSort
           label={t("sortBy")}

@@ -1,4 +1,6 @@
 import { and, asc, count, desc, eq, or } from "drizzle-orm";
+import { catalog } from "@/domain/billing/catalog";
+import { isPaidTier } from "@/domain/billing/entitlements";
 import type { Actor } from "@/lib/accounts/actor";
 import { recordStaffWrite } from "@/lib/accounts/audit";
 import { type DeletionSteps, deleteAccount } from "@/lib/accounts/delete";
@@ -125,13 +127,13 @@ export async function grantCourtesy(
 ): Promise<void> {
   await db.transaction(async (tx) => {
     const plan = await lockPlan(tx, userId);
-    if (plan.tier === "paid") {
+    if (isPaidTier(plan.tier)) {
       throw new DomainError(409, "alreadyPaid");
     }
     await tx
       .update(plans)
       .set({
-        tier: "paid",
+        tier: catalog.paidTier,
         status: "active",
         billingInterval: "lifetime",
         cancelAtPeriodEnd: false,
@@ -153,7 +155,7 @@ export async function grantCourtesy(
 export async function revokeCourtesy(db: Database, actor: Actor, userId: string): Promise<void> {
   await db.transaction(async (tx) => {
     const plan = await lockPlan(tx, userId);
-    if (plan.tier !== "paid" || !isCourtesy(plan)) {
+    if (!(isPaidTier(plan.tier) && isCourtesy(plan))) {
       throw new DomainError(409);
     }
     await tx
@@ -188,7 +190,7 @@ export async function refundLastPayment(
   if (plan === undefined) {
     throw new DomainError(404);
   }
-  if (plan.tier !== "paid" || isCourtesy(plan)) {
+  if (!isPaidTier(plan.tier) || isCourtesy(plan)) {
     throw new DomainError(409, "nothingToRefund");
   }
   if (plan.providerCustomerId === null) {

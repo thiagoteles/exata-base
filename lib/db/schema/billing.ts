@@ -1,9 +1,11 @@
 import { sql } from "drizzle-orm";
 import { boolean, check, index, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
+import { tierNames } from "@/domain/billing/entitlements";
 import { createdAt, instant, updatedAt } from "../columns";
 import { authoredBy, ownedBy } from "./user-references";
 
-export const planTier = pgEnum("plan_tier", ["free", "paid"]);
+// The tiers come from the catalog, so the database refuses a tier the product does not sell.
+export const planTier = pgEnum("plan_tier", tierNames);
 export const planStatus = pgEnum("plan_status", [
   "active",
   "canceled",

@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { compareCatalogs } from "../lib/i18n/catalog-compare";
-import { defaultLocale, locales } from "../lib/i18n/locales";
+import { reportCatalog } from "../lib/i18n/catalog-report";
+import { defaultLocale, isComplete, locales } from "../lib/i18n/locales";
 
 /*
- * Every language on the list must have a catalog with exactly the keys and arguments of the default
- * one. The root layout must also match the list: with several languages the page renders per
- * request, which the layout declares with `export const instant = false`; with one it declares nothing.
+ * Every complete language on the list must have a catalog with exactly the keys and arguments of the
+ * default one; one that is not complete may miss keys, which are reported with how much is left.
+ * The root layout must also match the list: with several languages the page renders per request, which the layout declares with `export const instant = false`; with one it declares nothing.
  */
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -18,8 +18,16 @@ const base = JSON.parse(read(`messages/${defaultLocale}.json`)) as Record<string
 for (const locale of locales.filter((candidate) => candidate !== defaultLocale)) {
   try {
     const other = JSON.parse(read(`messages/${locale}.json`)) as Record<string, never>;
-    for (const problem of compareCatalogs(base, other)) {
-      problems.push(`messages/${locale}.json: ${problem}`);
+    const report = reportCatalog({
+      locale,
+      defaultLocale,
+      complete: isComplete(locale),
+      base,
+      other,
+    });
+    problems.push(...report.problems);
+    for (const note of report.notes) {
+      process.stdout.write(`${note}\n`);
     }
   } catch {
     problems.push(

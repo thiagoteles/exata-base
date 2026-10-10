@@ -21,7 +21,7 @@ import { canBuy, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { publicHref } from "@/lib/i18n/public-paths";
-import { formatPrice, toCents } from "@/lib/money";
+import { formatMoney, toCents } from "@/lib/money";
 import { getCurrentUser } from "@/lib/ports/auth";
 import { offeredIntervals, readPrices } from "@/lib/ports/payment";
 import type { Interval, PriceTag } from "@/lib/ports/payment/types";
@@ -192,7 +192,7 @@ async function Offers({ searchParams }: { searchParams: Promise<{ source?: strin
         {
           id: interval,
           name: t(`names.${interval}`),
-          price: formatPrice(toCents(inCurrency(price).cents), inCurrency(price).currency),
+          price: formatMoney(toCents(inCurrency(price).cents), inCurrency(price).currency),
           unit: t(unitKey[interval]),
           highlighted: interval === highlighted,
           ...(note === undefined ? {} : { note }),

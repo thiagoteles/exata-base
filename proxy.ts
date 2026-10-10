@@ -3,9 +3,9 @@ import { currentInstant } from "@/domain/clock";
 import { readReferralCode } from "@/domain/referral/rules";
 import { accessRecord } from "@/lib/access-log";
 import { env } from "@/lib/env";
-import { isMultilingual, LOCALE_HEADER } from "@/lib/i18n/locales";
+import { defaultLocale, isMultilingual, LOCALE_HEADER } from "@/lib/i18n/locales";
 import { decideLanguage, redirectToLanguage, rememberLocale } from "@/lib/i18n/proxy";
-import { internalPathOf, publicPathOf } from "@/lib/i18n/public-paths";
+import { servedAddress } from "@/lib/i18n/public-paths";
 import { isMissingPage } from "@/lib/known-pages";
 import { authProxy } from "@/lib/ports/auth/proxy";
 import { logger } from "@/lib/ports/log";
@@ -46,12 +46,13 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   const unprefixed = decision?.pathname ?? visible;
   const prefix = visible.slice(0, visible.length - unprefixed.length);
 
-  // A route address that has a public twin is sent there, so only one address is indexed. Only
-  // page loads move; a form posted to the old address is still answered where it was sent.
-  const twin = publicPathOf(unprefixed);
+  // Each page has one address per language, so only one is indexed: the route address moves to the
+  // Portuguese one in the default language, and the Portuguese one moves to the route address in
+  // another. Only page loads move; a form posted to the old address is still answered where it was sent.
+  const address = servedAddress(unprefixed, decision === null || decision.locale === defaultLocale);
   const isPageLoad = request.method === "GET" || request.method === "HEAD";
-  if (twin !== null && isPageLoad && !request.headers.has(REWRITTEN_HEADER)) {
-    const target = new URL(`${prefix}${twin}`, env.APP_URL);
+  if (address.redirectTo !== null && isPageLoad && !request.headers.has(REWRITTEN_HEADER)) {
+    const target = new URL(`${prefix}${address.redirectTo}`, env.APP_URL);
     target.search = request.nextUrl.search;
     return NextResponse.redirect(target, PERMANENT);
   }
@@ -59,7 +60,7 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   // The routes are written in English and without a language prefix: a public or prefixed address
   // is served from its route, and the auth guard below sees that route address.
   const clean = new URL(request.url);
-  clean.pathname = internalPathOf(unprefixed) ?? unprefixed;
+  clean.pathname = address.route;
   // A dynamic page that does not exist is sent where no route matches, so Next answers its
   // not-found page with a real 404 instead of a 200 shell that later says "not found".
   if (isMissingPage(clean.pathname)) {

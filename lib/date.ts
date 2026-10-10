@@ -1,11 +1,11 @@
 import { dateInZone as calendarDate } from "@/domain/calendar";
-import { timeZone } from "@/lib/i18n/locales";
+import { defaultLocale, timeZone } from "@/lib/i18n/locales";
 
 /*
  * Two kinds of time. A calendar date (a birthday, a due date) is an ISO `YYYY-MM-DD` string with
  * no time zone. An instant is a Date stored as timestamptz and shown in a time zone: the person's
  * when the screen is theirs, America/Sao_Paulo otherwise.
- * Both are written `dd/mm/aaaa` on screen.
+ * Both are written `dd/mm/aaaa` on screen in the default language, and in the form of the language otherwise.
  */
 
 declare const isoDateBrand: unique symbol;
@@ -34,9 +34,16 @@ export function parseDate(input: string): IsoDate | null {
   return `${year}-${month}-${day}` as IsoDate;
 }
 
-export function formatDate(value: IsoDate): string {
+/** A calendar date written for a language: `dd/mm/aaaa` in the default one, the language's own short form elsewhere. */
+export function formatDate(value: IsoDate, locale: string = defaultLocale): string {
   const [, year = "", month = "", day = ""] = iso.exec(value) ?? [];
-  return `${day}/${month}/${year}`;
+  if (locale === defaultLocale) {
+    return `${day}/${month}/${year}`;
+  }
+  // The date has no zone, so it is formatted in UTC from midnight UTC and never moves a day.
+  return new Intl.DateTimeFormat(locale, { dateStyle: "short", timeZone: "UTC" }).format(
+    new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))),
+  );
 }
 
 /** The calendar date an instant falls on in a time zone, the product's own unless one is given. */
@@ -49,7 +56,11 @@ export function dateInSaoPaulo(instant: Date): IsoDate {
   return dateInZone(instant, timeZone);
 }
 
-/** An instant written as `dd/mm/aaaa`, in the person's time zone when the screen knows it. */
-export function formatInstantDate(instant: Date, zone: string = timeZone): string {
-  return formatDate(dateInZone(instant, zone));
+/** An instant written as a date, in the person's time zone when the screen knows it and in their language. */
+export function formatInstantDate(
+  instant: Date,
+  zone: string = timeZone,
+  locale: string = defaultLocale,
+): string {
+  return formatDate(dateInZone(instant, zone), locale);
 }

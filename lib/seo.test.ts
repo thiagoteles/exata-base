@@ -13,6 +13,26 @@ describe("sitemap", () => {
   });
 });
 
+describe("sitemap in more than one language", () => {
+  const entries = sitemapFor("https://app.test", [], ["pt-BR", "en-US"]);
+
+  it("lists each page once per language, in that language's own address", () => {
+    const urls = entries.map((entry) => entry.url);
+    expect(urls).toHaveLength(publicRoutes.length * 2);
+    expect(urls).toContain("https://app.test/contato");
+    expect(urls).toContain("https://app.test/en/contact");
+    expect(urls).not.toContain("https://app.test/en/contato");
+  });
+
+  it("names the other forms of each page, the same set on every entry of that page", () => {
+    const contact = entries.find((entry) => entry.url === "https://app.test/en/contact");
+    expect(contact?.alternates?.languages).toEqual({
+      "pt-BR": "https://app.test/contato",
+      "en-US": "https://app.test/en/contact",
+    });
+  });
+});
+
 describe("robots", () => {
   it("closes the whole site outside production", () => {
     expect(robotsFor("https://app.test", false)).toEqual({

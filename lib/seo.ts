@@ -1,22 +1,38 @@
 import type { MetadataRoute } from "next";
-import { publicPathOf } from "./i18n/public-paths";
+import { defaultLocale, locales } from "./i18n/locales";
+import { addressInLocale } from "./i18n/public-paths";
 import { publicRoutes } from "./public-routes";
 import { protectedPrefixes } from "./routes";
 import type { SitemapEntry } from "./sitemap-sources";
 
-/** The sitemap: one absolute URL per public page, fixed pages first, then each source's. */
+/**
+ * The sitemap: one absolute URL per public page, fixed pages first, then each source's. With more
+ * than one language every page is listed in each, and each entry names its other-language forms.
+ */
 export function sitemapFor(
   appUrl: string,
   fromSources: readonly SitemapEntry[] = [],
+  languages: readonly string[] = locales,
 ): MetadataRoute.Sitemap {
   const entries: readonly SitemapEntry[] = [
     ...publicRoutes.map((path) => ({ path })),
     ...fromSources,
   ];
-  return entries.map(({ path, lastModified }) => ({
-    url: new URL(publicPathOf(path) ?? path, appUrl).toString(),
-    ...(lastModified === undefined ? {} : { lastModified }),
-  }));
+  const absolute = (path: string, language: string) =>
+    new URL(addressInLocale(path, language), appUrl).toString();
+  return entries.flatMap(({ path, lastModified }) =>
+    (languages.length > 1 ? languages : [defaultLocale]).map((language) => ({
+      url: absolute(path, language),
+      ...(lastModified === undefined ? {} : { lastModified }),
+      ...(languages.length > 1
+        ? {
+            alternates: {
+              languages: Object.fromEntries(languages.map((each) => [each, absolute(path, each)])),
+            },
+          }
+        : {}),
+    })),
+  );
 }
 
 const privateAreas = [...protectedPrefixes, "/api/", "/storage/", "/health"];

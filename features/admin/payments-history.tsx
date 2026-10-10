@@ -3,7 +3,7 @@ import { Stamp, type StampTone } from "@/components/ui/stamp";
 import { isWithinWithdrawal, withdrawalEndsAt } from "@/domain/billing/withdrawal";
 import type { Payment } from "@/lib/billing/payments";
 import { formatInstantDate } from "@/lib/date";
-import { formatPrice, toCents } from "@/lib/money";
+import { formatMoney, toCents } from "@/lib/money";
 
 const statusTone: Record<Payment["status"], StampTone> = {
   paid: "success",
@@ -54,7 +54,7 @@ export async function PaymentsHistory({ payments, now }: { payments: Payment[]; 
                   {formatInstantDate(payment.paidAt)}
                 </td>
                 <td className="pe-4 text-right font-mono text-data tabular-nums">
-                  {formatPrice(toCents(payment.amountCents), payment.currency)}
+                  {formatMoney(toCents(payment.amountCents), payment.currency)}
                 </td>
                 <td className="pe-4 text-body">{t(`methods.${methodKey(payment.method)}`)}</td>
                 <td>

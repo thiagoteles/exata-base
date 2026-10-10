@@ -22,7 +22,7 @@ import { isCourtesy, type Plan, readPlan, subscriptionOf } from "@/lib/billing/s
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
 import { publicHref } from "@/lib/i18n/public-paths";
-import { formatPrice, toCents } from "@/lib/money";
+import { formatMoney, toCents } from "@/lib/money";
 import { requirePageRole } from "@/lib/page-guard";
 import { paymentGateway } from "@/lib/ports/payment";
 import { resolvePreferences } from "@/lib/preferences/resolve";
@@ -176,7 +176,7 @@ async function Receipts({ userId, timeZone }: { userId: string; timeZone: string
           >
             <div className="flex min-w-0 flex-col gap-0.5">
               <p className="text-field-label text-ink">
-                {formatPrice(toCents(payment.amountCents), payment.currency)}
+                {formatMoney(toCents(payment.amountCents), payment.currency)}
               </p>
               <p className="text-body-small text-ink-muted">
                 {t("paidOn", { date: formatInstantDate(payment.paidAt, timeZone) })}

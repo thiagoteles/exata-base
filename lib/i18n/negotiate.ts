@@ -81,7 +81,7 @@ export function stripLocalePrefix(pathname: string): string {
 }
 
 /** The address of `pathname` (clean) in a language: the default one has no prefix. */
-export function pathInLocale(pathname: string, locale: Locale): string {
+export function pathInLocale(pathname: string, locale: string): string {
   if (locale === defaultLocale) {
     return pathname;
   }

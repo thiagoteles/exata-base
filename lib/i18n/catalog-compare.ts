@@ -29,23 +29,64 @@ function flatten(catalog: Catalog, prefix = ""): Map<string, string> {
   return entries;
 }
 
-/** What is wrong with `other` compared with `base`, as readable lines. Empty means they match. */
-export function compareCatalogs(base: Catalog, other: Catalog): string[] {
+export type CatalogDifferences = {
+  /** Keys the default has and the other lacks. */
+  missing: string[];
+  /** Keys both have whose ICU arguments differ. */
+  mismatched: string[];
+  /** Keys the other has and the default lacks. */
+  extra: string[];
+};
+
+export function differences(base: Catalog, other: Catalog): CatalogDifferences {
   const left = flatten(base);
   const right = flatten(other);
-  const problems: string[] = [];
+  const found: CatalogDifferences = { missing: [], mismatched: [], extra: [] };
   for (const [key, message] of left) {
     const translated = right.get(key);
     if (translated === undefined) {
-      problems.push(`missing key: ${key}`);
+      found.missing.push(key);
     } else if (messageArguments(message).join() !== messageArguments(translated).join()) {
-      problems.push(`different arguments in: ${key}`);
+      found.mismatched.push(key);
     }
   }
   for (const key of right.keys()) {
     if (!left.has(key)) {
-      problems.push(`extra key: ${key}`);
+      found.extra.push(key);
     }
   }
-  return problems;
+  return found;
+}
+
+/** What is wrong with `other` compared with `base`, as readable lines. Empty means they match. */
+export function compareCatalogs(base: Catalog, other: Catalog): string[] {
+  const { missing, mismatched, extra } = differences(base, other);
+  return [
+    ...missing.map((key) => `missing key: ${key}`),
+    ...mismatched.map((key) => `different arguments in: ${key}`),
+    ...extra.map((key) => `extra key: ${key}`),
+  ];
+}
+
+export type Progress = {
+  total: number;
+  translated: number;
+  /** Missing keys counted by area, the first segment of the key, most missing first. */
+  missingByArea: [string, number][];
+};
+
+/** How much of the default catalog another language already has. */
+export function translationProgress(base: Catalog, other: Catalog): Progress {
+  const total = flatten(base).size;
+  const { missing } = differences(base, other);
+  const byArea = new Map<string, number>();
+  for (const key of missing) {
+    const area = key.split(".")[0] ?? key;
+    byArea.set(area, (byArea.get(area) ?? 0) + 1);
+  }
+  return {
+    total,
+    translated: total - missing.length,
+    missingByArea: [...byArea].sort(([, a], [, b]) => b - a),
+  };
 }

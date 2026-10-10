@@ -11,7 +11,7 @@ import { db } from "@/lib/db/client";
 import { receiptFacts } from "@/lib/documents/receipts";
 import { readDocument } from "@/lib/documents/slug";
 import { env } from "@/lib/env";
-import { formatPrice, toCents } from "@/lib/money";
+import { formatMoney, toCents } from "@/lib/money";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("verify");
@@ -56,7 +56,7 @@ async function Verification({ params }: { params: PageProps<"/verify/[slug]">["p
           <span className="font-mono text-data">{receiptNumber(facts.id)}</span>
         </RecordCell>
         <RecordCell label={t("amount")}>
-          {formatPrice(toCents(facts.amountCents), facts.currency)}
+          {formatMoney(toCents(facts.amountCents), facts.currency)}
         </RecordCell>
         <RecordCell label={t("date")}>
           <span className="font-mono text-data tabular-nums">

@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { formatBRL, formatPrice, parseBRL, toCents } from "./money";
+import { formatBRL, formatMoney, parseBRL, toCents } from "./money";
 
 const cents = fc.integer({ min: -1e15, max: 1e15 }).map(toCents);
 
@@ -32,10 +32,18 @@ describe("money in cents", () => {
   });
 });
 
-describe("formatPrice", () => {
+describe("formatMoney", () => {
   it("writes reais the way the rest of the app does, and other currencies with Intl", () => {
-    expect(formatPrice(toCents(2990), "brl")).toBe(formatBRL(toCents(2990)));
-    expect(formatPrice(toCents(1000), "usd")).toContain("10,00");
-    expect(formatPrice(toCents(1000), "usd")).toContain("US$");
+    expect(formatMoney(toCents(2990), "brl")).toBe(formatBRL(toCents(2990)));
+    expect(formatMoney(toCents(1000), "usd")).toContain("10,00");
+    expect(formatMoney(toCents(1000), "usd")).toContain("US$");
+  });
+});
+
+describe("money in another language", () => {
+  it("keeps the app's own reais in the default language and uses the language's form elsewhere", () => {
+    expect(formatMoney(toCents(123_456), "brl", "pt-BR")).toBe(formatBRL(toCents(123_456)));
+    expect(formatMoney(toCents(123_456), "usd", "en-US")).toBe("$1,234.56");
+    expect(formatMoney(toCents(123_456), "brl", "en-US")).toBe("R$1,234.56");
   });
 });

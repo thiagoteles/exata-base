@@ -22,7 +22,7 @@ import { listApiTokens } from "@/lib/api/tokens";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { isMultilingual } from "@/lib/i18n/locales";
-import { formatPrice, toCents } from "@/lib/money";
+import { formatMoney, toCents } from "@/lib/money";
 import { readOnboarding } from "@/lib/onboarding/service";
 import { requirePageRole } from "@/lib/page-guard";
 import { sessionAccess } from "@/lib/ports/auth";
@@ -114,7 +114,7 @@ async function AccountContent() {
           {earned > 0 ? (
             <p className="text-body text-ink">
               {t("referral.earned", {
-                amount: formatPrice(toCents(earned), catalog.currencies.default),
+                amount: formatMoney(toCents(earned), catalog.currencies.default),
               })}
             </p>
           ) : null}

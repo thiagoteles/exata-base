@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { dateInSaoPaulo, formatDate, formatInstantDate, parseDate } from "./date";
+import { dateInSaoPaulo, formatDate, formatInstantDate, type IsoDate, parseDate } from "./date";
 
 const HOUR = 3_600_000;
 const SAO_PAULO_OFFSET = -3 * HOUR;
@@ -58,5 +58,18 @@ describe("instants in America/Sao_Paulo", () => {
     expect(formatInstantDate(instant, "Asia/Tokyo")).toBe("01/01/2025");
     expect(formatInstantDate(instant, "America/Sao_Paulo")).toBe("31/12/2024");
     expect(formatInstantDate(instant, "UTC")).toBe("01/01/2025");
+  });
+});
+
+describe("dates in another language", () => {
+  it("keep dd/mm/aaaa in the default language and follow the language's short form elsewhere", () => {
+    expect(formatDate("2025-01-31" as IsoDate, "pt-BR")).toBe("31/01/2025");
+    expect(formatDate("2025-01-31" as IsoDate, "en-US")).toBe("1/31/25");
+  });
+
+  it("never move a day, whatever the language", () => {
+    expect(formatDate("2025-03-01" as IsoDate, "en-US")).toBe("3/1/25");
+    const instant = new Date("2025-01-01T02:30:00Z");
+    expect(formatInstantDate(instant, "America/Sao_Paulo", "en-US")).toBe("12/31/24");
   });
 });

@@ -11,7 +11,7 @@ import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
 import { withErrorResponse } from "@/lib/http";
 import { publicHref } from "@/lib/i18n/public-paths";
-import { formatPrice, toCents } from "@/lib/money";
+import { formatMoney, toCents } from "@/lib/money";
 import { requireUser } from "@/lib/ports/auth";
 import { attachmentDisposition } from "@/lib/ports/storage/attachment";
 import { resolvePreferences } from "@/lib/preferences/resolve";
@@ -51,7 +51,7 @@ export const GET = timedRoute(
         values: {
           number,
           payer: user.name.trim() || user.email,
-          amount: formatPrice(toCents(facts.amountCents), facts.currency),
+          amount: formatMoney(toCents(facts.amountCents), facts.currency),
           date: formatInstantDate(facts.paidAt, resolvePreferences(user.options).timeZone),
           method: t(`methods.${method as "card" | "pix" | "boleto" | "unknown"}`),
         },

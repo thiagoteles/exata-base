@@ -3,8 +3,7 @@ import { connection } from "next/server";
 import { getLocale } from "next-intl/server";
 import { env } from "@/lib/env";
 import { defaultLocale, isLocale, isMultilingual, type Locale, locales } from "@/lib/i18n/locales";
-import { pathInLocale } from "@/lib/i18n/negotiate";
-import { publicPathOf } from "@/lib/i18n/public-paths";
+import { addressInLocale } from "@/lib/i18n/public-paths";
 
 /*
  * Next does not merge a page's partial `openGraph` with the layout's, so a page that sets its own
@@ -39,11 +38,10 @@ export async function buildSocialMetadata({
   index = true,
 }: SocialInput): Promise<Metadata> {
   await connection();
-  const visible = publicPathOf(path) ?? path;
   const asked = isMultilingual ? await getLocale() : defaultLocale;
   const locale = isLocale(asked) ? asked : defaultLocale;
   const absolute = (pathname: string) => new URL(pathname, env.APP_URL).toString();
-  const url = absolute(pathInLocale(visible, locale));
+  const url = absolute(addressInLocale(path, locale));
   const imageUrl = absolute(image ?? DEFAULT_IMAGE);
   return {
     title,
@@ -54,9 +52,9 @@ export async function buildSocialMetadata({
         ? {
             languages: {
               ...Object.fromEntries(
-                locales.map((each) => [each, absolute(pathInLocale(visible, each))]),
+                locales.map((each) => [each, absolute(addressInLocale(path, each))]),
               ),
-              "x-default": absolute(visible),
+              "x-default": absolute(addressInLocale(path, defaultLocale)),
             },
           }
         : {}),

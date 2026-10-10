@@ -3,6 +3,8 @@
  * Reais only exist on screen, formatted by `formatBRL` and read back by `parseBRL`.
  */
 
+import { defaultLocale } from "@/lib/i18n/locales";
+
 declare const centsBrand: unique symbol;
 export type Cents = number & { readonly [centsBrand]: true };
 
@@ -55,12 +57,19 @@ export function parseBRL(input: string): Cents | null {
   return toCents(negative ? -total : total);
 }
 
-/** A price as the payment provider reports it, in the currency it was set in. */
-export function formatPrice(cents: Cents, currency: string): string {
-  if (currency.toLowerCase() === "brl") {
+/**
+ * An amount in a currency, written for a language. In the default language reais keep the app's own
+ * format; any other pair is Intl's, so `en-US` reads `$10.00` and `R$1,234.56`.
+ */
+export function formatMoney(
+  cents: Cents,
+  currency: string,
+  locale: string = defaultLocale,
+): string {
+  if (locale === defaultLocale && currency.toLowerCase() === "brl") {
     return formatBRL(cents);
   }
-  return new Intl.NumberFormat("pt-BR", {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format(cents / CENTS_PER_REAL);

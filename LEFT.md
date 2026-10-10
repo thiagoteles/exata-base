@@ -125,7 +125,7 @@ Tudo aqui se prova como a base já faz: eventos do Stripe assinados à mão e li
 ### F9. Fechamento
 
 - [ ] **F9.1 Retenção do backup no `setup:product`.** A pergunta, e o valor escrito no README e na política de privacidade. *Infraestrutura, item 3.*
-- [ ] **F9.2 SRI.** Prova em branch descartável do `experimental.sri` do Next com a casca estática. Se funcionar sem renderização dinâmica, ligar; se não, registrar por quê. *Infraestrutura, item 2.*
+- [x] **F9.2 SRI.** (provado: a casca fica estática, mas só 8 de 25 scripts levam hash; não ligado, motivo no `BASE.md`, seção 5) Prova em branch descartável do `experimental.sri` do Next com a casca estática. Se funcionar sem renderização dinâmica, ligar; se não, registrar por quê. *Infraestrutura, item 2.*
 - [ ] **F9.3 Relatório final.** `pnpm verify` verde; o que sobrou de "Depende de você" e "Fora do loop" vai para uma seção "Pendências externas" do `BASE.md`; este arquivo é apagado num commit próprio (`chore: remove the work list`).
 
 ## Fora do loop

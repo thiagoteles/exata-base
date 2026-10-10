@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
@@ -27,7 +27,10 @@ export default function ContactPage({ params }: PageProps<"/staff/contacts/[id]"
 
 async function Record({ params }: Pick<PageProps<"/staff/contacts/[id]">, "params">) {
   const { id } = await params;
-  const t = await getTranslations("inbox");
+  const [t, printing] = await Promise.all([
+    getTranslations("inbox"),
+    getTranslations("print.contact"),
+  ]);
   const user = await requirePageRole("staff", `/staff/contacts/${id}`);
   const message = await getContact(db, user, "all", id);
   if (message === null) {
@@ -35,7 +38,13 @@ async function Record({ params }: Pick<PageProps<"/staff/contacts/[id]">, "param
   }
   return (
     <>
-      <PageHeader title={message.name} subtitle={t("title")} />
+      <PageHeader
+        title={message.name}
+        subtitle={t("title")}
+        actions={[
+          { key: "print", label: printing("action"), href: `/print/contacts/${id}` as Route },
+        ]}
+      />
       <ContactRecord
         message={message}
         canManage

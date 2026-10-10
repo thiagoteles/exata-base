@@ -29,7 +29,7 @@ export function BottomBar({ items, more, label, moreLabel, moreTitle }: BottomBa
   return (
     <nav
       aria-label={label}
-      className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >
       {items.map((item) => {
         const current = isCurrent(pathname, item.href, item.exact);

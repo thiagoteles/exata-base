@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 export function PublicHeader({ actions }: { actions: ReactNode }) {
   const t = useTranslations();
   return (
-    <header className="border-b border-line bg-surface">
+    <header className="border-b border-line bg-surface print:hidden">
       <div className="mx-auto flex h-bar w-full max-w-310 items-center justify-between gap-4 px-4 md:px-8">
         <Link
           href="/"

@@ -10,6 +10,8 @@ import { isSerif, parseDesign } from "./tokens/preset";
  */
 
 const TOKEN_FILE = "styles/tokens.css";
+// Written by the same generator from the same palette: the print sheet needs the colors as values.
+const GENERATED_COLOR_FILES = new Set([TOKEN_FILE, "styles/print.css"]);
 
 const STOCK_PALETTE = [
   ...["slate", "gray", "zinc", "neutral", "stone", "mauve", "olive", "mist", "taupe"],
@@ -120,7 +122,9 @@ const isTest = (file: string) => testFile.test(file);
 const sourceFiles = globSync("**/*.{ts,tsx,mts}").filter(
   (file) => !(ignored(file) || isTest(file)),
 );
-const cssFiles = globSync("**/*.css").filter((file) => !ignored(file) && file !== TOKEN_FILE);
+const cssFiles = globSync("**/*.css").filter(
+  (file) => !(ignored(file) || GENERATED_COLOR_FILES.has(file)),
+);
 
 const findings = [
   ...sourceFiles.flatMap((file) => {

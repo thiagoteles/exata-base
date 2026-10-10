@@ -22,6 +22,7 @@ import {
   renderFrontmatterColors,
   renderPaletteNames,
   renderPresetTables,
+  renderPrintCss,
   renderTokensCss,
   replaceBetween,
 } from "./tokens/render";
@@ -118,6 +119,7 @@ const outputs: ReadonlyArray<readonly [string, string]> = [
     ),
   ],
   ["styles/preset.css", renderPresetCss(preset, choices)],
+  ["styles/print.css", renderPrintCss(light.palette)],
   ["app/fonts.ts", renderFonts(choices)],
   ["lib/typeface.ts", renderTypeface(choices)],
   ["lib/accents.ts", renderAccentNames(accents.map((a) => a.name))],

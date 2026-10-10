@@ -5,7 +5,7 @@
 
 const SIGN_IN_PATH = "/sign-in";
 
-export const protectedPrefixes = ["/account", "/staff", "/admin", "/catalog"] as const;
+export const protectedPrefixes = ["/account", "/staff", "/admin", "/catalog", "/print"] as const;
 
 export function isProtectedPath(pathname: string): boolean {
   return protectedPrefixes.some(

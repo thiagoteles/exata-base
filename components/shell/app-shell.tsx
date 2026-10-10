@@ -20,14 +20,14 @@ export function AppShell({ sidebar, bottomBar, userMenu, children }: AppShellPro
   const t = useTranslations();
   const contentId = useId();
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh flex-col print:block print:h-auto">
       <a
         href={`#${contentId}`}
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-action focus:px-4 focus:py-3 focus:text-on-action"
       >
         {t("nav.skip")}
       </a>
-      <header className="flex h-bar shrink-0 items-center justify-between border-b border-line bg-surface px-4 md:px-8">
+      <header className="flex h-bar shrink-0 items-center justify-between border-b border-line bg-surface px-4 md:px-8 print:hidden">
         <Link
           href="/"
           className="text-block-title text-ink focus-visible:outline-2 focus-visible:outline-focus"
@@ -36,8 +36,8 @@ export function AppShell({ sidebar, bottomBar, userMenu, children }: AppShellPro
         </Link>
         {userMenu}
       </header>
-      <div className="flex min-h-0 flex-1">
-        <aside className="hidden w-sidebar shrink-0 overflow-y-auto border-r border-line bg-surface lg:block">
+      <div className="flex min-h-0 flex-1 print:block">
+        <aside className="hidden w-sidebar shrink-0 overflow-y-auto border-r border-line bg-surface lg:block print:hidden">
           {sidebar}
         </aside>
         {/* Only the content scrolls, so it is a tab stop: a page with no link or button of its own
@@ -46,7 +46,7 @@ export function AppShell({ sidebar, bottomBar, userMenu, children }: AppShellPro
           id={contentId}
           // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrolling region must take focus to scroll by keyboard
           tabIndex={0}
-          className="min-w-0 flex-1 overflow-y-auto px-4 pt-8 pb-24 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus md:px-8 lg:pb-8"
+          className="min-w-0 flex-1 overflow-y-auto px-4 pt-8 pb-24 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus md:px-8 lg:pb-8 print:overflow-visible print:p-0"
         >
           {children}
         </main>

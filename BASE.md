@@ -133,6 +133,12 @@ Eventos do Stripe tratados: ver a skill `new-payment-event`. Operações diária
 
 O QR do PDF aponta para `/verificar/[slug]` (rota `/verify/[slug]`, registrada em `lib/known-pages.ts`). O slug é `tipo:id` assinado com `DOCUMENT_SECRET` (`lib/documents/slug.ts`, com um propósito próprio na assinatura): endereço forjado dá 404 de verdade, e nada fica guardado. A página lê o registro como ele está agora e não diz de quem é; um recibo de pagamento devolvido ou contestado continua verdadeiro, mas a página avisa que o pagamento mudou. O recibo sai de `payments` em `/account/receipts/[id]` (só do próprio pagador, só com status pago), nunca é gravado, e a página do plano lista um por pagamento. O `pnpm verify` confere que a fonte está na imagem de produção e que um endereço forjado responde 404 lá.
 
+### 3.7 Impressão
+
+Por CSS o que se imprime na hora; por PDF (3.5) o que se guarda ou se verifica. `pnpm tokens` escreve `styles/print.css` (`renderPrintCss`): a folha (`--spacing-sheet`, `--spacing-sheet-margin`), o `@page` A4 com `counter(page) / counter(pages)` na margem de baixo (a cor vai em hex, porque caixa de margem não lê variável), a paleta clara para uma folha na tela (`data-paper`, tema claro forçado) e, em `@media print`, tinta sobre papel em toda página (fundos e lavados viram papel, linhas firmes). Grupo `app/(print)` com casca própria e a ficha de contato de exemplo em `/print/contacts/[id]`, com a mesma guarda e a mesma leitura da tela (`getContact`). As cascas (`AppShell`, cabeçalho e rodapé públicos, barra de baixo, cabeçalho de página) levam `print:hidden`; o `AppShell` também solta a altura e o scroll no papel. `components/print`: `Sheet`, `SheetHeader`, `SheetFooter`, `NoBreak`, `PrintTable` (cabeçalho repete, linhas não partem), `PrintBar`. Provado no Playwright com `emulateMedia` e `page.pdf()` (uma página, casca escondida) e à mão com uma ficha longa (5 páginas, `1/5` ... `5/5` no pé, lido com `pdftotext`).
+
+**Numeração de página:** funciona no Chromium (124+ com caixas de margem; provado aqui). O `page.pdf()` do Playwright só existe no Chromium, então Safari e Firefox não foram provados nesta base; pelo que se sabe, nenhum dos dois desenha caixas de margem (`@bottom-center`), e então a folha sai igual, só sem o número. Regra: o que precisa de número em qualquer navegador é PDF.
+
 ### O que existe
 
 Contas (cadastro, confirmação, recuperação, convite, exportar em ZIP, apagar com trilha), contato (formulário público, caixa da equipe, resposta por e-mail, mensagens do membro), cobrança Stripe (`/plans`, `/account/plan` com a data de renovação ou do fim do acesso vinda da fatura paga em `plans.current_period_end`, portal, cancelar no fim do período, vitalício sobre assinatura, reembolso, cortesia, inadimplente mantém acesso), admin (usuários, convites, auditoria), `/events` com a limpeza de convites, `/catalog` (vitrine, assistente de três passos, upload), erro do navegador em `/api/client-errors`, alarme do GCP em `ops/gcp` e `pnpm gcp:alerts`, compose de produção, workflow de CI desligado, `.mcp.json`.
@@ -175,6 +181,8 @@ Skills em `.claude/skills`: `new-table`, `new-list-and-record`, `new-action`, `n
 - **Deploy sem CI.** O Coolify observa a `main` e faz o deploy a cada push, sem passar por nenhuma Action. A barreira é o hook de `pre-push` (build e `check:prerender`) mais o `pnpm verify` antes de entregar uma fase; `--no-verify` é a única forma de pular.
 
 - **Peso do catálogo medido (2026-10-09).** O `tsc` do TS 7 leva cerca de 1,75 s com as 984 chaves de hoje e cerca de 1,8 s com 5 mil chaves a mais (catálogo sintético de 100 grupos de 50, medido duas vezes cada, nenhum erro). Não passa de 2× o atual, então nenhuma mitigação é necessária; se um produto passar de dezenas de milhares de chaves, o caminho é tipar só as chaves das áreas que o arquivo usa, e não o catálogo inteiro.
+
+- **Arquivo novo importado pelo `globals.css` com o compose de pé.** O cache persistente do Turbopack no volume `.next` guarda que o arquivo não existia, e o dev server passa a responder 500 em tudo ("Can't resolve '../styles/x.css'") mesmo com o arquivo no disco. Limpe o `.next` dentro do contêiner (`docker compose exec app sh -c 'rm -rf /app/.next/*'`) e reinicie.
 
 ## 6. Estado
 

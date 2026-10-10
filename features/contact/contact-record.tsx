@@ -68,7 +68,7 @@ export async function ContactRecord({
       </Panel>
 
       {canManage ? (
-        <Panel className="flex flex-col gap-6">
+        <Panel className="flex flex-col gap-6 print:hidden">
           <h2 className="text-block-title text-ink">{t("manage")}</h2>
           <StatusControl id={message.id} status={message.status} />
           {answered ? null : <ReplyForm id={message.id} email={message.email} />}

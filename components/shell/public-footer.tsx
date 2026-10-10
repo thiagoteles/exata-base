@@ -18,7 +18,7 @@ export function PublicFooter({
 }) {
   const t = useTranslations();
   return (
-    <footer className="border-t border-line">
+    <footer className="border-t border-line print:hidden">
       <div className="mx-auto flex w-full max-w-310 flex-col gap-2 px-4 py-8 text-body-small text-ink-muted md:flex-row md:items-center md:justify-between md:px-8">
         <p>{t("site.name")}</p>
         <nav aria-label={t("nav.footer")} className="flex flex-wrap gap-x-6 gap-y-2">

@@ -1148,6 +1148,10 @@
       "consequence": "As alterações que você fez nesta tela serão perdidas.",
       "leave": "Sair sem salvar",
       "stay": "Continuar editando"
+    },
+    "print": {
+      "back": "Voltar",
+      "print": "Imprimir"
     }
   },
   "plan": {
@@ -1277,6 +1281,13 @@
       "confirm": "Comprar vitalício",
       "cancel": "Voltar",
       "note": "Sua assinatura atual será cancelada na compra, sem crédito proporcional."
+    }
+  },
+  "print": {
+    "contact": {
+      "title": "Ficha de contato",
+      "footer": "Ficha {number}, impressa a partir da caixa de contatos.",
+      "action": "Imprimir ficha"
     }
   },
   "privacy": {

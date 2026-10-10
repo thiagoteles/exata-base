@@ -10,6 +10,10 @@
       "title": "Para que usamos os dados",
       "body": "Explique a finalidade de cada dado e a base legal prevista na LGPD."
     },
+    "backups": {
+      "title": "Cópias de segurança",
+      "body": "Fazemos uma cópia de segurança do banco de dados todos os dias e a guardamos por 7 dias. Quem apaga a conta deixa de existir nas cópias quando elas vencem, no máximo 7 dias depois."
+    },
     "rights": {
       "title": "Seus direitos",
       "body": "A pessoa pode baixar os próprios dados e apagar a conta a qualquer momento, na página da conta."

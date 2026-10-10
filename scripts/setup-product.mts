@@ -5,9 +5,11 @@ import process from "node:process";
 import { createInterface } from "node:readline/promises";
 import { parseArgs } from "node:util";
 import {
+  applyBackupReadme,
   applyCatalog,
   applyDesign,
   applyPackage,
+  applyPrivacy,
   applyReadme,
   type ProductInput,
   readCurrent,
@@ -38,7 +40,8 @@ import { parseDesign, presetNames } from "./tokens/preset";
  */
 
 const files = {
-  catalog: "messages/pt-BR.json",
+  site: "messages/pt-BR/site.json",
+  privacy: "messages/pt-BR/privacy.json",
   manifest: "package.json",
   readme: "README.md",
   designDoc: "DESIGN.md",
@@ -53,6 +56,7 @@ const { values: flags } = parseArgs({
     audience: { type: "string" },
     tone: { type: "string" },
     surfaces: { type: "string" },
+    "backup-days": { type: "string" },
     preset: { type: "string" },
     hue: { type: "string" },
     chroma: { type: "string" },
@@ -71,7 +75,7 @@ const design = JSON.parse(read(files.design)) as Record<string, unknown> & {
   brand: { hue: number; chroma: number };
   neutral: { offset: number };
 };
-const current = readCurrent(read(files.catalog), read(files.designDoc));
+const current = readCurrent(read(files.site), read(files.designDoc), read(files.readme));
 const interactive = !flags.yes && process.stdin.isTTY === true;
 
 async function ask(
@@ -114,7 +118,16 @@ const input: ProductInput = {
     flags.surfaces,
     current.surfaces,
   ),
+  backupDays: current.backupDays,
 };
+const backupDays = Number(
+  await ask(
+    prompt,
+    "Days to keep the daily database backup (the privacy policy promises the same)",
+    flags["backup-days"],
+    String(current.backupDays),
+  ),
+);
 const preset = await ask(
   prompt,
   `Visual preset (${presetNames.join(", ")}; see DESIGN.md, Preset)`,
@@ -147,7 +160,7 @@ const serviceProblems =
   Object.keys(flags.set ?? []).length > 0 || Object.keys(services).length > 0
     ? validateIntegrations(services)
     : [];
-const problems = [...validateProduct(input), ...serviceProblems];
+const problems = [...validateProduct({ ...input, backupDays }), ...serviceProblems];
 let seeds: ReturnType<typeof parseSeeds> | null = null;
 try {
   seeds = parseSeeds({ brand: { hue, chroma }, neutral: design.neutral });
@@ -165,9 +178,10 @@ if (problems.length > 0 || seeds === null) {
 }
 
 const today = new Date().toISOString().slice(0, 10);
-writeFileSync(files.catalog, applyCatalog(read(files.catalog), input));
+writeFileSync(files.site, applyCatalog(read(files.site), input));
+writeFileSync(files.privacy, applyPrivacy(read(files.privacy), backupDays));
 writeFileSync(files.manifest, applyPackage(read(files.manifest), input));
-writeFileSync(files.readme, applyReadme(read(files.readme), input));
+writeFileSync(files.readme, applyBackupReadme(applyReadme(read(files.readme), input), backupDays));
 writeFileSync(files.designDoc, applyDesign(read(files.designDoc), input, today));
 writeFileSync(
   files.design,
@@ -181,6 +195,8 @@ if (Object.keys(services).length > 0) {
 
 // The palette, both themes, the preset files, the fonts and the DESIGN.md tables follow design.json.
 run("pnpm", ["tokens"]);
+// The catalog the app reads is the join of the area files that were just edited.
+run("pnpm", ["messages"]);
 run("pnpm", ["exec", "biome", "format", "--write", ...Object.values(files)]);
 if (!flags["no-check"]) {
   run("pnpm", ["check"]);
@@ -188,8 +204,8 @@ if (!flags["no-check"]) {
 
 process.stdout.write(`
 Done. Still yours to write:
-- the home page copy (home.* in ${files.catalog}), still a placeholder
-- the terms and privacy text (terms.*, privacy.*), written for a generic product
+- the home page copy (messages/pt-BR/home.json), still a placeholder
+- the terms and privacy text (messages/pt-BR/terms.json and privacy.json), written for a generic product; the backup retention is already in the privacy text
 - production variables: see the README, section "Variables"
 ${
   Object.keys(services).length > 0

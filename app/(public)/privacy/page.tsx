@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PrivacyPage() {
   const t = await getTranslations("privacy");
-  const sections = (["collected", "use", "rights", "contact"] as const).map((key) => ({
+  const sections = (["collected", "use", "backups", "rights", "contact"] as const).map((key) => ({
     key,
     title: t(`sections.${key}.title`),
     body: t(`sections.${key}.body`),

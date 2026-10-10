@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyBackupReadme,
   applyCatalog,
   applyDesign,
   applyPackage,
+  applyPrivacy,
   applyReadme,
   type ProductInput,
   packageSlug,
@@ -16,6 +18,7 @@ const input: ProductInput = {
   audience: "Corretores e donos de imobiliárias",
   tone: "calm, direct, trustworthy",
   surfaces: "public site, member area, admin",
+  backupDays: 7,
 };
 
 const design = [
@@ -58,11 +61,9 @@ describe("the answers", () => {
 });
 
 describe("writing the files", () => {
-  it("sets the site name and description in the catalog and keeps the rest", () => {
-    const json = JSON.stringify({ site: { name: "x", description: "y" }, other: { a: "b" } });
-    const result = JSON.parse(applyCatalog(json, input)) as Record<string, Record<string, string>>;
-    expect(result["site"]).toEqual({ name: "Casa Aberta", description: input.description });
-    expect(result["other"]).toEqual({ a: "b" });
+  it("sets the site name and description in the site area file", () => {
+    const result = JSON.parse(applyCatalog(JSON.stringify({ name: "x", description: "y" }), input));
+    expect(result).toEqual({ name: "Casa Aberta", description: input.description });
   });
 
   it("sets the package name and description, the description right after the name", () => {
@@ -102,11 +103,56 @@ describe("writing the files", () => {
   });
 });
 
+describe("the backup retention", () => {
+  const readme =
+    "Keep it for 7 days, the period the privacy policy promises: x (`--soft-delete-duration=7d`).";
+  const privacy = JSON.stringify({
+    sections: {
+      backups: {
+        body: "A cópia fica guardada e a guardamos por 7 dias. Some no máximo 7 dias depois.",
+      },
+    },
+  });
+
+  it("is written into the README and the bucket's soft delete", () => {
+    expect(applyBackupReadme(readme, 30)).toBe(
+      "Keep it for 30 days, the period the privacy policy promises: x (`--soft-delete-duration=30d`).",
+    );
+  });
+
+  it("is written into the privacy policy in the words the person reads, singular included", () => {
+    const body = (days: number) =>
+      (JSON.parse(applyPrivacy(privacy, days)) as { sections: { backups: { body: string } } })
+        .sections.backups.body;
+    expect(body(30)).toContain("guardamos por 30 dias");
+    expect(body(30)).toContain("no máximo 30 dias depois");
+    expect(body(1)).toContain("guardamos por 1 dia.");
+    expect(body(1)).toContain("no máximo 1 dia depois");
+  });
+
+  it("can be corrected by running again, and is read back as the default", () => {
+    const again = applyBackupReadme(applyBackupReadme(readme, 30), 14);
+    expect(again).toContain("Keep it for 14 days,");
+    expect(readCurrent(JSON.stringify({ name: "x", description: "y" }), "", again).backupDays).toBe(
+      14,
+    );
+    expect(readCurrent(JSON.stringify({ name: "x", description: "y" }), "").backupDays).toBe(7);
+    const privacyAgain = applyPrivacy(applyPrivacy(privacy, 30), 14);
+    expect(privacyAgain).toContain("guardamos por 14 dias");
+  });
+
+  it("is a whole number of days, at least one", () => {
+    for (const backupDays of [0, -1, 1.5, 91, Number.NaN]) {
+      expect(validateProduct({ ...input, backupDays })).toEqual([
+        "backup retention must be a whole number of days from 1 to 90",
+      ]);
+    }
+  });
+});
+
 describe("reading what is already there", () => {
   it("reads the placeholder as empty and real answers back", () => {
-    const catalog = JSON.stringify({
-      site: { name: "Meu produto", description: "Descreva aqui, algo" },
-    });
+    const catalog = JSON.stringify({ name: "Meu produto", description: "Descreva aqui, algo" });
     expect(readCurrent(catalog, design)).toMatchObject({ name: "", description: "", audience: "" });
     const filled = applyDesign(design, input, "2026-10-09");
     const written = applyCatalog(catalog, input);

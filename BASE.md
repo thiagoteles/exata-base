@@ -205,8 +205,28 @@ As fases 0 a 12 do plano foram feitas e provadas (cada uma foi um commit `feat:`
 **Já feito:** a `main` foi enviada ao GitHub e, depois, o histórico dela foi reescrito para um único commit (veja a seção 8). Os commits antigos, com os documentos de trabalho, deixaram de existir no branch publicado; o bundle guarda tudo.
 
 **Decisões em aberto:**
-- **Inglês opt-in está implementado e provado** (ver seção 3.1), mas o produto continua só em pt-BR. Limites assumidos: data e dinheiro mantêm o formato brasileiro de propósito; com mais de um idioma a casca deixa de ser estática (`instant = false` no layout raiz). E-mails saem no idioma do destinatário (`emailTranslatorFor`, `lib/ports/email/locale.ts`): o salvo na conta (`options.locale`), senão o do pedido que causou o envio; o contato guarda o idioma na mensagem (`contact_messages.locale`); o aviso à equipe fica no idioma padrão.
+- **Inglês opt-in está implementado e provado** (ver seção 3.1), mas o produto continua só em pt-BR. Limites assumidos: data e dinheiro mantêm o formato brasileiro no idioma padrão e seguem o idioma nos outros (`formatMoney`, `formatDate`, `formatInstantDate` aceitam o idioma; as telas ainda os chamam sem ele, o que um produto com segundo idioma passa a fazer com `getLocale()`); o idioma pode sair incompleto (3.1, `localeStatus`); com mais de um idioma a casca deixa de ser estática (`instant = false` no layout raiz). E-mails saem no idioma do destinatário (`emailTranslatorFor`, `lib/ports/email/locale.ts`): o salvo na conta (`options.locale`), senão o do pedido que causou o envio; o contato guarda o idioma na mensagem (`contact_messages.locale`); o aviso à equipe fica no idioma padrão.
 - Valores OKLCH do frontmatter do `DESIGN.md` ficaram, porque estão entre marcadores gerados pelo `pnpm tokens` e conferidos pelo `tokens:check`; só o que era escrito à mão saiu.
+
+### 6.1 Pendências externas
+
+O trabalho em loop terminou em 2026-10-09 (`pnpm verify` verde: checks, integração, imagem de produção e a suíte do navegador num compose limpo). O que sobrou não é código que o loop possa escrever:
+
+**Do dono, para destravar:**
+- **Chave do GCS para testar o storage de novo.** O pedido foi uma chave do projeto "test" no `.env.local`, mas não existe projeto com esse nome (o mais parecido é `testchunk`). Criar conta de serviço e chave é escrever na conta de GCP, então espera o nome do projeto. O storage já foi provado com chave de verdade em 2026-10-08.
+- **Servidor real atrás do Traefik ou da Cloudflare:** IP e porta de origem do cliente (Marco Civil, rate limit), número de réplicas e custo da escrita por requisição.
+- **Projeto GCP:** aplicar `pnpm gcp:alerts` e `pnpm gcp:access-log` de verdade e ver um alarme chegar.
+- **Coolify:** subir a imagem com um banco de verdade (seção 6, "Só o dono pode fazer").
+- **Renovate:** instalar o app hospedado no repositório; a configuração está pronta.
+- **Stripe de produção:** criar os preços com as chaves de busca de `domain/billing/catalog.ts` (`paid_monthly`, `paid_yearly`, `paid_yearly_once`, `paid_lifetime`) e apontar o webhook.
+
+**Espera um consumidor** (o knip recusa código sem uso): `generateSitemaps` em partes de 50 mil; port `indexing` com IndexNow; linha e heatmap nos gráficos.
+
+**É de cada produto:** URLs antigas no mapa de endereços; JSON-LD de domínio; `/aprenda`, FAQ e glossários; acesso por nível usando `features` e `limits` sem código novo; arquivos pagos; as figuras de domínio de `components/figures`; um segundo idioma de verdade (a base prova o mecanismo, não traz um); o texto real de termos, privacidade e home.
+
+**Decidido contra:** Google Indexing API (só serve a `JobPosting` e `BroadcastEvent`); mutation testing com Stryker (não há matemática de prêmios na base); OpenAPI gerado (entra com o primeiro cliente de fora que o peça); experimentos A/B.
+
+**Depende de tempo em produção ou de terceiros:** ligar a CSP de verdade (hoje só relata) depois de um período sem violações inesperadas; rever o `experimental.sri` quando o Next cobrir os chunks do fluxo (seção 5); numeração de página por CSS em Safari e Firefox, que o Playwright não prova (seção 3.7).
 
 ## 7. Como evoluir
 

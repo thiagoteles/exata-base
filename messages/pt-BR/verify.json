@@ -1,0 +1,24 @@
+{
+  "title": "Verificação de documento",
+  "kind": "Documento",
+  "kinds": {
+    "receipt": "Recibo de pagamento"
+  },
+  "number": "Número",
+  "amount": "Valor",
+  "date": "Data do pagamento",
+  "states": {
+    "paid": "Pago",
+    "partially_refunded": "Devolvido em parte",
+    "refunded": "Devolvido",
+    "disputed": "Em contestação"
+  },
+  "outcome": {
+    "valid": "Este recibo é verdadeiro.",
+    "changed": "Este recibo é verdadeiro, mas o pagamento mudou."
+  },
+  "outcomeHelp": {
+    "valid": "Ele foi emitido por nós, e o pagamento consta como concluído.",
+    "changed": "Ele foi emitido por nós, mas o pagamento foi devolvido ou está em contestação. Veja a situação abaixo."
+  }
+}

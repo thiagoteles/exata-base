@@ -221,7 +221,7 @@ export function validateIntegrations(values: Values): string[] {
 
 /**
  * Adds the secrets the app needs and the person should not have to invent: the sign-in secret when
- * the app signs people in itself, the daily-call secret, and the file-link secret when files stay
+ * the app signs people in itself, the daily-call secret, the document-address secret, and the file-link secret when files stay
  * on disk. A value already there is kept.
  */
 export function withGeneratedSecrets(values: Values, random: () => string): Values {
@@ -233,6 +233,7 @@ export function withGeneratedSecrets(values: Values, random: () => string): Valu
   };
   fill("CRON_SECRET");
   fill("UNSUBSCRIBE_SECRET");
+  fill("DOCUMENT_SECRET");
   if (next["AUTH_PROVIDER"] === "local") {
     fill("BETTER_AUTH_SECRET");
   }
@@ -253,6 +254,7 @@ const order = [
   "ACCESS_LOG",
   "CRON_SECRET",
   "UNSUBSCRIBE_SECRET",
+  "DOCUMENT_SECRET",
   "FILE_URL_SECRET",
 ];
 

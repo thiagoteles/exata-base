@@ -106,6 +106,8 @@ const server = {
   STORAGE_DIR: z.string().min(1).default(".storage"),
   FILE_URL_SECRET: z.string().min(32).default("local-development-file-url-secret"),
   // Signs the unsubscribe link in reminders and newsletters; see lib/unsubscribe.
+  // Signs the address in a document's QR code; see lib/documents.
+  DOCUMENT_SECRET: z.string().min(32).default("local-development-document-secret"),
   UNSUBSCRIBE_SECRET: z.string().min(32).default("local-development-unsubscribe-secret"),
   UPLOAD_MAX_MB: z.coerce.number().int().positive().max(100).default(10),
   UPLOAD_TYPES: csv
@@ -159,6 +161,10 @@ export function environmentIssues(
   if (isSet(raw, "MAILTRAP_TOKEN")) {
     // Real mail means reminders and news can exist, and each carries a link only this secret signs.
     required.push("EMAIL_FROM", "UNSUBSCRIBE_SECRET");
+  }
+  // With payments on, a receipt carries a QR code only this secret can sign.
+  if (isSet(raw, "STRIPE_SECRET_KEY")) {
+    required.push("DOCUMENT_SECRET");
   }
   // Files on disk open through URLs this secret signs; with Cloud Storage, Google signs them.
   if (!isSet(raw, "GCS_BUCKET")) {

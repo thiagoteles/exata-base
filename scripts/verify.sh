@@ -89,6 +89,17 @@ if [ "$moved" != "301 http://localhost:${image_port}/termos" ]; then
   echo "The route address did not move to the public one: $moved" >&2
   exit 1
 fi
+# A PDF is made from a font read off the disk by a path the tracer cannot follow; the image has it
+# only because the route declares the folder. An address nobody signed is no page.
+if ! docker exec "${name}-app" test -f assets/fonts/SourceSerif4-Regular.ttf; then
+  echo "The font for generated documents is not in the production image." >&2
+  exit 1
+fi
+forged="$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:${image_port}/verificar/forjado.assinatura")"
+if [ "$forged" != "404" ]; then
+  echo "A forged verification address answered $forged instead of 404." >&2
+  exit 1
+fi
 for probe in verify-probe.wav verify-probe.json; do
   served="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://localhost:${image_port}/${probe}")"
   if [ "$served" != "200 " ]; then

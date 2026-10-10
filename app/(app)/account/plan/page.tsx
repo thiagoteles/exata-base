@@ -17,10 +17,12 @@ import { trialStanding } from "@/domain/billing/trial";
 import { currentInstant } from "@/domain/clock";
 import { CancellationControl, PortalButton } from "@/features/billing/plan-controls";
 import { planState, planStateTone } from "@/features/billing/presentation";
+import { paymentsOf } from "@/lib/billing/payments";
 import { isCourtesy, type Plan, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
 import { publicHref } from "@/lib/i18n/public-paths";
+import { formatPrice, toCents } from "@/lib/money";
 import { requirePageRole } from "@/lib/page-guard";
 import { paymentGateway } from "@/lib/ports/payment";
 import { resolvePreferences } from "@/lib/preferences/resolve";
@@ -73,6 +75,7 @@ async function PlanContent({ searchParams }: Props) {
         ) : null}
         <PlanRecord plan={plan} timeZone={resolvePreferences(user.options).timeZone} />
         <PlanActions plan={plan} />
+        <Receipts userId={user.id} timeZone={resolvePreferences(user.options).timeZone} />
       </div>
     </>
   );
@@ -148,5 +151,47 @@ async function PlanActions({ plan }: { plan: Plan | null }) {
       {billingOn && plan?.providerCustomerId ? <PortalButton /> : null}
       {billingOn && subscribed ? <CancellationControl canceling={plan.cancelAtPeriodEnd} /> : null}
     </div>
+  );
+}
+
+/** A receipt for each settled payment, set as a ledger: when and how much in large type, one plain link per row. */
+async function Receipts({ userId, timeZone }: { userId: string; timeZone: string }) {
+  const [t, history] = await Promise.all([
+    getTranslations("plan.receipts"),
+    paymentsOf(db, userId),
+  ]);
+  const settled = history.filter((payment) => payment.status === "paid");
+  if (settled.length === 0) {
+    return null;
+  }
+  return (
+    <Panel className="flex flex-col gap-4">
+      <h2 className="text-block-title text-ink">{t("title")}</h2>
+      <p className="max-w-[52ch] text-body-small text-ink-muted">{t("help")}</p>
+      <ul className="flex flex-col divide-y divide-line border-y border-line">
+        {settled.map((payment) => (
+          <li
+            key={payment.id}
+            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3"
+          >
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <p className="text-field-label text-ink">
+                {formatPrice(toCents(payment.amountCents), payment.currency)}
+              </p>
+              <p className="text-body-small text-ink-muted">
+                {t("paidOn", { date: formatInstantDate(payment.paidAt, timeZone) })}
+              </p>
+            </div>
+            <a
+              href={`/account/receipts/${payment.id}`}
+              download
+              className={buttonClasses("secondary")}
+            >
+              {t("download")}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Panel>
   );
 }

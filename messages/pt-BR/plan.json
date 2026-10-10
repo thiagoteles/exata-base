@@ -52,5 +52,11 @@
   },
   "validUntil": "Vale até",
   "renewsOn": "Renova em",
-  "endsOn": "Acesso até"
+  "endsOn": "Acesso até",
+  "receipts": {
+    "title": "Recibos",
+    "help": "Um recibo em PDF para cada pagamento concluído. O código nele confirma que é verdadeiro.",
+    "download": "Baixar recibo",
+    "paidOn": "Pago em {date}"
+  }
 }

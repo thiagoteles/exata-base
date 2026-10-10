@@ -850,6 +850,24 @@
     "emDash": "{file}:{line}:{column}: travessão no texto. Use vírgula, ponto ou hífen.",
     "slug": "{file}: o nome do arquivo deve ser palavras minúsculas ligadas por hífen."
   },
+  "documents": {
+    "receipt": {
+      "title": "Recibo de pagamento",
+      "number": "Número",
+      "payer": "Pago por",
+      "amount": "Valor",
+      "date": "Data do pagamento",
+      "method": "Forma de pagamento",
+      "verifyTitle": "Confirme este recibo",
+      "verifyHelp": "Aponte a câmera para o código ou abra o endereço abaixo para ver que este recibo é verdadeiro.",
+      "methods": {
+        "card": "Cartão",
+        "pix": "Pix",
+        "boleto": "Boleto",
+        "unknown": "Não informada"
+      }
+    }
+  },
   "emails": {
     "layout": {
       "footer": "Este é um e-mail automático. Não é preciso responder.",
@@ -1186,7 +1204,13 @@
     },
     "validUntil": "Vale até",
     "renewsOn": "Renova em",
-    "endsOn": "Acesso até"
+    "endsOn": "Acesso até",
+    "receipts": {
+      "title": "Recibos",
+      "help": "Um recibo em PDF para cada pagamento concluído. O código nele confirma que é verdadeiro.",
+      "download": "Baixar recibo",
+      "paidOn": "Pago em {date}"
+    }
   },
   "plans": {
     "title": "Planos",
@@ -1372,5 +1396,29 @@
     "tooBig": "O valor máximo é {maximum}.",
     "tooFew": "{minimum, plural, one {Escolha pelo menos # item.} other {Escolha pelo menos # itens.}}",
     "tooMany": "{maximum, plural, one {Escolha no máximo # item.} other {Escolha no máximo # itens.}}"
+  },
+  "verify": {
+    "title": "Verificação de documento",
+    "kind": "Documento",
+    "kinds": {
+      "receipt": "Recibo de pagamento"
+    },
+    "number": "Número",
+    "amount": "Valor",
+    "date": "Data do pagamento",
+    "states": {
+      "paid": "Pago",
+      "partially_refunded": "Devolvido em parte",
+      "refunded": "Devolvido",
+      "disputed": "Em contestação"
+    },
+    "outcome": {
+      "valid": "Este recibo é verdadeiro.",
+      "changed": "Este recibo é verdadeiro, mas o pagamento mudou."
+    },
+    "outcomeHelp": {
+      "valid": "Ele foi emitido por nós, e o pagamento consta como concluído.",
+      "changed": "Ele foi emitido por nós, mas o pagamento foi devolvido ou está em contestação. Veja a situação abaixo."
+    }
   }
 }

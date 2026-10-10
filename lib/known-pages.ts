@@ -1,4 +1,6 @@
 import { articleSlugs } from "./content/articles";
+import { readDocument } from "./documents/slug";
+import { env } from "./env";
 import { matchPath } from "./i18n/path-map";
 
 /*
@@ -10,7 +12,14 @@ import { matchPath } from "./i18n/path-map";
 const dynamicRoutes: readonly {
   route: string;
   exists: (params: Record<string, string>) => boolean;
-}[] = [{ route: "/articles/[slug]", exists: ({ slug = "" }) => articleSlugs.has(slug) }];
+}[] = [
+  { route: "/articles/[slug]", exists: ({ slug = "" }) => articleSlugs.has(slug) },
+  // An address nobody signed is no page; whether the record behind a signed one still exists is the page's to say.
+  {
+    route: "/verify/[slug]",
+    exists: ({ slug = "" }) => readDocument(env.DOCUMENT_SECRET, slug) !== null,
+  },
+];
 
 /** True when the route address fits a dynamic public route but names no page. */
 export function isMissingPage(pathname: string): boolean {

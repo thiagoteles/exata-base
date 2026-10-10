@@ -68,6 +68,21 @@ describe("environment rules", () => {
     ]);
   });
 
+  it("require the secret that signs document addresses as soon as production takes payments", () => {
+    const raw = {
+      APP_URL: "https://a.b",
+      DATABASE_URL: "postgres://x",
+      BETTER_AUTH_SECRET: "s",
+      FILE_URL_SECRET: "f",
+      STRIPE_SECRET_KEY: "sk_x",
+      STRIPE_WEBHOOK_SECRET: "whsec_x",
+    };
+    expect(environmentIssues(local, raw, true)).toEqual([
+      "DOCUMENT_SECRET is required in production",
+    ]);
+    expect(environmentIssues(local, { ...raw, DOCUMENT_SECRET: "d" }, true)).toEqual([]);
+  });
+
   it("require the secret that signs unsubscribe links as soon as production sends real mail", () => {
     const raw = {
       APP_URL: "https://a.b",

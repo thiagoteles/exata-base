@@ -32,6 +32,8 @@ const nextConfig: NextConfig = {
   output: "standalone",
   headers: () => Promise.resolve([{ source: "/(.*)", headers: [...securityHeaders] }]),
   redirects: () => Promise.resolve(movedAddresses.map((moved) => ({ ...moved, permanent: true }))),
+  // Files read from disk at run time through a path the tracer cannot follow: the face PDFs use.
+  outputFileTracingIncludes: { "/account/receipts/*": ["./assets/fonts/**/*"] },
   turbopack: {
     rules: {
       "*.css": {

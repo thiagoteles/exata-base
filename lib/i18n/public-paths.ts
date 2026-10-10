@@ -16,6 +16,7 @@ export const publicPaths = {
   "/unsubscribe": "/descadastrar",
   "/articles": "/artigos",
   "/articles/[slug]": "/artigos/[slug]",
+  "/verify/[slug]": "/verificar/[slug]",
 } as const;
 
 type MappedRoute = keyof typeof publicPaths;

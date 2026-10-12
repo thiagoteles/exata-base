@@ -1,0 +1,19 @@
+{
+  "title": "Caixa de contatos",
+  "subtitle": "Mensagens enviadas pelo formulário de contato.",
+  "label": "Mensagens de contato",
+  "sender": "Remetente",
+  "subject": "Assunto",
+  "status": "Situação",
+  "date": "Recebida em",
+  "searchLabel": "Buscar mensagem",
+  "statusFilter": "Situação",
+  "allStatuses": "Todas",
+  "sortBy": "Ordenar por",
+  "sortDateDesc": "Mais recentes",
+  "sortDateAsc": "Mais antigas",
+  "sortName": "Remetente, A a Z",
+  "sortStatus": "Situação",
+  "emptyTitle": "Nenhuma mensagem ainda.",
+  "loading": "Carregando mensagens"
+}

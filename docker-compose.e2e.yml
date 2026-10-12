@@ -1,0 +1,19 @@
+# The browser suite's app: the production image in place of the development server, on the same
+# ports, database and mail catcher. `pnpm test:e2e` puts it up and takes it down again; it is not
+# meant to be started by hand. LOCAL_STACK seeds the admin, keeps search engines out and lets the
+# mail reach the catcher, and the image refuses it unless APP_URL is this machine.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${E2E_IMAGE:?set by pnpm test:e2e}
+    volumes: !reset []
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: ""
+      LOCAL_STACK: "on"
+      BETTER_AUTH_SECRET: local-browser-suite-secret-0123456789abcdef
+      FILE_URL_SECRET: local-browser-suite-file-url-secret-0123456789
+      STORAGE_DIR: /data/files

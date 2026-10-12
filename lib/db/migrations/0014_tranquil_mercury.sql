@@ -1,0 +1,1 @@
+ALTER TABLE "checkout_sessions" ADD COLUMN "abandoned_email_at" timestamp with time zone;

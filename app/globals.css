@@ -1,0 +1,140 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/preset.css";
+@import "../styles/print.css";
+
+/*
+ * What every preset shares: the keyframes the animations name. Everything else outside color, the
+ * type scale, radii, named sizes, durations and easing, is generated per preset.
+ */
+@theme {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes layer-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes layer-out {
+    to {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
+  @keyframes sheet-out {
+    to {
+      transform: translateY(100%);
+    }
+  }
+
+  @keyframes bar-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes stamp {
+    from {
+      opacity: 0;
+      transform: scale(1.06);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  /*
+   * The text size a person chose scales the root, so every size written in rem follows it: type,
+   * spacing and the named sizes alike. Sizes in pixels, like the bars, stay as they are.
+   */
+  :root[data-font-scale="large"] {
+    font-size: 112.5%;
+  }
+
+  :root[data-font-scale="larger"] {
+    font-size: 125%;
+  }
+
+  /*
+   * Reduced motion chosen from the account: the same rule as the system's, for a person whose
+   * system does not ask but who wants the page still.
+   */
+  :root[data-motion="reduce"] *,
+  :root[data-motion="reduce"] *::before,
+  :root[data-motion="reduce"] *::after {
+    /* biome-ignore-start lint/complexity/noImportantStyles: must override every component transition */
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    /* biome-ignore-end lint/complexity/noImportantStyles: must override every component transition */
+  }
+
+  /* Reduced motion jumps every animation to its final frame, so it must win over utility classes. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      /* biome-ignore-start lint/complexity/noImportantStyles: must override every component transition */
+      animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
+      /* biome-ignore-end lint/complexity/noImportantStyles: must override every component transition */
+    }
+  }
+}
+
+/*
+ * Waiting indicators only show after 180ms, so a fast answer never flashes. The keyframes name
+ * their end: fade-in ends at the element's own opacity, which here is the hidden 0.
+ */
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@utility appear-after {
+  opacity: 0;
+  animation: appear 120ms var(--ease-enter) 180ms forwards;
+}

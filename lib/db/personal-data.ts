@@ -1,0 +1,42 @@
+import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
+import { apiTokens } from "./schema/api-tokens";
+import { accounts, sessions } from "./schema/auth";
+import { checkoutSessions, payments, plans } from "./schema/billing";
+import { contactMessages } from "./schema/contact";
+import { files } from "./schema/files";
+import { referrals } from "./schema/referrals";
+import { sampleItems } from "./schema/sample-items";
+import { users } from "./schema/users";
+
+/*
+ * What belongs to a person. Every table with an `ownedBy` key is listed exactly once: either in
+ * the account export, with the column that points at the owner, or as not exported, with the
+ * reason. A test fails when a table is missing, so a new table cannot skip this decision.
+ */
+
+type Exported = { key: string; table: PgTable; owner: AnyPgColumn };
+type NotExported = { table: PgTable; reason: string };
+
+export const exportedData: readonly Exported[] = [
+  { key: "user", table: users, owner: users.id },
+  { key: "plan", table: plans, owner: plans.userId },
+  { key: "payments", table: payments, owner: payments.payerId },
+  { key: "contact_messages", table: contactMessages, owner: contactMessages.userId },
+  { key: "files", table: files, owner: files.ownerId },
+  { key: "sample_items", table: sampleItems, owner: sampleItems.ownerId },
+];
+
+export const notExportedData: readonly NotExported[] = [
+  { table: sessions, reason: "short-lived sign-in sessions, deleted with the account" },
+  { table: accounts, reason: "credentials and provider tokens, never handed out" },
+  {
+    table: checkoutSessions,
+    reason:
+      "a trail of the person's own attempts to buy; what was bought is in the plan and the payments, which are exported",
+  },
+  {
+    table: apiTokens,
+    reason: "credentials: only the hash of each token is kept, and it is never handed out",
+  },
+  { table: referrals, reason: "records who invited the person, which names someone else" },
+];

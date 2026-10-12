@@ -1,0 +1,78 @@
+{
+  "layout": {
+    "footer": "Este é um e-mail automático. Não é preciso responder.",
+    "unsubscribe": {
+      "reason": "Você recebe esta mensagem porque ligou esse aviso na sua conta.",
+      "action": "Parar de receber"
+    }
+  },
+  "verifyEmail": {
+    "subject": "Confirme seu e-mail",
+    "preview": "Falta um passo para usar sua conta.",
+    "greeting": "Olá, {name}.",
+    "body": "Para confirmar que este e-mail é seu e liberar o acesso, use o botão abaixo. O link vale por uma hora.",
+    "action": "Confirmar e-mail",
+    "ignore": "Se você não criou uma conta, pode ignorar esta mensagem."
+  },
+  "resetPassword": {
+    "subject": "Redefina sua senha",
+    "preview": "Recebemos um pedido para trocar sua senha.",
+    "greeting": "Olá, {name}.",
+    "body": "Use o botão abaixo para escolher uma nova senha. O link vale por uma hora.",
+    "action": "Escolher nova senha",
+    "ignore": "Se você não pediu a troca, sua senha continua a mesma e pode ignorar esta mensagem."
+  },
+  "greetingWithoutName": "Olá.",
+  "abandonedCheckout": {
+    "subject": "Seu plano ficou esperando",
+    "preview": "Você começou a assinar e não terminou.",
+    "greeting": "Olá, {name}",
+    "body": "Você começou a assinar e não terminou. O plano continua à sua espera, a um passo de distância.",
+    "action": "Voltar ao plano",
+    "ignore": "Se mudou de ideia, tudo bem: não vamos mandar outro lembrete sobre isso."
+  },
+  "trialEnding": {
+    "subject": "Seu teste gratuito termina em {date}",
+    "preview": "Seu teste gratuito termina em {date}.",
+    "greeting": "Olá, {name}",
+    "body": "Seu teste gratuito termina em {date}. A partir daí a primeira cobrança do plano acontece no cartão que você cadastrou. Se quiser mudar ou cancelar, é só abrir o seu plano.",
+    "action": "Abrir meu plano",
+    "ignore": "Se está tudo certo, não precisa fazer nada."
+  },
+  "planExpiring": {
+    "subject": "Seu plano termina em {date}",
+    "preview": "Seu plano de um ano termina em {date}.",
+    "greeting": "Olá, {name}",
+    "body": "Seu plano de um ano termina em {date}. Depois dessa data a conta volta ao plano gratuito, e tudo o que você guardou continua com você.",
+    "action": "Renovar o plano",
+    "ignore": "Se não quiser renovar, não precisa fazer nada."
+  },
+  "contactNotice": {
+    "subject": "Nova mensagem de contato: {subject}",
+    "preview": "{name} escreveu pelo formulário de contato.",
+    "heading": "Nova mensagem de contato",
+    "from": "De",
+    "subjectLabel": "Assunto",
+    "action": "Abrir na caixa de contatos"
+  },
+  "contactReply": {
+    "subject": "Resposta à sua mensagem",
+    "preview": "Respondemos a sua mensagem de contato.",
+    "greeting": "Olá, {name}.",
+    "intro": "Esta é a resposta à sua mensagem:",
+    "original": "Sua mensagem"
+  },
+  "invite": {
+    "subject": "Você foi convidado",
+    "preview": "Crie sua conta para começar.",
+    "greeting": "Você recebeu um convite.",
+    "body": "{inviter} convidou você para entrar como {role}. Use o botão abaixo para criar a conta com este e-mail. O convite vale por 7 dias.",
+    "action": "Criar minha conta",
+    "ignore": "Se você não esperava este convite, pode ignorar esta mensagem.",
+    "roles": {
+      "member": "membro",
+      "staff": "equipe",
+      "admin": "administrador"
+    }
+  }
+}

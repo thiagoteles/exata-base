@@ -1,0 +1,396 @@
+{
+  "title": "Catálogo",
+  "subtitle": "Componentes e padrões do sistema, funcionando de verdade.",
+  "actions": {
+    "notify": "Mostrar aviso",
+    "second": "Segunda ação",
+    "third": "Terceira ação"
+  },
+  "toast": {
+    "title": "Aviso de exemplo",
+    "description": "Fora da tela atual, some em 6 segundos."
+  },
+  "accent": {
+    "title": "Tons com escopo",
+    "fill": "Preenchido",
+    "ink": "Texto no tom",
+    "nested": "Um tom dentro de outro vence o de fora, e a marca devolve o tom de fora de todos os escopos."
+  },
+  "palettes": {
+    "title": "Paletas de categorias",
+    "help": "Cada categoria do produto tem uma cor própria, na ordem em que o gerador mediu: vizinhas se distinguem por quem enxerga bem e por quem tem daltonismo.",
+    "barLabel": "Barra dividida entre cinco categorias de exemplo",
+    "share": "{value, number}%",
+    "names": {
+      "alpha": "Primeira categoria",
+      "beta": "Segunda categoria",
+      "gamma": "Terceira categoria",
+      "delta": "Quarta categoria",
+      "epsilon": "Quinta categoria"
+    }
+  },
+  "choices": {
+    "title": "Caixas e opções",
+    "all": "Todos os assuntos",
+    "topics": {
+      "billing": "Cobrança",
+      "product": "Produto",
+      "security": "Segurança"
+    },
+    "sure": "Entendo que isto não tem volta",
+    "sureHelp": "A caixa de tom perigoso marca o que pede cuidado.",
+    "plan": {
+      "legend": "Forma de cobrança",
+      "monthly": "Mensal",
+      "monthlyHelp": "Cobrado todo mês, cancela quando quiser.",
+      "yearly": "Anual",
+      "lifetime": "Vitalício"
+    },
+    "compact": {
+      "legend": "Tamanho compacto",
+      "a": "Primeira opção",
+      "b": "Segunda opção"
+    }
+  },
+  "structure": {
+    "title": "Trilha, abas e seções",
+    "trail": "Você está aqui",
+    "crumbs": {
+      "home": "Início",
+      "catalog": "Catálogo",
+      "current": "Estrutura"
+    },
+    "tabs": {
+      "label": "Seções da conta",
+      "overview": "Resumo",
+      "overviewBody": "O painel escolhido ocupa o lugar dos outros, e a aba escolhida fica sublinhada em tinta.",
+      "activity": "Atividade",
+      "activityBody": "As setas movem e escolhem, e Home e End vão às pontas.",
+      "locked": "Bloqueada",
+      "settings": "Ajustes",
+      "settingsBody": "Uma aba desabilitada é pulada pelo teclado.",
+      "compact": "Seções compactas",
+      "one": "Primeira",
+      "oneBody": "Tamanho pequeno para espaços apertados.",
+      "two": "Segunda",
+      "twoBody": "O mesmo comportamento, em linha menor."
+    },
+    "accordion": {
+      "first": "Posso cancelar quando quiser?",
+      "firstBody": "Sim. O cancelamento vale ao fim do período já pago, sem multa.",
+      "second": "Como troco de plano?",
+      "secondBody": "Na página do plano, escolhendo outro. A diferença é calculada na hora.",
+      "third": "Onde ficam os recibos?",
+      "thirdBody": "Na conta, em Meu plano, e também no seu e-mail a cada cobrança.",
+      "a": "Vários abertos",
+      "aBody": "Neste modo cada linha abre e fecha por conta própria.",
+      "b": "Tamanho pequeno",
+      "bBody": "Linha menor para listas longas."
+    }
+  },
+  "measures": {
+    "title": "Medidas e espera",
+    "upload": "Envio do arquivo",
+    "compact": "Importação, tamanho pequeno",
+    "failing": "Tentativa com falhas",
+    "storage": "Armazenamento",
+    "storageText": "{used, number} GB de {total, number} GB",
+    "quota": "Cota do mês",
+    "quotaText": "Quase no limite da cota.",
+    "volume": "Volume",
+    "range": "Faixa de preço",
+    "from": "De",
+    "until": "Até",
+    "rangeText": "De R$ {from, number} até R$ {until, number}",
+    "loading": "Carregando o perfil"
+  },
+  "composition": {
+    "title": "Etapas, etiquetas e datas",
+    "stepsLabel": "Etapas do cadastro",
+    "stepsCompact": "Etapas, tamanho pequeno",
+    "steps": {
+      "data": "Dados",
+      "address": "Endereço",
+      "review": "Revisão"
+    },
+    "tags": "Assuntos escolhidos",
+    "tagNames": {
+      "billing": "Cobrança",
+      "product": "Produto",
+      "security": "Segurança"
+    },
+    "remove": "Remover {name}",
+    "noTags": "Nenhum assunto escolhido.",
+    "due": "Vencimento",
+    "dueHelp": "Digite ou escolha no calendário.",
+    "window": "Retirada, a partir de hoje",
+    "windowHelp": "A semana começa na segunda e dias passados não valem."
+  },
+  "publicPatterns": {
+    "title": "Tabela de preços e perguntas",
+    "caption": "Planos de exemplo",
+    "compare": "O que está incluso",
+    "included": "Incluído",
+    "notIncluded": "Não incluído",
+    "features": {
+      "reports": "Relatórios",
+      "export": "Exportação dos dados",
+      "support": "Suporte por e-mail"
+    },
+    "plans": {
+      "free": "Gratuito",
+      "monthly": "Mensal",
+      "yearly": "Anual"
+    },
+    "free": "Grátis",
+    "noEnd": "sem prazo",
+    "perMonth": "por mês",
+    "perYear": "por ano",
+    "yearlyNote": "Dois meses de graça em relação ao mensal.",
+    "subscribe": "Assinar",
+    "faq": {
+      "trial": {
+        "question": "Existe período de teste?",
+        "answer": "Existe, e a conta gratuita não vence: você usa o quanto quiser antes de decidir."
+      },
+      "switch": {
+        "question": "Posso trocar de plano depois?",
+        "answer": "Pode, na página do seu plano. A troca vale na hora."
+      }
+    }
+  },
+  "figures": {
+    "title": "Figuras",
+    "help": "Uma figura só desenha o que o domínio calculou. O texto vem do catálogo ou de uma função de notação, a trilha é a tinta numa fração fraca e o valor é a marca, então os dois acompanham o tema.",
+    "caption": "Uso do mês",
+    "summary": "Uso do mês: {value, number} de {max, number}"
+  },
+  "paidPatterns": {
+    "title": "Teste, passos e conquistas",
+    "trial": {
+      "title": "Teste gratuito",
+      "summary": "{days, plural, one {Falta # dia} other {Faltam # dias}} para o fim do teste.",
+      "bar": "Dias do teste já usados",
+      "action": "Ver planos"
+    },
+    "checklist": {
+      "progress": "Progresso dos passos",
+      "count": "{done, number} de {total, number}",
+      "done": "(feito)",
+      "finish": "Marcar como feito",
+      "steps": {
+        "profile": {
+          "title": "Complete o perfil",
+          "help": "Nome e foto aparecem para quem você convida."
+        },
+        "import": {
+          "title": "Importe seus dados",
+          "help": "Traga o que você já tem de uma planilha."
+        },
+        "invite": {
+          "title": "Convide alguém",
+          "help": "Quem entra pelo seu link já chega com tudo pronto."
+        }
+      }
+    },
+    "achievements": {
+      "earned": "Conquistada",
+      "locked": "A conquistar",
+      "first": {
+        "title": "Primeira ficha",
+        "body": "Cadastre a primeira ficha."
+      },
+      "ten": {
+        "title": "Dez fichas",
+        "body": "Cadastre dez fichas.",
+        "bar": "Fichas cadastradas"
+      },
+      "streak": {
+        "title": "Sete dias seguidos",
+        "body": "Volte sete dias seguidos."
+      }
+    }
+  },
+  "density": {
+    "title": "Densidades",
+    "help": "Os mesmos controles em cada densidade do sistema. O preset escolhe uma delas para o produto; aqui cada coluna pede a sua pelo nome.",
+    "names": {
+      "medium": "Média",
+      "comfortable": "Confortável",
+      "large": "Grande"
+    },
+    "field": "Nome",
+    "value": "Ana Souza",
+    "primary": "Salvar",
+    "secondary": "Cancelar",
+    "mode": "Modo",
+    "first": "Primeiro",
+    "second": "Segundo",
+    "tabs": "Seções de exemplo",
+    "body": "Painel da aba escolhida.",
+    "switch": "Avisos por e-mail",
+    "checkbox": "Lembrar deste aparelho",
+    "stamp": "Concluído"
+  },
+  "buttons": {
+    "title": "Botões",
+    "primary": "Salvar",
+    "secondary": "Cancelar",
+    "small": "Pequeno",
+    "dangerQuiet": "Excluir sem alarde",
+    "danger": "Excluir 3 pedidos",
+    "loading": "Enviando",
+    "disabled": "Indisponível",
+    "withIcon": "Novo pedido"
+  },
+  "fields": {
+    "title": "Campos",
+    "name": "Nome",
+    "nameHelp": "Como aparece nos documentos.",
+    "email": "E-mail",
+    "emailError": "Informe um e-mail válido.",
+    "cpf": "CPF",
+    "phone": "Telefone",
+    "cep": "CEP",
+    "date": "Data de nascimento",
+    "money": "Valor",
+    "message": "Mensagem"
+  },
+  "pickers": {
+    "title": "Seleção",
+    "select": "Situação",
+    "selectPlaceholder": "Escolha a situação",
+    "combobox": "Estado",
+    "comboboxPlaceholder": "Escolha o estado"
+  },
+  "layers": {
+    "title": "Camadas",
+    "dialog": "Abrir diálogo",
+    "dialogTitle": "Diálogo de exemplo",
+    "dialogBody": "No celular ele sobe da borda inferior como uma folha.",
+    "confirm": "Excluir",
+    "confirmTitle": "Excluir 3 pedidos?",
+    "confirmBody": "Os 3 pedidos serão apagados e não voltam.",
+    "confirmAction": "Excluir 3 pedidos",
+    "cancel": "Cancelar",
+    "popover": "Abrir popover",
+    "popoverBody": "Um painel flutuante com conteúdo curto.",
+    "help": "Ajuda",
+    "tooltip": "Explica só o ícone",
+    "menu": "Ações",
+    "menuEdit": "Editar",
+    "menuArchive": "Arquivar",
+    "menuDelete": "Excluir",
+    "toast": "Mostrar aviso"
+  },
+  "states": {
+    "title": "Estados e painéis",
+    "done": "Concluído",
+    "progress": "Em andamento",
+    "attention": "Atenção",
+    "refused": "Recusado",
+    "neutral": "Neutro",
+    "panelDefault": "Painel padrão",
+    "panelHighlight": "Painel de destaque, um por tela",
+    "panelDanger": "Zona de perigo"
+  },
+  "list": {
+    "title": "Lista",
+    "label": "Pedidos de exemplo",
+    "customer": "Cliente",
+    "status": "Situação",
+    "amount": "Valor",
+    "date": "Data",
+    "searchLabel": "Buscar pedido",
+    "statusFilter": "Situação",
+    "allStatuses": "Todas",
+    "sortBy": "Ordenar por",
+    "sortDateDesc": "Mais recentes",
+    "sortDateAsc": "Mais antigos",
+    "sortCustomer": "Cliente, A a Z",
+    "sortAmountDesc": "Maior valor",
+    "sortAmountAsc": "Menor valor",
+    "emptyTitle": "Ainda não há pedidos.",
+    "emptyAction": "Novo pedido",
+    "loading": "Carregando pedidos"
+  },
+  "statuses": {
+    "new": "Nova",
+    "progress": "Em andamento",
+    "paid": "Paga",
+    "refused": "Recusada"
+  },
+  "record": {
+    "title": "Ficha",
+    "customer": "Cliente",
+    "document": "CPF",
+    "total": "Total",
+    "created": "Criado em",
+    "note": "Observação",
+    "noteValue": "Entrega combinada com a recepção.",
+    "status": "Situação",
+    "dangerTitle": "Excluir este pedido",
+    "dangerBody": "Apagar remove o pedido e o histórico dele."
+  },
+  "save": {
+    "title": "Barra de salvar",
+    "name": "Nome do produto",
+    "hint": "Altere o campo para ver a barra. Salvar leva meio segundo.",
+    "link": "Ir para outra página"
+  },
+  "wizard": {
+    "title": "Assistente",
+    "stepsLabel": "Etapas do cadastro",
+    "step": "Passo {current, number} de {total, number}",
+    "steps": {
+      "data": "Dados",
+      "address": "Endereço",
+      "value": "Valor e revisão"
+    },
+    "name": "Nome completo",
+    "cpf": "CPF",
+    "birth": "Data de nascimento",
+    "cep": "CEP",
+    "searchCep": "Buscar CEP",
+    "cepUnavailable": "Não foi possível buscar o CEP agora. Digite o endereço.",
+    "cepNotFound": "Esse CEP não foi encontrado. Confira ou digite o endereço.",
+    "street": "Rua",
+    "number": "Número",
+    "district": "Bairro",
+    "city": "Cidade",
+    "state": "UF",
+    "amount": "Valor",
+    "next": "Continuar",
+    "back": "Voltar",
+    "confirm": "Conferir tudo",
+    "checked": "Tudo conferido. Nada foi gravado.",
+    "review": "Revisão",
+    "reviewName": "Nome",
+    "reviewAddress": "Endereço",
+    "reviewAmount": "Valor",
+    "serverError": "Não foi possível conferir. Tente de novo."
+  },
+  "files": {
+    "title": "Arquivos",
+    "choose": "Arquivo",
+    "send": "Enviar",
+    "sent": "Arquivo enviado.",
+    "empty": "Nenhum arquivo enviado ainda.",
+    "limits": "Até {maxMb, number} MB. Aceitos: {types}.",
+    "open": "Abrir",
+    "list": "Seus arquivos",
+    "genericError": "Não foi possível enviar. Tente de novo.",
+    "download": "Abrir {name}"
+  },
+  "paid": {
+    "title": "Plano pago",
+    "unlocked": "Seu plano é pago, então este bloco abre. A guarda que o protege é requirePaidPlan().",
+    "closedTitle": "Este bloco é do plano pago",
+    "locked": "Quem está no plano gratuito vê esta porta no lugar do conteúdo, com o que o plano abre e um caminho para os planos.",
+    "benefits": {
+      "one": "Conteúdo e recursos pagos",
+      "two": "Tudo o que o plano gratuito já tem"
+    },
+    "unlockedStamp": "Aberto"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "Fale com a gente",
+  "subtitle": "Escreva sua mensagem e respondemos por e-mail.",
+  "name": "Nome",
+  "email": "E-mail",
+  "subject": "Assunto",
+  "subjectPlaceholder": "Escolha o assunto",
+  "message": "Mensagem",
+  "messageHelp": "Conte o que você precisa. Quanto mais detalhe, mais rápido respondemos.",
+  "signedInAs": "Enviando como {email}.",
+  "submit": "Enviar mensagem",
+  "sentTitle": "Mensagem enviada",
+  "sentBody": "Recebemos sua mensagem e vamos responder por e-mail.",
+  "sentBack": "Voltar para o início",
+  "subjects": {
+    "general": "Dúvida geral",
+    "support": "Suporte",
+    "billing": "Cobrança",
+    "privacy": "Privacidade e dados"
+  },
+  "statuses": {
+    "new": "Nova",
+    "in_progress": "Em atendimento",
+    "answered": "Respondida",
+    "archived": "Arquivada"
+  }
+}

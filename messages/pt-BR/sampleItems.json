@@ -1,0 +1,55 @@
+{
+  "title": "Amostras",
+  "subtitle": "Os registros de amostras do seu cadastro.",
+  "label": "Amostras cadastradas",
+  "name": "Nome",
+  "code": "Código",
+  "status": "Situação",
+  "dueDate": "Prazo",
+  "createdAt": "Cadastro",
+  "searchLabel": "Buscar por nome ou código",
+  "statusFilter": "Situação",
+  "allStatuses": "Todas",
+  "sortBy": "Ordenar por",
+  "sortName": "Nome, A a Z",
+  "sortNameDesc": "Nome, Z a A",
+  "sortDateDesc": "Mais recentes",
+  "emptyTitle": "Nenhum registro de amostras ainda.",
+  "new": "Novo registro",
+  "newTitle": "Novo registro de amostras",
+  "editTitle": "Editar registro de amostras",
+  "edit": "Editar",
+  "delete": "Excluir",
+  "statuses": {
+    "open": "Em aberto",
+    "closed": "Encerrado"
+  },
+  "form": {
+    "name": "Nome",
+    "code": "Código",
+    "codeHelp": "Opcional. Letras, números e hífen; não se repete no seu cadastro.",
+    "status": "Situação",
+    "dueDate": "Prazo",
+    "notes": "Observações",
+    "create": "Cadastrar",
+    "save": "Salvar alterações",
+    "cancel": "Cancelar",
+    "failed": "Não foi possível salvar. Tente de novo."
+  },
+  "record": {
+    "code": "Código",
+    "status": "Situação",
+    "dueDate": "Prazo",
+    "since": "No cadastro desde",
+    "notes": "Observações",
+    "none": "Não informado"
+  },
+  "remove": {
+    "title": "Excluir {name}?",
+    "consequence": "Este registro será apagado. Não dá para desfazer.",
+    "confirm": "Excluir",
+    "cancel": "Manter",
+    "done": "{name} saiu do cadastro.",
+    "failed": "Não foi possível excluir. Tente de novo."
+  }
+}

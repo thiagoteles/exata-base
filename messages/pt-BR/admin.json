@@ -1,0 +1,232 @@
+{
+  "roles": {
+    "member": "Membro",
+    "staff": "Equipe",
+    "admin": "Administrador"
+  },
+  "plans": {
+    "free": "Gratuito",
+    "paid": "Pago",
+    "courtesy": "Cortesia"
+  },
+  "users": {
+    "title": "Usuários",
+    "subtitle": "Quem tem conta, com que papel e em que plano.",
+    "label": "Usuários",
+    "name": "Nome",
+    "email": "E-mail",
+    "role": "Papel",
+    "plan": "Plano",
+    "created": "Criado em",
+    "searchLabel": "Buscar usuário",
+    "roleFilter": "Papel",
+    "allRoles": "Todos",
+    "planFilter": "Plano",
+    "allPlans": "Todos",
+    "sortBy": "Ordenar por",
+    "sortDateDesc": "Mais recentes",
+    "sortDateAsc": "Mais antigos",
+    "sortName": "Nome, A a Z",
+    "sortEmail": "E-mail, A a Z",
+    "sortRole": "Papel",
+    "emptyTitle": "Nenhum usuário ainda.",
+    "noName": "Sem nome"
+  },
+  "user": {
+    "title": "Usuário",
+    "created": "Conta criada em",
+    "verified": "E-mail confirmado",
+    "yes": "Sim",
+    "no": "Não",
+    "plan": "Plano",
+    "courtesyFrom": "Cortesia concedida por",
+    "courtesyReason": "Motivo da cortesia",
+    "customer": "Cliente no Stripe",
+    "actions": "Ações",
+    "failed": "Não foi possível concluir. Tente de novo.",
+    "role": {
+      "label": "Papel",
+      "saved": "Papel atualizado."
+    },
+    "courtesy": {
+      "title": "Cortesia",
+      "reason": "Motivo",
+      "help": "Libera o plano pago sem cobrança. O motivo fica na auditoria.",
+      "grant": "Conceder cortesia",
+      "granted": "Cortesia concedida.",
+      "revoke": "Revogar cortesia",
+      "revokeTitle": "Revogar a cortesia?",
+      "revokeBody": "A conta volta para o plano gratuito agora.",
+      "revoked": "Cortesia revogada.",
+      "cancel": "Voltar"
+    },
+    "refund": {
+      "title": "Reembolsar o último pagamento",
+      "confirmTitle": "Reembolsar o último pagamento?",
+      "confirmBody": "O valor é devolvido por inteiro e a conta volta para o plano gratuito. Não dá para desfazer.",
+      "confirm": "Reembolsar",
+      "cancel": "Voltar",
+      "done": "Reembolso pedido. O plano muda quando o pagamento confirmar."
+    },
+    "delete": {
+      "title": "Apagar a conta",
+      "confirmTitle": "Apagar esta conta?",
+      "confirmBody": "A conta, os arquivos e as mensagens dessa pessoa serão apagados para sempre, e a assinatura será cancelada.",
+      "confirm": "Apagar a conta",
+      "cancel": "Voltar",
+      "done": "Conta apagada."
+    },
+    "payments": {
+      "title": "Pagamentos",
+      "empty": "Nenhum pagamento registrado.",
+      "date": "Data",
+      "amount": "Valor",
+      "method": "Forma",
+      "status": "Situação",
+      "methods": {
+        "card": "Cartão",
+        "pix": "Pix",
+        "boleto": "Boleto",
+        "other": "Outra"
+      },
+      "statuses": {
+        "paid": "Pago",
+        "partially_refunded": "Reembolso parcial",
+        "refunded": "Reembolsado",
+        "disputed": "Em disputa"
+      },
+      "withdrawal": "Dentro do prazo de arrependimento até {date}. Pedido nesse prazo, o reembolso integral é direito da pessoa."
+    }
+  },
+  "invites": {
+    "title": "Convites",
+    "subtitle": "Quem foi convidado e o que aconteceu com cada convite.",
+    "label": "Convites",
+    "email": "E-mail",
+    "role": "Papel",
+    "status": "Situação",
+    "invitedBy": "Convidado por",
+    "sent": "Enviado em",
+    "expires": "Vale até",
+    "statuses": {
+      "pending": "Pendente",
+      "accepted": "Aceito",
+      "expired": "Vencido",
+      "revoked": "Revogado"
+    },
+    "searchLabel": "Buscar convite",
+    "statusFilter": "Situação",
+    "allStatuses": "Todas",
+    "emptyTitle": "Nenhum convite enviado.",
+    "form": {
+      "title": "Convidar",
+      "email": "E-mail de quem vai receber",
+      "role": "Papel",
+      "send": "Enviar convite",
+      "sent": "Convite enviado.",
+      "failed": "Não foi possível convidar."
+    },
+    "revoke": {
+      "action": "Revogar",
+      "label": "Revogar convite de {email}",
+      "title": "Revogar o convite?",
+      "body": "O link enviado para {email} deixa de funcionar.",
+      "confirm": "Revogar convite",
+      "cancel": "Voltar",
+      "done": "Convite revogado."
+    }
+  },
+  "audit": {
+    "title": "Auditoria",
+    "subtitle": "Tudo o que a equipe e os administradores escreveram, do mais recente para o mais antigo.",
+    "label": "Auditoria",
+    "when": "Quando",
+    "who": "Quem",
+    "action": "O que",
+    "target": "Alvo",
+    "details": "Detalhes",
+    "searchLabel": "Buscar por autor",
+    "from": "De",
+    "to": "Até",
+    "emptyTitle": "Nada registrado ainda.",
+    "actions": {
+      "user_role_change": "Mudou o papel",
+      "user_delete": "Apagou a conta",
+      "plan_courtesy_grant": "Concedeu cortesia",
+      "plan_courtesy_revoke": "Revogou cortesia",
+      "plan_refund": "Pediu reembolso",
+      "invite_create": "Criou convite",
+      "invite_revoke": "Revogou convite",
+      "contact_status_change": "Mudou a situação do contato",
+      "contact_reply": "Respondeu um contato"
+    }
+  },
+  "numbers": {
+    "title": "Números",
+    "subtitle": "Cadastros, pagantes e receita, lidos direto do banco.",
+    "range": "Período",
+    "ranges": {
+      "7": "7 dias",
+      "30": "30 dias",
+      "90": "90 dias"
+    },
+    "summary": "Resumo do período",
+    "signups": "Cadastros",
+    "revenue": "Receita líquida",
+    "revenueNote": "Em reais, já descontados os reembolsos.",
+    "refunded": "Reembolsado",
+    "refundedNote": "De pagamentos feitos no período.",
+    "payers": "Pagantes",
+    "payersNote": "{courtesies, plural, =0 {Sem cortesias} one {Mais # cortesia} other {Mais # cortesias}}",
+    "cancellations": "Cancelamentos agendados",
+    "cancellationsNote": "Assinaturas que terminam no fim do período pago.",
+    "signupsByDay": "Cadastros por dia",
+    "revenueByDay": "Receita líquida por dia",
+    "payersByPlan": "Pagantes por plano",
+    "table": "Ver os números em tabela",
+    "day": "Dia",
+    "value": "Valor"
+  },
+  "health": {
+    "title": "Saúde",
+    "subtitle": "Os trabalhos agendados, os webhooks e o banco, como estão agora.",
+    "release": "No ar",
+    "service": "Serviço",
+    "version": "Versão",
+    "unknownVersion": "Sem commit informado",
+    "database": "Banco",
+    "databaseUp": "Respondendo",
+    "answered": "Respondeu em {ms, number} ms",
+    "postgres": "Postgres",
+    "size": "Tamanho",
+    "migrations": "Migrations",
+    "migrationsApplied": "{count, plural, =0 {Nenhuma aplicada} one {# aplicada} other {# aplicadas}}",
+    "lastMigration": "A mais recente foi gerada em {date}",
+    "jobs": "Trabalhos agendados",
+    "jobsNote": "O prazo é o mesmo do alarme de ausência. Passou dele, o trabalho está atrasado.",
+    "job": "Trabalho",
+    "state": "Estado",
+    "lastRun": "Última execução",
+    "duration": "Duração",
+    "window": "Prazo",
+    "windowHours": "{hours, plural, one {# hora} other {# horas}}",
+    "failures": "{count, plural, one {# operação falhou} other {# operações falharam}}",
+    "neverRan": "Nunca rodou",
+    "states": {
+      "ok": "Em dia",
+      "failing": "Com falha",
+      "late": "Atrasado",
+      "never": "Sem registro"
+    },
+    "webhooks": "Webhooks",
+    "webhooksNote": "A última entrega recebida de cada provedor. Silêncio pode ser só falta de movimento.",
+    "source": "Origem",
+    "lastDelivery": "Última entrega",
+    "lastType": "Evento",
+    "noDelivery": "Nenhuma entrega",
+    "sources": {
+      "payments": "Pagamentos",
+      "accounts": "Contas"
+    }
+  }
+}

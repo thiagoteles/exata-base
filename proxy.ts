@@ -1,0 +1,99 @@
+import { type NextFetchEvent, NextRequest, NextResponse } from "next/server";
+import { currentInstant } from "@/domain/clock";
+import { readReferralCode } from "@/domain/referral/rules";
+import { accessRecord } from "@/lib/access-log";
+import { env } from "@/lib/env";
+import { defaultLocale, isMultilingual, LOCALE_HEADER } from "@/lib/i18n/locales";
+import { decideLanguage, redirectToLanguage, rememberLocale } from "@/lib/i18n/proxy";
+import { servedAddress } from "@/lib/i18n/public-paths";
+import { isMissingPage } from "@/lib/known-pages";
+import { authProxy } from "@/lib/ports/auth/proxy";
+import { logger } from "@/lib/ports/log";
+import { REFERRAL_COOKIE, referralCookieOptions } from "@/lib/referral/cookie";
+import { REQUEST_ID_HEADER, requestIdFrom } from "@/lib/request-id";
+import { buildCsp } from "@/lib/security/csp";
+import { cspSources } from "@/lib/security/sources";
+
+const PERMANENT = 301;
+const MISSING_PAGE = "/_missing";
+// Built once from the runtime environment: the image is built with none, so the policy cannot be
+// fixed at build time like the other security headers.
+const reportOnlyPolicy = buildCsp(cspSources(), { development: env.NODE_ENV !== "production" });
+// Marks a request this proxy already rewrote. In production Next passes a rewritten request through
+// the proxy again to resume a prerendered page, now at the route address; without the mark that
+// second pass would answer the route address with the redirect, and the page would never load. A
+// caller who sends the mark only skips the redirect and still gets the same page.
+const REWRITTEN_HEADER = "x-public-address";
+
+export function proxy(request: NextRequest, event: NextFetchEvent) {
+  const requestId = requestIdFrom(request.headers);
+  // The second pass of a rewritten request is the same access, already recorded.
+  if (env.ACCESS_LOG === "on" && !request.headers.has(REWRITTEN_HEADER)) {
+    logger.info(
+      "access",
+      accessRecord(
+        { headers: request.headers, method: request.method, path: request.nextUrl.pathname },
+        env.TRUSTED_PROXY,
+        currentInstant(),
+      ),
+    );
+  }
+  const decision = isMultilingual ? decideLanguage(request) : null;
+  if (decision?.redirectTo) {
+    return redirectToLanguage(request, decision);
+  }
+  const visible = request.nextUrl.pathname;
+  const unprefixed = decision?.pathname ?? visible;
+  const prefix = visible.slice(0, visible.length - unprefixed.length);
+
+  // Each page has one address per language, so only one is indexed: the route address moves to the
+  // Portuguese one in the default language, and the Portuguese one moves to the route address in
+  // another. Only page loads move; a form posted to the old address is still answered where it was sent.
+  const address = servedAddress(unprefixed, decision === null || decision.locale === defaultLocale);
+  const isPageLoad = request.method === "GET" || request.method === "HEAD";
+  if (address.redirectTo !== null && isPageLoad && !request.headers.has(REWRITTEN_HEADER)) {
+    const target = new URL(`${prefix}${address.redirectTo}`, env.APP_URL);
+    target.search = request.nextUrl.search;
+    return NextResponse.redirect(target, PERMANENT);
+  }
+
+  // The routes are written in English and without a language prefix: a public or prefixed address
+  // is served from its route, and the auth guard below sees that route address.
+  const clean = new URL(request.url);
+  clean.pathname = address.route;
+  // A dynamic page that does not exist is sent where no route matches, so Next answers its
+  // not-found page with a real 404 instead of a 200 shell that later says "not found".
+  if (isMissingPage(clean.pathname)) {
+    clean.pathname = MISSING_PAGE;
+  }
+  const rewritten = clean.pathname !== visible;
+  const seen = rewritten ? new NextRequest(clean, request) : request;
+  return authProxy(seen, event, (forwarded) => {
+    const headers = new Headers(forwarded.headers);
+    headers.set(REQUEST_ID_HEADER, requestId);
+    if (rewritten) {
+      headers.set(REWRITTEN_HEADER, visible);
+    }
+    if (decision !== null) {
+      headers.set(LOCALE_HEADER, decision.locale);
+    }
+    const response = rewritten
+      ? NextResponse.rewrite(clean, { request: { headers } })
+      : NextResponse.next({ request: { headers } });
+    response.headers.set(REQUEST_ID_HEADER, requestId);
+    response.headers.set("Content-Security-Policy-Report-Only", reportOnlyPolicy);
+    // A visitor who arrives by an inviter's link is remembered until they sign up.
+    const invitedBy = isPageLoad ? readReferralCode(request.nextUrl.searchParams.get("ref")) : null;
+    if (invitedBy !== null) {
+      response.cookies.set(REFERRAL_COOKIE, invitedBy, referralCookieOptions);
+    }
+    return decision === null ? response : rememberLocale(response, decision.locale);
+  });
+}
+
+export const config = {
+  matcher: [
+    // biome-ignore lint/security/noSecrets: a route pattern, not a credential
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|ico|txt|xml)$).*)",
+  ],
+};

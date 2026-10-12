@@ -1,0 +1,79 @@
+# Local development. `docker compose up` brings the app up with no .env file: every value below is
+# local and public by design. Ports avoid the common defaults so several projects can run at once.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # The development server compiles routes on as many threads as it is given, and each thread
+    # holds memory while it works; two keep the peak under what the machine running Docker has.
+    cpus: 2
+    ports:
+      - "47300:3000"
+    volumes:
+      - .:/app
+      # Anonymous volumes keep the image's Linux node_modules and the container's own .next, instead
+      # of the host's, which hold macOS or Windows binaries.
+      - /app/node_modules
+      - /app/.next
+      # The host's .env.local holds real provider keys for running outside Docker. Next would load
+      # it here too, behind the compose's values, and send mail and payments to the real services;
+      # an empty file in its place keeps the compose on its own local values.
+      - /dev/null:/app/.env.local:ro
+    environment:
+      NODE_ENV: development
+      # Node sizes its heap from the memory Docker gives the machine (2.2 GB of the default 7.7),
+      # and the development server restarts itself at 80% of it. Every route compiled stays in
+      # memory, so a day of work reached it. 8 GB assumes Docker has 12 GB (Docker Desktop,
+      # Settings, Resources): with less, the machine would kill the server before Next restarts it.
+      NODE_OPTIONS: --max-old-space-size=8192
+      npm_config_update_notifier: "false"
+      # The git hooks belong to the host checkout, not to the container: lefthook skips installing
+      # them when CI is set and LEFTHOOK is off.
+      CI: "true"
+      LEFTHOOK: "0"
+      TZ: America/Sao_Paulo
+      AUTH_PROVIDER: local
+      APP_URL: http://localhost:47300
+      DATABASE_URL: postgres://app:app@postgres:5432/app
+      ADMIN_EMAILS: admin@app.local
+      SMTP_LOCAL_URL: smtp://mailpit:1025
+      CONTACT_EMAIL: contato@app.local
+      CRON_SECRET: local-development-cron-secret-0123456789
+      INGEST_SECRETS: job-run=local-development-ingest-secret-0123456789
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 10s
+      timeout: 4s
+      retries: 30
+      start_period: 60s
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports:
+      - "47440:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:v1.31
+    ports:
+      - "47030:8025"
+
+volumes:
+  postgres-data:

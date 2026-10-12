@@ -1,0 +1,12 @@
+# Development image, the one `docker compose up` runs. The dependencies are installed here, when
+# the image is built, not each time the container starts; the source is mounted over /app.
+# After a change to package.json or the lockfile: `docker compose up --build --renew-anon-volumes`.
+
+FROM node:24-alpine
+ENV PNPM_HOME=/pnpm COREPACK_ENABLE_DOWNLOAD_PROMPT=0 NEXT_TELEMETRY_DISABLED=1 CI=true LEFTHOOK=0
+RUN corepack enable
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN --mount=type=cache,id=pnpm-dev,target=/pnpm/store pnpm install --frozen-lockfile
+EXPOSE 3000
+CMD ["sh", "-c", "(pnpm messages --watch &) && pnpm dev --hostname 0.0.0.0 --port 3000"]

@@ -1,0 +1,49 @@
+{
+  "eyebrow": "Texto de exemplo",
+  "steps": {
+    "title": "Como funciona",
+    "intro": "Três passos, na ordem em que acontecem. Troque pelos do seu produto.",
+    "items": {
+      "create": {
+        "title": "Crie sua conta",
+        "body": "Leva um minuto e só pede o que é preciso. Você confirma o e-mail e já entra."
+      },
+      "fill": {
+        "title": "Cadastre o que você já tem",
+        "body": "Digite ou importe. O que for pessoal fica só com você e pode ser exportado a qualquer hora."
+      },
+      "follow": {
+        "title": "Acompanhe sem esforço",
+        "body": "Tudo o que importa fica numa tela só, com avisos que você mesmo escolhe receber."
+      }
+    }
+  },
+  "faq": {
+    "title": "Perguntas frequentes",
+    "intro": "Respostas curtas para o que mais se pergunta antes de começar.",
+    "items": {
+      "start": {
+        "question": "Preciso pagar para começar?",
+        "answer": "Não. A conta gratuita já traz o essencial, e você só assina se quiser mais."
+      },
+      "data": {
+        "question": "O que acontece com os meus dados?",
+        "answer": "Ficam na sua conta. Você baixa uma cópia quando quiser e apaga tudo com um botão, sem pedir a ninguém."
+      },
+      "cancel": {
+        "question": "Posso cancelar quando quiser?",
+        "answer": "Sim. O cancelamento vale ao fim do período já pago, sem multa e sem ligação."
+      }
+    }
+  },
+  "title": "O dia a dia organizado, sem enfeite",
+  "subtitle": "Texto de exemplo. Troque esta frase pela proposta do seu produto, em um parágrafo curto.",
+  "primary": "Criar conta",
+  "secondary": "Já tenho conta",
+  "sampleLabel": "Exemplo de ficha",
+  "sampleCustomer": "Cliente",
+  "sampleDocument": "CPF",
+  "sampleTotal": "Total",
+  "sampleStatus": "Paga",
+  "sampleName": "Ana Souza"
+}

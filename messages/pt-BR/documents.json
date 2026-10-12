@@ -1,0 +1,18 @@
+{
+  "receipt": {
+    "title": "Recibo de pagamento",
+    "number": "Número",
+    "payer": "Pago por",
+    "amount": "Valor",
+    "date": "Data do pagamento",
+    "method": "Forma de pagamento",
+    "verifyTitle": "Confirme este recibo",
+    "verifyHelp": "Aponte a câmera para o código ou abra o endereço abaixo para ver que este recibo é verdadeiro.",
+    "methods": {
+      "card": "Cartão",
+      "pix": "Pix",
+      "boleto": "Boleto",
+      "unknown": "Não informada"
+    }
+  }
+}

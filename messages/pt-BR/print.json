@@ -1,0 +1,7 @@
+{
+  "contact": {
+    "title": "Ficha de contato",
+    "footer": "Ficha {number}, impressa a partir da caixa de contatos.",
+    "action": "Imprimir ficha"
+  }
+}

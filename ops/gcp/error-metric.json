@@ -1,0 +1,5 @@
+{
+  "name": "app_errors",
+  "description": "Entries the app wrote with severity ERROR or worse",
+  "filter": "logName:\"/logs/app\" AND severity>=ERROR"
+}

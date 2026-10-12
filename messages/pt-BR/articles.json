@@ -1,0 +1,10 @@
+{
+  "title": "Artigos",
+  "subtitle": "Textos para ler com calma, do mais novo para o mais antigo.",
+  "empty": "Ainda não há artigos.",
+  "published": "Publicado em {date}",
+  "updated": "Atualizado em {date}",
+  "by": "Por {author}",
+  "trail": "Você está aqui",
+  "home": "Início"
+}

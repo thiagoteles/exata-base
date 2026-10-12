@@ -6,6 +6,7 @@ import { validationMessage, z } from "@/lib/validation";
 import { cpfSchema, dateSchema } from "@/lib/validation-br";
 import { renderWithIntl } from "@/tests/render";
 import {
+  FormComboboxField,
   FormMaskedField,
   FormSelectField,
   FormSwitchField,
@@ -102,5 +103,41 @@ describe("a schema form", () => {
     const [values] = onSubmit.mock.calls[0] ?? [];
     expect(values).toEqual({ cpf: "529.982.247-25", birth: "15/03/1985" });
     expect(typed.safeParse(values).success).toBe(true);
+  });
+});
+
+const chosen = z.object({ owner: z.uuid({ message: validationMessage("required") }) });
+type Chosen = z.input<typeof chosen>;
+
+function ChoiceForm({ onSubmit }: { onSubmit: (values: Chosen) => void }) {
+  const form = useSchemaForm<Chosen>(chosen, { owner: "" });
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <FormComboboxField
+        control={form.control}
+        name="owner"
+        label="Tutor"
+        placeholder="Escolha"
+        options={[
+          { value: "0c6f5c1e-3f4a-4a56-9f0e-8a1d7e5b2c31", label: "Ana" },
+          { value: "1d7f6d2f-4a5b-4b67-8a1e-9b2e8f6c3d42", label: "João" },
+        ]}
+      />
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}
+
+describe("a choice searched in a long list", () => {
+  it("is refused while empty, and hands submit the value of the option found by typing", async () => {
+    const onSubmit = vi.fn();
+    renderWithIntl(<ChoiceForm onSubmit={onSubmit} />);
+    await submit();
+    expect(screen.getByText("Preencha este campo.")).toBeTruthy();
+    await act(() => fireEvent.click(screen.getByRole("button", { name: "Tutor" })));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "joao" } });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    await submit();
+    expect(onSubmit.mock.calls[0]?.[0]).toEqual({ owner: "1d7f6d2f-4a5b-4b67-8a1e-9b2e8f6c3d42" });
   });
 });

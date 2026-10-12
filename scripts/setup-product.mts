@@ -79,8 +79,31 @@ const { values: flags } = parseArgs({
     set: { type: "string", multiple: true },
     yes: { type: "boolean", default: false },
     "no-check": { type: "boolean", default: false },
+    help: { type: "boolean", short: "h", default: false },
   },
 });
+
+if (flags.help) {
+  process.stdout.write(`pnpm setup:product [flags]
+
+Asks what is missing; with --yes, asks nothing and keeps the current value of every flag left out.
+
+  --name <text>          product name
+  --description <text>   one sentence: what it does and for whom
+  --audience <text>      who it is for
+  --tone <text>          three words on how it sounds and looks
+  --surfaces <text>      public site, member area, staff area, admin
+  --backup-days <n>      days the daily backup is kept
+  --ports <n>            local app port; database, mail and image follow it
+  --preset <name>        ${presetNames.join(", ")}
+  --hue <0-360>          brand hue
+  --chroma <0.04-0.2>    brand chroma
+  --set NAME=value       an outside service's key (repeatable)
+  --yes                  answer nothing interactively
+  --no-check             skip pnpm check at the end
+`);
+  process.exit(0);
+}
 
 const read = (file: string) => readFileSync(file, "utf8");
 const run = (command: string, args: string[]) => execFileSync(command, args, { stdio: "inherit" });
@@ -206,6 +229,12 @@ if (problems.length > 0 || seeds === null) {
   process.exit(1);
 }
 
+// The catalog references are pictures of the colors and the preset; changing either outdates them.
+const looksChanged =
+  preset !== (design.preset ?? "instrument") ||
+  hue !== design.brand.hue ||
+  chroma !== design.brand.chroma;
+
 const today = new Date().toISOString().slice(0, 10);
 writeFileSync(files.site, applyCatalog(read(files.site), input));
 writeFileSync(files.privacy, applyPrivacy(read(files.privacy), backupDays));
@@ -246,6 +275,10 @@ Done. Still yours to write:
 - the terms and privacy text (messages/pt-BR/terms.json and privacy.json), written for a generic product; the backup retention is already in the privacy text
 - production variables: see the README, section "Variables"
 ${
+  looksChanged
+    ? "- the catalog references in e2e/__snapshots__ still show the old look: with the compose up, run `pnpm test:e2e e2e/catalog-snapshots.spec.ts --update-snapshots`, look at the new pictures and commit them\n"
+    : ""
+}${
   Object.keys(services).length > 0
     ? `- the services you answered are in ${integrationsFile} (ignored by git): copy its lines into the hosting panel, and point each webhook as the README says\n`
     : ""

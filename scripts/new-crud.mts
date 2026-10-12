@@ -155,5 +155,7 @@ if (values["sync-sample"]) {
 ${names.area} is ready: ${files.length} files, the migration, the navigation entry and its text.
 Still yours: the fields (the sample has name, code, status, due date and notes), the text in
 messages/pt-BR/${renamer(names)("sampleItems")}.json, and \`pnpm db:migrate\` to apply the migration.
+Change the fields in two migrations, first adding and then removing, so drizzle-kit asks nothing;
+a child of another area has its recipe in the new-crud skill.
 `);
 }

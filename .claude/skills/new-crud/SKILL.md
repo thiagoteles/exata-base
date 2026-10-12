@@ -30,18 +30,57 @@ pnpm db:migrate
 
 ## After it runs
 
-1. **The fields.** The sample has name, code (unique in the account), status, due date and notes.
+1. **The fields.** The sample has name, code, status, due date and notes.
    Change the table, `lib/<area>/options.ts`, the input type in the rules, the form schema, the
-   form, the record and the list together, then `pnpm db:generate --name <change>` and
-   `pnpm db:migrate`. A Brazilian field uses the schemas of `lib/validation-br.ts` inside
-   `optional(...)` when it may stay blank, and its mask in `FormMaskedField`.
+   form, the record and the list together. A Brazilian field uses the schemas of
+   `lib/validation-br.ts` inside `optional(...)` when it may stay blank, and its mask in
+   `FormMaskedField`; a choice among the account's own records (a long list) is
+   `FormComboboxField`.
+   **Write the migration in two steps**: drizzle-kit asks "created or renamed?" whenever one
+   migration both adds and removes columns, enums or tables, and that question needs a terminal
+   (an agent gets `Interactive prompts require a TTY`). So first add the new columns and enums
+   with the old ones still there and run `pnpm db:generate --name <area>-fields`, then remove the
+   old ones and run `pnpm db:generate --name <area>-drop-sample-fields`. Neither asks anything, and
+   a column is never renamed by accident. Then `pnpm db:migrate`.
 2. **The text** is in `messages/pt-BR/<areaCamel>.json`. Read it once: it was written around the
    label.
 3. **The tests** follow the fields: the integration test and the spec name the sample's fields.
-4. A child record (the animals of a person) is a second area whose table points at the first with
-   the owner repeated in a composite foreign key, so the database refuses a child filed under
-   another account's parent. Count children with the table names written in full: inside a
-   subquery Drizzle leaves a column unqualified.
+4. **A child area** (the animals of a person) is a second `pnpm new:crud`, then:
+   - **The table** gets the parent's id and a composite key with the owner repeated, so the
+     database refuses a child filed under another account's parent. The parent already has the
+     unique `(owner_id, id)` the key needs (every generated table is born with it):
+     ```ts
+     personId: uuid().notNull(),
+     // ...
+     index().on(table.personId),
+     foreignKey({
+       columns: [table.ownerId, table.personId],
+       foreignColumns: [people.ownerId, people.id],
+       name: "pets_person_fk",
+     }),
+     ```
+     With no `onDelete` the parent cannot be deleted while it has children, and deleting the
+     account still takes both (the check runs at the end of the cascade). If the parent table was
+     made before it had that unique, add the unique in one migration and the key in the next:
+     drizzle-kit writes a new key before a new unique and Postgres refuses that order.
+   - **The rules**: create and update wrap the write in
+     `refusingBrokenLinks("<childParentMissing>", ...)` and refuse a parent id that `isRecordId`
+     rejects with the same key; the parent's delete wraps its delete in
+     `refusingBrokenLinks("<parentHasChildren>", ...)`. Both keys go in `messages/pt-BR/errors.json`.
+     Reads join the parent for its name (`innerJoin(people, eq(people.id, pets.personId))`), the
+     list searches the parent's name too, and a `<children>Of<Parent>(db, viewer, scope, parentId)`
+     read serves the parent's page.
+   - **The form** receives the account's parents (a `<parent>Choices(db, viewer)` read in the
+     parent's rules) and picks one with `FormComboboxField`. The new-child page reads
+     `?<parent>=<id>` and starts the form under that parent when it is one of the account's, and
+     shows an empty state with a link to the parent's form while the account has none.
+   - **The parent's page** shows the children: a component in the child's feature (a feature
+     never imports another feature; the page composes both) with a link to each child and one to
+     the new-child form with the parent already chosen.
+   - Count children with the table names written in full: inside a subquery Drizzle leaves a
+     column unqualified.
+   - The navigation lists the parent before the child (`lib/navigation.ts`); an icon that fits the
+     domain is a name in `navIconNames` and its Tabler icon in the shell's icon map.
 
 ## The base itself
 

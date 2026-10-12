@@ -1,0 +1,1 @@
+ALTER TABLE "sample_items" ADD CONSTRAINT "sample_items_owner_id" UNIQUE("owner_id","id");

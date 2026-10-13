@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/patterns/page-header";
 import { editSampleItemHref } from "@/features/sample-items/presentation";
 import { SampleItemRecord } from "@/features/sample-items/record";
+import { SamplePartsOfSampleItem } from "@/features/sample-parts/of-parent";
 import { db } from "@/lib/db/client";
 import { requirePageRole } from "@/lib/page-guard";
 import { readerOf } from "@/lib/reader";
@@ -41,6 +42,7 @@ async function SampleItem({ params }: Pick<PageProps<"/sample-items/[id]">, "par
         subtitle={t("title")}
         actions={[{ key: "edit", label: t("edit"), href: editSampleItemHref(id) }]}
       />
+      <SamplePartsOfSampleItem viewer={user} scope="mine" sampleItemId={id} canManage />
       <SampleItemRecord item={item} canManage timeZone={timeZone} locale={locale} />
     </>
   );

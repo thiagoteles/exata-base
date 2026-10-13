@@ -22,5 +22,9 @@
   "paidPlanRequired": "Esse recurso é do plano pago.",
   "nothingToRefund": "Não há pagamento para reembolsar.",
   "emailNotSent": "Não foi possível enviar o e-mail. Tente de novo.",
-  "sampleItemCodeTaken": "Já existe um registro com esse código no seu cadastro."
+  "sampleItemCodeTaken": "Já existe um registro com esse código no seu cadastro.",
+  "sampleItemHasLinks": "Ainda há outros registros ligados a este. Exclua ou mova esses registros antes.",
+  "samplePartCodeTaken": "Já existe um registro com esse código no seu cadastro.",
+  "samplePartHasLinks": "Ainda há outros registros ligados a este. Exclua ou mova esses registros antes.",
+  "samplePartParentMissing": "Escolha um registro de amostras do seu cadastro."
 }

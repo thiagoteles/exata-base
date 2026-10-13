@@ -933,6 +933,16 @@
       }
     },
     {
+      "includes": ["lib/*/records.ts", "tests/integration/*.test.ts"],
+      "linter": {
+        "rules": {
+          "security": {
+            "noSecrets": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["**/*.test.ts", "**/*.test.tsx", "e2e/**", "tests/**"],
       "linter": {
         "rules": {

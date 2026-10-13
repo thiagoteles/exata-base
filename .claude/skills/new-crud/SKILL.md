@@ -1,6 +1,6 @@
 ---
 name: new-crud
-description: Make a complete area of records a person keeps: table, rules, list, record, add and change form, delete, pages, text and tests. Use when a product needs to register something new (people, orders, pets, projects), before writing any of it by hand.
+description: Make a complete area of records a person keeps, or a child area filed under another (the pets of a person): table, rules, list, record, add and change form, delete, pages, text and tests. Use when a product needs to register something new (people, orders, pets, projects), before writing any of it by hand.
 ---
 
 # New area of records
@@ -45,44 +45,41 @@ pnpm db:migrate
 2. **The text** is in `messages/pt-BR/<areaCamel>.json`. Read it once: it was written around the
    label.
 3. **The tests** follow the fields: the integration test and the spec name the sample's fields.
-4. **A child area** (the animals of a person) is a second `pnpm new:crud`, then:
-   - **The table** gets the parent's id and a composite key with the owner repeated, so the
-     database refuses a child filed under another account's parent. The parent already has the
-     unique `(owner_id, id)` the key needs (every generated table is born with it):
-     ```ts
-     personId: uuid().notNull(),
-     // ...
-     index().on(table.personId),
-     foreignKey({
-       columns: [table.ownerId, table.personId],
-       foreignColumns: [people.ownerId, people.id],
-       name: "pets_person_fk",
-     }),
-     ```
-     With no `onDelete` the parent cannot be deleted while it has children, and deleting the
-     account still takes both (the check runs at the end of the cascade). If the parent table was
-     made before it had that unique, add the unique in one migration and the key in the next:
-     drizzle-kit writes a new key before a new unique and Postgres refuses that order.
-   - **The rules**: create and update wrap the write in
-     `refusingBrokenLinks("<childParentMissing>", ...)` and refuse a parent id that `isRecordId`
-     rejects with the same key; the parent's delete wraps its delete in
-     `refusingBrokenLinks("<parentHasChildren>", ...)`. Both keys go in `messages/pt-BR/errors.json`.
-     Reads join the parent for its name (`innerJoin(people, eq(people.id, pets.personId))`), the
-     list searches the parent's name too, and a `<children>Of<Parent>(db, viewer, scope, parentId)`
-     read serves the parent's page.
-   - **The form** receives the account's parents (a `<parent>Choices(db, viewer)` read in the
-     parent's rules) and picks one with `FormComboboxField`. The new-child page reads
-     `?<parent>=<id>` and starts the form under that parent when it is one of the account's, and
-     shows an empty state with a link to the parent's form while the account has none.
-   - **The parent's page** shows the children: a component in the child's feature (a feature
-     never imports another feature; the page composes both) with a link to each child and one to
-     the new-child form with the parent already chosen.
+4. **A child area** (the animals of a person) is one command, once the parent exists:
+   ```
+   pnpm new:crud pets --entity Pet --label "Animais" --parent people
+   pnpm db:migrate
+   ```
+   It writes the area from the second living sample (`sample-parts`, filed under `sample-items`):
+   the table with the parent's id and a key that repeats the owner, so the database refuses a
+   parent of another account; rules that refuse a missing parent (409, `<child>ParentMissing`),
+   read the parent's name with every record and search by it; a form that picks the parent with
+   `FormComboboxField` and starts under it when opened with `?parent=<id>`; an empty state that
+   sends to the parent's form while the account has none; the parent's name as a link on the
+   record and a column in the list; and the navigation entry right below the parent's. In the
+   parent it adds only two lines to its record page: the import and the section that lists the
+   children with the way to add another. The parent's delete already refuses while children point
+   at it (409, `<parent>HasLinks`): every area is born that way.
+   - The parent needs what every generated area has: a `name` column, the unique
+     `(owner_id, id)`, `export type <Entity>Row` in its rules and its label in `nav.json`. The
+     command checks and says what is missing before writing anything. A parent made before the
+     unique existed gets it in a migration of its own first: drizzle-kit writes a new key before a
+     new unique in one migration, and Postgres refuses that order.
+   - When the parent's record page changed so much that the two lines have no place, the command
+     prints them for you to place.
+   - Text: the field that names the parent reads "Registro de <rótulo do pai>"; read
+     `messages/pt-BR/<child>.json` once and make it sound like the product ("Tutor").
+   - The child's tests create the parent straight in its table with only the owner and the name,
+     so they hold whatever fields the parent gets; give them the parent's required columns if you
+     add any without a default. The browser spec makes the parent through its form with only the
+     name.
    - Count children with the table names written in full: inside a subquery Drizzle leaves a
-     column unqualified.
-   - The navigation lists the parent before the child (`lib/navigation.ts`); an icon that fits the
-     domain is a name in `navIconNames` and its Tabler icon in the shell's icon map.
+     column unqualified. An icon that fits the domain is a name in `navIconNames` and its Tabler
+     icon in the shell's icon map.
 
 ## The base itself
 
-The sample lives in the base on purpose, as the template. After changing it, run
-`pnpm new:crud --sync-sample`: a test fails while the template and the living sample differ.
+Both samples live in the base on purpose, as the templates: `sample-items` and `sample-parts`,
+filed under it. After changing either, run `pnpm new:crud --sync-sample`: a test fails while a
+template and its living sample differ. The template keeps the parent's record page without the
+child's two lines. The first area a product makes removes both samples.

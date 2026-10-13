@@ -134,6 +134,13 @@
       "when": 1791848288305,
       "tag": "0018_sample-items-owner-key",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791849461615,
+      "tag": "0019_sample_parts",
+      "breakpoints": true
     }
   ]
 }

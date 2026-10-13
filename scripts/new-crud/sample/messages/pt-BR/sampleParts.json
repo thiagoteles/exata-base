@@ -1,0 +1,66 @@
+{
+  "title": "Peças",
+  "subtitle": "Os registros de peças do seu cadastro.",
+  "label": "Peças cadastradas",
+  "name": "Nome",
+  "parent": "Registro de amostras",
+  "code": "Código",
+  "status": "Situação",
+  "dueDate": "Prazo",
+  "createdAt": "Cadastro",
+  "searchLabel": "Buscar por nome, código ou registro de amostras",
+  "statusFilter": "Situação",
+  "allStatuses": "Todas",
+  "sortBy": "Ordenar por",
+  "sortName": "Nome, A a Z",
+  "sortNameDesc": "Nome, Z a A",
+  "sortDateDesc": "Mais recentes",
+  "emptyTitle": "Nenhum registro de peças ainda.",
+  "new": "Novo registro",
+  "newTitle": "Novo registro de peças",
+  "editTitle": "Editar registro de peças",
+  "edit": "Editar",
+  "delete": "Excluir",
+  "statuses": {
+    "open": "Em aberto",
+    "closed": "Encerrado"
+  },
+  "form": {
+    "parent": "Registro de amostras",
+    "parentPlaceholder": "Escolha o registro de amostras",
+    "name": "Nome",
+    "code": "Código",
+    "codeHelp": "Opcional. Letras, números e hífen; não se repete no seu cadastro.",
+    "status": "Situação",
+    "dueDate": "Prazo",
+    "notes": "Observações",
+    "create": "Cadastrar",
+    "save": "Salvar alterações",
+    "cancel": "Cancelar",
+    "failed": "Não foi possível salvar. Tente de novo."
+  },
+  "record": {
+    "parent": "Registro de amostras",
+    "code": "Código",
+    "status": "Situação",
+    "dueDate": "Prazo",
+    "since": "No cadastro desde",
+    "notes": "Observações",
+    "none": "Não informado"
+  },
+  "needsParent": "Para cadastrar aqui, cadastre antes um registro de amostras.",
+  "needsParentAction": "Cadastrar em amostras",
+  "ofParent": {
+    "title": "{count, plural, =0 {Nenhum registro de peças} one {Um registro de peças} other {# registros de peças}}",
+    "add": "Adicionar",
+    "empty": "Ainda não há registros de peças aqui."
+  },
+  "remove": {
+    "title": "Excluir {name}?",
+    "consequence": "Este registro será apagado. Não dá para desfazer.",
+    "confirm": "Excluir",
+    "cancel": "Manter",
+    "done": "{name} saiu do cadastro.",
+    "failed": "Não foi possível excluir. Tente de novo."
+  }
+}

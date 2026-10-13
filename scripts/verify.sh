@@ -122,23 +122,26 @@ docker rm -f "${name}-app" "${name}-db" > /dev/null
 docker network rm "${name}-net" > /dev/null
 docker image rm "${name}:local" > /dev/null
 
-echo "== A generated area, in a product born the way create-next-app makes one"
+echo "== A generated area and its child, in a product born the way create-next-app makes one"
 # The packages are installed before git exists, as create-next-app does; then the generator makes
-# an area, and that area must pass the check, its rules and its screens with nobody touching it.
+# an area and a child area under it, and both must pass the check, their rules and their screens
+# with nobody touching them.
 git ls-files -z --cached --others --exclude-standard | tar --null -T - -cf - | tar -xf - -C "$generated"
 (
   cd "$generated"
-  rm -f BASE.md LEFT.md
+  rm -f BASE.md
   pnpm install --frozen-lockfile --prefer-offline > /dev/null
   git init -q && git add -A && git -c user.email=verify@app.local -c user.name=verify commit -qm "Initial commit"
   pnpm new:crud verify-records --entity VerifyRecord --label "Registros de prova"
+  pnpm new:crud verify-parts --entity VerifyPart --label "Peças de prova" --parent verify-records
   git add -A
   pnpm check
-  pnpm exec vitest run --config vitest.integration.config.mts tests/integration/verify-records.test.ts
+  pnpm exec vitest run --config vitest.integration.config.mts \
+    tests/integration/verify-records.test.ts tests/integration/verify-parts.test.ts
   docker compose -p "${name}-generated" up -d
 )
 wait_for "http://localhost:${app_port}/health" 600
-(cd "$generated" && pnpm exec playwright test e2e/verify-records.spec.ts)
+(cd "$generated" && pnpm exec playwright test e2e/verify-records.spec.ts e2e/verify-parts.spec.ts)
 (cd "$generated" && docker compose -p "${name}-generated" down -v > /dev/null)
 
 echo "== Browser suite on a clean compose, against the production build"

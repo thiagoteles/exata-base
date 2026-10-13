@@ -35,6 +35,7 @@ export type NavItem = {
 
 const navItems: readonly NavItem[] = [
   { key: "sampleItems", href: "/sample-items", group: "main", minimum: "member", icon: "folder" },
+  { key: "sampleParts", href: "/sample-parts", group: "main", minimum: "member", icon: "folder" },
   { key: "account", href: "/account", group: "main", minimum: "member", icon: "user", exact: true },
   { key: "plan", href: "/account/plan", group: "main", minimum: "member", icon: "card" },
   { key: "messages", href: "/account/messages", group: "main", minimum: "member", icon: "mail" },

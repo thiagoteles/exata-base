@@ -22,10 +22,13 @@ import { jobRuns } from "./schema/operations";
 import { rateLimits } from "./schema/rate-limits";
 import { referrals } from "./schema/referrals";
 import { sampleItemStatus, sampleItems } from "./schema/sample-items";
+import { samplePartStatus, sampleParts } from "./schema/sample-parts";
 import { userRole, users } from "./schema/users";
 
 /** Every table and enum. A new table is added here and in the personal data registry. */
 export const schema = {
+  sampleParts,
+  samplePartStatus,
   users,
   userRole,
   sessions,

@@ -6,6 +6,7 @@ import { contactMessages } from "./schema/contact";
 import { files } from "./schema/files";
 import { referrals } from "./schema/referrals";
 import { sampleItems } from "./schema/sample-items";
+import { sampleParts } from "./schema/sample-parts";
 import { users } from "./schema/users";
 
 /*
@@ -18,6 +19,7 @@ type Exported = { key: string; table: PgTable; owner: AnyPgColumn };
 type NotExported = { table: PgTable; reason: string };
 
 export const exportedData: readonly Exported[] = [
+  { key: "sample_parts", table: sampleParts, owner: sampleParts.ownerId },
   { key: "user", table: users, owner: users.id },
   { key: "plan", table: plans, owner: plans.userId },
   { key: "payments", table: payments, owner: payments.payerId },

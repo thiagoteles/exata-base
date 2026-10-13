@@ -1,7 +1,7 @@
 import { and, asc, count, desc, eq, or } from "drizzle-orm";
 import { isRecordId, type Scope, type Viewer, visibleTo } from "@/lib/access/rules";
 import type { IsoDate } from "@/lib/date";
-import { refusingDuplicates, sameVersion } from "@/lib/db/conflicts";
+import { refusingBrokenLinks, refusingDuplicates, sameVersion } from "@/lib/db/conflicts";
 import type { Database } from "@/lib/db/database";
 import { sampleItems } from "@/lib/db/schema/sample-items";
 import { contains } from "@/lib/db/search";
@@ -76,14 +76,14 @@ export async function updateSampleItem(
   throw new DomainError(current === undefined ? 404 : 409);
 }
 
+/** Deletes a record; 404 when not the viewer's, 409 while records of another area point at it. */
 export async function deleteSampleItem(db: Database, viewer: Viewer, id: string): Promise<void> {
   if (!isRecordId(id)) {
     throw new DomainError(404);
   }
-  const gone = await db
-    .delete(sampleItems)
-    .where(own(viewer, id))
-    .returning({ id: sampleItems.id });
+  const gone = await refusingBrokenLinks("sampleItemHasLinks", () =>
+    db.delete(sampleItems).where(own(viewer, id)).returning({ id: sampleItems.id }),
+  );
   if (gone.length === 0) {
     throw new DomainError(404);
   }

@@ -3,7 +3,8 @@
  * sample (`sample-items`) is a real area: it compiles, its rules run against Postgres and its
  * screens in the browser suite. A copy of it is kept out of the app, as the template the generator
  * reads, so a product that removed the sample can still make areas. A test keeps the copy equal
- * to the living sample while the sample exists.
+ * to the living sample while the sample exists. A second sample, `sample-parts`, is filed under the
+ * first and is the template of a child area (`--parent`).
  */
 
 export const TEMPLATE_ROOT = "scripts/new-crud/sample";
@@ -63,12 +64,103 @@ export const registrations = [
   },
 ] as const;
 
+const inUse = "Ainda há outros registros ligados a este. Exclua ou mova esses registros antes.";
+
 export const catalogKeys = [
   { file: "messages/pt-BR/nav.json", path: ["items", "sampleItems"], value: "Amostras" },
   {
     file: "messages/pt-BR/errors.json",
     path: ["sampleItemCodeTaken"],
     value: "Já existe um registro com esse código no seu cadastro.",
+  },
+  { file: "messages/pt-BR/errors.json", path: ["sampleItemHasLinks"], value: inUse },
+] as const;
+
+/** Every file of the child sample, by its path in the app. */
+export const childFiles = [
+  "lib/db/schema/sample-parts.ts",
+  "lib/sample-parts/options.ts",
+  "lib/sample-parts/records.ts",
+  "features/sample-parts/actions.ts",
+  "features/sample-parts/delete-record.tsx",
+  "features/sample-parts/form.tsx",
+  "features/sample-parts/list.tsx",
+  "features/sample-parts/of-parent.tsx",
+  "features/sample-parts/presentation.ts",
+  "features/sample-parts/record.tsx",
+  "features/sample-parts/schema.ts",
+  "app/(app)/sample-parts/page.tsx",
+  "app/(app)/sample-parts/new/page.tsx",
+  "app/(app)/sample-parts/[id]/page.tsx",
+  "app/(app)/sample-parts/[id]/edit/page.tsx",
+  "messages/pt-BR/sampleParts.json",
+  "tests/integration/sample-parts.test.ts",
+  "e2e/sample-parts.spec.ts",
+] as const;
+
+/** The child sample's lines in the shared registries, written after the same anchors. */
+export const childRegistrations = [
+  {
+    file: "lib/db/schema.ts",
+    anchor: 'import { is } from "drizzle-orm";',
+    lines: ['import { samplePartStatus, sampleParts } from "./schema/sample-parts";'],
+  },
+  {
+    file: "lib/db/schema.ts",
+    anchor: "export const schema = {",
+    lines: ["  sampleParts,", "  samplePartStatus,"],
+  },
+  {
+    file: "lib/db/personal-data.ts",
+    anchor: 'import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";',
+    lines: ['import { sampleParts } from "./schema/sample-parts";'],
+  },
+  {
+    file: "lib/db/personal-data.ts",
+    anchor: "export const exportedData: readonly Exported[] = [",
+    lines: ['  { key: "sample_parts", table: sampleParts, owner: sampleParts.ownerId },'],
+  },
+] as const;
+
+/** The child's entry in the navigation, written right below its parent's. */
+export const childNavigation = {
+  file: "lib/navigation.ts",
+  line: '  { key: "sampleParts", href: "/sample-parts", group: "main", minimum: "member", icon: "folder" },',
+} as const;
+
+/**
+ * What the parent's record page gets: the import of the child's section, and the section itself
+ * right before the parent's record. The anchors are written with the first sample's names, which
+ * stand for the parent. The template of the first sample is kept without these lines.
+ */
+export const parentPage = {
+  file: "app/(app)/sample-items/[id]/page.tsx",
+  importAnchor: 'import { SampleItemRecord } from "@/features/sample-items/record";',
+  importLine: 'import { SamplePartsOfSampleItem } from "@/features/sample-parts/of-parent";',
+  sectionAnchor:
+    "      <SampleItemRecord item={item} canManage timeZone={timeZone} locale={locale} />",
+  sectionLine:
+    '      <SamplePartsOfSampleItem viewer={user} scope="mine" sampleItemId={id} canManage />',
+} as const;
+
+/** A file of the samples as the template keeps it: the parent's page without the child's lines. */
+export const asTemplate = (file: string, text: string): string =>
+  file === parentPage.file
+    ? removeLines(text, [parentPage.importLine, parentPage.sectionLine])
+    : text;
+
+export const childCatalogKeys = [
+  { file: "messages/pt-BR/nav.json", path: ["items", "sampleParts"], value: "Peças" },
+  {
+    file: "messages/pt-BR/errors.json",
+    path: ["samplePartCodeTaken"],
+    value: "Já existe um registro com esse código no seu cadastro.",
+  },
+  { file: "messages/pt-BR/errors.json", path: ["samplePartHasLinks"], value: inUse },
+  {
+    file: "messages/pt-BR/errors.json",
+    path: ["samplePartParentMissing"],
+    value: "Escolha um registro de amostras do seu cadastro.",
   },
 ] as const;
 
@@ -84,6 +176,19 @@ export function insertAfter(text: string, anchor: string, lines: readonly string
   }
   const end = at + anchor.length;
   return `${text.slice(0, end)}\n${missing.join("\n")}${text.slice(end)}`;
+}
+
+/** Writes the lines right before the anchor. A line already there is not written twice. */
+export function insertBefore(text: string, anchor: string, lines: readonly string[]): string {
+  const at = text.indexOf(anchor);
+  if (at === -1) {
+    throw new Error(`the anchor is gone: ${anchor}`);
+  }
+  const missing = lines.filter((line) => !text.includes(line));
+  if (missing.length === 0) {
+    return text;
+  }
+  return `${text.slice(0, at)}${missing.join("\n")}\n${text.slice(at)}`;
 }
 
 /** Takes lines out, for a product that no longer wants the sample. */

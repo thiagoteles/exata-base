@@ -72,6 +72,8 @@ Next 16.4 com `cacheComponents` e `partialPrefetching` (a casca é estática e o
 - Toda `EmailMessage` leva `category`; `domain/email/consent.ts` decide e `lib/ports/email/consent.ts` filtra os destinatários pela preferência `email` da conta. O padrão de conta nova é lembretes ligados e novidades desligadas. `sendEmail` devolve `sent`, `declined` ou `failed`.
 - Descadastro sem tabela: `categoria:endereço` em base64url mais HMAC-SHA256 com propósito (`lib/unsubscribe/token.ts`). A porta manda uma cópia por destinatário com o link e os cabeçalhos `List-Unsubscribe` e `List-Unsubscribe-Post`. `POST /api/unsubscribe?token=` desliga sem tela; `GET` leva a `/descadastrar`. Endereço sem conta e conta que já desligou respondem igual.
 - E-mails saem no idioma do destinatário (`emailTranslatorFor`): o salvo na conta, senão o do pedido que causou o envio; o aviso à equipe fica no idioma padrão.
+- Anexos: `EmailMessage.attachments` (`filename`, `contentType`, `content`), mapeados no Mailtrap (base64, `disposition: attachment`) e no SMTP local. O total é limitado por `EMAIL_ATTACHMENTS_MAX_MB` (10) em `lib/ports/email/attachments.ts`; acima disso o envio é recusado inteiro e devolve `failed`, com os tamanhos no log. Quem anexa confere o mesmo teto antes, com `checkAttachments` de `domain/email/attachments.ts`, para mostrar o tamanho de cada arquivo. O limite do provedor vale para a mensagem codificada, cerca de um terço maior, e não foi lido na documentação do Mailtrap.
+- Categoria `billing`: o que uma pessoa manda a outra sobre dinheiro devido (um lembrete de cobrança ao cliente). Chega a endereço sem conta, leva o link assinado de um clique e nunca vai a endereço que usou o link. Parar é uma linha em `email_suppressions` (endereço em minúsculas, sem dono, mantida depois que qualquer conta é apagada), porque endereço sem conta não tem preferência para desligar. `mayEmail(categoria, preferencias, suprimido)`; as outras três categorias não mudaram.
 - Um e-mail que uma operação envia reivindica a linha antes de enviar, então dois disparos não mandam duas vezes; `declined` não devolve a reivindicação, `failed` devolve.
 
 ### 3.5 Cobrança
@@ -118,6 +120,7 @@ Um segundo idioma é opt-in (README): o catálogo, a lista em `lib/i18n/locales.
 
 - API pública: `app/api/v1/*` atrás de tokens pessoais (`exb_` mais 32 bytes, só o hash em `api_tokens`, no máximo dez em vigor, último uso gravado no máximo uma vez por minuto). `apiRoute`, `apiWrite` e `apiPreflight` em `lib/api/route.ts`; limite de 600 por hora por token; `Cache-Control: no-store`. Sem OpenAPI gerado.
 - PDF e QR só em `lib/documents/`: `renderPdf`, `qrPngDataUri`, `qrSvg`; cores do `emailPalette` em hex; fonte TTF de `assets/fonts/` (Source Serif 4, OFL), declarada em `outputFileTracingIncludes` junto com as fontes padrão do pdfkit.
+- Idioma do documento (`lib/documents/language.ts`): lista própria, `pt-BR` e `en`, escolhida por documento e separada dos idiomas da interface. O português é a área `documents` do catálogo; o inglês é `messages/documents.en.json`, que não liga o roteamento por idioma. Um teste exige as mesmas chaves e argumentos e recusa valor em inglês igual ao português. Dinheiro e data seguem o idioma do documento: `formatMoney(valor, idioma)` de `domain/money/format.ts` e `formatDate(dia, idioma)`.
 - Documento verificável: o QR aponta para `/verificar/[slug]`, com `tipo:id` assinado por `DOCUMENT_SECRET`; endereço forjado é 404, nada fica guardado. O recibo sai de `payments` em `/account/receipts/[id]` e nunca é gravado.
 - Impressão: `styles/print.css` (folha, `@page` A4 com `counter(page) / counter(pages)` na margem, paleta clara em `data-paper`, tinta sobre papel em `@media print`); grupo `app/(print)` com casca própria; `components/print`. O exemplo é `/print/contacts/[id]`.
 
@@ -129,6 +132,16 @@ Um segundo idioma é opt-in (README): o catálogo, a lista em `lib/i18n/locales.
 - `pnpm new:crud <área>` troca o nome da amostra em todas as formas (kebab, snake, Pascal, camel, em palavras, o rótulo) e grava as linhas de registro depois de âncoras fixas (`lib/db/schema.ts`, `lib/db/personal-data.ts`, `lib/navigation.ts`) e as chaves nos catálogos. A primeira área de um produto remove as duas amostras, numa migração gerada depois da migração da área nova.
 - `pnpm new:crud <área> --parent <pai>` troca primeiro os nomes da filha e depois os da primeira amostra pelos do pai (entidade lida de `export type <Entity>Row`, rótulo de `nav.json`), confere que o pai tem `name` e a unicidade `(owner_id, id)`, insere duas linhas na ficha do pai (ou as imprime, se a ficha mudou) e põe a navegação logo abaixo da do pai.
 - O `pnpm verify` gera uma área e uma filha num produto nascido como o do `create-next-app` e roda check, integração e e2e sobre elas.
+
+### 3.11 Dinheiro em várias moedas, câmbio e séries
+
+- `domain/money`: `Money` é `{ minor, currency }`, inteiro seguro de unidades menores mais o código ISO 4217 em maiúsculas. As casas vêm do expoente da moeda (JPY 0, KWD 3, CLF 4, o resto 2; a tabela segue a norma e difere do CLDR só em IQD, o que um teste prova). O texto sai de um decimal exato, sem float, e a leitura é estrita: mais casas do que a moeda tem é recusado, não arredondado. `Cents` e `lib/money.ts` continuam para o que é só em reais; a conversão é na borda, e códigos de preço em minúsculas viram maiúsculas ao entrar.
+- Colunas de dinheiro novas devem ser `bigint`, não `integer`: IDR passa de 2,1 bilhões de unidades menores com R$ 21 milhões de rupias.
+- `domain/exchange`: dias do calendário sem relógio (`dates.ts`), política de qual dia e qual lado da cotação (`policy.ts`, padrão: venda do dia anterior à emissão) e conversão exata por cotação decimal, arredondando uma vez, metade para longe de zero (`convert.ts`).
+- Porta `exchange-rate` (`lib/ports/exchange-rate`): uma fonte, o PTAX do Banco Central, sem chave, com prazo de 2,5 s; fonte que falha vira `unavailable`, que é resposta. O endpoint de período devolve todos os boletins e o de fechamento é escolhido pelo início do rótulo (`Fechamento`). Provado contra o serviço real em 2026-10-12 (formato dos campos e dia sem cotação). `lib/exchange-rate/service.ts` guarda a cotação em `exchange_quotes` (uma cotação publicada não muda), olha o dia e os nove anteriores numa só chamada e lembra um dia passado sem fechamento, para um fim de semana não ser perguntado de novo. O hoje entra por parâmetro.
+- Séries numeradas: `number_sequences` guarda o último número por pessoa e série; `nextNumber(executor, ownerId, serie)` é um upsert que trava a linha até o fim da transação de quem chama, então chamadores concorrentes esperam a vez e uma transação desfeita devolve o número. Chame dentro da transação que usa o número. `domain/sequences/number.ts` escreve `INV-0008` e lê de volta; a série é maiúsculas, dígitos e hífens simples, começando por letra.
+- CNPJ com letras desde 2026: `maskCnpj` e `cnpjSchema` (`isValidCnpj` com `version: 2`, que lê numérico e alfanumérico), devolvendo catorze maiúsculas e dígitos.
+- Arquivo ligado a um registro: `files.subject_type`, `files.subject_id` e `files.kind`, sem chave estrangeira, porque a base não conhece as tabelas do produto. `listFiles(db, dono, registro)` filtra por dono e registro; `removeFilesOf` apaga bytes e linhas quando o registro vai embora. O limite de tamanho já era por chamada, então um plano mais baixo passa um `limitsFrom` menor.
 
 ## 4. Como se prova
 
@@ -195,6 +208,8 @@ Um segundo idioma é opt-in (README): o catálogo, a lista em `lib/i18n/locales.
 ## 6. Estado
 
 **Provado contra serviços reais:** Clerk (instância de desenvolvimento, `pnpm test:clerk`), Stripe (chaves de teste: checkouts, portal, cancelamento, reembolso, webhook), Google Cloud Storage e Logging (envio, link assinado, link adulterado recusado), `pnpm gcp:alerts` e `pnpm gcp:access-log` (alarme de enxurrada e de trabalho parado chegando por e-mail; o sink de acesso leva alguns minutos para valer), Umami 3 (envio pelo servidor e relatórios), e um produto criado pelo `create-next-app --example` contra o repositório público, com `setup:product`, áreas geradas e `pnpm verify` verde.
+
+**Provado só em teste:** anexos do Mailtrap (o corpo do pedido é testado com um fetch falso, sem chamada real; o limite de tamanho do provedor não foi lido); o envio com anexos ao Mailpit.
 
 **Não provado:** o caminho no Coolify com um banco de verdade; o uptime check (precisa de `APP_URL` público); numeração de página em Safari e Firefox.
 

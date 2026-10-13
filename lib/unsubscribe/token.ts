@@ -1,16 +1,16 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 /*
- * The link in a reminder or a newsletter that stops it. It is a signed statement, not a row: the
- * token says "this address, this kind of mail" and carries a signature only the server can make,
- * so there is nothing to store, nothing to look up and nothing to expire. A link in an old message
- * keeps working for good, which is what an unsubscribe link has to do.
+ * The link in a reminder, a newsletter or a billing message that stops it. It is a signed statement,
+ * not a row: the token says "this address, this kind of mail" and carries a signature only the
+ * server can make, so there is nothing to store, nothing to look up and nothing to expire. A link in
+ * an old message keeps working for good, which is what an unsubscribe link has to do.
  */
 
-export type Unsubscribable = "reminder" | "news";
+export type Unsubscribable = "reminder" | "news" | "billing";
 export type Unsubscription = { address: string; category: Unsubscribable };
 
-const categories: readonly string[] = ["reminder", "news"];
+const categories: readonly string[] = ["reminder", "news", "billing"];
 const SEPARATOR = ".";
 // The signature covers a purpose too, so a signature made for something else never fits here.
 const PURPOSE = "unsubscribe\n";

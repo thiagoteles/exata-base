@@ -16,6 +16,7 @@ import {
   planTier,
 } from "./schema/billing";
 import { contactMessages, contactStatus, contactSubject } from "./schema/contact";
+import { emailSuppressionCategory, emailSuppressions } from "./schema/email-suppressions";
 import { files } from "./schema/files";
 import { invites } from "./schema/invites";
 import { jobRuns } from "./schema/operations";
@@ -50,6 +51,8 @@ export const schema = {
   contactMessages,
   contactSubject,
   contactStatus,
+  emailSuppressions,
+  emailSuppressionCategory,
   files,
   rateLimits,
   jobRuns,

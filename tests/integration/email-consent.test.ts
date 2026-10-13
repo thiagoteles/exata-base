@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { emailSuppressions } from "@/lib/db/schema/email-suppressions";
 import { allowedRecipients } from "@/lib/ports/email/consent";
 import { savePreference } from "@/lib/preferences/service";
+import { applyUnsubscribe } from "@/lib/unsubscribe/service";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
 
@@ -37,6 +39,34 @@ describe("who a message may reach", () => {
     await savePreference(db, ana.id, "email", { reminders: false, news: true });
     expect(await reminder(["ana@example.com", "bia@example.com"])).toEqual(["bia@example.com"]);
     expect(await news(["ana@example.com", "bia@example.com"])).toEqual(["ana@example.com"]);
+  });
+
+  it("sends billing mail to an address with no account, until that address stops it", async () => {
+    const billing = (to: string | string[]) => allowedRecipients(db, { to, category: "billing" });
+    expect(await billing(["client@example.com", "other@example.com"])).toEqual([
+      "client@example.com",
+      "other@example.com",
+    ]);
+    await applyUnsubscribe(db, { address: "Client@Example.com", category: "billing" });
+    expect(await billing(["client@example.com", "other@example.com"])).toEqual([
+      "other@example.com",
+    ]);
+    expect(await billing("CLIENT@example.com")).toEqual([]);
+  });
+
+  it("stops billing mail for an address and leaves what it needs and the other kinds alone", async () => {
+    await createUser(db, "ana@example.com");
+    await applyUnsubscribe(db, { address: "ana@example.com", category: "billing" });
+    expect(await allowedRecipients(db, { to: "ana@example.com", category: "billing" })).toEqual([]);
+    expect(await reminder("ana@example.com")).toEqual(["ana@example.com"]);
+    expect(await transactional("ana@example.com")).toEqual(["ana@example.com"]);
+  });
+
+  it("keeps one suppression per address when the link is used twice", async () => {
+    await applyUnsubscribe(db, { address: "client@example.com", category: "billing" });
+    await applyUnsubscribe(db, { address: "client@example.com", category: "billing" });
+    const rows = await db.select().from(emailSuppressions);
+    expect(rows.filter((row) => row.address === "client@example.com")).toHaveLength(1);
   });
 
   it("matches the address whatever its case, and keeps the case it was given", async () => {

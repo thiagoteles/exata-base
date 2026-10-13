@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { readUnsubscribe, signUnsubscribe, type Unsubscribable } from "./token";
 
 const secret = "s".repeat(32);
-const categories = fc.constantFrom<Unsubscribable>("reminder", "news");
+const categories = fc.constantFrom<Unsubscribable>("reminder", "news", "billing");
 
 describe("unsubscribe tokens", () => {
   it("read back what was signed, with the address in lower case", () => {

@@ -36,12 +36,38 @@ describe("who may be e-mailed what", () => {
     expect(mayEmail("news", null)).toBe(false);
   });
 
+  it("sends billing mail to anyone who has not asked to stop it, account or not", () => {
+    fc.assert(
+      fc.property(anyone, (who) => {
+        expect(mayEmail("billing", who)).toBe(true);
+        expect(mayEmail("billing", who, false)).toBe(true);
+      }),
+    );
+  });
+
+  it("never sends billing mail to an address that asked to stop it, whatever its preferences", () => {
+    fc.assert(
+      fc.property(anyone, (who) => {
+        expect(mayEmail("billing", who, true)).toBe(false);
+      }),
+    );
+  });
+
+  it("lets a stopped billing address change nothing about the other categories", () => {
+    fc.assert(
+      fc.property(anyone, fc.constantFrom("transactional", "reminder", "news"), (who, category) => {
+        expect(mayEmail(category, who, true)).toBe(mayEmail(category, who, false));
+      }),
+    );
+  });
+
   it("does not make a choice for a new account beyond reminders on and news off", () => {
     const fresh: EmailPreferences = defaultEmailPreferences;
     expect(emailCategories.map((category) => mayEmail(category, fresh))).toEqual([
       true,
       true,
       false,
+      true,
     ]);
   });
 
@@ -50,10 +76,13 @@ describe("who may be e-mailed what", () => {
       fc.property(preferences, fc.constantFrom(...emailCategories), (who, category) => {
         const stricter = { reminders: false, news: false };
         expect(
-          !mayEmail(category, stricter) || mayEmail(category, who) || category === "transactional",
+          !mayEmail(category, stricter) ||
+            mayEmail(category, who) ||
+            category === "transactional" ||
+            category === "billing",
         ).toBe(true);
         if (mayEmail(category, stricter)) {
-          expect(category).toBe("transactional");
+          expect(["transactional", "billing"]).toContain(category);
         }
       }),
     );

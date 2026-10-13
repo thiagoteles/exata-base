@@ -10,7 +10,7 @@ import { confirmUnsubscribe } from "./actions";
 type UnsubscribeFormProps = {
   token: string;
   address: string;
-  category: "reminder" | "news";
+  category: "reminder" | "news" | "billing";
 };
 
 /** One question and one button: stop this kind of mail for this address. It says what happened after. */

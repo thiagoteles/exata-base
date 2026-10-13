@@ -19,6 +19,7 @@ import { contactMessages, contactStatus, contactSubject } from "./schema/contact
 import { emailSuppressionCategory, emailSuppressions } from "./schema/email-suppressions";
 import { files } from "./schema/files";
 import { invites } from "./schema/invites";
+import { numberSequences } from "./schema/number-sequences";
 import { jobRuns } from "./schema/operations";
 import { rateLimits } from "./schema/rate-limits";
 import { referrals } from "./schema/referrals";
@@ -54,6 +55,7 @@ export const schema = {
   emailSuppressions,
   emailSuppressionCategory,
   files,
+  numberSequences,
   rateLimits,
   jobRuns,
   referrals,

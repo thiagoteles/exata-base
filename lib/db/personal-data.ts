@@ -4,6 +4,7 @@ import { accounts, sessions } from "./schema/auth";
 import { checkoutSessions, payments, plans } from "./schema/billing";
 import { contactMessages } from "./schema/contact";
 import { files } from "./schema/files";
+import { numberSequences } from "./schema/number-sequences";
 import { referrals } from "./schema/referrals";
 import { sampleItems } from "./schema/sample-items";
 import { sampleParts } from "./schema/sample-parts";
@@ -41,4 +42,9 @@ export const notExportedData: readonly NotExported[] = [
     reason: "credentials: only the hash of each token is kept, and it is never handed out",
   },
   { table: referrals, reason: "records who invited the person, which names someone else" },
+  {
+    table: numberSequences,
+    reason:
+      "a counter of the numbers already handed out; the records that carry those numbers are exported",
+  },
 ];

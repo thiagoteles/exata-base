@@ -11,12 +11,16 @@ import type { FileStorage } from "@/lib/ports/storage/types";
 
 export type UploadLimits = { maxBytes: number; allowedTypes: readonly string[] };
 
+/** The record a file is attached to: the kind of record and its id. */
+export type FileSubject = { type: string; id: string };
+
 type IncomingFile = { name: string; type: string; bytes: Uint8Array<ArrayBuffer> };
 
 const MAX_NAME_LENGTH = 200;
 const BYTES_PER_MB = 1_048_576;
 const DOWNLOAD_LINK_SECONDS = 300;
 const pathSeparators = /[\\/]+/g;
+const LABEL_SHAPE = /^[a-z][a-z0-9_]{0,31}$/;
 
 export const limitsFrom = (maxMb: number, allowedTypes: readonly string[]): UploadLimits => ({
   maxBytes: maxMb * BYTES_PER_MB,
@@ -42,7 +46,18 @@ type SaveUpload = {
   ownerId: string;
   file: IncomingFile;
   limits: UploadLimits;
+  /** The record the file belongs to. The caller has already checked that the owner owns it. */
+  subject?: FileSubject;
+  /** What the file is for that record, such as `statement`. */
+  kind?: string;
 };
+
+function checkLabels(subject: FileSubject | undefined, kind: string | undefined): void {
+  const labels = [subject?.type, kind].filter((label) => label !== undefined);
+  if (labels.some((label) => !LABEL_SHAPE.test(label))) {
+    throw new RangeError("A file's record type and kind are lowercase words with underscores");
+  }
+}
 
 export async function saveUpload({
   db,
@@ -50,7 +65,10 @@ export async function saveUpload({
   ownerId,
   file,
   limits,
+  subject,
+  kind,
 }: SaveUpload): Promise<{ id: string; name: string }> {
+  checkLabels(subject, kind);
   checkUpload(file, limits);
   const storageKey = `files/${ownerId}/${crypto.randomUUID()}`;
   const name = file.name.replace(pathSeparators, "_").slice(0, MAX_NAME_LENGTH) || "file";
@@ -65,6 +83,9 @@ export async function saveUpload({
         contentType: file.type,
         sizeBytes: file.bytes.byteLength,
         storageKey,
+        subjectType: subject?.type ?? null,
+        subjectId: subject?.id ?? null,
+        kind: kind ?? null,
       })
       .returning({ id: files.id, name: files.name });
     if (row === undefined) {
@@ -78,18 +99,53 @@ export async function saveUpload({
   }
 }
 
-export function listFiles(db: Database, ownerId: string) {
+/** The person's files, newest first; with a subject, only the files attached to that record. */
+export function listFiles(db: Database, ownerId: string, subject?: FileSubject) {
   return db
     .select({
       id: files.id,
       name: files.name,
       contentType: files.contentType,
       sizeBytes: files.sizeBytes,
+      kind: files.kind,
       createdAt: files.createdAt,
     })
     .from(files)
-    .where(eq(files.ownerId, ownerId))
+    .where(
+      subject === undefined
+        ? eq(files.ownerId, ownerId)
+        : and(
+            eq(files.ownerId, ownerId),
+            eq(files.subjectType, subject.type),
+            eq(files.subjectId, subject.id),
+          ),
+    )
     .orderBy(desc(files.createdAt));
+}
+
+/** Removes the bytes and the rows of every file attached to a record, for when the record goes. */
+export async function removeFilesOf(
+  db: Database,
+  storage: FileStorage,
+  ownerId: string,
+  subject: FileSubject,
+): Promise<number> {
+  const rows = await db
+    .select({ id: files.id, storageKey: files.storageKey })
+    .from(files)
+    .where(
+      and(
+        eq(files.ownerId, ownerId),
+        eq(files.subjectType, subject.type),
+        eq(files.subjectId, subject.id),
+      ),
+    );
+  for (const row of rows) {
+    // biome-ignore lint/performance/noAwaitInLoops: one object at a time keeps a failure attributable
+    await storage.remove(row.storageKey);
+    await db.delete(files).where(eq(files.id, row.id));
+  }
+  return rows.length;
 }
 
 /** A short-lived link to a file the person owns. Null for anyone else's file or one that is gone. */

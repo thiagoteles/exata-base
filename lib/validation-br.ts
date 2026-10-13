@@ -1,6 +1,11 @@
-import { isValidCep, isValidCpf, isValidPhone } from "@brazilian-utils/brazilian-utils";
+import {
+  isValidCep,
+  isValidCnpj,
+  isValidCpf,
+  isValidPhone,
+} from "@brazilian-utils/brazilian-utils";
 import { parseDate } from "@/lib/date";
-import { digitsOf } from "@/lib/masks";
+import { alphanumericOf, digitsOf } from "@/lib/masks";
 import { parseBRL } from "@/lib/money";
 import { validationMessage, z } from "@/lib/validation";
 
@@ -18,6 +23,12 @@ export const cpfSchema = z
   .string()
   .transform(digitsOf)
   .refine((digits) => isValidCpf(digits), invalid("invalid"));
+
+/** A CNPJ, numeric or alphanumeric (version 2 reads both), returned as fourteen capitals and digits. */
+export const cnpjSchema = z
+  .string()
+  .transform(alphanumericOf)
+  .refine((value) => isValidCnpj(value, { version: 2 }), invalid("invalid"));
 
 export const phoneSchema = z
   .string()

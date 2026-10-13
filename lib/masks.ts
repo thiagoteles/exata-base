@@ -7,7 +7,13 @@ const nonDigits = /\D/g;
 const leadingZeros = /^0+/;
 const thousandsBoundary = /\B(?=(\d{3})+(?!\d))/g;
 
+const nonAlphanumeric = /[^0-9A-Za-z]/g;
+
 export const digitsOf = (input: string): string => input.replace(nonDigits, "");
+
+/** Letters and digits only, in capitals: the clean form of a CNPJ, which may carry letters since 2026. */
+export const alphanumericOf = (input: string): string =>
+  input.replace(nonAlphanumeric, "").toUpperCase();
 
 /** Lays digits over a pattern where `0` is a digit, stopping where the digits end. */
 function applyPattern(digits: string, pattern: string): string {
@@ -35,6 +41,20 @@ const MOBILE_DIGITS = 11;
 
 export const maskCpf = (input: string) =>
   applyPattern(digitsOf(input).slice(0, CPF_DIGITS), "000.000.000-00");
+
+const CNPJ_BASE_CHARACTERS = 12;
+const CNPJ_CHARACTERS = 14;
+
+/**
+ * A CNPJ as `00.000.000/0000-00`. The first twelve characters may be letters or digits and the last
+ * two are always digits, so a letter typed in the check digits is dropped, not kept.
+ */
+export function maskCnpj(input: string): string {
+  const characters = alphanumericOf(input);
+  const base = characters.slice(0, CNPJ_BASE_CHARACTERS);
+  const check = digitsOf(characters.slice(CNPJ_BASE_CHARACTERS, CNPJ_CHARACTERS));
+  return applyPattern(`${base}${check}`, "00.000.000/0000-00");
+}
 
 export const maskCep = (input: string) =>
   applyPattern(digitsOf(input).slice(0, CEP_DIGITS), "00000-000");

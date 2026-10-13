@@ -1,7 +1,10 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+import { maskCnpj } from "./masks";
 import { readValidationMessage, z } from "./validation";
 import {
   cepSchema,
+  cnpjSchema,
   cpfSchema,
   dateSchema,
   moneySchema,
@@ -39,6 +42,63 @@ describe("Brazilian data is checked, not just shaped", () => {
     expect(moneySchema.parse("1.234,56")).toBe(123_456);
     expect(keyOf(moneySchema.safeParse("0,00"))).toBe("invalidMoney");
     expect(keyOf(moneySchema.safeParse("abc"))).toBe("invalidMoney");
+  });
+});
+
+/** The check digits of a CNPJ by the published rule: each character is its code minus 48, mod 11. */
+function withCheckDigits(base: string): string {
+  const value = (character: string) => character.charCodeAt(0) - 48;
+  const digit = (characters: string, weights: readonly number[]) => {
+    const sum = [...characters].reduce(
+      (total, character, index) => total + value(character) * (weights[index] ?? 0),
+      0,
+    );
+    const rest = sum % 11;
+    return rest < 2 ? 0 : 11 - rest;
+  };
+  const first = digit(base, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  const second = digit(`${base}${first}`, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  return `${base}${first}${second}`;
+}
+
+const cnpjBase = fc.stringMatching(/^[0-9A-Z]{12}$/).filter((base) => !/^(.)\1+$/.test(base));
+
+describe("a CNPJ, numeric or with letters", () => {
+  it("accepts the numeric form with or without the mask", () => {
+    expect(cnpjSchema.parse("11.222.333/0001-81")).toBe("11222333000181");
+    expect(cnpjSchema.parse("11222333000181")).toBe("11222333000181");
+  });
+
+  it("accepts the official alphanumeric example in capitals", () => {
+    expect(cnpjSchema.parse("12.ABC.345/01DE-35")).toBe("12ABC34501DE35");
+    expect(cnpjSchema.parse("12abc34501de35")).toBe("12ABC34501DE35");
+  });
+
+  it("refuses a wrong check digit, a short value and repeated characters", () => {
+    expect(keyOf(cnpjSchema.safeParse("11.222.333/0001-82"))).toBe("invalid");
+    expect(keyOf(cnpjSchema.safeParse("12.ABC.345/01DE-36"))).toBe("invalid");
+    expect(keyOf(cnpjSchema.safeParse("1122233300018"))).toBe("invalid");
+    expect(keyOf(cnpjSchema.safeParse("00.000.000/0000-00"))).toBe("invalid");
+  });
+
+  it("accepts any base with the check digits the rule computes, however it is typed", () => {
+    fc.assert(
+      fc.property(cnpjBase, (base) => {
+        const cnpj = withCheckDigits(base);
+        expect(cnpjSchema.parse(cnpj)).toBe(cnpj);
+        expect(cnpjSchema.parse(maskCnpj(cnpj))).toBe(cnpj);
+      }),
+    );
+  });
+
+  it("refuses the same base when a check digit is changed", () => {
+    fc.assert(
+      fc.property(cnpjBase, fc.integer({ min: 1, max: 9 }), (base, shift) => {
+        const cnpj = withCheckDigits(base);
+        const changed = `${cnpj.slice(0, 13)}${(Number(cnpj.slice(13)) + shift) % 10}`;
+        expect(cnpjSchema.safeParse(changed).success).toBe(false);
+      }),
+    );
   });
 });
 

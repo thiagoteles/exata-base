@@ -1,6 +1,15 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { digitsOf, maskCep, maskCpf, maskDate, maskMoney, maskPhone } from "./masks";
+import {
+  alphanumericOf,
+  digitsOf,
+  maskCep,
+  maskCnpj,
+  maskCpf,
+  maskDate,
+  maskMoney,
+  maskPhone,
+} from "./masks";
 import { parseBRL } from "./money";
 
 const digits = fc.stringMatching(/^\d{0,20}$/);
@@ -11,6 +20,8 @@ describe("masks", () => {
     expect(maskCpf("52998224725")).toBe("529.982.247-25");
     expect(maskPhone("11987654321")).toBe("(11) 98765-4321");
     expect(maskPhone("1133334444")).toBe("(11) 3333-4444");
+    expect(maskCnpj("11222333000181")).toBe("11.222.333/0001-81");
+    expect(maskCnpj("12abc34501de35")).toBe("12.ABC.345/01DE-35");
     expect(maskCep("01310100")).toBe("01310-100");
     expect(maskDate("29022024")).toBe("29/02/2024");
     expect(maskMoney("123456")).toBe("1.234,56");
@@ -27,10 +38,22 @@ describe("masks", () => {
     );
   });
 
+  it("keep a CNPJ's letters and digits in capitals, and drop a letter from the check digits", () => {
+    fc.assert(
+      fc.property(typing, (input) => {
+        const characters = alphanumericOf(input);
+        const masked = alphanumericOf(maskCnpj(input));
+        expect(masked.slice(0, 12)).toBe(characters.slice(0, 12));
+        expect(masked.slice(12)).toBe(digitsOf(characters.slice(12, 14)));
+      }),
+    );
+    expect(alphanumericOf("12.abc/34-5")).toBe("12ABC345");
+  });
+
   it("are stable: masking a masked value changes nothing, whatever was typed", () => {
     fc.assert(
       fc.property(typing, (input) => {
-        for (const mask of [maskCpf, maskPhone, maskCep, maskDate, maskMoney]) {
+        for (const mask of [maskCpf, maskCnpj, maskPhone, maskCep, maskDate, maskMoney]) {
           expect(mask(mask(input))).toBe(mask(input));
         }
       }),

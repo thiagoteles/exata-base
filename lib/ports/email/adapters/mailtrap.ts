@@ -36,6 +36,16 @@ export function createMailtrapSender({
           text: message.text,
           ...(message.replyTo === undefined ? {} : { reply_to: { email: message.replyTo } }),
           ...(message.headers === undefined ? {} : { headers: message.headers }),
+          ...(message.attachments === undefined || message.attachments.length === 0
+            ? {}
+            : {
+                attachments: message.attachments.map((file) => ({
+                  filename: file.filename,
+                  type: file.contentType,
+                  content: Buffer.from(file.content).toString("base64"),
+                  disposition: "attachment",
+                })),
+              }),
         }),
       });
       if (!response.ok) {

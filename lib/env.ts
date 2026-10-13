@@ -112,6 +112,8 @@ const server = {
   DOCUMENT_SECRET: z.string().min(32).default("local-development-document-secret"),
   UNSUBSCRIBE_SECRET: z.string().min(32).default("local-development-unsubscribe-secret"),
   UPLOAD_MAX_MB: z.coerce.number().int().positive().max(100).default(10),
+  // The total size of the files attached to one e-mail; over it the send is refused, whole.
+  EMAIL_ATTACHMENTS_MAX_MB: z.coerce.number().int().positive().max(40).default(10),
   UPLOAD_TYPES: csv
     .pipe(z.array(z.string().regex(/^[a-z]+\/[a-z0-9.+-]+$/)).min(1))
     .default(["image/png", "image/jpeg", "image/webp", "application/pdf"]),

@@ -2,6 +2,7 @@ import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/ports/log";
 import { unsubscribeLinks } from "@/lib/unsubscribe/links";
+import { prepareAttachments } from "./attachments";
 import { allowedRecipients } from "./consent";
 import type { EmailMessage, EmailSender, SendResult } from "./types";
 import { withUnsubscribe } from "./unsubscribe";
@@ -33,7 +34,19 @@ async function loadSender(): Promise<EmailSender | null> {
 let sender: Promise<EmailSender | null> | undefined;
 
 /** Sends one message to whoever may get it. The reason for anything but "sent" is in the log. */
-export async function sendEmail(message: EmailMessage): Promise<SendResult> {
+export async function sendEmail(input: EmailMessage): Promise<SendResult> {
+  const prepared = prepareAttachments(input.attachments, env.EMAIL_ATTACHMENTS_MAX_MB);
+  if (!prepared.ok) {
+    // A caller that attaches files checks the same cap first and shows the sizes; this is the backstop.
+    logger.error("email not sent: the attachments are over the cap", {
+      subject: input.subject,
+      totalBytes: prepared.check.totalBytes,
+      maxBytes: prepared.check.maxBytes,
+    });
+    return "failed";
+  }
+  const message: EmailMessage =
+    prepared.attachments === undefined ? input : { ...input, attachments: prepared.attachments };
   const recipients = await allowedRecipients(db, message);
   if (recipients.length === 0) {
     return "declined";

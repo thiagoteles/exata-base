@@ -45,6 +45,7 @@ services:
       STORAGE_DIR: /data/files
       FILE_URL_SECRET: ${FILE_URL_SECRET:-}
       UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-10}
+      EMAIL_ATTACHMENTS_MAX_MB: ${EMAIL_ATTACHMENTS_MAX_MB:-10}
     volumes:
       # Files live here when there is no Cloud Storage bucket.
       - app-files:/data/files

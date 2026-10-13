@@ -33,6 +33,37 @@ describe("Mailtrap Email API", () => {
     });
   });
 
+  it("sends each attachment as base64 with its name and type", async () => {
+    const { calls, fetch } = recordingFetch();
+    await createMailtrapSender({ token: "tok", from: "no-reply@app.test", fetch }).send({
+      ...message,
+      attachments: [
+        {
+          filename: "INV-0008.pdf",
+          contentType: "application/pdf",
+          content: new TextEncoder().encode("%PDF-1.7"),
+        },
+      ],
+    });
+    expect(JSON.parse(String(calls[0]?.init.body)).attachments).toEqual([
+      {
+        filename: "INV-0008.pdf",
+        type: "application/pdf",
+        content: Buffer.from("%PDF-1.7").toString("base64"),
+        disposition: "attachment",
+      },
+    ]);
+  });
+
+  it("leaves the attachments field out when there are none", async () => {
+    const { calls, fetch } = recordingFetch();
+    await createMailtrapSender({ token: "tok", from: "a@b.c", fetch }).send({
+      ...message,
+      attachments: [],
+    });
+    expect(JSON.parse(String(calls[0]?.init.body))).not.toHaveProperty("attachments");
+  });
+
   it("sends to the sandbox inbox, where nobody receives it, when an inbox is set", async () => {
     const { calls, fetch } = recordingFetch();
     await createMailtrapSender({ token: "tok", from: "a@b.c", inbox: "123", fetch }).send(message);

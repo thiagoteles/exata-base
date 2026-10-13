@@ -143,6 +143,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | `ACCESS_LOG` | no | `on` for a product run for profit: one access record per request (address, source port when known, time, path), as the Marco Civil asks. Kept 183 days in a log of its own: run `pnpm gcp:access-log` once. Outside Google Cloud the lines go to stdout, and keeping them is the operator's job |
 | `SOURCE_COMMIT`, `SERVICE_NAME` | no | The deployed commit (Coolify fills it) and the service name (`app`); Error Reporting groups errors by both |
 | `UPLOAD_MAX_MB`, `UPLOAD_TYPES` | no | Upload limit (10) and accepted types |
+| `EMAIL_ATTACHMENTS_MAX_MB` | no | Total size of the files attached to one e-mail (10); over it the send is refused |
 
 ## Backup and restore
 

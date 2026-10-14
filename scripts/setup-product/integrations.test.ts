@@ -22,7 +22,7 @@ describe("validating the integrations", () => {
 
   it("names the key with the wrong prefix", () => {
     const problems = validateIntegrations({ ...stripe, STRIPE_SECRET_KEY: "pk_test_abc" });
-    expect(problems).toEqual(["STRIPE_SECRET_KEY must start with sk_"]);
+    expect(problems).toEqual(["STRIPE_SECRET_KEY must start with sk_ or rk_"]);
   });
 
   it("asks for the rest of a half filled group", () => {

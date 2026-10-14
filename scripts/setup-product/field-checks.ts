@@ -9,6 +9,13 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const startsWith = (prefix: string) => (value: string) =>
   value.startsWith(prefix) ? null : `must start with ${prefix}`;
+/** Accepts any of the prefixes, such as a secret key or a restricted one. */
+export const startsWithOneOf =
+  (...prefixes: string[]) =>
+  (value: string) =>
+    prefixes.some((prefix) => value.startsWith(prefix))
+      ? null
+      : `must start with ${prefixes.join(" or ")}`;
 export const email = (value: string) => (EMAIL.test(value) ? null : "must be an e-mail address");
 export const emailList = (value: string) =>
   value

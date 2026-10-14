@@ -83,7 +83,12 @@ const server = {
   // `source=secret` pairs, one secret per source a worker outside the server may deliver to.
   INGEST_SECRETS: ingestSecrets.default({}),
 
-  STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
+  // A secret key (sk_) or a restricted one (rk_), which Stripe recommends: it needs to write Checkout
+  // Sessions, Customers, the customer portal and Refunds, and to read the rest it is sent.
+  STRIPE_SECRET_KEY: z
+    .string()
+    .regex(/^(sk|rk)_/)
+    .optional(),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
 
   GCP_CREDENTIALS: gcpCredentials.optional(),

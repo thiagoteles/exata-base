@@ -12,11 +12,14 @@ export function qrPngDataUri(text: string): Promise<string> {
   return QRCode.toDataURL(text, { margin: QUIET_ZONE_MODULES, width: PNG_WIDTH });
 }
 
-/** The code as an SVG document, drawn in one color on a transparent ground. */
-export function qrSvg(text: string, color: string): Promise<string> {
+/**
+ * The code as an SVG document, drawn in one color on a transparent ground, or on the given one: a
+ * code a camera must read is drawn dark on light whatever the page's theme is.
+ */
+export function qrSvg(text: string, color: string, ground = "#0000"): Promise<string> {
   return QRCode.toString(text, {
     type: "svg",
     margin: QUIET_ZONE_MODULES,
-    color: { dark: color, light: "#0000" },
+    color: { dark: color, light: ground },
   });
 }

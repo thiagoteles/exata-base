@@ -16,6 +16,13 @@ describe("environment rules", () => {
         false,
       ),
     ).toEqual([]);
+    expect(
+      environmentIssues(
+        env,
+        { STRIPE_SECRET_KEY: "rk_live_x", STRIPE_WEBHOOK_SECRET: "whsec_x" },
+        false,
+      ),
+    ).toEqual([]);
   });
 
   it("let a build pass with no variables at all", () => {

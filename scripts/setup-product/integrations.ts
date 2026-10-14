@@ -7,6 +7,7 @@ import {
   proxy,
   serviceAccount,
   startsWith,
+  startsWithOneOf,
   url,
   uuid,
 } from "./field-checks";
@@ -70,7 +71,11 @@ export const integrations: readonly Integration[] = [
     question: "Payments through Stripe",
     note: "Prices are not asked for: each price is found in Stripe by its lookup key (paid_monthly, paid_yearly, paid_lifetime, from the plan catalog). Create the ones you sell.",
     fields: [
-      { name: "STRIPE_SECRET_KEY", label: "Stripe secret key", check: startsWith("sk_") },
+      {
+        name: "STRIPE_SECRET_KEY",
+        label: "Stripe secret or restricted key",
+        check: startsWithOneOf("sk_", "rk_"),
+      },
       {
         name: "STRIPE_WEBHOOK_SECRET",
         label: "Stripe webhook secret",

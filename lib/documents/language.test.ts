@@ -3,12 +3,8 @@ import { reportCatalog } from "@/lib/i18n/catalog-report";
 import { isLocale } from "@/lib/i18n/locales";
 import english from "@/messages/documents.en.json";
 import portuguese from "@/messages/pt-BR.json";
-import {
-  defaultDocumentLanguage,
-  documentLanguages,
-  documentTranslator,
-  isDocumentLanguage,
-} from "./language";
+import { documentTranslator } from "./language";
+import { defaultDocumentLanguage, documentLanguages, isDocumentLanguage } from "./languages";
 
 type Tree = { [key: string]: string | Tree };
 

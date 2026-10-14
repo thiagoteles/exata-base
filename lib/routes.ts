@@ -5,6 +5,13 @@
 
 const SIGN_IN_PATH = "/sign-in";
 
+/**
+ * Where a person lands after signing in when they were not headed anywhere in particular. The base
+ * has no home of its own for the signed-in area, so it is the public home page; a product points
+ * this at its own first screen.
+ */
+export const SIGNED_IN_HOME = "/";
+
 export const protectedPrefixes = ["/account", "/staff", "/admin", "/catalog", "/print"] as const;
 
 export function isProtectedPath(pathname: string): boolean {

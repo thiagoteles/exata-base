@@ -29,7 +29,13 @@ export async function linkSentTo(email: string): Promise<string> {
   throw new Error(`No e-mail with a link reached ${email}`);
 }
 
-type Message = { Subject: string; Text: string; HTML: string; To: { Address: string }[] };
+type Message = {
+  Subject: string;
+  Text: string;
+  HTML: string;
+  To: { Address: string }[];
+  Attachments: { FileName: string }[];
+};
 
 /** Waits for a message to an address whose subject contains the given text, and returns it whole. */
 export async function messageSentTo(email: string, subjectPart: string): Promise<Message> {

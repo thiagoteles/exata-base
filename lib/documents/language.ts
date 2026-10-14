@@ -2,6 +2,7 @@ import { createTranslator } from "next-intl";
 import type { Locale } from "@/lib/i18n/locales";
 import english from "@/messages/documents.en.json";
 import portuguese from "@/messages/pt-BR.json";
+import type { DocumentLanguage } from "./languages";
 
 /*
  * The language of a document, which is not the language of the interface. A person using the app
@@ -10,14 +11,6 @@ import portuguese from "@/messages/pt-BR.json";
  * The catalogs have the same keys. Portuguese is the interface's own `documents` area; English is a
  * catalog of its own, so adding it does not switch on the interface's language routing.
  */
-
-export const documentLanguages = ["pt-BR", "en"] as const;
-export type DocumentLanguage = (typeof documentLanguages)[number];
-
-export const defaultDocumentLanguage: DocumentLanguage = "pt-BR";
-
-export const isDocumentLanguage = (value: unknown): value is DocumentLanguage =>
-  documentLanguages.some((language) => language === value);
 
 /** The `documents` area in the language of the document: `t("receipt.title")`. */
 export function documentTranslator(language: DocumentLanguage) {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SIGNED_IN_HOME } from "@/lib/routes";
 import { afterSignIn } from "./sign-in-complete";
 
 describe("after signing in", () => {
@@ -8,6 +9,12 @@ describe("after signing in", () => {
       cookies: [{ name: "theme", value: "dark" }],
       save: [],
     });
+  });
+
+  it("lands on the signed-in home when there was nowhere in particular to go", () => {
+    expect(afterSignIn({}, {}, null).location).toBe(SIGNED_IN_HOME);
+    expect(afterSignIn({}, {}, "/").location).toBe(SIGNED_IN_HOME);
+    expect(afterSignIn({}, {}, "https://evil.test/x").location).toBe(SIGNED_IN_HOME);
   });
 
   it("carries the saved language, and drops one that is not on the list", () => {

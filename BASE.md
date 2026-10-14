@@ -12,7 +12,7 @@ Um example público e completo do `create-next-app`, de onde nascem produtos web
 
 ## 2. Decisões
 
-- **Postgres e Drizzle.** Em produção o app lê `DATABASE_URL`; o banco é um recurso Postgres do Coolify com o backup agendado do Coolify. Não há script de backup.
+- **Postgres e Drizzle.** Em produção o banco roda na mesma stack do app (`postgres` no `docker-compose.production.yml`, volume próprio, sem porta publicada); o compose monta o `DATABASE_URL` a partir de `POSTGRES_PASSWORD`. O backup é o agendado do Coolify para o Postgres da stack. Não há script de backup.
 - **Docker sem configuração.** `docker compose up` sobe app, Postgres e Mailpit sem `.env`. A imagem de produção é construída sem segredo; o único argumento é a chave publicável do Clerk, no modo Clerk.
 - **Dois modos de auth por uma flag** (`AUTH_PROVIDER`): `local` (better-auth, Google opcional) e `clerk` (padrão em produção). Páginas, ações e rotas só veem a porta de auth.
 - **Stripe, só Stripe,** desligado sem chave.

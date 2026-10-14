@@ -98,7 +98,7 @@ The image is built from the `Dockerfile` with no secret, and every value is read
 
 On Coolify:
 
-1. Create a **Postgres resource** and turn on its **scheduled backup** to a bucket. The product ships no backup script: the host owns backups.
+1. The database runs in the same stack (`postgres` in `docker-compose.production.yml`, on its own volume). Set `POSTGRES_PASSWORD` (letters and digits only) and turn on the **scheduled backup** Coolify offers for the stack's Postgres, to a bucket. The product ships no backup script: the host owns backups.
 2. Create the app from this repository with `docker-compose.production.yml`. Set the variables below in the panel.
 3. Add one **scheduled task** per cadence, running inside the app container. A product that only has daily operations needs only the first:
 
@@ -121,7 +121,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 | Variable | Needed | Notes |
 |---|---|---|
 | `APP_URL` | yes | Public address. Base of e-mail links, Open Graph and the Stripe return |
-| `DATABASE_URL` | yes | The Postgres connection string |
+| `POSTGRES_PASSWORD` | yes | The password of the stack's Postgres, letters and digits only. The compose builds `DATABASE_URL` from it, so `DATABASE_URL` is not set by hand in production |
 | `AUTH_PROVIDER` | no | `clerk` (default) or `local` |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET` | with `clerk` | The publishable key is public and goes to the build (in Coolify, tick it as a build variable): the prerendered pages carry Clerk's provider, so the image is for one Clerk instance. The other two are read at runtime. Point the Clerk webhook at `/api/webhooks/clerk` |
 | `BETTER_AUTH_SECRET` | with `local` | At least 32 characters |
@@ -147,12 +147,12 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 
 ## Backup and restore
 
-The database is backed up by the hosting platform: in Coolify, a scheduled backup of the Postgres resource, once a day. Keep it for 7 days, the period the privacy policy promises (`pnpm setup:product` writes it in both places): a longer one keeps deleted people's data longer. Files are not in that backup; on Cloud Storage, turn on soft delete for the bucket (`gcloud storage buckets update gs://BUCKET --soft-delete-duration=7d`).
+The database is backed up by the hosting platform: in Coolify, a scheduled backup of the stack's Postgres, once a day. Keep it for 7 days, the period the privacy policy promises (`pnpm setup:product` writes it in both places): a longer one keeps deleted people's data longer. Files are not in that backup; on Cloud Storage, turn on soft delete for the bucket (`gcloud storage buckets update gs://BUCKET --soft-delete-duration=7d`).
 
 **Drill, once a month.** `pnpm restore:drill path/to/backup.dmp` restores the file into a throwaway Postgres, applies the migrations it lacks and counts every table; it fails when the copy has no users. It reads the custom format Coolify writes and plain SQL, gzipped or not.
 
 **Restoring for real.**
-1. Restore the backup into a new Postgres resource and point the app's `DATABASE_URL` at it. The app migrates it on start.
+1. Restore the backup into the stack's Postgres (Coolify restores a backup into it), or into a new Postgres whose address you give the app as `DATABASE_URL` in place of the one the compose builds. The app migrates it on start.
 2. Accounts deleted after the backup was taken are back. List their former ids: from the failed database, `select former_user_id from account_deletions where created_at > '<backup time>'`; if it is gone, from Cloud Logging, the lines whose message is `account deleted` (`jsonPayload.formerUserId`).
 3. Put one id per line in a file and run `APP_URL=... CRON_SECRET=... pnpm restore:reapply ids.txt`. The app deletes each again with its usual steps and records it in the deletion trail as the restore.
 

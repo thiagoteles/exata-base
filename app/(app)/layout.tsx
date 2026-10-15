@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { AppShell } from "@/components/shell/app-shell";
+import { ThemeToggle } from "@/features/account/theme-toggle";
 import { BottomBarSlot, SidebarSlot, UserMenuSlot } from "./shell-slots";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
@@ -17,9 +18,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </Suspense>
       }
       userMenu={
-        <Suspense>
-          <UserMenuSlot />
-        </Suspense>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Suspense>
+            <UserMenuSlot />
+          </Suspense>
+        </div>
       }
     >
       {children}

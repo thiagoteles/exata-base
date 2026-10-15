@@ -20,7 +20,8 @@
     "light": "Claro",
     "dark": "Escuro",
     "help": "Vale neste navegador e nos outros em que você entrar.",
-    "failed": "Não foi possível salvar o tema."
+    "failed": "Não foi possível salvar o tema.",
+    "toggle": "Tema escuro"
   },
   "accessibility": {
     "title": "Acessibilidade",

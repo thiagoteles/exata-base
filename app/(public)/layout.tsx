@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PublicFooter } from "@/components/shell/public-footer";
 import { PublicHeader } from "@/components/shell/public-header";
 import { ThemePicker } from "@/features/account/theme-picker";
+import { ThemeToggle } from "@/features/account/theme-toggle";
 import { LanguageSwitcher } from "@/features/language/language-switcher";
 import { isMultilingual } from "@/lib/i18n/locales";
 import { billingConfigured } from "@/lib/ports/payment/configured";
@@ -13,9 +14,12 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh flex-col">
       <PublicHeader
         actions={
-          <Suspense fallback={<SignedOutActions />}>
-            <HeaderActions />
-          </Suspense>
+          <>
+            <ThemeToggle />
+            <Suspense fallback={<SignedOutActions />}>
+              <HeaderActions />
+            </Suspense>
+          </>
         }
       />
       <div className="flex-1">{children}</div>

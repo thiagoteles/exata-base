@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { browserPreferenceKeys, preferenceKeys, preferences } from "./definitions";
+import { productPreferences } from "./definitions.product";
 import {
   carryAtSignIn,
   cookieFor,
@@ -9,7 +10,18 @@ import {
   specFor,
 } from "./resolve";
 
+// The product's own preferences, each at its fallback, beside the base's.
+const productDefaults = Object.fromEntries(
+  Object.entries(productPreferences as Record<string, { fallback: unknown }>).map(
+    ([key, definition]) => [key, definition.fallback],
+  ),
+);
+const productBrowserKeys = Object.entries(
+  productPreferences as Record<string, { browser?: true }>,
+).flatMap(([key, definition]) => (definition.browser === true ? [key] : []));
+
 const defaults = {
+  ...productDefaults,
   theme: "system",
   fontScale: "default",
   motion: "system",
@@ -97,7 +109,9 @@ describe("resolving what is stored", () => {
   });
 
   it("keeps what is too big for a cookie out of cookies: a draft has none, either way", () => {
-    expect(browserPreferenceKeys).toEqual(["contactDraft"]);
+    expect([...browserPreferenceKeys].sort()).toEqual(
+      ["contactDraft", ...productBrowserKeys].sort(),
+    );
     expect(cookieFor("contactDraft", { subject: "support", body: "Oi" })).toBeNull();
     expect(carryAtSignIn({ contactDraft: { subject: "", body: "Oi" } }, {})).toEqual({
       save: [],

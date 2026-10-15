@@ -5,7 +5,8 @@
     "lib/i18n/request.ts",
     "**/*.type-test.ts",
     "e2e/*.setup.ts",
-    "e2e/clerk/*.ts"
+    "e2e/clerk/*.ts",
+    "drizzle.base.config.ts"
   ],
   "project": ["**/*.{ts,tsx,mts,css}", "!tools/**", "!scripts/new-crud/sample/**"],
   "ignore": ["scripts/new-crud/sample/**"],

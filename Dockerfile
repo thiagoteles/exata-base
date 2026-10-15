@@ -29,6 +29,7 @@ COPY --from=build --chown=app:app /app/.next/static ./.next/static
 # Files the browser fetches as they are. The standalone output does not include this folder.
 COPY --from=build --chown=app:app /app/public ./public
 COPY --from=build --chown=app:app /app/lib/db/migrations ./lib/db/migrations
+COPY --from=build --chown=app:app /app/lib/db/product-migrations ./lib/db/product-migrations
 COPY --chown=app:app scripts/docker-entrypoint.sh ./docker-entrypoint.sh
 USER app
 EXPOSE 3000

@@ -169,6 +169,13 @@
       "when": 1791859024607,
       "tag": "0023_lean_jack_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792040003145,
+      "tag": "0024_samples_leave_the_base_stream",
+      "breakpoints": true
     }
   ]
 }

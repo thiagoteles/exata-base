@@ -24,6 +24,7 @@
     "restore:reapply": "bash scripts/restore-reapply.sh",
     "test:e2e": "bash scripts/e2e.sh",
     "db:generate": "drizzle-kit generate",
+    "db:generate:base": "drizzle-kit generate --config drizzle.base.config.ts",
     "new:crud": "tsx scripts/new-crud.mts",
     "db:migrate": "docker compose exec -T app pnpm exec tsx scripts/db-migrate.mts",
     "lint:migrations": "tsx scripts/check-migrations.ts",

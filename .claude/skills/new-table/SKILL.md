@@ -25,9 +25,13 @@ Tables live in `lib/db/schema/`, one file per area. Read `lib/db/schema/contact.
    the primary key. Add an index for the list's default filter and sort.
 5. **Rules in the database.** What must always be true goes in a `check(...)`, like the lowercase
    e-mail in `lib/db/schema/users.ts`.
-6. **Register it.** Add the table and its enums to `lib/db/schema.ts`. If it has an `ownedBy` key,
-   add it to `exportedData` or `notExportedData` in `lib/db/personal-data.ts`, with the reason.
-7. **Migrate.** Run `pnpm db:generate --name <what-changed>` and commit the SQL with the schema.
+6. **Register it.** A product's table goes in `lib/db/schema.product.ts` with its enums, and if it has
+   an `ownedBy` key, in `productExportedData` or `productNotExportedData` in
+   `lib/db/personal-data.product.ts`, with the reason. A table of the base itself goes in
+   `lib/db/schema.ts`, `lib/db/personal-data.ts` and the list in `lib/db/base-schema.ts`.
+7. **Migrate.** Run `pnpm db:generate --name <what-changed>` and commit the SQL with the schema: it
+   lands in the product's stream, `lib/db/product-migrations`. In the base, a base table migrates
+   with `pnpm db:generate:base` into `lib/db/migrations`.
    `pnpm db:migrate` applies it to the running compose's database; there is no need to restart the app.
    Behavior the generator cannot express (a trigger, a function) goes in a custom migration:
    `pnpm db:generate --custom --name <what>`, like `0001_free_plan_on_signup.sql`.

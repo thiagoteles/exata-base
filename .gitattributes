@@ -8,6 +8,9 @@
 *.product.json merge=ours
 *.product.env merge=ours
 
+# The product's stream of migrations and the ones it adopted from before the streams were apart.
+lib/db/product-migrations/** merge=ours
+
 # What setup:product writes and the product's own words.
 README.md merge=ours
 CLAUDE.md merge=ours

@@ -238,7 +238,8 @@ function writeChild(names: AreaNames, parent: AreaNames): { files: string[]; man
   return { files, manual };
 }
 
-const migrations = () => readdirSync("lib/db/migrations").filter((file) => file.endsWith(".sql"));
+const migrations = () =>
+  readdirSync("lib/db/product-migrations").filter((file) => file.endsWith(".sql"));
 
 /**
  * Writes one migration and proves it was written: drizzle-kit answers a question it cannot ask
@@ -251,7 +252,7 @@ function migrate(name: string) {
     throw new Error(`drizzle-kit wrote no migration for ${name}; run pnpm db:generate yourself`);
   }
   // drizzle-kit leaves its snapshots unformatted, and the lint reads them.
-  run("pnpm", ["exec", "biome", "format", "--write", "lib/db/migrations"]);
+  run("pnpm", ["exec", "biome", "format", "--write", "lib/db/product-migrations"]);
 }
 
 function tidy(files: string[]) {

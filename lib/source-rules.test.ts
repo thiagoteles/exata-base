@@ -65,7 +65,8 @@ describe("source rules", () => {
     // storage reads its own directory, outside the image; any other reader is listed here with its
     // entry in `outputFileTracingIncludes`, so a file is never missing only in production.
     const reads = /\b(readFile|readFileSync|createReadStream|readdir|readdirSync)\s*\(/;
-    const knownReaders = new Set(["lib/ports/storage/adapters/disk.ts"]);
+    // The migrator reads both journals, which the Dockerfile copies into the image whole.
+    const knownReaders = new Set(["lib/ports/storage/adapters/disk.ts", "lib/db/migrate.ts"]);
     const appCode = /^(app|lib|features|components|domain)\/|^proxy\.ts$/;
     const offenders = trackedSources()
       .filter(

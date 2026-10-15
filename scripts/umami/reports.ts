@@ -1,7 +1,9 @@
 import { funnel } from "@/lib/analytics-events";
+import { productFunnels } from "@/lib/analytics-events.product";
 
 /*
- * The saved reports every product gets, built from the event catalog's funnel. The setup creates
+ * The saved reports every product gets, built from the event catalog's funnel, and the product's own
+ * funnels. The setup creates
  * what is missing and corrects what drifted, matching by type and name; a report a person made by
  * hand in Umami is never touched.
  */
@@ -54,6 +56,12 @@ export function standardReports(currency: string): SavedReport[] {
     },
     { type: "retention", name: "Retenção", description: MANAGED, parameters: {} },
     { type: "journey", name: "Caminhos", description: MANAGED, parameters: { steps: 5 } },
+    ...productFunnels.map((own) => ({
+      type: "funnel",
+      name: own.name,
+      description: `${own.description} ${MANAGED}`,
+      parameters: { window: own.windowMinutes, steps: steps(own.steps) },
+    })),
   ];
 }
 

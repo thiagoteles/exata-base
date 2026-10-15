@@ -1,4 +1,5 @@
 import { articleSitemap } from "./content/articles";
+import { productSitemapSources } from "./sitemap-sources.product";
 
 /*
  * Public pages that come from the database register here, one source per area, each returning
@@ -11,5 +12,5 @@ export type SitemapEntry = { path: `/${string}`; lastModified?: Date };
 
 export type SitemapSource = { name: string; entries: () => Promise<readonly SitemapEntry[]> };
 
-/** Every source of generated or database pages. A product adds one per public area. */
-export const sitemapSources: readonly SitemapSource[] = [articleSitemap];
+/** Every source of generated or database pages: the articles, and the product's from its own file. */
+export const sitemapSources: readonly SitemapSource[] = [articleSitemap, ...productSitemapSources];

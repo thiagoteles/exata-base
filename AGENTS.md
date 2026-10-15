@@ -27,7 +27,7 @@ A product never edits a file of the base. What it declares goes in the `*.produc
 - Its sentences in an area of the base (a navigation label, an error): `messages/pt-BR/<area>.product.json`, laid over the base's area key by key. Its English documents: `messages/documents.en.product.json`.
 - Its tables: `lib/db/schema.product.ts` and what of them belongs to a person, `lib/db/personal-data.product.ts`.
 - Its destinations and their icons: `lib/navigation.product.ts`, `components/shell/nav-icon.product.tsx`. Where a person lands after signing in: `lib/routes.product.ts`.
-- Its public pages: `lib/i18n/public-paths.product.ts`, and a dynamic one also in `lib/known-pages.product.ts`.
+- Its public pages: `lib/i18n/public-paths.product.ts`, and a dynamic one also in `lib/known-pages.product.ts`. In the sitemap, a fixed one in `lib/public-routes.product.ts`, generated ones as a source in `lib/sitemap-sources.product.ts`.
 - Its kinds of signed document: `lib/documents/kinds.product.ts`, and how each is verified, `features/verify/verifications.product.tsx`.
 - Its environment variables: `lib/env.product.ts`; what its browser suite adds to the production image, `e2e.product.env`.
 - What a route of its own needs traced into the build (a PDF's fonts): `next.config.product.ts`.

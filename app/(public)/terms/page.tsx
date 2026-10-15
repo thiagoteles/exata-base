@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { LegalPage } from "@/components/shell/legal-page";
 import { buildSocialMetadata } from "@/lib/social-metadata";
 
@@ -9,11 +9,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function TermsPage() {
-  const t = await getTranslations("terms");
-  const sections = (["service", "account", "payment", "changes"] as const).map((key) => ({
-    key,
-    title: t(`sections.${key}.title`),
-    body: t(`sections.${key}.body`),
-  }));
+  const [t, messages] = await Promise.all([getTranslations("terms"), getMessages()]);
+  // Every section the product wrote, in the order it wrote them: the text decides, not this page.
+  const written = (
+    messages as { terms: { sections: Record<string, { title: string; body: string }> } }
+  ).terms.sections;
+  const sections = Object.entries(written).map(([key, section]) => ({ key, ...section }));
   return <LegalPage title={t("title")} notice={t("notice")} sections={sections} />;
 }

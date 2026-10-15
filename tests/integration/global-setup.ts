@@ -8,7 +8,7 @@ import { migrateDatabase } from "@/lib/db/migrate";
 let container: StartedPostgreSqlContainer | undefined;
 
 export async function setup(project: TestProject) {
-  container = await new PostgreSqlContainer("postgres:17-alpine").start();
+  container = await new PostgreSqlContainer("postgres:18-alpine").start();
   const databaseUrl = container.getConnectionUri();
   const db = createDatabase(databaseUrl);
   await migrateDatabase(db);

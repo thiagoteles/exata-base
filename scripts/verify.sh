@@ -65,7 +65,7 @@ echo "== Production image"
 docker build -t "${name}:local" .
 docker network create "${name}-net" > /dev/null
 docker run -d --name "${name}-db" --network "${name}-net" \
-  -e POSTGRES_USER=app -e POSTGRES_PASSWORD=app -e POSTGRES_DB=app postgres:17-alpine > /dev/null
+  -e POSTGRES_USER=app -e POSTGRES_PASSWORD=app -e POSTGRES_DB=app postgres:18-alpine > /dev/null
 until docker exec "${name}-db" pg_isready -U app -d app > /dev/null 2>&1; do sleep 1; done
 secret="$(openssl rand -hex 32)"
 docker run -d --name "${name}-app" --network "${name}-net" -p "${image_port}:3000" \

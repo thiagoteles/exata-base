@@ -55,7 +55,10 @@ services:
       start_period: 60s
 
   postgres:
-    image: postgres:17-alpine
+    # The version production runs. Postgres 18 keeps its data under a folder named for the major
+    # version, so the volume is mounted one level up, and a new version is a new volume: the old
+    # one is left as it was, and the database starts empty (the seed runs again).
+    image: postgres:18-alpine
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -63,7 +66,7 @@ services:
     ports:
       - "47440:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres18-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app -d app"]
       interval: 2s
@@ -76,4 +79,4 @@ services:
       - "47030:8025"
 
 volumes:
-  postgres-data:
+  postgres18-data:

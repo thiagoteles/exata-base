@@ -15,7 +15,7 @@ cleanup() { docker rm -f "$name" > /dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 docker run -d --name "$name" -p "${port}:5432" -e POSTGRES_USER=app -e POSTGRES_PASSWORD=app \
-  -e POSTGRES_DB=app postgres:17-alpine > /dev/null
+  -e POSTGRES_DB=app postgres:18-alpine > /dev/null
 until docker exec "$name" pg_isready -U app -d app > /dev/null 2>&1; do sleep 1; done
 
 echo "== Restoring $dump"

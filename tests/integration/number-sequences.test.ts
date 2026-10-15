@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextNumber } from "@/lib/sequences/service";
+import { lastNumber, nextNumber, setNextNumber } from "@/lib/sequences/service";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
 
@@ -45,5 +45,16 @@ describe("a numbered series", () => {
   it("refuses a series that is not capital letters, digits and hyphens", async () => {
     const ana = await createUser(db, "ana@example.com");
     await expect(nextNumber(db, ana.id, "inv")).rejects.toThrow(RangeError);
+  });
+
+  it("goes on from a number set ahead, and never moves back onto one handed out", async () => {
+    const ana = await createUser(db, "ana@example.com");
+    expect(await lastNumber(db, ana.id, "INV")).toBe(0);
+    expect(await setNextNumber(db, ana.id, { series: "INV", next: 9 })).toBe(true);
+    expect(await nextNumber(db, ana.id, "INV")).toBe(9);
+    expect(await lastNumber(db, ana.id, "INV")).toBe(9);
+    expect(await setNextNumber(db, ana.id, { series: "INV", next: 9 })).toBe(false);
+    expect(await setNextNumber(db, ana.id, { series: "INV", next: 10 })).toBe(true);
+    expect(await nextNumber(db, ana.id, "INV")).toBe(10);
   });
 });

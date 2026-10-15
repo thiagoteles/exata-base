@@ -28,5 +28,5 @@ const icons: Readonly<Record<NavIconName, typeof IconUser>> = {
 
 export function NavIcon({ name }: { name: ShellItem["icon"] }) {
   const Icon = icons[name];
-  return <Icon className="size-5 shrink-0" aria-hidden="true" />;
+  return <Icon className="size-[1.125rem] shrink-0" stroke={1.75} aria-hidden="true" />;
 }

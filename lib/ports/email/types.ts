@@ -9,6 +9,11 @@ export type EmailAttachment = {
 
 export type EmailMessage = {
   to: string | readonly string[];
+  /**
+   * Addresses that get the same message in copy, seen by every recipient. Only for mail the person
+   * asked to send (`transactional`): reminders and news go one copy per recipient, so they have none.
+   */
+  cc?: readonly string[];
   /** What the message is, so the port can leave out whoever turned that kind off. */
   category: EmailCategory;
   subject: string;

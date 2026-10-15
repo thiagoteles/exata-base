@@ -33,6 +33,18 @@ describe("Mailtrap Email API", () => {
     });
   });
 
+  it("puts the copies in cc, and leaves the field out when there are none", async () => {
+    const { calls, fetch } = recordingFetch();
+    await createMailtrapSender({ token: "tok", from: "no-reply@app.test", fetch }).send({
+      ...message,
+      cc: ["eu@example.com", "socio@example.com"],
+    });
+    expect(JSON.parse(String(calls[0]?.init.body)).cc).toEqual([
+      { email: "eu@example.com" },
+      { email: "socio@example.com" },
+    ]);
+  });
+
   it("sends each attachment as base64 with its name and type", async () => {
     const { calls, fetch } = recordingFetch();
     await createMailtrapSender({ token: "tok", from: "no-reply@app.test", fetch }).send({

@@ -34,6 +34,7 @@ type Message = {
   Text: string;
   HTML: string;
   To: { Address: string }[];
+  Cc: { Address: string }[];
   Attachments: { FileName: string }[];
 };
 

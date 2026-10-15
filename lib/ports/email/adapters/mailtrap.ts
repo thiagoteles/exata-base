@@ -31,6 +31,9 @@ export function createMailtrapSender({
         body: JSON.stringify({
           from: { email: from },
           to: recipients.map((email) => ({ email })),
+          ...(message.cc === undefined || message.cc.length === 0
+            ? {}
+            : { cc: message.cc.map((email) => ({ email })) }),
           subject: message.subject,
           html: message.html,
           text: message.text,

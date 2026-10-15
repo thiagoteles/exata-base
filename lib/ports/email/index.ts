@@ -61,12 +61,13 @@ export async function sendEmail(input: EmailMessage): Promise<SendResult> {
     if (message.category === "transactional") {
       await destination.send({ ...message, to: recipients });
     } else {
-      // Each recipient gets a copy with a link of their own, so the link says whose it is.
-      const { category } = message;
+      // Each recipient gets a copy with a link of their own, so the link says whose it is; a copy
+      // shared with others would carry someone else's link, so these go without one.
+      const { category, cc: _shared, ...single } = message;
       for (const address of recipients) {
         // biome-ignore lint/performance/noAwaitInLoops: one copy after another keeps the order and the provider's rate
         await destination.send(
-          withUnsubscribe(message, address, unsubscribeLinks(address, category)),
+          withUnsubscribe({ ...single, category }, address, unsubscribeLinks(address, category)),
         );
       }
     }

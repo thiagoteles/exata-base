@@ -9,6 +9,7 @@ export function createSmtpSender(url: string, from: string): EmailSender {
       await transport.sendMail({
         from,
         to: [...(typeof message.to === "string" ? [message.to] : message.to)],
+        ...(message.cc === undefined || message.cc.length === 0 ? {} : { cc: [...message.cc] }),
         subject: message.subject,
         html: message.html,
         text: message.text,

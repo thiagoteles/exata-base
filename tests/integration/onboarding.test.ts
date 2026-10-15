@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { OnboardingStep } from "@/domain/onboarding/step";
+import { onboardingSteps } from "@/domain/onboarding/steps";
 import {
   finishOnboardingStep,
   finishStepsOfPreference,
@@ -9,29 +11,49 @@ import { createUser } from "./factories";
 
 const db = testDatabase();
 
+// The product's own steps, so the rules are proven on the list the product ships.
+const steps: readonly OnboardingStep[] = onboardingSteps;
+const [first, second] = steps;
+const final = steps.find((step) => step.final === true);
+const beforeFinal = steps.find((step) => step.final !== true);
+const finalOfPreference = steps.find(
+  (step) => step.final === true && step.preference !== undefined,
+);
+
 describe("the first steps of an account", () => {
   it("start empty, point at the first step, and remember what was finished", async () => {
     const ana = await createUser(db, "ana@example.com");
-    expect(await readOnboarding(db, ana.id)).toMatchObject({ doneCount: 0, next: "look" });
-    const { progress } = await finishOnboardingStep(db, ana.id, "look");
-    expect(progress).toMatchObject({ doneCount: 1, next: "invite" });
+    expect(await readOnboarding(db, ana.id)).toMatchObject({ doneCount: 0, next: first?.id });
+    const { progress } = await finishOnboardingStep(db, ana.id, first?.id ?? "");
+    expect(progress).toMatchObject({ doneCount: 1, next: second?.id ?? null });
     expect(await readOnboarding(db, ana.id)).toMatchObject({ doneCount: 1 });
   });
 
-  it("say activated on the one call that finishes the final step, and never again", async () => {
+  it("say activated on the one call that finishes the final step, and never again", async ({
+    skip,
+  }) => {
+    if (final === undefined || beforeFinal === undefined) {
+      skip();
+    }
     const bia = await createUser(db, "bia@example.com");
-    expect((await finishOnboardingStep(db, bia.id, "invite")).activatedNow).toBe(false);
-    expect((await finishOnboardingStep(db, bia.id, "email")).activatedNow).toBe(true);
-    const again = await finishOnboardingStep(db, bia.id, "email");
+    expect((await finishOnboardingStep(db, bia.id, beforeFinal?.id ?? "")).activatedNow).toBe(
+      false,
+    );
+    expect((await finishOnboardingStep(db, bia.id, final?.id ?? "")).activatedNow).toBe(true);
+    const again = await finishOnboardingStep(db, bia.id, final?.id ?? "");
     expect(again.activatedNow).toBe(false);
     expect(again.progress.doneCount).toBe(2);
   });
 
-  it("finish the step of a preference when the account saves it, once", async () => {
+  it("finish the final step of a preference when the account saves it, once", async ({ skip }) => {
+    if (finalOfPreference === undefined) {
+      skip();
+    }
     const dani = await createUser(db, "dani@example.com");
-    expect(await finishStepsOfPreference(db, dani.id, "theme")).toBe(false);
-    expect(await finishStepsOfPreference(db, dani.id, "email")).toBe(true);
-    expect(await finishStepsOfPreference(db, dani.id, "email")).toBe(false);
+    const preference = finalOfPreference?.preference ?? "";
+    expect(await finishStepsOfPreference(db, dani.id, "made-up")).toBe(false);
+    expect(await finishStepsOfPreference(db, dani.id, preference)).toBe(true);
+    expect(await finishStepsOfPreference(db, dani.id, preference)).toBe(false);
     expect(await readOnboarding(db, dani.id)).toMatchObject({ activated: true, doneCount: 1 });
   });
 

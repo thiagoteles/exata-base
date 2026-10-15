@@ -1,9 +1,9 @@
-import { browserPreferenceKeys } from "@/lib/preferences/definitions";
-
 /*
  * What a visitor keeps in this browser: values the registry marks as `browser`, under a name of
  * their own, as JSON. Storage can be blocked (a private window, a setting), so every call is safe
  * to make and does nothing when it cannot work; a visitor then simply loses the draft on reload.
+ * It does not import the preference registry: a page that keeps one draft in the browser should not
+ * carry every preference's schema to do it.
  */
 
 const PREFIX = "visitor:";
@@ -33,10 +33,10 @@ export function clearVisitorValue(key: string): void {
   }
 }
 
-/** Everything this browser holds for a visitor, by key, for the account to claim. */
-export function readAllVisitorValues(): Record<string, unknown> {
+/** Everything this browser holds for a visitor under the keys given, for the account to claim. */
+export function readAllVisitorValues(keys: readonly string[]): Record<string, unknown> {
   const held: Record<string, unknown> = {};
-  for (const key of browserPreferenceKeys) {
+  for (const key of keys) {
     const value = readVisitorValue(key);
     if (value !== undefined) {
       held[key] = value;

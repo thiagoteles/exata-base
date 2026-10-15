@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { clearVisitorValue, readAllVisitorValues } from "@/lib/browser-storage";
 import { claimVisitorData } from "@/lib/preferences/actions";
+import { browserPreferenceKeys } from "@/lib/preferences/definitions";
 
 /**
  * Hands the account what this browser kept while the person was a visitor, the first time a signed-in
@@ -11,7 +12,7 @@ import { claimVisitorData } from "@/lib/preferences/actions";
  */
 export function ClaimVisitorData() {
   useEffect(() => {
-    const values = readAllVisitorValues();
+    const values = readAllVisitorValues(browserPreferenceKeys);
     if (Object.keys(values).length === 0) {
       return;
     }

@@ -15,6 +15,9 @@ const withNextIntl = createNextIntlPlugin({
   },
 });
 
+// The validation library's own files, wherever the package manager put them.
+const ZOD_MODULE = /[\\/]node_modules[\\/]zod[\\/]/;
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
@@ -28,9 +31,26 @@ const nextConfig: NextConfig = {
   // cache and kept them, about 12 MB of heap a route that never left: an empty route cost 22 MB
   // with it and 10 MB without. Compiling took the same time either way (the first page about a
   // second longer from a cold start), and a change in a file was recompiled as fast.
-  webpack: (config, { dev }) => {
+  //
+  // In the browser's production build, zod gets a chunk of its own. Left to the default split it
+  // shared one with what every page loads (the text provider, the link), so a page with no form
+  // downloaded the whole validation library; apart, it comes only with the screens that use it.
+  webpack: (config, { dev, isServer }) => {
     if (dev) {
       config.cache = false;
+    }
+    const split = config.optimization?.splitChunks;
+    if (!(dev || isServer) && split !== undefined && split !== false) {
+      split.cacheGroups = {
+        ...split.cacheGroups,
+        zod: {
+          test: ZOD_MODULE,
+          name: "zod",
+          chunks: "all",
+          priority: 50,
+          enforce: true,
+        },
+      };
     }
     return config;
   },

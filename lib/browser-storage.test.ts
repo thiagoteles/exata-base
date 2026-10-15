@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { browserPreferenceKeys } from "@/lib/preferences/definitions";
 import {
   clearVisitorValue,
   readAllVisitorValues,
@@ -41,13 +42,15 @@ describe("what a visitor keeps in the browser", () => {
         analytics: "x",
       }),
     );
-    expect(readAllVisitorValues()).toEqual({ contactDraft: { subject: "", body: "Oi" } });
+    expect(readAllVisitorValues(browserPreferenceKeys)).toEqual({
+      contactDraft: { subject: "", body: "Oi" },
+    });
   });
 
   it("reads a value that is not JSON as nothing", () => {
     vi.stubGlobal("localStorage", fakeStorage({ "visitor:contactDraft": "{broken" }));
     expect(readVisitorValue("contactDraft")).toBeUndefined();
-    expect(readAllVisitorValues()).toEqual({});
+    expect(readAllVisitorValues(browserPreferenceKeys)).toEqual({});
   });
 
   it("does nothing, and never throws, when the browser blocks storage", () => {
@@ -65,6 +68,6 @@ describe("what a visitor keeps in the browser", () => {
     expect(() => writeVisitorValue("contactDraft", { subject: "", body: "x" })).not.toThrow();
     expect(() => clearVisitorValue("contactDraft")).not.toThrow();
     expect(readVisitorValue("contactDraft")).toBeUndefined();
-    expect(readAllVisitorValues()).toEqual({});
+    expect(readAllVisitorValues(browserPreferenceKeys)).toEqual({});
   });
 });

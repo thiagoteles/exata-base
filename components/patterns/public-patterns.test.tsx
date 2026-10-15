@@ -50,6 +50,10 @@ describe("the public site's patterns", () => {
     expect(screen.getByRole("link", { name: "Começar" })).toBeTruthy();
     expect(screen.getByText("Prova real").parentElement?.classList.contains("reveal")).toBe(true);
     expect(container.querySelector("section")?.id).toBe("demo");
+    // Mirrored, the proof comes first and keeps the wide column.
+    expect(container.querySelector("section")?.className).toContain(
+      "lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]",
+    );
   });
 
   it("gives each audience's words as a quote with the product's answer under it", () => {

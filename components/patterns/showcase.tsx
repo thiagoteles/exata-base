@@ -45,7 +45,7 @@ export function Showcase({
   return (
     <section
       {...(anchor === undefined ? {} : { id: anchor })}
-      className="mx-auto grid w-full max-w-310 scroll-mt-8 gap-10 px-4 py-14 md:px-8 md:py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16"
+      className={`mx-auto grid w-full max-w-310 scroll-mt-8 gap-10 px-4 py-14 md:px-8 md:py-20 lg:gap-16 ${mirror ? "lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]" : "lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"}`}
     >
       <div
         className={`flex flex-col gap-5 ${mirror ? "lg:order-last" : ""} ${stickyText ? "lg:sticky lg:top-8 lg:self-start" : "lg:self-center"}`}

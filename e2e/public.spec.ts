@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
+import { articles } from "../lib/content/articles-index";
 import home from "../messages/pt-BR/home.json" with { type: "json" };
 import site from "../messages/pt-BR/site.json" with { type: "json" };
 import { appOrigin } from "./origin";
@@ -197,10 +198,14 @@ test("the home page describes the organization and its questions to search engin
   }
 });
 
+// The articles are the product's: the specs read the newest one from the generated index.
+const [newest] = articles;
+
 test("a plans page declares its questions, and an article its trail", async ({ page }) => {
+  test.skip(newest === undefined, "the product has no article yet");
   await page.goto("/planos");
   expect((await structuredData(page)).map((item) => item["@type"])).toContain("FAQPage");
-  await page.goto("/artigos/como-escrever-um-artigo");
+  await page.goto(`/artigos/${newest?.slug}`);
   const kinds = (await structuredData(page)).map((item) => item["@type"]);
   expect(kinds).toContain("Article");
   expect(kinds).toContain("BreadcrumbList");
@@ -211,13 +216,13 @@ test("articles list, open with their reading layout, and a missing one is a real
   page,
   request,
 }) => {
+  test.skip(newest === undefined, "the product has no article yet");
+  const { slug, title } = newest ?? { slug: "", title: "" };
   await page.goto("/artigos");
   await expect(page.getByRole("heading", { level: 1, name: "Artigos" })).toBeVisible();
-  await page.getByRole("link", { name: "Como escrever um artigo" }).click();
-  await expect(page).toHaveURL(/\/artigos\/como-escrever-um-artigo$/);
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Como escrever um artigo" }),
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: "O topo do arquivo" })).toBeVisible();
+  await page.getByRole("link", { name: title, exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/artigos/${slug}$`));
+  await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2 }).first()).toBeVisible();
   expect((await request.get("/artigos/nao-existe")).status()).toBe(404);
 });

@@ -19,7 +19,7 @@ Open http://localhost:47300. Sign in as the seeded admin, `admin@app.local` with
 ## A new product
 
 1. **Make it.** `pnpm create next-app my-product --example "https://github.com/thiagoteles/exata-base"`. It installs the packages before `git init`, so the product has no git hooks yet: run `pnpm check` once, which installs them, before the first commit.
-2. **Remove the base's notes.** `git rm BASE.md`, committed alone (`AGENTS.md` says the same to an agent).
+2. **Tie it to the base.** After the first commit: `git remote add base https://github.com/thiagoteles/exata-base.git`, then `pnpm base:update --since $(git ls-remote base main | cut -f1)`, which records that the product already holds the base as it was made (a product from `create-next-app` starts with no history in common with the base). `BASE.md` stays: it is the base's notes, inert in a product, and keeping it lets the base's updates merge cleanly.
 3. **Say what it is.** `pnpm setup:product`, below.
 4. **Bring it up.** `docker compose up`, on the product's own ports.
 5. **Make its areas.** `pnpm new:crud people --entity Person --label "Pessoas"` writes the table, the rules, the list, the record, the form, the delete, the pages, the text, the navigation and the tests, and takes the place of the base's samples. `pnpm new:crud pets --entity Pet --label "Animais" --parent people` writes an area whose records are filed under one of the first, with the children listed on the parent's page. Then change the fields in two migrations (add the new ones and `pnpm db:generate`, remove the old ones and `pnpm db:generate` again) and `pnpm db:migrate`, with no restart. The `new-crud` skill has the details.
@@ -28,6 +28,12 @@ Open http://localhost:47300. Sign in as the seeded admin, `admin@app.local` with
 8. **Paper, if it needs it.** A sheet page under `app/(print)/print/` with the same guard and read as its screen.
 9. **Prove it.** `pnpm verify` before delivering.
 10. **Publish.** See [Publishing](#publishing).
+
+### Updates from the base
+
+`pnpm base:update` merges what changed in the base since the last update: it fetches the remote `base`, merges `base/main`, keeps deleted what the product deleted on purpose (the samples it replaced), regenerates the generated files from the product's own sources (`pnpm messages`, `pnpm tokens`), and commits, which runs the check. What it cannot settle it lists; settle it, run `pnpm tokens`, and commit.
+
+What keeps the merge quiet is that a product never edits a file of the base. What it declares lives in the `*.product.*` file beside each registry (its tables, destinations, public pages, plans, environment, scheduled jobs; `AGENTS.md` lists them), and the files that are wholly the product's (this README, `design.json`, `ports.json`, the home page, its words) are marked `merge=ours` in `.gitattributes`, so where both sides changed one, the product's version stays. A product that needs a base file changed changes it in the base, and merges.
 
 ### Setting up the product
 

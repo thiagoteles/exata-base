@@ -235,6 +235,7 @@ The rest of this file describes the `instrument` values; the table below is what
 | `--animate-sheet-out` | `sheet-out 196ms var(--ease-exit) both` |
 | `--animate-bar-in` | `bar-in 200ms var(--ease-enter) both` |
 | `--animate-stamp` | `stamp 120ms var(--ease-enter) both` |
+| `--animate-enter` | `enter 480ms var(--ease-enter) both` |
 <!-- preset:end -->
 
 ## Colors
@@ -451,6 +452,8 @@ The rest of this file describes the `instrument` values; the table below is what
 
 **Measure.** Running text at most 680px wide. Field descriptions at most 52ch.
 
+**The document face.** Every preset shares one more face: Source Serif 4, the face the PDFs embed. On screen it sets a document that is also a PDF, so the sample reads as the paper it becomes: `<Sheet face="document">`, titles included. It is never an interface face; `pnpm lint:tokens` refuses `font-document` outside `components/print`. It is not preloaded, so a page without a sheet never downloads it. Numbers inside the sheet stay in the mono face.
+
 **Declared exception:** JetBrains Mono is known as a programmer's font. Here it only appears in numbers and short data, never in sentences, and that is what keeps the interface from looking like a developer tool.
 
 ## Layout
@@ -575,6 +578,18 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 
 A card inside a card does not exist.
 
+**Public site.** The surface that persuades has its own patterns, all in `components/patterns`, all receiving their words from the catalog and their pictures as props. A home page reads top to bottom as a story about the product, and every picture on it is a real piece of the product (a record, a document, a figure that teaches a true rule of the domain), never an illustration of one.
+- `Hero`: display title with a short brand rule, the eyebrow in sentence case, two actions at most, the product beside the words.
+- `ProofStrip`: three or four facts under the hero, numbered in mono, divided by hairlines. A fact, not an adjective.
+- `Showcase`: one thing the product does. Words in the narrow column, the proof in the wide one; `mirror` alternates sides, `stickyText` keeps the words beside a tall demo. The proof arrives as it scrolls (see Motion).
+- `ContentSection`: the ledger band for lists, steps and questions, heading hung on the left.
+- `Voices`: who it is for, in the first person, each quote large with the product's answer. Situations, not testimonials: no name, photo or star.
+- `Faq`: the questions, and the same list as structured data.
+- `ClosingBand`: the promise once more on the sunken ground, with the hero's actions.
+- A document shown on the page is a `Sheet` with `paper` (it keeps the light paper palette in any theme) and `face="document"`; its title takes the level it has in the page.
+- Every call to action is a `TrackedLink` with the spot it sits in (`where`), so the funnel knows which one brought a person in.
+- Sections breathe more than the app: 56 to 80px between bands on a phone and a desktop. No band repeats the shape of the one above it.
+
 **Empty, error and loading states** are part of the component, not extras. The error page shows the request id in mono.
 
 ## Data
@@ -609,7 +624,9 @@ Charts follow one method: pick the form first (a single number is a stat tile, n
 - **Waiting:** loading states and indicators only appear after 180ms. A fast response never flashes.
 - **Hover:** hover hints and keyboard shortcuts only appear under `(hover: hover) and (pointer: fine)`.
 - **Reduced motion:** everything jumps to the final frame, with a 0.01ms duration and no delay. It applies when the system asks for it and also when the person chose it in their account (`data-motion="reduce"`). The resting state of every animation is the base style itself, so nothing is left halfway.
-- **The one authored moment:** the "Salvo" (Saved) stamp. It scales from 1.06 to 1 together with opacity, in 120ms, with no bounce. It is the only animation with personality in the system.
+- **The one authored moment:** the "Salvo" (Saved) stamp. It scales from 1.06 to 1 together with opacity, in 120ms, with no bounce. It is the only animation with personality in the app.
+- **The public site's entrance.** A public page may stage one entrance: the few things that arrive together arrive in order, once, never in a loop. `animate-enter` (a 12px rise with opacity, its length set by the motion knob) or `animate-stamp`, with `enter-step-N` waiting N steps of 80ms. The usual sequence is the product beside the hero, then its stamp.
+- **Revealing on scroll.** `reveal` lets something rise into place as it enters the view, tied to scrolling, only where the browser supports `animation-timeline: view()`. Elsewhere, and with reduced motion, it is simply there. `Showcase` uses it for its proof; nothing in the app does.
 
 ## Decisions Log
 | Date | Decision | Rationale |

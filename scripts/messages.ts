@@ -2,11 +2,12 @@ import { existsSync, readdirSync, readFileSync, watch, writeFileSync } from "nod
 import path from "node:path";
 import process from "node:process";
 import { locales } from "../lib/i18n/locales";
-import { areaOf, joinAreas } from "./messages/join";
+import { areaOf, joinAreas, overlay, overlayOf } from "./messages/join";
 
 /*
  * `pnpm messages` joins `messages/<locale>/<area>.json` into `messages/<locale>.json`, the catalog the
- * app reads and the type of every text key. `--check` only compares, which is what `pnpm check` runs.
+ * app reads and the type of every text key. A product's `<area>.product.json` is laid over the
+ * base's area of the same name, key by key, so the product never edits a file of the base. `--check` only compares, which is what `pnpm check` runs.
  * `--watch` joins again whenever an area file changes, so the development server sees the edit.
  */
 
@@ -20,14 +21,23 @@ function joined(locale: string): string {
     throw new Error(`messages/${locale}/ is missing: a language has one JSON file per area there`);
   }
   const areas: Record<string, unknown> = {};
-  for (const file of readdirSync(folder)) {
+  const overlays: Record<string, unknown> = {};
+  const read = (file: string) =>
+    JSON.parse(readFileSync(path.join(folder, file), "utf8")) as unknown;
+  for (const file of readdirSync(folder).filter((name) => overlayOf(name) !== null)) {
+    overlays[overlayOf(file) ?? ""] = read(file);
+  }
+  for (const file of readdirSync(folder).filter((name) => overlayOf(name) === null)) {
     const area = areaOf(file);
     if (area === null) {
       throw new Error(
         `messages/${locale}/${file}: an area file is named after its area, like nav.json`,
       );
     }
-    areas[area] = JSON.parse(readFileSync(path.join(folder, file), "utf8")) as unknown;
+    areas[area] = read(file);
+  }
+  for (const [area, over] of Object.entries(overlays)) {
+    areas[area] = area in areas ? overlay(areas[area], over) : over;
   }
   return joinAreas(areas);
 }

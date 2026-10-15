@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { reportCatalog } from "@/lib/i18n/catalog-report";
 import { isLocale } from "@/lib/i18n/locales";
-import english from "@/messages/documents.en.json";
 import portuguese from "@/messages/pt-BR.json";
-import { documentTranslator } from "./language";
+import { documentTranslator, english } from "./language";
 import { defaultDocumentLanguage, documentLanguages, isDocumentLanguage } from "./languages";
 
 type Tree = { [key: string]: string | Tree };

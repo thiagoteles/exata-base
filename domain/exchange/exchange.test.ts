@@ -12,7 +12,15 @@ import {
   toDayNumber,
   weekdayOf,
 } from "./dates";
-import { defaultRatePolicy, pickRate, referenceDay } from "./policy";
+import {
+  defaultRatePolicy,
+  pickRate,
+  type RateChoice,
+  type RateReference,
+  rateChoices,
+  rateReferences,
+  referenceDay,
+} from "./policy";
 
 const USD = currencyCode("USD");
 const BRL = currencyCode("BRL");
@@ -81,10 +89,34 @@ describe("which day's quote converts an amount", () => {
     expect(referenceDay({ side: "buy", reference: "receipt_day" }, days)).toBe("2026-10-20");
   });
 
+  it("names the day of the fiscal note, and the one before it, and has none until the note's day is known", () => {
+    const days = { issue: "2026-10-12", nfse: "2026-10-21" };
+    expect(referenceDay({ side: "sell", reference: "nfse_day" }, days)).toBe("2026-10-21");
+    expect(referenceDay({ side: "sell", reference: "day_before_nfse" }, days)).toBe("2026-10-20");
+    expect(
+      referenceDay({ side: "sell", reference: "day_before_nfse" }, { issue: "2026-10-12" }),
+    ).toBeNull();
+    expect(
+      referenceDay({ side: "sell", reference: "nfse_day" }, { issue: "2026-10-12" }),
+    ).toBeNull();
+  });
+
   it("has no day for a receipt policy before the receipt is known", () => {
     expect(
       referenceDay({ side: "buy", reference: "receipt_day" }, { issue: "2026-10-12" }),
     ).toBeNull();
+  });
+
+  it("offers both sides or no conversion, and every reference names a day once every day is known", () => {
+    expect(rateChoices).toEqual<RateChoice[]>(["buy", "sell", "none"]);
+    const days = { issue: "2026-10-09", receipt: "2026-10-20", nfse: "2026-10-12" };
+    for (const reference of rateReferences) {
+      expect(referenceDay({ side: "sell", reference }, days)).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+    const noted: RateReference[] = ["nfse_day", "day_before_nfse"];
+    for (const reference of noted) {
+      expect(referenceDay({ side: "sell", reference }, { issue: "2026-10-09" })).toBeNull();
+    }
   });
 
   it("picks the side of a quote", () => {

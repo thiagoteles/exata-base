@@ -1,0 +1,27 @@
+# The files a product owns. A product merges the base's updates from the remote `base`; where both
+# the base and the product changed one of these, the product's version is kept (`merge=ours`, a
+# driver `pnpm hooks` sets up in each clone). The base ships them with its samples and placeholders.
+
+# What the product declares beside each registry of the base.
+*.product.ts merge=ours
+*.product.tsx merge=ours
+*.product.json merge=ours
+*.product.env merge=ours
+
+# What setup:product writes and the product's own words.
+README.md merge=ours
+CLAUDE.md merge=ours
+ports.json merge=ours
+design.json merge=ours
+messages/pt-BR/site.json merge=ours
+messages/pt-BR/home.json merge=ours
+messages/pt-BR/terms.json merge=ours
+messages/pt-BR/privacy.json merge=ours
+content/** merge=ours
+
+# The home page and its share image, which the product rewrites from the base's sample.
+app/(public)/page.tsx merge=ours
+app/opengraph-image.tsx merge=ours
+
+# The catalog pictures of the product's own preset.
+e2e/__snapshots__/** merge=ours

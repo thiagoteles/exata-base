@@ -10,6 +10,10 @@ services:
       dockerfile: Dockerfile
     image: ${E2E_IMAGE:?set by pnpm test:e2e}
     volumes: !reset []
+    # What the product's own suite needs on top (an allowance raised for the runs), in its own file.
+    env_file:
+      - path: ./e2e.product.env
+        required: false
     environment:
       NODE_ENV: production
       NODE_OPTIONS: ""

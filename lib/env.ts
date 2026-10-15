@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 import process from "node:process";
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+import { productEnv } from "@/lib/env.product";
 import { parseIngestSecrets } from "@/lib/ingest/secrets";
 import ports from "@/ports.json" with { type: "json" };
 
@@ -122,6 +123,7 @@ const server = {
   UPLOAD_TYPES: csv
     .pipe(z.array(z.string().regex(/^[a-z]+\/[a-z0-9.+-]+$/)).min(1))
     .default(["image/png", "image/jpeg", "image/webp", "application/pdf"]),
+  ...productEnv,
 };
 
 type ServerShape = typeof server;

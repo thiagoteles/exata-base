@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Suspense } from "react";
+import { type ReactNode, Suspense } from "react";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { receiptNumber } from "@/domain/documents/receipt";
+import { productVerifications } from "@/features/verify/verifications.product";
 import { formatInstantDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
 import { receiptFacts } from "@/lib/documents/receipts";
@@ -29,11 +30,32 @@ export default function VerifyPage({ params }: PageProps<"/verify/[slug]">) {
   );
 }
 
-/** Reads the address, so it streams in. What it shows is the record as it is now, never a copy made at printing. */
+/**
+ * Reads the address, so it streams in. What it shows is the record as it is now, never a copy made
+ * at printing: a receipt here, any other kind by the product's own verification of it.
+ */
 async function Verification({ params }: { params: PageProps<"/verify/[slug]">["params"] }) {
-  const [t, { slug }] = await Promise.all([getTranslations("verify"), params]);
+  const { slug } = await params;
   const document = readDocument(env.DOCUMENT_SECRET, slug);
-  const facts = document === null ? null : await receiptFacts(db, document.id);
+  if (document === null) {
+    notFound();
+  }
+  if (document.kind === "receipt") {
+    return <VerifiedReceipt id={document.id} />;
+  }
+  // Read by a plain string: with no kind of its own, the product's map has no key to index by.
+  const verifications: Partial<Record<string, (props: { id: string }) => Promise<ReactNode>>> =
+    productVerifications;
+  const Verified = verifications[document.kind];
+  if (Verified === undefined) {
+    notFound();
+  }
+  return <Verified id={document.id} />;
+}
+
+async function VerifiedReceipt({ id }: { id: string }) {
+  const t = await getTranslations("verify");
+  const facts = await receiptFacts(db, id);
   if (facts === null) {
     notFound();
   }

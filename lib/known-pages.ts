@@ -2,12 +2,13 @@ import { articleSlugs } from "./content/articles";
 import { readDocument } from "./documents/slug";
 import { env } from "./env";
 import { matchPath } from "./i18n/path-map";
+import { productDynamicRoutes } from "./known-pages.product";
 
 /*
  * Public routes with a dynamic segment, and how to tell whether an address names a page that
  * exists. Under Cache Components the shell of a dynamic page streams before the page can call
  * notFound(), so a missing page would answer 200; the proxy asks here first and answers a real 404.
- * A product adds one entry per public dynamic route, reading a list that needs no database call.
+ * The product's own routes come from its own file.
  */
 const dynamicRoutes: readonly {
   route: string;
@@ -19,6 +20,7 @@ const dynamicRoutes: readonly {
     route: "/verify/[slug]",
     exists: ({ slug = "" }) => readDocument(env.DOCUMENT_SECRET, slug) !== null,
   },
+  ...productDynamicRoutes,
 ];
 
 /** True when the route address fits a dynamic public route but names no page. */

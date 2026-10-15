@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { unzipSync } from "fflate";
+import { SIGNED_IN_HOME } from "../lib/routes";
 import { signUnsubscribe } from "../lib/unsubscribe/token";
 import { linkSentTo } from "./mail";
 import { appHost, appOrigin } from "./origin";
@@ -221,7 +222,7 @@ test("a way back that leaves the site is ignored after signing in", async ({ pag
   await page.getByRole("textbox", { name: "E-mail", exact: true }).fill(email);
   await page.getByLabel("Senha").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL((url) => url.origin === appOrigin && url.pathname === "/");
+  await page.waitForURL((url) => url.origin === appOrigin && url.pathname === SIGNED_IN_HOME);
   expect(new URL(page.url()).host).toBe(appHost);
 });
 

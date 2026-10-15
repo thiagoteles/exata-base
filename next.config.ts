@@ -4,6 +4,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 import { locales } from "./lib/i18n/locales";
 import { movedAddresses } from "./lib/redirects";
 import { securityHeaders } from "./lib/security/headers";
+import { productTracingIncludes } from "./next.config.product";
 
 const withNextIntl = createNextIntlPlugin({
   requestConfig: "./lib/i18n/request.ts",
@@ -86,6 +87,9 @@ const nextConfig: NextConfig = {
       "./assets/fonts/**/*",
       "./node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/**/*",
     ],
+    ...Object.fromEntries(
+      Object.entries(productTracingIncludes).map(([route, files]) => [route, [...files]]),
+    ),
   },
 };
 

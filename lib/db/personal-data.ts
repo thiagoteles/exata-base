@@ -1,4 +1,5 @@
 import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
+import { productExportedData, productNotExportedData } from "./personal-data.product";
 import { apiTokens } from "./schema/api-tokens";
 import { accounts, sessions } from "./schema/auth";
 import { checkoutSessions, payments, plans } from "./schema/billing";
@@ -6,8 +7,6 @@ import { contactMessages } from "./schema/contact";
 import { files } from "./schema/files";
 import { numberSequences } from "./schema/number-sequences";
 import { referrals } from "./schema/referrals";
-import { sampleItems } from "./schema/sample-items";
-import { sampleParts } from "./schema/sample-parts";
 import { users } from "./schema/users";
 
 /*
@@ -20,16 +19,16 @@ type Exported = { key: string; table: PgTable; owner: AnyPgColumn };
 type NotExported = { table: PgTable; reason: string };
 
 export const exportedData: readonly Exported[] = [
-  { key: "sample_parts", table: sampleParts, owner: sampleParts.ownerId },
+  ...productExportedData,
   { key: "user", table: users, owner: users.id },
   { key: "plan", table: plans, owner: plans.userId },
   { key: "payments", table: payments, owner: payments.payerId },
   { key: "contact_messages", table: contactMessages, owner: contactMessages.userId },
   { key: "files", table: files, owner: files.ownerId },
-  { key: "sample_items", table: sampleItems, owner: sampleItems.ownerId },
 ];
 
 export const notExportedData: readonly NotExported[] = [
+  ...productNotExportedData,
   { table: sessions, reason: "short-lived sign-in sessions, deleted with the account" },
   { table: accounts, reason: "credentials and provider tokens, never handed out" },
   {

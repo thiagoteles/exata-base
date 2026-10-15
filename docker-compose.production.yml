@@ -17,7 +17,7 @@ services:
       TZ: America/Sao_Paulo
       APP_URL: ${APP_URL:?Set APP_URL to the public address of the product}
       # Letters and digits only in the password: it goes inside this address unescaped.
-      DATABASE_URL: postgres://app:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/app
+      DATABASE_URL: postgres://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-app}
       AUTH_PROVIDER: ${AUTH_PROVIDER:-clerk}
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       TRUSTED_PROXY: ${TRUSTED_PROXY:-traefik}
@@ -60,13 +60,15 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: app
+      # The database and its owner are `app` unless the product named them (POSTGRES_DB and
+      # POSTGRES_USER in Coolify) before the first deploy; Postgres fixes both when the volume is made.
+      POSTGRES_USER: ${POSTGRES_USER:-app}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
-      POSTGRES_DB: app
+      POSTGRES_DB: ${POSTGRES_DB:-app}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 4s
       retries: 20

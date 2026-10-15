@@ -30,34 +30,43 @@ export const sampleFiles = [
   "e2e/sample-items.spec.ts",
 ] as const;
 
+/** The comment that opens the product's schema file: an area's import is written right above it. */
+const schemaImportAnchor = "/*\n * The product's own tables and enums";
+
+/** The opening of the product's destinations, where an area's entry is written. */
+export const navAnchor = "export const productNavItems = [";
+
 /**
- * Where each shared registry learns about an area: the sample's own lines, which the generator
- * writes with the new names right after the anchor. JSON catalogs get a key instead.
+ * Where each of the product's registries learns about an area: the sample's own lines, which the
+ * generator writes with the new names right after the anchor (or right before it, for an import
+ * that goes above a comment). JSON catalogs get a key in the product's overlay instead. Every file
+ * named here is the product's own, so an area never touches a file of the base.
  */
 export const registrations = [
   {
-    file: "lib/db/schema.ts",
-    anchor: 'import { is } from "drizzle-orm";',
+    file: "lib/db/schema.product.ts",
+    anchor: schemaImportAnchor,
+    before: true,
     lines: ['import { sampleItemStatus, sampleItems } from "./schema/sample-items";'],
   },
   {
-    file: "lib/db/schema.ts",
-    anchor: "export const schema = {",
+    file: "lib/db/schema.product.ts",
+    anchor: "export const productSchema = {",
     lines: ["  sampleItems,", "  sampleItemStatus,"],
   },
   {
-    file: "lib/db/personal-data.ts",
+    file: "lib/db/personal-data.product.ts",
     anchor: 'import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";',
     lines: ['import { sampleItems } from "./schema/sample-items";'],
   },
   {
-    file: "lib/db/personal-data.ts",
-    anchor: "export const exportedData: readonly Exported[] = [",
+    file: "lib/db/personal-data.product.ts",
+    anchor: "export const productExportedData: readonly Exported[] = [",
     lines: ['  { key: "sample_items", table: sampleItems, owner: sampleItems.ownerId },'],
   },
   {
-    file: "lib/navigation.ts",
-    anchor: "const navItems: readonly NavItem[] = [",
+    file: "lib/navigation.product.ts",
+    anchor: navAnchor,
     lines: [
       '  { key: "sampleItems", href: "/sample-items", group: "main", minimum: "member", icon: "folder" },',
     ],
@@ -67,13 +76,13 @@ export const registrations = [
 const inUse = "Ainda há outros registros ligados a este. Exclua ou mova esses registros antes.";
 
 export const catalogKeys = [
-  { file: "messages/pt-BR/nav.json", path: ["items", "sampleItems"], value: "Amostras" },
+  { file: "messages/pt-BR/nav.product.json", path: ["items", "sampleItems"], value: "Amostras" },
   {
-    file: "messages/pt-BR/errors.json",
+    file: "messages/pt-BR/errors.product.json",
     path: ["sampleItemCodeTaken"],
     value: "Já existe um registro com esse código no seu cadastro.",
   },
-  { file: "messages/pt-BR/errors.json", path: ["sampleItemHasLinks"], value: inUse },
+  { file: "messages/pt-BR/errors.product.json", path: ["sampleItemHasLinks"], value: inUse },
 ] as const;
 
 /** Every file of the child sample, by its path in the app. */
@@ -101,30 +110,31 @@ export const childFiles = [
 /** The child sample's lines in the shared registries, written after the same anchors. */
 export const childRegistrations = [
   {
-    file: "lib/db/schema.ts",
-    anchor: 'import { is } from "drizzle-orm";',
+    file: "lib/db/schema.product.ts",
+    anchor: schemaImportAnchor,
+    before: true,
     lines: ['import { samplePartStatus, sampleParts } from "./schema/sample-parts";'],
   },
   {
-    file: "lib/db/schema.ts",
-    anchor: "export const schema = {",
+    file: "lib/db/schema.product.ts",
+    anchor: "export const productSchema = {",
     lines: ["  sampleParts,", "  samplePartStatus,"],
   },
   {
-    file: "lib/db/personal-data.ts",
+    file: "lib/db/personal-data.product.ts",
     anchor: 'import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";',
     lines: ['import { sampleParts } from "./schema/sample-parts";'],
   },
   {
-    file: "lib/db/personal-data.ts",
-    anchor: "export const exportedData: readonly Exported[] = [",
+    file: "lib/db/personal-data.product.ts",
+    anchor: "export const productExportedData: readonly Exported[] = [",
     lines: ['  { key: "sample_parts", table: sampleParts, owner: sampleParts.ownerId },'],
   },
 ] as const;
 
 /** The child's entry in the navigation, written right below its parent's. */
 export const childNavigation = {
-  file: "lib/navigation.ts",
+  file: "lib/navigation.product.ts",
   line: '  { key: "sampleParts", href: "/sample-parts", group: "main", minimum: "member", icon: "folder" },',
 } as const;
 
@@ -150,19 +160,30 @@ export const asTemplate = (file: string, text: string): string =>
     : text;
 
 export const childCatalogKeys = [
-  { file: "messages/pt-BR/nav.json", path: ["items", "sampleParts"], value: "Peças" },
+  { file: "messages/pt-BR/nav.product.json", path: ["items", "sampleParts"], value: "Peças" },
   {
-    file: "messages/pt-BR/errors.json",
+    file: "messages/pt-BR/errors.product.json",
     path: ["samplePartCodeTaken"],
     value: "Já existe um registro com esse código no seu cadastro.",
   },
-  { file: "messages/pt-BR/errors.json", path: ["samplePartHasLinks"], value: inUse },
+  { file: "messages/pt-BR/errors.product.json", path: ["samplePartHasLinks"], value: inUse },
   {
-    file: "messages/pt-BR/errors.json",
+    file: "messages/pt-BR/errors.product.json",
     path: ["samplePartParentMissing"],
     value: "Escolha um registro de amostras do seu cadastro.",
   },
 ] as const;
+
+/** Writes a registration's lines at its anchor: after it, or before it when it says so. */
+export function register(
+  text: string,
+  entry: { anchor: string; before?: boolean },
+  lines: readonly string[],
+): string {
+  return entry.before === true
+    ? insertBefore(text, entry.anchor, lines)
+    : insertAfter(text, entry.anchor, lines);
+}
 
 /** Writes the lines after the anchor. A line already there is not written twice. */
 export function insertAfter(text: string, anchor: string, lines: readonly string[]): string {

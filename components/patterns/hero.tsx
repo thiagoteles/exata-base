@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 type HeroProps = {
-  /** A short label above the title, in small capitals: what this is, not a slogan. */
+  /** A short label above the title, in sentence case: what this is, not a slogan. */
   eyebrow?: string;
   title: string;
   subtitle: string;
@@ -23,7 +23,7 @@ export function Hero({ eyebrow, title, subtitle, actions, aside }: HeroProps) {
         <div className="flex items-center gap-3">
           <span aria-hidden="true" className="h-0.5 w-12 bg-brand" />
           {eyebrow === undefined ? null : (
-            <p className="text-label tracking-wide text-brand-ink uppercase">{eyebrow}</p>
+            <p className="text-label font-semibold text-brand-ink">{eyebrow}</p>
           )}
         </div>
         <h1 className="text-display text-ink">{title}</h1>

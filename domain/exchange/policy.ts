@@ -7,19 +7,36 @@
 
 import { addDays } from "./dates";
 
-export type RateSide = "buy" | "sell";
+const rateSides = ["buy", "sell"] as const;
+export type RateSide = (typeof rateSides)[number];
+
+/** What an issuer chooses: one side of the quote, or no conversion of its own (only rates typed by hand). */
+export const rateChoices = [...rateSides, "none"] as const;
+export type RateChoice = (typeof rateChoices)[number];
 
 /** The day the quote is wanted for. */
-type RateReference = "issue_day" | "receipt_day" | "day_before_issue";
+export const rateReferences = [
+  "issue_day",
+  "receipt_day",
+  "day_before_issue",
+  "nfse_day",
+  "day_before_nfse",
+] as const;
+export type RateReference = (typeof rateReferences)[number];
 
 export type RatePolicy = { side: RateSide; reference: RateReference };
 
 /** The default the product starts with: the sell quote of the day before the invoice was issued. */
 export const defaultRatePolicy: RatePolicy = { side: "sell", reference: "day_before_issue" };
 
-export type RateDays = { issue: string; receipt?: string | undefined };
+export type RateDays = {
+  issue: string;
+  receipt?: string | undefined;
+  /** The day the fiscal note was issued, once the accountant gave it. */
+  nfse?: string | undefined;
+};
 
-/** The day to ask for under a policy, or null when the policy needs a receipt day that is not known. */
+/** The day to ask for under a policy, or null when it needs a receipt or note day that is not known. */
 export function referenceDay(policy: RatePolicy, days: RateDays): string | null {
   switch (policy.reference) {
     case "issue_day":
@@ -28,6 +45,10 @@ export function referenceDay(policy: RatePolicy, days: RateDays): string | null 
       return addDays(days.issue, -1);
     case "receipt_day":
       return days.receipt ?? null;
+    case "nfse_day":
+      return days.nfse ?? null;
+    case "day_before_nfse":
+      return days.nfse === undefined ? null : addDays(days.nfse, -1);
     default:
       return policy.reference satisfies never;
   }

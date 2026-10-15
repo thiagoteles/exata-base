@@ -4,8 +4,10 @@
  * A token is shown once, when it is made; only its hash is kept.
  */
 
-/** What a token may be allowed to do. A product adds its own, one per kind of access. */
-export const apiScopes = ["profile:read", "profile:write"] as const;
+import { productApiScopes } from "./scopes.product";
+
+/** What a token may be allowed to do: the base's, and the product's from its own file. */
+export const apiScopes = ["profile:read", "profile:write", ...productApiScopes] as const;
 export type ApiScope = (typeof apiScopes)[number];
 
 export const TOKEN_PREFIX = "exb_";

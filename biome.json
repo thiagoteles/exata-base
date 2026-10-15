@@ -863,7 +863,7 @@
       }
     },
     {
-      "includes": ["lib/validation.ts", "lib/env.ts"],
+      "includes": ["lib/validation.ts", "lib/env.ts", "lib/env.product.ts"],
       "linter": {
         "rules": {
           "style": {

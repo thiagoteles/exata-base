@@ -11,9 +11,11 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import type { NavIcon as NavIconName } from "@/lib/navigation";
+import { productNavIcons } from "./nav-icon.product";
 import type { ShellItem } from "./nav-types";
 
 const icons: Readonly<Record<NavIconName, typeof IconUser>> = {
+  ...productNavIcons,
   user: IconUser,
   mail: IconMail,
   inbox: IconInbox,

@@ -57,12 +57,7 @@ const files = {
 const integrationsFile = ".env.integrations";
 const portsFile = "ports.json";
 /** Files that cannot read the ports file and name a port in their text. */
-const portDocuments = [
-  "docker-compose.yml",
-  "README.md",
-  "AGENTS.md",
-  ".claude/skills/new-email/SKILL.md",
-] as const;
+const portDocuments = ["docker-compose.yml", "README.md"] as const;
 
 const { values: flags } = parseArgs({
   options: {

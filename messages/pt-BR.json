@@ -986,6 +986,37 @@
   },
   "home": {
     "eyebrow": "Texto de exemplo",
+    "title": "O dia a dia organizado, sem enfeite",
+    "subtitle": "Texto de exemplo. Troque esta frase pela proposta do seu produto, em um parágrafo curto.",
+    "primary": "Criar conta",
+    "secondary": "Já tenho conta",
+    "sampleLabel": "Exemplo de ficha",
+    "sampleCustomer": "Cliente",
+    "sampleDocument": "CPF",
+    "sampleTotal": "Total",
+    "sampleStatus": "Paga",
+    "sampleName": "Ana Souza",
+    "proof": {
+      "label": "O que o produto garante",
+      "items": {
+        "data": {
+          "title": "Seus dados são seus",
+          "body": "Baixe uma cópia ou apague tudo quando quiser."
+        },
+        "free": {
+          "title": "Comece sem pagar",
+          "body": "O essencial é grátis, sem cartão."
+        },
+        "cancel": {
+          "title": "Cancele com um clique",
+          "body": "Sem multa e sem ligação."
+        },
+        "brazil": {
+          "title": "Feito para o Brasil",
+          "body": "CPF, CEP, reais e datas como você escreve."
+        }
+      }
+    },
     "steps": {
       "title": "Como funciona",
       "intro": "Três passos, na ordem em que acontecem. Troque pelos do seu produto.",
@@ -1001,6 +1032,47 @@
         "follow": {
           "title": "Acompanhe sem esforço",
           "body": "Tudo o que importa fica numa tela só, com avisos que você mesmo escolhe receber."
+        }
+      }
+    },
+    "showcase": {
+      "title": "Mostre o produto, não um desenho dele",
+      "body": "Texto de exemplo. Cada seção mostra uma coisa que o produto faz, ao lado de uma peça real dele: uma ficha, um documento, uma figura.",
+      "points": {
+        "real": "A peça é a mesma que a pessoa verá depois de entrar",
+        "paper": "Um documento aparece como papel, na letra do PDF",
+        "facts": "Cada linha diz um fato, não um adjetivo"
+      },
+      "action": "Ver como funciona",
+      "sheetBrand": "Produto",
+      "sheetTitle": "Recibo",
+      "sheetDate": "14/10/2026",
+      "sheetCaption": "Itens do recibo",
+      "sheetItem": "Item",
+      "sheetAmount": "Valor",
+      "sheetLineOne": "Assinatura mensal",
+      "sheetLineTwo": "Armazenamento extra",
+      "sheetFooter": "Documento de exemplo"
+    },
+    "voices": {
+      "title": "Para quem é",
+      "intro": "As situações de quem usa, nas palavras dessas pessoas. Troque pelas do seu público.",
+      "items": {
+        "paper": {
+          "quote": "Ainda anoto tudo num caderno.",
+          "answer": "Cadastre do jeito que já faz e encontre qualquer coisa em segundos."
+        },
+        "sheet": {
+          "quote": "Minha planilha virou um monstro.",
+          "answer": "Importe o que tem e deixe as contas para o produto."
+        },
+        "phone": {
+          "quote": "Resolvo quase tudo pelo celular.",
+          "answer": "Cada tela foi feita para a tela pequena, não espremida nela."
+        },
+        "time": {
+          "quote": "Não tenho tempo para aprender outro sistema.",
+          "answer": "Os primeiros passos aparecem na sua conta, um de cada vez."
         }
       }
     },
@@ -1022,16 +1094,10 @@
         }
       }
     },
-    "title": "O dia a dia organizado, sem enfeite",
-    "subtitle": "Texto de exemplo. Troque esta frase pela proposta do seu produto, em um parágrafo curto.",
-    "primary": "Criar conta",
-    "secondary": "Já tenho conta",
-    "sampleLabel": "Exemplo de ficha",
-    "sampleCustomer": "Cliente",
-    "sampleDocument": "CPF",
-    "sampleTotal": "Total",
-    "sampleStatus": "Paga",
-    "sampleName": "Ana Souza"
+    "closing": {
+      "title": "Texto de exemplo: a promessa mais uma vez",
+      "body": "A mesma ação do começo da página, para quem leu até aqui."
+    }
   },
   "inbox": {
     "title": "Caixa de contatos",

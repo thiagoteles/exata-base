@@ -2,13 +2,14 @@ import type { Route } from "next";
 import { defaultLocale } from "./locales";
 import { pathInLocale } from "./negotiate";
 import { createPathMap, fillPath } from "./path-map";
+import { productPublicPaths } from "./public-paths.product";
 
 /*
  * The addresses a visitor sees, by the route that serves them. Folders under `app/` stay in
  * English; the proxy serves each public address from its route and answers the English address
  * with a permanent redirect to the public one, so search engines index one address. The signed-in
- * area and the sign-in screens keep their route addresses. A product adds its public pages here,
- * dynamic ones included (`"/lotteries/[game]": "/loterias/[game]"`).
+ * area and the sign-in screens keep their route addresses. The product's pages come from its own
+ * file.
  */
 export const publicPaths = {
   "/plans": "/planos",
@@ -19,6 +20,7 @@ export const publicPaths = {
   "/articles": "/artigos",
   "/articles/[slug]": "/artigos/[slug]",
   "/verify/[slug]": "/verificar/[slug]",
+  ...productPublicPaths,
 } as const;
 
 type MappedRoute = keyof typeof publicPaths;

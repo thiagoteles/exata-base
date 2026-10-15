@@ -11,33 +11,20 @@ import {
   themes,
 } from "@/lib/theme";
 import { z } from "@/lib/validation";
+import { definePreference } from "./define";
+import { productPreferences } from "./definitions.product";
 
 /*
  * Every preference a person can save, in one place. Each declares what is valid (zod) and what
- * applies until they choose (the fallback, also used when a saved value no longer parses). A
- * product adds its own here, and nothing else changes: not a column, not an action, not a migration.
+ * applies until they choose (the fallback, also used when a saved value no longer parses). The
+ * product adds its own in its own file, and nothing else changes: not a column, not an action, not
+ * a migration.
  *
  * Every preference travels in a cookie, which is how a visitor with no account keeps it, how the
  * first paint can read it before any code runs, and how it reaches the account at sign-in. The
  * cookie is `pref-<key>` with the value as JSON unless something else already reads one under its
  * own name and shape (the theme script, the proxy), which the definition then declares.
  */
-
-export type PreferenceDefinition<T> = {
-  schema: z.ZodType<T>;
-  fallback: T;
-  /**
-   * Kept in the browser's own storage while the person is a visitor, and never in a cookie, which
-   * rides every request and holds 4 KB: for what is too big for that, such as a draft. It is saved to
-   * the account when they sign in (see `claimVisitorValues`). The schema is its size limit.
-   */
-  browser?: true;
-  /** A cookie that something other than the registry reads. `encode` returning null clears it. */
-  cookie?: { name: string; encode: (value: T) => string | null; decode: (raw: string) => unknown };
-};
-
-const definePreference = <T>(definition: PreferenceDefinition<T>): PreferenceDefinition<T> =>
-  definition;
 
 export const preferences = {
   theme: definePreference<"light" | "dark" | "system">({
@@ -109,6 +96,7 @@ export const preferences = {
     fallback: defaultLocale,
     cookie: { name: LOCALE_COOKIE, encode: (value) => value, decode: (raw) => raw },
   }),
+  ...productPreferences,
 };
 
 export type PreferenceKey = keyof typeof preferences;

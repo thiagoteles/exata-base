@@ -1,15 +1,17 @@
 import { env } from "@/lib/env";
 import { authCspSources } from "@/lib/ports/auth/csp";
 import type { CspSources } from "./csp";
+import { productCspSources } from "./sources.product";
 
 /*
- * Every origin the browser may reach, as each part declares it. A product that loads something new
- * in the page adds its declaration here, so the policy never grows by hand.
+ * Every origin the browser may reach, as each part declares it. What the product loads is declared
+ * in its own file, so the policy never grows by hand.
  */
 export function cspSources(): CspSources[] {
   const umami = env.UMAMI_SCRIPT_URL === undefined ? null : new URL(env.UMAMI_SCRIPT_URL).origin;
   return [
     authCspSources(env.AUTH_PROVIDER, env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY),
     umami === null ? {} : { "script-src": [umami], "connect-src": [umami] },
+    ...productCspSources(),
   ];
 }

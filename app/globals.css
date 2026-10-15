@@ -60,6 +60,13 @@
     }
   }
 
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+  }
+
   @keyframes spin {
     to {
       transform: rotate(360deg);
@@ -72,6 +79,11 @@
   h2,
   h3 {
     font-family: var(--font-heading);
+  }
+
+  /* A document's titles are in its own face, like the rest of the paper. */
+  .font-document :where(h1, h2, h3) {
+    font-family: inherit;
   }
 
   body {
@@ -137,4 +149,34 @@
 @utility appear-after {
   opacity: 0;
   animation: appear 120ms var(--ease-enter) 180ms forwards;
+}
+
+/*
+ * A public page's entrance: the few things that arrive together arrive in order, one step apart.
+ * `enter-step-2` waits two steps; it works with any animation (`animate-enter`, `animate-stamp`).
+ * The step is a delay, so reduced motion, which removes every delay, lands on the final frame.
+ */
+@utility enter-step-* {
+  animation-delay: calc(--value(integer) * 80ms);
+}
+
+/*
+ * What arrives as it scrolls into view, on a public page. Only where the browser ties animations
+ * to scrolling; elsewhere, and with reduced motion, it is simply there. The resting state is the
+ * element's own style, so nothing is ever left half shown.
+ */
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    animation: enter linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 70%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  :root[data-motion="reduce"] & {
+    animation: none;
+  }
 }

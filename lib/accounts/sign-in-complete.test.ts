@@ -58,7 +58,7 @@ describe("after signing in", () => {
       "/\\evil.test",
       "javascript:alert(1)",
     ]) {
-      expect(afterSignIn({}, {}, next).location).toBe("/");
+      expect(afterSignIn({}, {}, next).location).toBe(SIGNED_IN_HOME);
     }
   });
 

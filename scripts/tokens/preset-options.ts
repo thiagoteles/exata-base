@@ -165,10 +165,25 @@ const animations = (fade: number, layer: number, bar: number, stamp: number) => 
   };
 };
 
+// A public page's entrance and what comes into view as it scrolls; nothing in the app uses it.
+const entrance = (ms: number) => ({ "--animate-enter": `enter ${ms}ms var(--ease-enter) both` });
+
 export const motions = {
-  calm: { "--ease-enter": "cubic-bezier(0.2, 0.8, 0.2, 1)", ...animations(200, 280, 200, 120) },
-  minimal: { "--ease-enter": "cubic-bezier(0.2, 0.8, 0.2, 1)", ...animations(140, 200, 140, 120) },
-  lively: { "--ease-enter": "cubic-bezier(0.34, 1.3, 0.64, 1)", ...animations(200, 340, 240, 220) },
+  calm: {
+    "--ease-enter": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    ...animations(200, 280, 200, 120),
+    ...entrance(480),
+  },
+  minimal: {
+    "--ease-enter": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    ...animations(140, 200, 140, 120),
+    ...entrance(320),
+  },
+  lively: {
+    "--ease-enter": "cubic-bezier(0.34, 1.3, 0.64, 1)",
+    ...animations(200, 340, 240, 220),
+    ...entrance(560),
+  },
 } satisfies Record<string, Vars>;
 
 /** How the neutrals are tinted: the brand hue, or a fixed warm paper, and how much chroma. */

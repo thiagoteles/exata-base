@@ -13,6 +13,14 @@ function gitPath(name: string): string | null {
   }
 }
 
+function gitConfig(name: string): string | null {
+  try {
+    return execFileSync("git", ["config", "--get", name], { encoding: "utf8" }).trim();
+  } catch {
+    return null;
+  }
+}
+
 const preCommitPath = gitPath("hooks/pre-commit");
 const state = {
   insideGit: preCommitPath !== null,
@@ -23,6 +31,17 @@ const state = {
       ? readFileSync(preCommitPath, "utf8")
       : null,
 };
+
+// The files `.gitattributes` gives to the product keep the product's version in a merge from the
+// base; git needs the driver named in each clone, and a clone carries no config. Only a product has
+// the remote `base`: in the base itself the files merge as any other, with no driver named.
+if (
+  state.insideGit &&
+  gitConfig("remote.base.url") !== null &&
+  gitConfig("merge.ours.driver") === null
+) {
+  execFileSync("git", ["config", "merge.ours.driver", "true"]);
+}
 
 if (needsHooks(state)) {
   execFileSync("pnpm", ["exec", "lefthook", "install"], { stdio: "pipe" });

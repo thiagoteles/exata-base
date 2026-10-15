@@ -18,6 +18,7 @@
     var(--font-face-heading, var(--font-face-sans)), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-face-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-face-mono), ui-monospace, monospace;
+  --font-document: var(--font-face-document), ui-serif, Georgia, serif;
 
   --text-display: clamp(2.5rem, 1.6rem + 3vw, 3.5rem);
   --text-display--line-height: 1.07;
@@ -83,6 +84,7 @@
   --animate-sheet-out: sheet-out 196ms var(--ease-exit) both;
   --animate-bar-in: bar-in 200ms var(--ease-enter) both;
   --animate-stamp: stamp 120ms var(--ease-enter) both;
+  --animate-enter: enter 480ms var(--ease-enter) both;
   --animate-spin: spin 800ms linear infinite;
   --ease-enter: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);

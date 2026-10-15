@@ -15,6 +15,7 @@
     "knip": "knip",
     "test": "vitest run --coverage",
     "hooks": "tsx scripts/hooks.ts",
+    "base:update": "tsx scripts/base-update.ts",
     "check": "pnpm hooks && pnpm messages:check && pnpm typecheck && pnpm lint && pnpm lint:tokens && pnpm tokens:check && pnpm content:check && pnpm lint:migrations && pnpm lint:catalogs && pnpm knip && pnpm test",
     "check:full": "pnpm check && pnpm test:integration && pnpm test:e2e",
     "check:prerender": "tsx scripts/check-prerender.ts",

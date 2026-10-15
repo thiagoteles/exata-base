@@ -6,10 +6,34 @@
  */
 
 const AREA_FILE = /^([A-Za-z][A-Za-z0-9]*)\.json$/;
+const PRODUCT_FILE = /^([A-Za-z][A-Za-z0-9]*)\.product\.json$/;
 
 /** The area a file name stands for, or null when the name is not one. */
 export function areaOf(fileName: string): string | null {
   return AREA_FILE.exec(fileName)?.[1] ?? null;
+}
+
+/**
+ * The area a product's overlay stands for (`nav.product.json` is laid over `nav.json`), or null.
+ * The product writes its own sentences of a base area there, so it never edits the base's file.
+ */
+export function overlayOf(fileName: string): string | null {
+  return PRODUCT_FILE.exec(fileName)?.[1] ?? null;
+}
+
+const isBranch = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** The overlay laid over the area, key by key: what the overlay says wins, the rest is kept. */
+export function overlay(area: unknown, over: unknown): unknown {
+  if (!(isBranch(area) && isBranch(over))) {
+    return over;
+  }
+  const merged: Record<string, unknown> = { ...area };
+  for (const [key, value] of Object.entries(over)) {
+    merged[key] = key in area ? overlay(area[key], value) : value;
+  }
+  return merged;
 }
 
 /**

@@ -25,6 +25,17 @@ describe("presets", () => {
     }
   });
 
+  it("sets documents in the face the PDFs embed, whatever the preset, without preloading it", () => {
+    for (const name of presetNames) {
+      const { preset, choices } = parseDesign({ preset: name });
+      const fonts = renderFonts(choices);
+      expect(fonts).toContain('variable: "--font-face-document"');
+      expect(fonts).toMatch(/Source_Serif_4\(\{[^}]*preload: false/);
+      expect(fonts).toContain("document.variable");
+      expect(renderPresetCss(preset, choices)).toContain("--font-document:");
+    }
+  });
+
   it("offers every density as a scope any element can ask for by name, whatever the preset", () => {
     for (const name of presetNames) {
       const { preset, choices } = parseDesign({ preset: name });

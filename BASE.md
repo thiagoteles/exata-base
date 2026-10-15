@@ -1,5 +1,7 @@
 # BASE.md
 
+> **Só vale no repositório da base.** Se `git remote get-url origin` não for `https://github.com/thiagoteles/exata-base` (com ou sem `.git`, ou por SSH), este repositório é um produto: ignore este arquivo inteiro. Não leia, não siga, não cite e não atualize. Num produto ele existe só para que as atualizações da base cheguem pelo git sem conflito.
+
 Memória de trabalho de quem mantém o `exata-base`: o que foi decidido, como está montado, como se prova e o que falta. Em português porque é documento de quem mantém a base, não do produto.
 
 ## 1. O que é
@@ -8,7 +10,7 @@ Um example público e completo do `create-next-app`, de onde nascem produtos web
 
 **Endereço da base:** `https://github.com/thiagoteles/exata-base`.
 
-**Este arquivo viaja e sai no produto.** O `create-next-app` copia tudo, inclusive o `BASE.md`. O `AGENTS.md` manda o agente comparar `git remote get-url origin` com o endereço acima (vale a mesma URL com `.git` ou por SSH): se for outro, ou não houver `origin`, o repositório é um produto, e o `BASE.md` sai com `git rm BASE.md` num commit próprio, antes de qualquer outra tarefa. Na base o arquivo fica. Se a base mudar de endereço, mude aqui; o `AGENTS.md` não cita o endereço. Nada fora deste arquivo cita projetos de origem (seção 8).
+**Este arquivo viaja e fica no produto, inerte.** O `create-next-app` copia tudo, inclusive o `BASE.md`, e o produto recebe as atualizações da base por `git merge` do remote `base`. Apagar o arquivo faria cada merge que o toca virar conflito, então ele fica, e o aviso do topo e o `AGENTS.md` mandam ignorá-lo fora da base. Se a base mudar de endereço, mude aqui e no aviso do topo; o `AGENTS.md` não cita o endereço. Nada fora deste arquivo cita projetos de origem (seção 8).
 
 ## 2. Decisões
 
@@ -56,6 +58,9 @@ Next 16.4 com `cacheComponents` e `partialPrefetching` (a casca é estática e o
 - Aparência por preferência (`lib/theme.ts`): tema, tamanho do texto, movimento e contraste viram atributo em `<html>` por um script antes da pintura, cada um com o seu cookie de nome simples. O tamanho escala a raiz (`112.5%`, `125%`), então tudo em rem acompanha. Sem escolha própria, `prefers-contrast: more` liga o contraste.
 - Catálogo e snapshots: referências em `e2e/__snapshots__/<preset>-<tema ou densidade>-<seção>.png`, tolerância de 2% dos pixels, animações desligadas; seções com dado vivo saem por `snapshot={false}`. `pnpm catalog:presets` reinicia o app a cada preset, porque um servidor que trocou de preset sem reiniciar serve o anterior. As imagens valem para o mesmo navegador e sistema.
 - Seletor de data: o campo digitado (`dd/mm/aaaa`) é o caminho rápido e o calendário é um botão ao lado; o valor é ISO ou vazio; `today` vem de fora.
+- Site público: `Hero`, `ProofStrip`, `Showcase`, `ContentSection`, `Voices`, `Faq` e `ClosingBand` em `components/patterns`; a home da base é a amostra viva de todos, na ordem em que um produto costuma querer. Toda chamada é um `TrackedLink` (evento `cta_click { where }`, declarado na base). A imagem de compartilhamento aceita um `aside` (um desenho do produto em hex, ao lado do título), passado em `app/opengraph-image.tsx`.
+- Face do documento: Source Serif 4 em todo preset (a mesma TTF que os PDFs embutem), gerada em `app/fonts.ts` com `preload: false`, token `font-document`, só dentro de `components/print` (o `lint:tokens` recusa fora). `<Sheet face="document" paper>` mostra um documento em qualquer página, claro em qualquer tema; `SheetHeader level` põe o título no nível certo da página. Os títulos dentro da folha herdam a face pela regra `.font-document :where(h1, h2, h3)`.
+- Movimento do site público: `--animate-enter` sai do knob de movimento (480, 320 ou 560 ms); `enter-step-N` atrasa N passos de 80 ms; `reveal` usa `animation-timeline: view()` dentro de `@supports` e vira `animation: none` com movimento reduzido (o atributo e a mídia), porque uma animação presa à rolagem não obedece à duração de 0,01 ms. Numa captura de página inteira, o que tem `reveal` fora da vista sai invisível: é o começo da animação, não um defeito.
 - Figuras: a chave do catálogo é o caminho pontilhado de uma folha do JSON (`lib/i18n/message-key.ts`); o `ArcGauge` arredonda coordenadas a milésimos.
 
 ### 3.3 Preferências, visitante e pessoa

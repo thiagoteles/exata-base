@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { productDocumentKinds } from "./kinds.product";
 
 /*
  * The address in a document's QR code. It is a signed statement ("this kind of document, this
@@ -7,7 +8,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  * so it is always the current truth about that document.
  */
 
-const documentKinds = ["receipt"] as const;
+const documentKinds = ["receipt", ...productDocumentKinds] as const;
 type DocumentKind = (typeof documentKinds)[number];
 export type DocumentRef = { kind: DocumentKind; id: string };
 

@@ -1,10 +1,12 @@
 import type { Route } from "next";
 import { hasRole, type Role } from "@/lib/accounts/roles";
+import { type productNavIconNames, productNavItems } from "./navigation.product";
 
 /*
  * Every destination of the signed-in area, with the lowest role that sees it. The sidebar and the
- * bottom bar both read this list, so a new page is added here and nowhere else. A page adds its
- * own entry when it exists: there is no entry for a screen that is not built yet.
+ * bottom bar both read this list. The product's destinations come first, from its own file, where a
+ * new page of the product is added. A page adds its own entry when it exists: there is no entry for
+ * a screen that is not built yet.
  */
 
 export type NavGroup = "main" | "staff" | "admin";
@@ -21,7 +23,7 @@ const navIconNames = [
   "pulse",
   "folder",
 ] as const;
-export type NavIcon = (typeof navIconNames)[number];
+export type NavIcon = (typeof navIconNames)[number] | (typeof productNavIconNames)[number];
 
 export type NavItem = {
   key: string;
@@ -34,8 +36,7 @@ export type NavItem = {
 };
 
 const navItems: readonly NavItem[] = [
-  { key: "sampleItems", href: "/sample-items", group: "main", minimum: "member", icon: "folder" },
-  { key: "sampleParts", href: "/sample-parts", group: "main", minimum: "member", icon: "folder" },
+  ...productNavItems,
   { key: "account", href: "/account", group: "main", minimum: "member", icon: "user", exact: true },
   { key: "plan", href: "/account/plan", group: "main", minimum: "member", icon: "card" },
   { key: "messages", href: "/account/messages", group: "main", minimum: "member", icon: "mail" },

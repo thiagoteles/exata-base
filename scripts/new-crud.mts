@@ -21,7 +21,9 @@ import {
   childRegistrations,
   insertAfter,
   insertBefore,
+  navAnchor,
   parentPage,
+  register,
   registrations,
   removeLines,
   sampleFiles,
@@ -108,8 +110,8 @@ function writeArea(names: AreaNames): string[] {
     writeFileSync(target, rename(read(path.join(TEMPLATE_ROOT, file))));
     return target;
   });
-  for (const { file, anchor, lines } of registrations) {
-    writeFileSync(file, insertAfter(read(file), anchor, lines.map(rename)));
+  for (const entry of registrations) {
+    writeFileSync(entry.file, register(read(entry.file), entry, entry.lines.map(rename)));
   }
   for (const { file, path: keyPath, value } of catalogKeys) {
     const key = keyPath.map(rename);
@@ -140,8 +142,10 @@ function parentNames(area: string): { names: AreaNames; problems: string[] } {
   }
   const schema = read(schemaFile);
   const entity = rowType.exec(read(rulesFile))?.[1] ?? "";
-  const nav = JSON.parse(read("messages/pt-BR/nav.json")) as { items: Record<string, string> };
-  const label = nav.items[camelArea(area)] ?? "";
+  const nav = JSON.parse(read("messages/pt-BR/nav.product.json")) as {
+    items?: Record<string, string>;
+  };
+  const label = nav.items?.[camelArea(area)] ?? "";
   const problems: string[] = [];
   if (entity === "") {
     problems.push(
@@ -149,7 +153,9 @@ function parentNames(area: string): { names: AreaNames; problems: string[] } {
     );
   }
   if (label === "") {
-    problems.push(`messages/pt-BR/nav.json has no items.${camelArea(area)}, the parent's label`);
+    problems.push(
+      `messages/pt-BR/nav.product.json has no items.${camelArea(area)}, the parent's label`,
+    );
   }
   if (!nameColumn.test(schema)) {
     problems.push(
@@ -184,8 +190,8 @@ function writeChild(names: AreaNames, parent: AreaNames): { files: string[]; man
     writeFileSync(target, rename(read(path.join(TEMPLATE_ROOT, file))));
     return target;
   });
-  for (const { file, anchor, lines } of childRegistrations) {
-    writeFileSync(file, insertAfter(read(file), anchor, lines.map(rename)));
+  for (const entry of childRegistrations) {
+    writeFileSync(entry.file, register(read(entry.file), entry, entry.lines.map(rename)));
   }
   // Right below the parent's entry, found by its key so a changed icon or role still finds it.
   // A long entry is formatted over several lines, so the child goes after the line that closes it.
@@ -198,9 +204,7 @@ function writeChild(names: AreaNames, parent: AreaNames): { files: string[]; man
   if (below === -1) {
     writeFileSync(
       childNavigation.file,
-      insertAfter(read(childNavigation.file), "const navItems: readonly NavItem[] = [", [
-        rename(childNavigation.line),
-      ]),
+      insertAfter(read(childNavigation.file), navAnchor, [rename(childNavigation.line)]),
     );
   } else {
     navigation.splice(below + 1, 0, rename(childNavigation.line));

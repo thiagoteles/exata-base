@@ -9,6 +9,16 @@ const tags = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
 const themes = ["light", "dark"] as const;
 
 async function violations(page: Page) {
+  // A public page's entrance blends its colors for half a second; contrast is read once it lands.
+  // Animations tied to scrolling never finish, so only the ones on the document's clock are awaited.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => animation.timeline === document.timeline)
+        .map((animation) => animation.finished),
+    ),
+  );
   const results = await new AxeBuilder({ page }).withTags(tags).analyze();
   return results.violations.map(
     (violation) =>
@@ -43,6 +53,24 @@ test("the home page leads to sign-up and sign-in", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Entrar" }).first().click();
   await expect(page).toHaveURL("/sign-in");
+});
+
+test("the home arrives whole with reduced motion, and its sample document stays paper in the dark", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.context().addCookies([{ name: "theme", value: "dark", url: appOrigin }]);
+  await page.goto("/");
+  const opacity = (selector: string) =>
+    page
+      .locator(selector)
+      .first()
+      .evaluate((element) => getComputedStyle(element).opacity);
+  expect(await opacity(".animate-enter")).toBe("1");
+  expect(await opacity(".reveal")).toBe("1");
+  const sheet = page.locator("article[data-paper]");
+  expect(await sheet.evaluate((element) => getComputedStyle(element).colorScheme)).toBe("light");
+  await expect(sheet.getByRole("heading", { level: 3 })).toBeVisible();
 });
 
 test("an unknown address gets the not-found page with a way home", async ({ page }) => {

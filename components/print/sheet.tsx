@@ -1,33 +1,51 @@
 import type { ReactNode } from "react";
 
+type SheetProps = {
+  children: ReactNode;
+  /** Sets the sheet in the face the PDFs embed, for a document that is also a PDF. */
+  face?: "text" | "document";
+  /**
+   * Keeps the light paper palette on any page, in any theme: a document shown outside the print
+   * pages, such as a sample on the public site. The print pages are paper already.
+   */
+  paper?: boolean;
+};
+
 /*
  * One printed sheet. On screen it is a page of paper on the desk, as wide as an A4; in print it
  * gives up its frame and margins to the page box, which draws them. Ink on paper comes from the
  * print tokens, so nothing here picks a color for the printer.
  */
-export function Sheet({ children }: { children: ReactNode }) {
+export function Sheet({ children, face = "text", paper = false }: SheetProps) {
   return (
-    <article className="mx-auto flex w-full max-w-sheet flex-col gap-8 border border-line bg-surface p-sheet-margin text-ink print:max-w-none print:border-0 print:p-0">
+    <article
+      {...(paper ? { "data-paper": "" } : {})}
+      className={`mx-auto flex w-full max-w-sheet flex-col gap-8 border border-line bg-surface p-sheet-margin text-ink print:max-w-none print:border-0 print:p-0 ${face === "document" ? "font-document" : ""}`}
+    >
       {children}
     </article>
   );
 }
 
-/** The brand and the date on the left and right of the title, ruled underneath. */
-export function SheetHeader({
-  brand,
-  title,
-  date,
-}: {
+type SheetHeaderProps = {
   brand: string;
   title: string;
   date: string;
-}) {
+  /**
+   * The title's level in the page's outline. A sheet that is the page is its first heading; a
+   * sample document inside another page sits under that page's own headings.
+   */
+  level?: 1 | 2 | 3;
+};
+
+/** The brand and the date on the left and right of the title, ruled underneath. */
+export function SheetHeader({ brand, title, date, level = 1 }: SheetHeaderProps) {
+  const Title = `h${level}` as const;
   return (
     <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b-2 border-ink pb-3">
       <div className="flex flex-col gap-1">
         <p className="text-label text-ink-muted">{brand}</p>
-        <h1 className="text-page-title text-ink">{title}</h1>
+        <Title className="text-page-title text-ink">{title}</Title>
       </div>
       <p className="font-mono text-data text-ink-muted tabular-nums">{date}</p>
     </header>

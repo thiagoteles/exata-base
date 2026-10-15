@@ -16,6 +16,25 @@ describe("a printed sheet", () => {
     expect(screen.getByText("09/10/2026")).toBeTruthy();
   });
 
+  it("takes the level its title has in the page that shows it", () => {
+    renderWithIntl(<SheetHeader brand="Produto" title="Recibo" date="14/10/2026" level={3} />);
+    expect(screen.getByRole("heading", { level: 3, name: "Recibo" })).toBeTruthy();
+  });
+
+  it("is set in the text face and the page's palette unless asked for the document face and paper", () => {
+    const { container, rerender } = renderWithIntl(<Sheet>texto</Sheet>);
+    const sheet = () => container.querySelector("article");
+    expect(sheet()?.classList.contains("font-document")).toBe(false);
+    expect(sheet()?.hasAttribute("data-paper")).toBe(false);
+    rerender(
+      <Sheet face="document" paper>
+        texto
+      </Sheet>,
+    );
+    expect(sheet()?.classList.contains("font-document")).toBe(true);
+    expect(sheet()?.hasAttribute("data-paper")).toBe(true);
+  });
+
   it("keeps a block whole, and the table head and rows in the form the printer repeats and never cuts", () => {
     const { container } = renderWithIntl(
       <NoBreak>

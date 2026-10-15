@@ -69,6 +69,16 @@ const serifRule = {
 };
 classRules.push(serifRule);
 
+/** A class name standing alone, not part of a longer one. */
+const wholeClass = (name: string) => new RegExp(String.raw`(?<![\w-])${name}(?![\w-])`, "g");
+
+// The document face belongs to the sheet: a document reads as paper, an interface never does.
+const SHEET_FOLDER = "components/print/";
+const documentFaceRule = {
+  pattern: wholeClass("font-document"),
+  reason: "only a sheet is set in the document face; give the Sheet the document face instead",
+};
+
 const handWrittenColor = /#[0-9a-fA-F]{3,8}\b|\b(?:oklch|oklab|rgba?|hsla?|hwb|lab|lch)\(/g;
 
 type Finding = { file: string; line: number; match: string; reason: string };
@@ -129,7 +139,8 @@ const cssFiles = globSync("**/*.css").filter(
 const findings = [
   ...sourceFiles.flatMap((file) => {
     const text = readFileSync(file, "utf8");
-    return scan(file, text, regions(text, stringLiteral), classRules);
+    const rules = file.startsWith(SHEET_FOLDER) ? classRules : [...classRules, documentFaceRule];
+    return scan(file, text, regions(text, stringLiteral), rules);
   }),
   ...cssFiles.flatMap((file) => {
     const text = readFileSync(file, "utf8");

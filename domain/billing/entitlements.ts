@@ -1,4 +1,5 @@
-import { catalog, type LimitRule } from "./catalog";
+import { catalog } from "./catalog";
+import type { LimitRule } from "./catalog-shape";
 
 /*
  * What a holder may do, from the plan alone. A plan grants its tier while it is active, on trial

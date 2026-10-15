@@ -1,10 +1,11 @@
 /*
  * The security headers that do not depend on the environment, sent on every response including
- * static files. Browser features are all closed; a product opens the ones it uses here, such as
- * a microphone for an app that listens (`microphone: "self"`).
+ * static files. Browser features are all closed; the product opens the ones it uses in its own file.
  */
 
-const openedFeatures: Readonly<Record<string, "self">> = {};
+import { productOpenedFeatures } from "./features.product";
+
+const openedFeatures = productOpenedFeatures;
 
 const closedFeatures = ["camera", "microphone", "geolocation", "payment", "usb", "serial", "hid"];
 

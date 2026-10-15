@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { areaOf, joinAreas } from "./join";
+import { areaOf, joinAreas, overlay, overlayOf } from "./join";
 
 describe("joining the areas of the catalog", () => {
   it("names an area after its file, and refuses a file that is not named like one", () => {
@@ -8,6 +8,18 @@ describe("joining the areas of the catalog", () => {
     for (const bad of ["nav.txt", "nav.json.bak", "my-area.json", ".json", "1nav.json", "nav"]) {
       expect(areaOf(bad)).toBeNull();
     }
+  });
+
+  it("knows a product's overlay of an area by its name, and lays it over the area key by key", () => {
+    expect(overlayOf("nav.product.json")).toBe("nav");
+    expect(overlayOf("nav.json")).toBeNull();
+    expect(areaOf("nav.product.json")).toBeNull();
+    const base = { items: { account: "Conta", plan: "Plano" }, title: "Menu" };
+    const product = { items: { invoices: "Faturas", plan: "Assinatura" } };
+    expect(overlay(base, product)).toEqual({
+      items: { account: "Conta", plan: "Assinatura", invoices: "Faturas" },
+      title: "Menu",
+    });
   });
 
   it("puts the areas in alphabetical order whatever order they arrive in", () => {

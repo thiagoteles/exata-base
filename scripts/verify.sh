@@ -129,7 +129,6 @@ echo "== A generated area and its child, in a product born the way create-next-a
 git ls-files -z --cached --others --exclude-standard | tar --null -T - -cf - | tar -xf - -C "$generated"
 (
   cd "$generated"
-  rm -f BASE.md
   pnpm install --frozen-lockfile --prefer-offline > /dev/null
   git init -q && git add -A && git -c user.email=verify@app.local -c user.name=verify commit -qm "Initial commit"
   pnpm new:crud verify-records --entity VerifyRecord --label "Registros de prova"

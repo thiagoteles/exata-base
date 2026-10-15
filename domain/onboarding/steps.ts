@@ -1,27 +1,14 @@
 /*
- * The first steps of a new account. A product lists its own in `onboardingSteps`; the last one
+ * The first steps of a new account. A product lists its own in its own steps file; the last one
  * marked `final` is what the product calls activation, and finishing it is the moment the funnel's
  * activated event is sent. Everything here is pure: what was done comes in, what is left goes out.
  */
 
-/**
- * `byApp` marks a step the product finishes by itself when the thing happens, so the person has no
- * button for it and activation cannot be claimed without doing it. `preference` names the saved
- * choice that finishes it: saving that preference in an account ticks the step.
- */
-export type OnboardingStep = {
-  readonly id: string;
-  readonly final?: true;
-  readonly byApp?: true;
-  readonly preference?: string;
-};
+import type { OnboardingStep } from "./step";
+import { productOnboardingSteps } from "./steps.product";
 
-/** What the base ships; a product replaces the list with the steps that make its own first minutes. */
-export const onboardingSteps = [
-  { id: "look" },
-  { id: "invite" },
-  { id: "email", byApp: true, final: true, preference: "email" },
-] as const satisfies readonly OnboardingStep[];
+/** The product's steps, from its own file. */
+export const onboardingSteps = productOnboardingSteps;
 
 export type OnboardingStepId = (typeof onboardingSteps)[number]["id"];
 

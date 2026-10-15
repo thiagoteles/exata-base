@@ -7,6 +7,8 @@ import { changeRole } from "@/lib/accounts/role-change";
 import { staffAuditLog } from "@/lib/db/schema/audit";
 import { invites } from "@/lib/db/schema/invites";
 import { users } from "@/lib/db/schema/users";
+import type { PreferenceDefinition } from "@/lib/preferences/define";
+import { productPreferences } from "@/lib/preferences/definitions.product";
 import { readPreferences, readStoredOptions, savePreference } from "@/lib/preferences/service";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
@@ -149,6 +151,12 @@ const defaults = {
   currency: "brl",
   onboarding: [],
   locale: "pt-BR",
+  // The product's own preferences read as their fallbacks too.
+  ...Object.fromEntries(
+    Object.entries(productPreferences as Record<string, PreferenceDefinition<unknown>>).map(
+      ([key, definition]) => [key, definition.fallback],
+    ),
+  ),
 };
 
 describe("preferences in the options column", () => {

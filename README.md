@@ -31,7 +31,7 @@ Open http://localhost:47300. Sign in as the seeded admin, `admin@app.local` with
 
 ### Updates from the base
 
-`pnpm base:update` merges what changed in the base since the last update: it fetches the remote `base`, merges `base/main`, keeps deleted what the product deleted on purpose (the samples it replaced), regenerates the generated files from the product's own sources (`pnpm messages`, `pnpm tokens`), and commits, which runs the check. What it cannot settle it lists; settle it, run `pnpm tokens`, and commit.
+`pnpm base:update` merges what changed in the base since the last update: it fetches the remote `base`, merges `base/main`, keeps deleted what the product deleted on purpose (the samples it replaced), regenerates the generated files from the product's own sources (`pnpm messages`, `pnpm tokens`), and commits, which runs the check. What it cannot settle it lists; settle it, run `pnpm tokens`, and commit. Commit your own work before, never stash it around the merge: the files marked `merge=ours` keep the checked-out side in any merge git does, a `git stash pop` included, and the stashed side is dropped without a word.
 
 What keeps the merge quiet is that a product never edits a file of the base. What it declares lives in the `*.product.*` file beside each registry (its tables, destinations, public pages, plans, environment, scheduled jobs; `AGENTS.md` lists them), and the files that are wholly the product's (this README, `design.json`, `ports.json`, the home page, its words) are marked `merge=ours` in `.gitattributes`, so where both sides changed one, the product's version stays. A product that needs a base file changed changes it in the base, and merges.
 

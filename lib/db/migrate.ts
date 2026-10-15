@@ -10,6 +10,12 @@ import type { Database } from "./database";
 const MIGRATION_LOCK = 72_431_906;
 
 const SCHEMA = "drizzle";
+/**
+ * The base's last migration while one journal held everything. A product was always made from the
+ * base after it, so its migrations from those days are the records made after this one; an older
+ * record the base's journal does not know is a leftover of the base's own development, left alone.
+ */
+const ONE_STREAM_END = "0023_lean_jack_flag";
 const BASE_TABLE = "__drizzle_migrations";
 const PRODUCT_TABLE = "__product_migrations";
 
@@ -56,10 +62,14 @@ async function adoptOneStream(connection: Connection, streams: MigrationStreams)
   if (found?.base === null || found?.base === undefined || found.product !== null) {
     return;
   }
-  const baseMoments = new Set(journalOf(streams.baseFolder).entries.map((entry) => entry.when));
+  const baseEntries = journalOf(streams.baseFolder).entries;
+  const baseMoments = new Set(baseEntries.map((entry) => entry.when));
+  const end = baseEntries.find((entry) => entry.tag === ONE_STREAM_END)?.when ?? 0;
   const rows = await connection<{ id: number; created_at: string }[]>`
     select id, created_at from ${connection(SCHEMA)}.${connection(BASE_TABLE)}`;
-  const foreign = rows.filter((row) => !baseMoments.has(Number(row.created_at)));
+  const foreign = rows.filter(
+    (row) => !baseMoments.has(Number(row.created_at)) && Number(row.created_at) > end,
+  );
   if (foreign.length === 0) {
     return;
   }

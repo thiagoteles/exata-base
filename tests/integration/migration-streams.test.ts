@@ -26,8 +26,22 @@ const streams = (adopted: readonly string[]) => ({
   adopted,
 });
 
-/** A new database holding the base's stream, with one product migration recorded among the base's. */
-async function migratedAsOneStream(name: string) {
+type Journal = { entries: { tag: string; when: number }[] };
+const journal = (folder: string) =>
+  JSON.parse(readFileSync(path.join(folder, "meta/_journal.json"), "utf8")) as Journal;
+
+/** Every migration of the product's stream, as a database migrated in one stream would hold them. */
+const productTags = journal(streams([]).productFolder).entries.map((entry) => entry.tag);
+
+/** When the base's last migration of the one-stream era was made; products came after it. */
+const oneStreamEnd =
+  journal(streams([]).baseFolder).entries.find((entry) => entry.tag === "0023_lean_jack_flag")
+    ?.when ?? 0;
+const AFTER = oneStreamEnd + 1000;
+const BEFORE = oneStreamEnd - 1000;
+
+/** A new database holding the base's stream, with one record the base's journal does not know. */
+async function migratedAsOneStream(name: string, recordedAt: number) {
   await admin.execute(sql.raw(`create database ${name}`));
   const url = new URL(inject("databaseUrl"));
   url.pathname = `/${name}`;
@@ -35,47 +49,44 @@ async function migratedAsOneStream(name: string) {
   opened.push(db);
   await migrate(db, { migrationsFolder: streams([]).baseFolder });
   await db.execute(
-    sql.raw(`insert into drizzle.__drizzle_migrations (hash, created_at) values ('product', 1)`),
+    sql.raw(
+      `insert into drizzle.__drizzle_migrations (hash, created_at) values ('unknown', ${recordedAt})`,
+    ),
   );
   return db;
 }
 
-/** Every migration of the product's stream, as a database migrated in one stream would hold them. */
-const productTags = (
-  JSON.parse(readFileSync(path.join(streams([]).productFolder, "meta/_journal.json"), "utf8")) as {
-    entries: { tag: string }[];
-  }
-).entries.map((entry) => entry.tag);
-
 const count = async (db: ReturnType<typeof createDatabase>, query: string) =>
   Number(((await db.execute(sql.raw(query))) as unknown as { n: string }[])[0]?.n);
+const productRecords = (db: ReturnType<typeof createDatabase>) =>
+  count(db, "select count(*) as n from drizzle.__product_migrations");
+const baseRecordsAt = (db: ReturnType<typeof createDatabase>, moment: number) =>
+  count(db, `select count(*) as n from drizzle.__drizzle_migrations where created_at = ${moment}`);
 
 describe("migrations in two streams", () => {
   it("takes a database migrated as one stream: the product's records move, nothing runs twice", async () => {
-    const db = await migratedAsOneStream("one_stream_adopted");
+    const db = await migratedAsOneStream("one_stream_adopted", AFTER);
     await migrateDatabase(db, streams(productTags));
-    expect(await count(db, "select count(*) as n from drizzle.__product_migrations")).toBe(
-      productTags.length,
-    );
-    expect(
-      await count(
-        db,
-        "select count(*) as n from drizzle.__drizzle_migrations where created_at = 1",
-      ),
-    ).toBe(0);
+    expect(await productRecords(db)).toBe(productTags.length);
+    expect(await baseRecordsAt(db, AFTER)).toBe(0);
     await migrateDatabase(db, streams(productTags));
-    expect(await count(db, "select count(*) as n from drizzle.__product_migrations")).toBe(
-      productTags.length,
-    );
+    expect(await productRecords(db)).toBe(productTags.length);
+  });
+
+  it("leaves alone an old record of the base's own development, from before the products", async () => {
+    const db = await migratedAsOneStream("one_stream_leftover", BEFORE);
+    await migrateDatabase(db, streams([]));
+    expect(await baseRecordsAt(db, BEFORE)).toBe(1);
+    expect(await productRecords(db)).toBe(productTags.length);
   });
 
   it("refuses to guess which product migrations such a database already holds", async () => {
-    const db = await migratedAsOneStream("one_stream_unlisted");
+    const db = await migratedAsOneStream("one_stream_unlisted", AFTER);
     await expect(migrateDatabase(db, streams([]))).rejects.toThrow(/adopted-migrations/);
   });
 
   it("refuses an adopted migration the product's stream does not have", async () => {
-    const db = await migratedAsOneStream("one_stream_unknown");
+    const db = await migratedAsOneStream("one_stream_unknown", AFTER);
     await expect(migrateDatabase(db, streams(["0099_nothing"]))).rejects.toThrow(/0099_nothing/);
   });
 });

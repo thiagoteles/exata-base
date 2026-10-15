@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
+import home from "../messages/pt-BR/home.json" with { type: "json" };
 import site from "../messages/pt-BR/site.json" with { type: "json" };
 import { appOrigin } from "./origin";
 
@@ -27,7 +28,8 @@ async function violations(page: Page) {
 }
 
 const pages = [
-  { path: "/", heading: "O dia a dia organizado, sem enfeite" },
+  // The home is the product's: its title is read from the product's own words.
+  { path: "/", heading: home.title },
   { path: "/privacidade", heading: "Política de privacidade" },
   { path: "/termos", heading: "Termos de uso" },
   { path: "/sign-in", heading: "Entrar" },
@@ -55,22 +57,21 @@ test("the home page leads to sign-up and sign-in", async ({ page }) => {
   await expect(page).toHaveURL("/sign-in");
 });
 
-test("the home arrives whole with reduced motion, and its sample document stays paper in the dark", async ({
+test("the home arrives whole with reduced motion, and every document on it stays paper in the dark", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.context().addCookies([{ name: "theme", value: "dark", url: appOrigin }]);
   await page.goto("/");
-  const opacity = (selector: string) =>
-    page
-      .locator(selector)
-      .first()
-      .evaluate((element) => getComputedStyle(element).opacity);
-  expect(await opacity(".animate-enter")).toBe("1");
-  expect(await opacity(".reveal")).toBe("1");
-  const sheet = page.locator("article[data-paper]");
-  expect(await sheet.evaluate((element) => getComputedStyle(element).colorScheme)).toBe("light");
-  await expect(sheet.getByRole("heading", { level: 3 })).toBeVisible();
+  // Whatever the product's home stages, nothing waits halfway: every entrance is at rest at once.
+  const opacities = await page
+    .locator(".animate-enter, .animate-stamp, .reveal")
+    .evaluateAll((elements) => elements.map((element) => getComputedStyle(element).opacity));
+  expect(opacities.filter((opacity) => opacity !== "1")).toEqual([]);
+  const schemes = await page
+    .locator("article[data-paper]")
+    .evaluateAll((elements) => elements.map((element) => getComputedStyle(element).colorScheme));
+  expect(schemes.filter((scheme) => scheme !== "light")).toEqual([]);
 });
 
 test("an unknown address gets the not-found page with a way home", async ({ page }) => {
@@ -178,11 +179,10 @@ test("the home page describes the organization and its questions to search engin
 }) => {
   await page.goto("/");
   const data = await structuredData(page);
-  expect(data.map((item) => item["@type"]).sort((a, b) => a.localeCompare(b))).toEqual([
-    "FAQPage",
-    "Organization",
-    "WebSite",
-  ]);
+  // At least these; a product may declare more of its own (what it sells, what it is).
+  expect(data.map((item) => item["@type"])).toEqual(
+    expect.arrayContaining(["FAQPage", "Organization", "WebSite"]),
+  );
   expect(data.find((item) => item["@type"] === "Organization")?.["url"]).toBe(`${appOrigin}/`);
   // What the page shows is what it declares: every question is on screen, and opens to its answer.
   const faq = data.find((item) => item["@type"] === "FAQPage") as unknown as {

@@ -1,9 +1,10 @@
 # Production on Coolify (or any Docker host). Every value below is read when the container starts,
 # except Clerk's publishable key, which is public and is given to the build (in Coolify, mark it as
-# a build variable); leave it empty for local sign-in. The database runs beside the app, in this
-# stack, on a volume of its own; the app reaches it by the service name. Back it up from the
-# stack's Postgres in Coolify, which offers a scheduled backup for it. Coolify's proxy owns the
-# public port and the certificate, so nothing is published, the database included.
+# a build variable); leave it empty for local sign-in. The database is not in this stack: it is a
+# Postgres of its own (in Coolify, a PostgreSQL resource on the same destination), so a deploy, a
+# rollback or deleting the app never touches it, and Coolify backs it up on a schedule. The app
+# reaches it by its internal address, given as DATABASE_URL. Coolify's proxy owns the public port
+# and the certificate, so nothing is published.
 # Set the variables in Coolify's panel, not in this file. The README says what each one does.
 
 services:
@@ -16,8 +17,8 @@ services:
     environment:
       TZ: America/Sao_Paulo
       APP_URL: ${APP_URL:?Set APP_URL to the public address of the product}
-      # Letters and digits only in the password: it goes inside this address unescaped.
-      DATABASE_URL: postgres://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-app}
+      # The database resource's internal URL, as Coolify shows it.
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL to the internal URL of the database}
       AUTH_PROVIDER: ${AUTH_PROVIDER:-clerk}
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       TRUSTED_PROXY: ${TRUSTED_PROXY:-traefik}
@@ -49,30 +50,9 @@ services:
       FILE_URL_SECRET: ${FILE_URL_SECRET:-}
       UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-10}
       EMAIL_ATTACHMENTS_MAX_MB: ${EMAIL_ATTACHMENTS_MAX_MB:-10}
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
       # Files live here when there is no Cloud Storage bucket.
       - app-files:/data/files
 
-  postgres:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    environment:
-      # The database and its owner are `app` unless the product named them (POSTGRES_DB and
-      # POSTGRES_USER in Coolify) before the first deploy; Postgres fixes both when the volume is made.
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 4s
-      retries: 20
-
 volumes:
   app-files:
-  postgres-data:

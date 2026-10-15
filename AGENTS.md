@@ -38,7 +38,7 @@ A product never edits a file of the base. What it declares goes in the `*.produc
 - Its own preferences: `lib/preferences/definitions.product.ts`.
 - A browser feature it opens (microphone, camera): `lib/security/features.product.ts`; an origin it loads from: `lib/security/sources.product.ts`.
 - A scheduled job: `lib/scheduled/registry.product.ts` and a line in `ops/gcp/heartbeats.json`.
-- Its production database name, if not `app`: `POSTGRES_DB` and `POSTGRES_USER` in the host's panel, before the first deploy.
+- Its production database: a PostgreSQL resource of its own on the host, never in the app's stack; the app gets its internal URL as `DATABASE_URL` (README, Publishing).
 
 ### Where things go
 

@@ -17,9 +17,11 @@ const tryGit = (...args: string[]) => spawnSync("git", args, { encoding: "utf8" 
 const run = (command: string, args: string[]) => execFileSync(command, args, { stdio: "inherit" });
 const say = (text: string) => process.stdout.write(`${text}\n`);
 
-// Written by `pnpm tokens` and `pnpm messages` from files the product owns; never merged by hand.
+// Written by `pnpm tokens`, `pnpm messages` and `pnpm content` from files the product owns; never
+// merged by hand.
 const generated = new Set([
   "messages/pt-BR.json",
+  "lib/content/articles-index.ts",
   "styles/tokens.css",
   "styles/preset.css",
   "styles/print.css",
@@ -85,6 +87,7 @@ for (const { code, file } of statusOf()) {
   }
 }
 run("pnpm", ["messages"]);
+run("pnpm", ["content"]);
 // DESIGN.md holds generated tables between the base's prose; settled by hand, it is generated after.
 const designSettled = !statusOf().some(
   ({ code, file }) => file === "DESIGN.md" && code.includes("U"),

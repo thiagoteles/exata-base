@@ -21,7 +21,7 @@ export function ContentSection({ marker, title, intro, children, id }: ContentSe
       {...(id === undefined ? {} : { id })}
       className="mx-auto w-full max-w-310 px-4 py-10 md:px-8 md:py-14"
     >
-      <div className="grid gap-8 border-t border-line-strong pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-16">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 border-t border-line-strong pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-16">
         <header className="flex flex-col gap-2 lg:sticky lg:top-8 lg:self-start">
           {marker === undefined ? null : (
             <span aria-hidden="true" className="font-mono text-data text-ink-muted">

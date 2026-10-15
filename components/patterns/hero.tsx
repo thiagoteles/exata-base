@@ -14,11 +14,13 @@ type HeroProps = {
 /*
  * The first screen of a public page. The title is the display type with a rule above it that stops
  * short of the edge, so the words sit on a line instead of floating; the aside is offset downward
- * so the two halves do not start on the same baseline.
+ * so the two halves do not start on the same baseline. On a narrow screen the one column is the
+ * screen's width, never the widest thing in it, so a document beside the words wraps instead of
+ * pushing the page sideways when the text is larger.
  */
 export function Hero({ eyebrow, title, subtitle, actions, aside }: HeroProps) {
   return (
-    <section className="mx-auto grid w-full max-w-310 gap-12 px-4 py-12 md:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16 lg:py-18">
+    <section className="mx-auto grid w-full max-w-310 grid-cols-[minmax(0,1fr)] gap-12 px-4 py-12 md:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16 lg:py-18">
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <span aria-hidden="true" className="h-0.5 w-12 bg-brand" />

@@ -16,13 +16,13 @@ describe("a printed sheet", () => {
     expect(screen.getByText("09/10/2026")).toBeTruthy();
   });
 
-  it("keeps the page's margin unless asked for the panel's inset on a narrow screen", () => {
+  it("keeps the page's margin unless asked for the panel's inset", () => {
     const { container, rerender } = renderWithIntl(<Sheet>texto</Sheet>);
     const sheet = () => container.querySelector("article");
     expect(sheet()?.classList.contains("p-sheet-margin")).toBe(true);
     rerender(<Sheet inset="compact">texto</Sheet>);
     expect(sheet()?.classList.contains("p-panel-inset")).toBe(true);
-    expect(sheet()?.classList.contains("md:p-sheet-margin")).toBe(true);
+    expect(sheet()?.classList.contains("p-sheet-margin")).toBe(false);
   });
 
   it("takes the level its title has in the page that shows it", () => {

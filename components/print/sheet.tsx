@@ -10,22 +10,23 @@ type SheetProps = {
    */
   paper?: boolean;
   /**
-   * The margin of the page, or the panel's inset on a narrow screen (`compact`): a sample document
-   * shown beside other things on the public site, which would be squeezed by an A4 margin on a phone.
+   * The margin of the page, or the panel's inset (`compact`): a sample document shown beside other
+   * things on the public site is a column, never a whole A4, and an A4 margin would squeeze it.
    */
   inset?: "page" | "compact";
 };
 
 /*
  * One printed sheet. On screen it is a page of paper on the desk, as wide as an A4; in print it
- * gives up its frame and margins to the page box, which draws them. Ink on paper comes from the
+ * gives up its frame and margins to the page box, which draws them. It is a size container, so
+ * what it holds can arrange itself by the width of the paper rather than of the screen. Ink on paper comes from the
  * print tokens, so nothing here picks a color for the printer.
  */
 export function Sheet({ children, face = "text", paper = false, inset = "page" }: SheetProps) {
   return (
     <article
       {...(paper ? { "data-paper": "" } : {})}
-      className={`mx-auto flex w-full max-w-sheet flex-col gap-8 border border-line bg-surface text-ink print:max-w-none print:border-0 print:p-0 ${inset === "compact" ? "p-panel-inset md:p-sheet-margin" : "p-sheet-margin"} ${face === "document" ? "font-document" : ""}`}
+      className={`@container mx-auto flex w-full max-w-sheet flex-col gap-8 border border-line bg-surface text-ink print:max-w-none print:border-0 print:p-0 ${inset === "compact" ? "p-panel-inset" : "p-sheet-margin"} ${face === "document" ? "font-document" : ""}`}
     >
       {children}
     </article>

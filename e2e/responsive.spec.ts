@@ -27,9 +27,14 @@ test("on a phone the sidebar becomes a bottom bar of 64px with the destinations 
   await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
   const bar = page.getByRole("navigation", { name: "Navegação principal do celular" });
   await expect(bar).toBeVisible();
-  const link = bar.getByRole("link", { name: "Minha conta" });
-  const box = await link.boundingBox();
-  expect(box?.height).toBe(64);
+  // The bar's destinations are the product's first ones, whatever they are: each is a 64px target.
+  const links = bar.getByRole("link");
+  expect(await links.count()).toBeGreaterThan(0);
+  for (const box of await links.evaluateAll((all) =>
+    all.map((link) => link.getBoundingClientRect().height),
+  )) {
+    expect(box).toBe(64);
+  }
   await expect(page.getByRole("navigation", { name: "Navegação da área logada" })).toBeHidden();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

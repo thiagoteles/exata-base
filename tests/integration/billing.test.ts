@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
+import { firstPaidFeature } from "@/domain/billing/entitlements";
 import { entitlementsFor, readPlan } from "@/lib/billing/service";
 import { paymentEvents, plans } from "@/lib/db/schema/billing";
 import { billingFixture, gateway } from "./billing-fixture";
@@ -15,8 +16,9 @@ import {
 } from "./stripe-events";
 
 const db = testDatabase();
+const paid = (features: ReadonlySet<string>) => [...features].includes(`${firstPaidFeature}`);
 const premium = async (userId: string) =>
-  (await entitlementsFor(db, { kind: "user", id: userId }, new Date())).features.has("premium");
+  paid((await entitlementsFor(db, { kind: "user", id: userId }, new Date())).features);
 const { deliver, subscriber } = billingFixture(db);
 
 describe("a purchase", () => {

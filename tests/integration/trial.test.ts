@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { firstPaidFeature } from "@/domain/billing/entitlements";
 import { entitlementsFor, readPlan } from "@/lib/billing/service";
 import { billingFixture } from "./billing-fixture";
 import { testDatabase } from "./database";
@@ -18,7 +19,9 @@ const DAY_SECONDS = 86_400;
 const started = new Date(EVENT_CREATED_SECONDS * 1000);
 const trialEnd = new Date((EVENT_CREATED_SECONDS + 14 * DAY_SECONDS) * 1000);
 const premium = async (id: string, now: Date) =>
-  (await entitlementsFor(db, { kind: "user", id }, now)).features.has("premium");
+  (await entitlementsFor(db, { kind: "user", id }, now)).features.has(
+    firstPaidFeature as NonNullable<typeof firstPaidFeature>,
+  );
 
 async function startTrial(email: string) {
   const person = await createUser(db, email);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { entitlementsOf, isPaidTier, type PlanState } from "./entitlements";
+import { entitlementsOf, firstPaidFeature, isPaidTier, type PlanState } from "./entitlements";
 
 const now = new Date("2026-06-01T12:00:00Z");
 const plan = (over: Partial<PlanState> = {}): PlanState => ({
@@ -13,7 +13,8 @@ describe("entitlements", () => {
   it("grant the tier's features, including the ones it extends", () => {
     const paid = entitlementsOf(plan(), now);
     expect(paid.tier).toBe("paid");
-    expect(paid.features.has("premium")).toBe(true);
+    expect(firstPaidFeature).toBeDefined();
+    expect(paid.features.has(firstPaidFeature as NonNullable<typeof firstPaidFeature>)).toBe(true);
   });
 
   it("grant free with no plan, a pending payment or a canceled plan", () => {
@@ -43,7 +44,9 @@ describe("featuresOfTier", () => {
   it("lists what a tier grants, the inherited features included, and nothing for free", async () => {
     const { featuresOfTier } = await import("./entitlements");
     expect([...featuresOfTier("free")]).toEqual([]);
-    expect(featuresOfTier("paid").has("premium")).toBe(true);
+    expect(
+      featuresOfTier("paid").has(firstPaidFeature as NonNullable<typeof firstPaidFeature>),
+    ).toBe(true);
   });
 });
 

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { firstPaidFeature } from "@/domain/billing/entitlements";
 import { DomainError } from "@/lib/errors";
 import { z } from "@/lib/validation";
 
@@ -71,7 +72,9 @@ vi.mock("@/lib/billing/guard", async () => {
 
 const { actionFor, limitedPublicAction } = await import("./client");
 
-const premiumOnly = actionFor("member", { feature: "premium" })
+// The sold tier's own first feature, whatever the product named it.
+const paidFeature = firstPaidFeature as NonNullable<typeof firstPaidFeature>;
+const premiumOnly = actionFor("member", { feature: paidFeature })
   .metadata({ name: "premiumOnly" })
   .action(() => Promise.resolve({ done: true }));
 
@@ -163,7 +166,7 @@ describe("server actions", () => {
       status: 403,
       key: "paidPlanRequired",
     });
-    expect(plan.asked).toEqual(["u1:premium", "u1:premium"]);
+    expect(plan.asked).toEqual([`u1:${paidFeature}`, `u1:${paidFeature}`]);
   });
 
   it("never expose an unexpected error, and log it under the action's name", async () => {

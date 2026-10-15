@@ -52,6 +52,12 @@ function resolve(tier: Tier, seen: ReadonlySet<Tier> = new Set()): Omit<Entitlem
 /** Every feature a tier grants, the ones it inherits included. For screens that compare plans. */
 export const featuresOfTier = (tier: Tier): ReadonlySet<Feature> => resolve(tier).features;
 
+/**
+ * The first feature the sold tier grants, whatever the product calls it: what shows a gate at work
+ * (the catalog's paid block) and what the tests open and close, without naming a product's feature.
+ */
+export const firstPaidFeature: Feature | undefined = [...featuresOfTier(catalog.paidTier)][0];
+
 function grantedTier(plan: PlanState | null, now: Date): Tier {
   if (plan === null || plan.status === "pending" || plan.status === "canceled") {
     return "free";

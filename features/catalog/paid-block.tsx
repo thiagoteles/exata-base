@@ -5,6 +5,7 @@ import { Gate } from "@/components/patterns/gate";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
+import { firstPaidFeature } from "@/domain/billing/entitlements";
 import { hasFeature } from "@/lib/billing/guard";
 import { publicHref } from "@/lib/i18n/public-paths";
 
@@ -16,7 +17,7 @@ export async function PaidBlock() {
   ]);
   return (
     <Gate
-      open={await hasFeature("premium")}
+      open={firstPaidFeature !== undefined && (await hasFeature(firstPaidFeature))}
       source="catalog"
       label={p("label")}
       closed={{

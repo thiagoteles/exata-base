@@ -80,15 +80,24 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
+// The formatter's line width: past it, a property's value moves to a line of its own.
+const LINE_WIDTH = 100;
+
+/** One property, broken the way the formatter breaks it when it does not fit on one line. */
+function renderField(key: string, value: string): string {
+  const line = `    ${key}: ${JSON.stringify(value)},`;
+  return line.length <= LINE_WIDTH ? line : `    ${key}:\n      ${JSON.stringify(value)},`;
+}
+
 /* Written the way the formatter writes it, so the check compares like with like. */
 function renderList(items: readonly Record<string, string | undefined>[]): string {
   if (items.length === 0) {
     return "[]";
   }
   const objects = items.map((item) => {
-    const fields = Object.entries(item)
-      .filter(([, value]) => value !== undefined)
-      .map(([key, value]) => `    ${key}: ${JSON.stringify(value)},`);
+    const fields = Object.entries(item).flatMap(([key, value]) =>
+      value === undefined ? [] : [renderField(key, value)],
+    );
     return `  {\n${fields.join("\n")}\n  },`;
   });
   return `[\n${objects.join("\n")}\n]`;

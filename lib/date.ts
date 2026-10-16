@@ -40,8 +40,9 @@ export function formatDate(value: IsoDate, locale: string = defaultLocale): stri
   if (locale === defaultLocale) {
     return `${day}/${month}/${year}`;
   }
-  // The date has no zone, so it is formatted in UTC from midnight UTC and never moves a day.
-  return new Intl.DateTimeFormat(locale, { dateStyle: "short", timeZone: "UTC" }).format(
+  // The date has no zone, so it is formatted in UTC from midnight UTC and never moves a day. The
+  // medium style names the month, so "3/1/25" is never read as the third of January.
+  return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(
     new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))),
   );
 }

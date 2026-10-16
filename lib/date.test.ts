@@ -62,14 +62,14 @@ describe("instants in America/Sao_Paulo", () => {
 });
 
 describe("dates in another language", () => {
-  it("keep dd/mm/aaaa in the default language and follow the language's short form elsewhere", () => {
+  it("keep dd/mm/aaaa in the default language and name the month in the language elsewhere", () => {
     expect(formatDate("2025-01-31" as IsoDate, "pt-BR")).toBe("31/01/2025");
-    expect(formatDate("2025-01-31" as IsoDate, "en-US")).toBe("1/31/25");
+    expect(formatDate("2025-01-31" as IsoDate, "en-US")).toBe("Jan 31, 2025");
   });
 
   it("never move a day, whatever the language", () => {
-    expect(formatDate("2025-03-01" as IsoDate, "en-US")).toBe("3/1/25");
+    expect(formatDate("2025-03-01" as IsoDate, "en-US")).toBe("Mar 1, 2025");
     const instant = new Date("2025-01-01T02:30:00Z");
-    expect(formatInstantDate(instant, "America/Sao_Paulo", "en-US")).toBe("12/31/24");
+    expect(formatInstantDate(instant, "America/Sao_Paulo", "en-US")).toBe("Dec 31, 2024");
   });
 });

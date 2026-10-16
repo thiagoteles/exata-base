@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -11,11 +12,11 @@ import "./globals.css";
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang={await getLocale()} className={fontVariables} suppressHydrationWarning>
-      <head>
-        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a constant script, no user input */}
-        <script dangerouslySetInnerHTML={{ __html: pageScript }} />
-      </head>
       <body>
+        {/* biome-ignore lint/correctness/useUniqueElementIds: next/script needs a fixed id to dedupe an inline script */}
+        <Script id="page-script" strategy="beforeInteractive">
+          {pageScript}
+        </Script>
         <NextIntlClientProvider>
           <AuthProvider>
             <AppProviders>{children}</AppProviders>

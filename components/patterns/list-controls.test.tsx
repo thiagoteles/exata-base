@@ -74,4 +74,10 @@ describe("list controls", () => {
     expect(screen.getByText("1 a 5 de 5")).toBeTruthy();
     expect(screen.queryByRole("button")).toBeNull();
   });
+
+  it("shows nothing for an empty list, whose own row already says so", () => {
+    inUrl("", <ListPagination window={pageWindow(1, 0)} />);
+    expect(screen.queryByRole("navigation")).toBeNull();
+    expect(screen.queryByText(/resultados|de 0/)).toBeNull();
+  });
 });

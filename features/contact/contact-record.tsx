@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { PageSection } from "@/components/patterns/page-section";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
-import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import type { ContactRow } from "@/lib/contact/service";
 import { formatInstantDate } from "@/lib/date";
@@ -26,7 +26,7 @@ export async function ContactRecord({
   const [t, contact] = await Promise.all([getTranslations("record"), getTranslations("contact")]);
   const answered = message.replyBody !== null;
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
       <RecordGrid>
         <RecordCell
           label={t("from")}
@@ -50,29 +50,33 @@ export async function ContactRecord({
         </RecordCell>
       </RecordGrid>
 
-      <Panel className="flex flex-col gap-3">
-        <h2 className="text-block-title text-ink">{t("replyTitle")}</h2>
+      <PageSection title={t("replyTitle")}>
         {answered && message.answeredAt !== null ? (
-          <>
-            <p className="whitespace-pre-wrap text-body text-ink">{message.replyBody}</p>
+          <div className="flex flex-col gap-3">
+            <p className="max-w-[68ch] whitespace-pre-wrap text-body text-ink">
+              {message.replyBody}
+            </p>
             <p className="text-body-small text-ink-muted">
               {t("answeredBy", {
                 name: message.answeredByEmail ?? t("unknownPerson"),
                 date: formatInstantDate(message.answeredAt, timeZone),
               })}
             </p>
-          </>
+          </div>
         ) : (
           <p className="text-body text-ink-muted">{t("noReplyYet")}</p>
         )}
-      </Panel>
+      </PageSection>
 
       {canManage ? (
-        <Panel className="flex flex-col gap-6 print:hidden">
-          <h2 className="text-block-title text-ink">{t("manage")}</h2>
-          <StatusControl id={message.id} status={message.status} />
-          {answered ? null : <ReplyForm id={message.id} email={message.email} />}
-        </Panel>
+        <div className="print:hidden">
+          <PageSection title={t("manage")}>
+            <div className="flex flex-col gap-6">
+              <StatusControl id={message.id} status={message.status} />
+              {answered ? null : <ReplyForm id={message.id} email={message.email} />}
+            </div>
+          </PageSection>
+        </div>
       ) : null}
     </div>
   );

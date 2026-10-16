@@ -1202,7 +1202,6 @@
       "previous": "Anterior",
       "next": "Próxima",
       "position": "{from, number} a {to, number} de {total, number}",
-      "positionNone": "0 resultados",
       "clear": "Limpar busca",
       "removeFilter": "Remover filtro {name}",
       "noResults": "Nada para “{term}”{filters, plural, =0 {} one { com # filtro} other { com # filtros}}",

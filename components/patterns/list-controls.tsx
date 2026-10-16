@@ -111,10 +111,11 @@ export function ListNoResults({ term, filters }: NoResultsProps) {
 export function ListPagination({ window }: { window: PageWindow }) {
   const t = useTranslations("patterns.list");
   const [, setParams] = useQueryStates({ page: parseAsInteger }, options);
-  const position =
-    window.total === 0
-      ? t("positionNone")
-      : t("position", { from: window.from, to: window.to, total: window.total });
+  // An empty list already says so in its own row; a count of nothing would only repeat it.
+  if (window.total === 0) {
+    return null;
+  }
+  const position = t("position", { from: window.from, to: window.to, total: window.total });
   // A list that fits on one page has nowhere to go, so two dead buttons would only be noise.
   if (window.pages <= 1) {
     return <p className="mt-4 font-mono text-data tabular-nums text-ink-muted">{position}</p>;

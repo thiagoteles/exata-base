@@ -60,12 +60,18 @@ describe("list controls", () => {
   });
 
   it("disables the ends of the list", () => {
-    inUrl("", <ListPagination window={pageWindow(1, 5)} />);
+    inUrl("", <ListPagination window={pageWindow(1, 312)} />);
     expect((screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement).disabled).toBe(
       true,
     );
     expect((screen.getByRole("button", { name: "Próxima" }) as HTMLButtonElement).disabled).toBe(
-      true,
+      false,
     );
+  });
+
+  it("shows only the count when the list fits on one page", () => {
+    inUrl("", <ListPagination window={pageWindow(1, 5)} />);
+    expect(screen.getByText("1 a 5 de 5")).toBeTruthy();
+    expect(screen.queryByRole("button")).toBeNull();
   });
 });

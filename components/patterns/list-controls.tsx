@@ -111,6 +111,14 @@ export function ListNoResults({ term, filters }: NoResultsProps) {
 export function ListPagination({ window }: { window: PageWindow }) {
   const t = useTranslations("patterns.list");
   const [, setParams] = useQueryStates({ page: parseAsInteger }, options);
+  const position =
+    window.total === 0
+      ? t("positionNone")
+      : t("position", { from: window.from, to: window.to, total: window.total });
+  // A list that fits on one page has nowhere to go, so two dead buttons would only be noise.
+  if (window.pages <= 1) {
+    return <p className="mt-4 font-mono text-data tabular-nums text-ink-muted">{position}</p>;
+  }
   return (
     <nav aria-label={t("pagination")} className="mt-4 flex items-center justify-between gap-4">
       <Button
@@ -121,11 +129,7 @@ export function ListPagination({ window }: { window: PageWindow }) {
       >
         {t("previous")}
       </Button>
-      <p className="font-mono text-data tabular-nums text-ink-muted">
-        {window.total === 0
-          ? t("positionNone")
-          : t("position", { from: window.from, to: window.to, total: window.total })}
-      </p>
+      <p className="font-mono text-data tabular-nums text-ink-muted">{position}</p>
       <Button
         variant="secondary"
         disabled={window.page >= window.pages}

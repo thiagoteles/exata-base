@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
 import { PageHeader } from "@/components/patterns/page-header";
+import { PageSection } from "@/components/patterns/page-section";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { TrialNotice } from "@/components/patterns/trial-notice";
 import { Panel } from "@/components/ui/panel";
@@ -53,8 +54,13 @@ async function PlanContent({ searchParams }: Props) {
   const paid = plan !== null && isPaidTier(plan.tier);
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
-      <div className="flex flex-col gap-8">
+      <PageHeader
+        title={t("title")}
+        subtitle={t("subtitle")}
+        showBack={false}
+        controls={<PlanActions plan={plan} />}
+      />
+      <div className="flex flex-col gap-10">
         {query.checkout === "success" && !paid ? (
           <Panel tone="info" role="status">
             <p className="text-body text-ink">{t("confirming")}</p>
@@ -74,7 +80,6 @@ async function PlanContent({ searchParams }: Props) {
           </Panel>
         ) : null}
         <PlanRecord plan={plan} timeZone={resolvePreferences(user.options).timeZone} />
-        <PlanActions plan={plan} />
         <Receipts userId={user.id} timeZone={resolvePreferences(user.options).timeZone} />
       </div>
     </>
@@ -108,11 +113,28 @@ async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: str
   const t = await getTranslations("plan");
   const state = planState(plan);
   const paid = plan !== null && isPaidTier(plan.tier);
+  const cells = [
+    true,
+    paid,
+    plan?.currentPeriodEnd !== null && plan?.currentPeriodEnd !== undefined,
+    Boolean(plan?.courtesyReason),
+  ].filter(Boolean).length;
+  // As many columns as cells, so the grid never ends in an empty one; four make two rows of two.
+  const columns = [
+    "",
+    "md:grid-cols-1 xl:grid-cols-1",
+    "md:grid-cols-2 xl:grid-cols-2",
+    "md:grid-cols-3 xl:grid-cols-3",
+    "md:grid-cols-2 xl:grid-cols-2",
+  ][cells];
   return (
-    <RecordGrid>
+    <RecordGrid className={columns}>
       <RecordCell
         label={t("plan")}
-        stamp={<Stamp tone={planStateTone[state]}>{t(`statuses.${state}`)}</Stamp>}
+        // On the free plan the name already says it; a stamp would only repeat it.
+        {...(state === "free"
+          ? {}
+          : { stamp: <Stamp tone={planStateTone[state]}>{t(`statuses.${state}`)}</Stamp> })}
       >
         {t(`names.${paid ? (plan.billingInterval ?? "free") : "free"}`)}
       </RecordCell>
@@ -129,9 +151,7 @@ async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: str
         </RecordCell>
       ) : null}
       {plan?.courtesyReason ? (
-        <RecordCell label={t("courtesyReason")} wide>
-          {plan.courtesyReason}
-        </RecordCell>
+        <RecordCell label={t("courtesyReason")}>{plan.courtesyReason}</RecordCell>
       ) : null}
     </RecordGrid>
   );
@@ -141,16 +161,17 @@ async function PlanActions({ plan }: { plan: Plan | null }) {
   const t = await getTranslations("plan");
   const billingOn = (await paymentGateway()) !== null;
   const subscribed = plan !== null && isPaidTier(plan.tier) && subscriptionOf(plan) !== null;
+  // The header's controls: the danger first, the way forward last.
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <>
+      {billingOn && subscribed ? <CancellationControl canceling={plan.cancelAtPeriodEnd} /> : null}
+      {billingOn && plan?.providerCustomerId ? <PortalButton /> : null}
       {plan !== null && isPaidTier(plan.tier) ? null : (
         <Link href={publicHref("/plans")} className={buttonClasses("primary")}>
           {t("seePlans")}
         </Link>
       )}
-      {billingOn && plan?.providerCustomerId ? <PortalButton /> : null}
-      {billingOn && subscribed ? <CancellationControl canceling={plan.cancelAtPeriodEnd} /> : null}
-    </div>
+    </>
   );
 }
 
@@ -165,10 +186,8 @@ async function Receipts({ userId, timeZone }: { userId: string; timeZone: string
     return null;
   }
   return (
-    <Panel className="flex flex-col gap-4">
-      <h2 className="text-block-title text-ink">{t("title")}</h2>
-      <p className="max-w-[52ch] text-body-small text-ink-muted">{t("help")}</p>
-      <ul className="flex flex-col divide-y divide-line border-y border-line">
+    <PageSection title={t("title")} help={t("help")}>
+      <ul className="flex flex-col divide-y divide-line border-b border-line">
         {settled.map((payment) => (
           <li
             key={payment.id}
@@ -192,6 +211,6 @@ async function Receipts({ userId, timeZone }: { userId: string; timeZone: string
           </li>
         ))}
       </ul>
-    </Panel>
+    </PageSection>
   );
 }

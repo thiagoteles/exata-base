@@ -14,7 +14,7 @@ import type { ShellGroup } from "./nav-types";
 export function Sidebar({ groups, label }: { groups: readonly ShellGroup[]; label: string }) {
   const pathname = usePathname();
   return (
-    <nav aria-label={label} className="flex flex-col gap-5 px-3 py-4">
+    <nav aria-label={label} className="flex flex-col gap-6 px-3 py-4">
       {groups.map((group) => (
         <div key={group.key} className="flex flex-col gap-0.5">
           {group.label === null ? null : (
@@ -28,7 +28,7 @@ export function Sidebar({ groups, label }: { groups: readonly ShellGroup[]; labe
                 href={item.href}
                 aria-current={current ? "page" : undefined}
                 className={cn(
-                  "flex min-h-segment items-center gap-2.5 rounded-control border-s-[3px] ps-2.5 pe-2 py-2 text-body-small focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+                  "flex min-h-control items-center gap-2.5 rounded-control border-s-[3px] ps-2.5 pe-2 py-2 text-body-small focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
                   current
                     ? "border-brand bg-brand-wash font-semibold text-brand-ink"
                     : "border-transparent text-ink hover:bg-sunken",

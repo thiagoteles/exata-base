@@ -16,6 +16,8 @@ type FormTextFieldProps<Values extends FieldValues> = {
   name: Path<Values>;
   label: string;
   help?: string | undefined;
+  /** A code read character by character (an account number, a SWIFT, a key) is written in mono. */
+  code?: boolean;
 } & Pick<ComponentProps<"input">, "type" | "autoComplete" | "readOnly">;
 
 /** A text field wired to a react-hook-form form, showing its error as text from the catalog. */
@@ -24,6 +26,7 @@ export function FormTextField<Values extends FieldValues>({
   name,
   label,
   help,
+  code = false,
   ...input
 }: FormTextFieldProps<Values>) {
   const text = useValidationText();
@@ -38,7 +41,14 @@ export function FormTextField<Values extends FieldValues>({
       help={help}
       error={text(typeof message === "string" ? message : undefined)}
     >
-      {(control) => <Input {...control} {...input} {...form.register(name)} />}
+      {(control) => (
+        <Input
+          {...control}
+          {...input}
+          {...form.register(name)}
+          {...(code ? { className: "font-mono text-data" } : {})}
+        />
+      )}
     </Field>
   );
 }

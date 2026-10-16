@@ -13,6 +13,7 @@ import {
   FormSwitchField,
   FormTextAreaField,
 } from "./form-fields";
+import { FormTextField } from "./form-text-field";
 import { useSchemaForm } from "./use-schema-form";
 
 const schema = z.object({
@@ -162,5 +163,26 @@ describe("a day", () => {
     });
     await submit();
     expect(onSubmit.mock.calls[0]?.[0]).toEqual({ day: "2026-11-05" });
+  });
+});
+
+function CodeForm() {
+  const form = useSchemaForm<{ swift: string; name: string }>(
+    z.object({ swift: z.string(), name: z.string() }),
+    { swift: "", name: "" },
+  );
+  return (
+    <form>
+      <FormTextField form={form} name="swift" label="SWIFT" code />
+      <FormTextField form={form} name="name" label="Nome" />
+    </form>
+  );
+}
+
+describe("a code", () => {
+  it("is written in mono, and a plain text field is not", () => {
+    renderWithIntl(<CodeForm />);
+    expect(screen.getByRole("textbox", { name: "SWIFT" }).className).toContain("font-mono");
+    expect(screen.getByRole("textbox", { name: "Nome" }).className).not.toContain("font-mono");
   });
 });

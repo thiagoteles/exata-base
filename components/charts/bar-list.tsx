@@ -1,6 +1,7 @@
 /*
  * A few categories and one measure each, as horizontal bars with the value at the tip. Every
- * value is written, so there is nothing a hover could add; the bars share one scale from zero.
+ * value is written, so there is nothing a hover could add; the bars share one scale from zero. A
+ * long label wraps rather than being cut, so no category is left half named.
  */
 
 type Row = { key: string; label: string; value: number; valueText: string };
@@ -11,7 +12,7 @@ export function BarList({ rows, label }: { rows: readonly Row[]; label: string }
     <ul aria-label={label} className="flex flex-col gap-3">
       {rows.map((row) => (
         <li key={row.key} className="grid grid-cols-[minmax(6rem,12rem)_1fr] items-center gap-4">
-          <span className="truncate text-body text-ink">{row.label}</span>
+          <span className="min-w-0 text-pretty text-body text-ink">{row.label}</span>
           <span className="flex items-center gap-3">
             <span
               className="h-5 rounded-e-mark bg-chart-seq-5"

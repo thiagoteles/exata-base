@@ -1,5 +1,6 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 import { type Column, DataList } from "@/components/patterns/data-list";
+import { PageSection } from "@/components/patterns/page-section";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Stamp, type StampTone } from "@/components/ui/stamp";
 import type { JobState } from "@/domain/operations/job-health";
@@ -118,77 +119,66 @@ export async function HealthBoard({
   ];
 
   return (
-    <div className="flex flex-col gap-12">
-      <section className="flex flex-col gap-4">
-        <h2 className="text-section text-ink">{t("release")}</h2>
-        <RecordGrid aria-label={t("release")} className="md:grid-cols-2 xl:grid-cols-4">
-          <RecordCell label={t("version")} wide>
-            {release.commit === null ? (
-              <span className="text-ink-muted">{t("unknownVersion")}</span>
-            ) : (
-              <span className="font-mono text-data tabular-nums">
-                {release.commit.slice(0, COMMIT_LENGTH)}
-              </span>
-            )}
-            <span className="mt-1 block text-body-small text-ink-muted">
-              {t("service")} <span className="font-mono">{release.service}</span>
-            </span>
-          </RecordCell>
-          <RecordCell
-            label={t("database")}
-            stamp={<Stamp tone="success">{t("databaseUp")}</Stamp>}
-            wide
-          >
-            {t("answered", { ms: database.latencyMs })}
-          </RecordCell>
-          <RecordCell label={t("postgres")}>
-            <span className="font-mono text-data tabular-nums">{database.serverVersion}</span>
-          </RecordCell>
-          <RecordCell label={t("size")}>
+    <div className="flex flex-col gap-10">
+      <RecordGrid aria-label={t("release")} className="md:grid-cols-2 xl:grid-cols-4">
+        <RecordCell label={t("version")} wide>
+          {release.commit === null ? (
+            <span className="text-ink-muted">{t("unknownVersion")}</span>
+          ) : (
             <span className="font-mono text-data tabular-nums">
-              {format.number(database.sizeBytes / MEGABYTE, {
-                style: "unit",
-                unit: "megabyte",
-                maximumFractionDigits: 1,
-              })}
+              {release.commit.slice(0, COMMIT_LENGTH)}
             </span>
-          </RecordCell>
-          <RecordCell label={t("migrations")} wide>
-            {t("migrationsApplied", { count: database.migrations })}
-            {database.lastMigrationAt === null ? null : (
-              <span className="mt-1 block text-body-small text-ink-muted">
-                {t("lastMigration", { date: format.dateTime(database.lastMigrationAt, stamp) })}
-              </span>
-            )}
-          </RecordCell>
-        </RecordGrid>
-      </section>
+          )}
+          <span className="mt-1 block text-body-small text-ink-muted">
+            {t("service")} <span className="font-mono">{release.service}</span>
+          </span>
+        </RecordCell>
+        <RecordCell
+          label={t("database")}
+          stamp={<Stamp tone="success">{t("databaseUp")}</Stamp>}
+          wide
+        >
+          {t("answered", { ms: database.latencyMs })}
+        </RecordCell>
+        <RecordCell label={t("postgres")}>
+          <span className="font-mono text-data tabular-nums">{database.serverVersion}</span>
+        </RecordCell>
+        <RecordCell label={t("size")}>
+          <span className="font-mono text-data tabular-nums">
+            {format.number(database.sizeBytes / MEGABYTE, {
+              style: "unit",
+              unit: "megabyte",
+              maximumFractionDigits: 1,
+            })}
+          </span>
+        </RecordCell>
+        <RecordCell label={t("migrations")} wide>
+          {t("migrationsApplied", { count: database.migrations })}
+          {database.lastMigrationAt === null ? null : (
+            <span className="mt-1 block text-body-small text-ink-muted">
+              {t("lastMigration", { date: format.dateTime(database.lastMigrationAt, stamp) })}
+            </span>
+          )}
+        </RecordCell>
+      </RecordGrid>
 
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-section text-ink">{t("jobs")}</h2>
-          <p className="max-w-[60ch] text-body-small text-ink-muted">{t("jobsNote")}</p>
-        </div>
+      <PageSection title={t("jobs")} help={t("jobsNote")}>
         <DataList
           label={t("jobs")}
           columns={jobColumns}
           rows={health.jobs}
           getKey={(job) => job.name}
         />
-      </section>
+      </PageSection>
 
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-section text-ink">{t("webhooks")}</h2>
-          <p className="max-w-[60ch] text-body-small text-ink-muted">{t("webhooksNote")}</p>
-        </div>
+      <PageSection title={t("webhooks")} help={t("webhooksNote")}>
         <DataList
           label={t("webhooks")}
           columns={webhookColumns}
           rows={health.webhooks}
           getKey={(hook) => hook.source}
         />
-      </section>
+      </PageSection>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { BarList } from "@/components/charts/bar-list";
 import { ColumnChart } from "@/components/charts/column-chart";
 import { StatTile } from "@/components/charts/stat-tile";
+import { PageSection } from "@/components/patterns/page-section";
 import {
   type BusinessNumbers,
   type DayValue,
@@ -91,8 +92,7 @@ export async function NumbersBoard({
         </dl>
       </section>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-section text-ink">{t("signupsByDay")}</h2>
+      <PageSection title={t("signupsByDay")}>
         <ColumnChart
           title={t("signupsByDay")}
           columns={columns(numbers.signups, (value) => counts.format(value))}
@@ -100,10 +100,9 @@ export async function NumbersBoard({
           tableLabel={t("table")}
           headers={headers}
         />
-      </section>
+      </PageSection>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-section text-ink">{t("revenueByDay")}</h2>
+      <PageSection title={t("revenueByDay")}>
         <ColumnChart
           title={t("revenueByDay")}
           columns={columns(numbers.revenueCents, brl)}
@@ -111,10 +110,9 @@ export async function NumbersBoard({
           tableLabel={t("table")}
           headers={headers}
         />
-      </section>
+      </PageSection>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-section text-ink">{t("payersByPlan")}</h2>
+      <PageSection title={t("payersByPlan")}>
         <BarList
           label={t("payersByPlan")}
           rows={numbers.payersByTier.map((row) => ({
@@ -124,7 +122,7 @@ export async function NumbersBoard({
             valueText: counts.format(row.count),
           }))}
         />
-      </section>
+      </PageSection>
     </div>
   );
 }

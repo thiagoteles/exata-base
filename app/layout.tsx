@@ -1,11 +1,10 @@
-import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { AnalyticsScript } from "@/components/analytics-script";
 import { AppProviders } from "@/components/app-providers";
+import { PageScript } from "@/components/page-script";
 import { AuthProvider } from "@/lib/ports/auth/provider";
-import { pageScript } from "@/lib/theme";
 import { fontVariables } from "./fonts";
 import "./globals.css";
 
@@ -13,10 +12,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang={await getLocale()} className={fontVariables} suppressHydrationWarning>
       <body>
-        {/* biome-ignore lint/correctness/useUniqueElementIds: next/script needs a fixed id to dedupe an inline script */}
-        <Script id="page-script" strategy="beforeInteractive">
-          {pageScript}
-        </Script>
+        <PageScript />
         <NextIntlClientProvider>
           <AuthProvider>
             <AppProviders>{children}</AppProviders>

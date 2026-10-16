@@ -37,7 +37,8 @@ export function UnsubscribeForm({ token, address, category }: UnsubscribeFormPro
     return (
       <Panel tone="info" role="status" className="flex flex-col gap-2">
         <p className="text-body text-ink">{t(`done.${category}`, { address })}</p>
-        <p className="text-body-small text-ink-muted">{t("changeLater")}</p>
+        {/* A billing reminder goes to someone with no account here, so the way back is the sender. */}
+        <p className="text-body-small text-ink-muted">{t(`changeLater.${category}`)}</p>
       </Panel>
     );
   }

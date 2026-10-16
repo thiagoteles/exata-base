@@ -1600,7 +1600,11 @@
       "news": "Pronto. {address} não receberá mais novidades.",
       "billing": "Pronto. {address} não receberá mais lembretes de cobrança."
     },
-    "changeLater": "Você pode mudar isso quando quiser, em Minha conta.",
+    "changeLater": {
+      "reminder": "Você pode mudar isso quando quiser, em Minha conta.",
+      "news": "Você pode mudar isso quando quiser, em Minha conta.",
+      "billing": "Se quiser voltar a receber, peça a quem envia as cobranças."
+    },
     "invalid": "Este link não vale. Use o da mensagem mais recente, ou ajuste suas escolhas em Minha conta.",
     "toAccount": "Ir para Minha conta"
   },

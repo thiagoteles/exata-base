@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
 import { PageHeader } from "@/components/patterns/page-header";
+import { PageSection } from "@/components/patterns/page-section";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Panel } from "@/components/ui/panel";
 import { buttonClasses } from "@/components/ui/styles";
@@ -66,7 +67,7 @@ async function AccountContent() {
   return (
     <>
       <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-10">
         {/* Four cells fill two columns exactly; three columns would leave a gap in the second row. */}
         <RecordGrid className="md:grid-cols-2 xl:grid-cols-2">
           <RecordCell label={t("profile.name")}>
@@ -80,22 +81,17 @@ async function AccountContent() {
         </RecordGrid>
 
         {onboarding.complete ? null : (
-          <Panel className="flex flex-col gap-4">
-            <h2 className="text-block-title text-ink">{steps("title")}</h2>
-            <p className="max-w-[52ch] text-body-small text-ink-muted">{steps("subtitle")}</p>
+          <PageSection title={steps("title")} help={steps("subtitle")}>
             <FirstSteps progress={onboarding} />
-          </Panel>
+          </PageSection>
         )}
 
-        <Panel className="flex flex-col gap-4">
-          <h2 className="text-block-title text-ink">{t("theme.title")}</h2>
+        <PageSection title={t("theme.title")} help={t("theme.help")}>
           <ThemePicker initial={preferences.theme} />
-          <p className="max-w-[52ch] text-body-small text-ink-muted">{t("theme.help")}</p>
           {isMultilingual ? <LanguageSwitcher /> : null}
-        </Panel>
+        </PageSection>
 
-        <Panel className="flex flex-col gap-4">
-          <h2 className="text-block-title text-ink">{t("accessibility.title")}</h2>
+        <PageSection title={t("accessibility.title")} help={t("accessibility.help")}>
           <AccessibilityPreferences
             initial={{
               fontScale: preferences.fontScale,
@@ -103,12 +99,9 @@ async function AccountContent() {
               contrast: preferences.contrast,
             }}
           />
-          <p className="max-w-[52ch] text-body-small text-ink-muted">{t("accessibility.help")}</p>
-        </Panel>
+        </PageSection>
 
-        <Panel className="flex flex-col gap-4">
-          <h2 className="text-block-title text-ink">{t("referral.title")}</h2>
-          <p className="max-w-[52ch] text-body-small text-ink-muted">{t("referral.help")}</p>
+        <PageSection title={t("referral.title")} help={t("referral.help")}>
           <ReferralLink url={`${env.APP_URL}/?ref=${referral.code}`} />
           <p className="text-body text-ink">{t("referral.count", { count: referral.invited })}</p>
           {earned > 0 ? (
@@ -118,26 +111,24 @@ async function AccountContent() {
               })}
             </p>
           ) : null}
-        </Panel>
+        </PageSection>
 
-        <Panel className="flex flex-col gap-4">
-          <h2 className="text-block-title text-ink">{t("email.title")}</h2>
+        <PageSection title={t("email.title")}>
           <EmailPreferencesPanel initial={preferences.email} />
-        </Panel>
+        </PageSection>
 
         {access.kind === "own" || access.url !== null ? (
-          <Panel className="flex flex-col gap-4">
-            <h2 className="text-block-title text-ink">{t("devices.title")}</h2>
+          <PageSection
+            title={t("devices.title")}
+            help={access.kind === "own" ? t("devices.help") : undefined}
+          >
             {access.kind === "own" ? (
-              <>
-                <p className="max-w-[52ch] text-body-small text-ink-muted">{t("devices.help")}</p>
-                <Devices
-                  rows={devices.map((device) => ({
-                    ...device,
-                    createdAt: device.createdAt.toISOString(),
-                  }))}
-                />
-              </>
+              <Devices
+                rows={devices.map((device) => ({
+                  ...device,
+                  createdAt: device.createdAt.toISOString(),
+                }))}
+              />
             ) : (
               <>
                 <p className="max-w-[52ch] text-body text-ink">{t("devices.external")}</p>
@@ -150,12 +141,10 @@ async function AccountContent() {
                 </a>
               </>
             )}
-          </Panel>
+          </PageSection>
         ) : null}
 
-        <Panel className="flex flex-col gap-4">
-          <h2 className="text-block-title text-ink">{t("apiTokens.title")}</h2>
-          <p className="max-w-[52ch] text-body-small text-ink-muted">{t("apiTokens.help")}</p>
+        <PageSection title={t("apiTokens.title")} help={t("apiTokens.help")}>
           <ApiTokens
             rows={tokens.map((token) => ({
               ...token,
@@ -163,23 +152,23 @@ async function AccountContent() {
               lastUsedAt: token.lastUsedAt?.toISOString() ?? null,
             }))}
           />
-        </Panel>
+        </PageSection>
 
-        <Panel className="flex flex-col gap-4">
-          <h2 className="text-block-title text-ink">{t("data.title")}</h2>
+        <PageSection title={t("data.title")}>
           <p className="max-w-[52ch] text-body text-ink">{t("data.body")}</p>
           <a href="/account/export" download className={`${buttonClasses("secondary")} self-start`}>
             {t("data.download")}
           </a>
-        </Panel>
+        </PageSection>
 
-        <Panel tone="danger" className="flex flex-col gap-4">
-          <h2 className="text-block-title text-ink">{t("delete.title")}</h2>
-          <p className="max-w-[52ch] text-body text-ink">{t("delete.body")}</p>
-          <div className="self-start">
-            <DeleteAccount />
-          </div>
-        </Panel>
+        <PageSection title={t("delete.title")}>
+          <Panel tone="danger" className="flex flex-col gap-4">
+            <p className="max-w-[52ch] text-body text-ink">{t("delete.body")}</p>
+            <div className="self-start">
+              <DeleteAccount />
+            </div>
+          </Panel>
+        </PageSection>
       </div>
     </>
   );

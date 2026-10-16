@@ -611,7 +611,7 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 A card inside a card does not exist.
 
 **Public site.** The surface that persuades has its own patterns, all in `components/patterns`, all receiving their words from the catalog and their pictures as props. A home page reads top to bottom as a story about the product, and every picture on it is a real piece of the product (a record, a document, a figure that teaches a true rule of the domain), never an illustration of one.
-- `Hero`: display title with a short brand rule, the eyebrow in sentence case, two actions at most, the product beside the words.
+- `Hero`: display title with a short brand rule, the eyebrow in sentence case, two actions at most, the product beside the words, both halves starting on the same line.
 - `ProofStrip`: three or four facts under the hero, numbered in mono, divided by hairlines. A fact, not an adjective.
 - `Showcase`: one thing the product does. Words in the narrow column, the proof in the wide one; `mirror` alternates sides, `stickyText` keeps the words beside a tall demo. The proof arrives as it scrolls (see Motion).
 - `ContentSection`: the ledger band for lists, steps and questions, heading hung on the left.

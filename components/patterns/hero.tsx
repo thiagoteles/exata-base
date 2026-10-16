@@ -13,8 +13,8 @@ type HeroProps = {
 
 /*
  * The first screen of a public page. The title is the display type with a rule above it that stops
- * short of the edge, so the words sit on a line instead of floating; the aside is offset downward
- * so the two halves do not start on the same baseline. When the aside is the taller of the two (a
+ * short of the edge, so the words sit on a line instead of floating; the two halves start on the
+ * same line, so the eyebrow and the top of the product meet the eye together. When the aside is the taller of the two (a
  * whole document), the words stay in view beside it as it scrolls, instead of leaving a hole under
  * them. On a narrow screen the one column is the
  * screen's width, never the widest thing in it, so a document beside the words wraps instead of
@@ -34,7 +34,7 @@ export function Hero({ eyebrow, title, subtitle, actions, aside }: HeroProps) {
         <p className="max-w-[52ch] text-body text-ink-muted">{subtitle}</p>
         {actions === undefined ? null : <div className="flex flex-wrap gap-3">{actions}</div>}
       </div>
-      {aside === undefined ? null : <div className="lg:mt-16">{aside}</div>}
+      {aside === undefined ? null : <div>{aside}</div>}
     </section>
   );
 }

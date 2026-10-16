@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageSection } from "@/components/patterns/page-section";
 import { Stamp, type StampTone } from "@/components/ui/stamp";
 import { isWithinWithdrawal, withdrawalEndsAt } from "@/domain/billing/withdrawal";
 import type { Payment } from "@/lib/billing/payments";
@@ -28,8 +29,7 @@ export async function PaymentsHistory({ payments, now }: { payments: Payment[]; 
       ? withdrawalEndsAt(latest.paidAt)
       : null;
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-block-title text-ink">{t("title")}</h2>
+    <PageSection title={t("title")}>
       {withdrawal === null ? null : (
         <p className="max-w-[60ch] text-body-small text-warning-ink">
           {t("withdrawal", { date: formatInstantDate(withdrawal) })}
@@ -65,6 +65,6 @@ export async function PaymentsHistory({ payments, now }: { payments: Payment[]; 
           </tbody>
         </table>
       )}
-    </section>
+    </PageSection>
   );
 }

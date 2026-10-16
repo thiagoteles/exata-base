@@ -57,10 +57,10 @@ export async function UsersList({
       key: "name",
       header: t("name"),
       kind: "title",
-      width: "2fr",
+      width: "1.4fr",
       cell: (row) => row.name.trim() || row.email,
     },
-    { key: "email", header: t("email"), width: "2fr", cell: (row) => row.email },
+    { key: "email", header: t("email"), width: "2.6fr", cell: (row) => row.email },
     { key: "role", header: t("role"), cell: (row) => roles(row.role) },
     {
       key: "plan",

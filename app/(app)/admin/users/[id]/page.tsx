@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { ListSkeleton } from "@/components/patterns/list-states";
 import { PageHeader } from "@/components/patterns/page-header";
 import { currentInstant } from "@/domain/clock";
-import { UserRecord } from "@/features/admin/user-record";
+import { UserActions, UserRecord } from "@/features/admin/user-record";
 import { getUserRecord } from "@/lib/admin/users";
 import { db } from "@/lib/db/client";
 import { requirePageRole } from "@/lib/page-guard";
@@ -28,7 +28,6 @@ export default function UserPage({ params }: PageProps<"/admin/users/[id]">) {
 
 async function Record({ params }: Pick<PageProps<"/admin/users/[id]">, "params">) {
   const { id } = await params;
-  const t = await getTranslations("admin.users");
   const viewer = await requirePageRole("admin", `/admin/users/${id}`);
   const record = await getUserRecord(db, viewer, id);
   if (record === null) {
@@ -38,8 +37,12 @@ async function Record({ params }: Pick<PageProps<"/admin/users/[id]">, "params">
   await connection();
   return (
     <>
-      <PageHeader title={record.user.name.trim() || record.user.email} subtitle={t("title")} />
-      <UserRecord record={record} viewerId={viewer.id} now={currentInstant()} />
+      <PageHeader
+        title={record.user.name.trim() || record.user.email}
+        subtitle={record.user.email}
+        controls={<UserActions record={record} viewerId={viewer.id} />}
+      />
+      <UserRecord record={record} now={currentInstant()} />
     </>
   );
 }

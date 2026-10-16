@@ -545,6 +545,7 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 
 **Field.** Label above (`field-label`), 48px field, 2px `line-strong` border, radius 10, 16px horizontal padding, value in the 17px body size.
 - CPF, phone, CEP, date and money use `data` in mono with a mask.
+- A day is the `DatePicker` (`FormDateField` in a form): typed as dd/mm/aaaa or picked from a month. Never the browser's own date input, which writes the browser's language and order.
 - Focus: `brand` border and a 4px `brand-wash` ring.
 - Error: `danger` border, message below in 15px `danger-ink` with an icon, wired with `aria-describedby`. The error replaces the hint and never appears next to it.
 - Help: below, 15px, `ink-muted`, at most 52ch.

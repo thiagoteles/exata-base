@@ -2,6 +2,7 @@
 
 import { type Control, Controller, type FieldValues, type Path } from "react-hook-form";
 import { Combobox } from "@/components/ui/combobox";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Field, TextArea } from "@/components/ui/field";
 import { MaskedInput } from "@/components/ui/masked-input";
 import { type Option, Select } from "@/components/ui/select";
@@ -9,9 +10,10 @@ import { Switch } from "@/components/ui/switch";
 import { useValidationText } from "@/lib/use-validation-text";
 
 /*
- * The fields a form is made of, beside the plain text one: a masked value (CPF, phone, CEP, date,
- * money), a choice from a list, a choice searched in a long list, a long text and an on-off setting. Each is wired to react-hook-form
- * and shows its error as text from the catalog, so a feature only names the field and its label.
+ * The fields a form is made of, beside the plain text one: a masked value (CPF, phone, CEP, money),
+ * a day, a choice from a list, a choice searched in a long list, a long text and an on-off setting.
+ * Each is wired to react-hook-form and shows its error as text from the catalog, so a feature only
+ * names the field and its label.
  */
 
 type FieldProps<Values extends FieldValues> = {
@@ -50,6 +52,44 @@ export function FormMaskedField<Values extends FieldValues>({
               onValueChange={field.onChange}
               onBlur={field.onBlur}
               {...(prefix === undefined ? {} : { prefix })}
+            />
+          )}
+        </Field>
+      )}
+    />
+  );
+}
+
+/** A day, typed as dd/mm/aaaa or picked from a month; the form holds it as an ISO date or "". */
+export function FormDateField<Values extends FieldValues>({
+  control,
+  name,
+  label,
+  help,
+  today,
+  min,
+  max,
+}: FieldProps<Values> & {
+  /** Today, as an ISO date, given by the screen, which opens the month on it. */
+  today: string;
+  min?: string;
+  max?: string;
+}) {
+  const text = useValidationText();
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field label={label} help={help} error={text(fieldState.error?.message)}>
+          {(aria) => (
+            <DatePicker
+              {...aria}
+              value={String(field.value ?? "")}
+              onValueChange={field.onChange}
+              today={today}
+              {...(min === undefined ? {} : { min })}
+              {...(max === undefined ? {} : { max })}
             />
           )}
         </Field>

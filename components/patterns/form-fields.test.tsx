@@ -7,6 +7,7 @@ import { cpfSchema, dateSchema } from "@/lib/validation-br";
 import { renderWithIntl } from "@/tests/render";
 import {
   FormComboboxField,
+  FormDateField,
   FormMaskedField,
   FormSelectField,
   FormSwitchField,
@@ -139,5 +140,27 @@ describe("a choice searched in a long list", () => {
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
     await submit();
     expect(onSubmit.mock.calls[0]?.[0]).toEqual({ owner: "1d7f6d2f-4a5b-4b67-8a1e-9b2e8f6c3d42" });
+  });
+});
+
+function DateForm({ onSubmit }: { onSubmit: (values: { day: string }) => void }) {
+  const form = useSchemaForm<{ day: string }>(z.object({ day: z.string() }), { day: "" });
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <FormDateField control={form.control} name="day" label="Dia" today="2026-10-16" />
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}
+
+describe("a day", () => {
+  it("is typed as the reader writes it and handed to submit as an ISO date", async () => {
+    const onSubmit = vi.fn();
+    renderWithIntl(<DateForm onSubmit={onSubmit} />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Dia" }), {
+      target: { value: "05/11/2026" },
+    });
+    await submit();
+    expect(onSubmit.mock.calls[0]?.[0]).toEqual({ day: "2026-11-05" });
   });
 });

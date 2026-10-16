@@ -3,7 +3,7 @@ import { type ReactNode, useId } from "react";
 type PageSectionProps = {
   title: string;
   /** One or two lines on what the section is for, under the title, at most 60ch. */
-  help?: string;
+  help?: string | undefined;
   /** The section's own actions, on the right of the title. */
   actions?: ReactNode;
   children: ReactNode;

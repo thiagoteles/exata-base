@@ -28,11 +28,12 @@ export async function SamplePartsOfSampleItem({
 }: SamplePartsOfSampleItemProps) {
   const t = await getTranslations("sampleParts");
   const rows = await samplePartsOfSampleItem(db, viewer, scope, sampleItemId);
-  // The section is named for what it holds; how many there are is its line of help.
+  // The section is named for what it holds; how many there are is its line of help, said only when
+  // there are some, since the empty state already says there are none.
   return (
     <PageSection
       title={t("title")}
-      help={t("ofParent.title", { count: rows.length })}
+      help={rows.length === 0 ? undefined : t("ofParent.title", { count: rows.length })}
       actions={
         canManage ? (
           <Link href={newSamplePartHref(sampleItemId)} className={buttonClasses("secondary")}>

@@ -44,7 +44,7 @@ export async function InvitesList({
   const { rows, window } = await queryInvites(db, viewer, params, currentInstant());
 
   const columns: Column<InviteRow>[] = [
-    { key: "email", header: t("email"), kind: "title", width: "2fr", cell: (row) => row.email },
+    { key: "email", header: t("email"), kind: "title", width: "3fr", cell: (row) => row.email },
     { key: "role", header: t("role"), cell: (row) => roles(row.role) },
     {
       key: "status",
@@ -52,7 +52,7 @@ export async function InvitesList({
       kind: "status",
       cell: (row) => <Stamp tone={inviteTone[row.status]}>{t(`statuses.${row.status}`)}</Stamp>,
     },
-    { key: "by", header: t("invitedBy"), width: "2fr", cell: (row) => row.invitedByEmail },
+    { key: "by", header: t("invitedBy"), width: "1.6fr", cell: (row) => row.invitedByEmail },
     {
       key: "sent",
       header: t("sent"),

@@ -36,7 +36,7 @@ export function Checkbox({
 }: CheckboxProps) {
   const id = useId();
   return (
-    <div className="flex min-h-control items-start gap-3 py-2">
+    <div className="relative flex min-h-control items-start gap-3 py-2">
       <Primitive.Root
         id={id}
         checked={checked}

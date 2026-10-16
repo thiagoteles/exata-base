@@ -15,12 +15,14 @@ type SegmentedProps = {
  * narrow screen, or with larger text, the choices wrap onto a second line instead of leaving the box.
  */
 export function Segmented({ label, value, onValueChange, options }: SegmentedProps) {
+  // Positioned, so the hidden inputs Radix puts beside each choice inside a form are placed against
+  // the box, not against the page, where they would stretch a page whose content scrolls on its own.
   return (
     <RadioGroup.Root
       aria-label={label}
       value={value}
       onValueChange={onValueChange}
-      className="inline-flex max-w-full flex-wrap rounded-control border-2 border-line-strong bg-surface p-0.5"
+      className="relative inline-flex max-w-full flex-wrap rounded-control border-2 border-line-strong bg-surface p-0.5"
     >
       {options.map((option) => (
         <RadioGroup.Item

@@ -48,7 +48,7 @@ export function RadioGroup({
         {options.map((option) => {
           const id = `${base}-${option.value}`;
           return (
-            <div key={option.value} className="flex min-h-control items-start gap-3 py-2">
+            <div key={option.value} className="relative flex min-h-control items-start gap-3 py-2">
               <Primitive.Item
                 id={id}
                 value={option.value}

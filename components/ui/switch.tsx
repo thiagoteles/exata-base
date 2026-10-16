@@ -20,7 +20,7 @@ type SwitchProps = {
  */
 export function Switch({ label, description, checked, onCheckedChange, disabled }: SwitchProps) {
   return (
-    <div className="flex min-h-control items-center justify-between gap-6">
+    <div className="relative flex min-h-control items-center justify-between gap-6">
       <label htmlFor={label} className="flex min-w-0 flex-col gap-0.5">
         <span className="text-body text-ink">{label}</span>
         {description === undefined ? null : (

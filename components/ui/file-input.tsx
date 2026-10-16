@@ -22,7 +22,8 @@ const KB_PER_MB = 1024;
  * One file, chosen by a click, the keyboard or a drop. Underneath it is a real file input, so a form
  * sends it as it always did and `onChange` reads `files` the usual way. Empty, it is a dashed area
  * that says what to do; with a file, it names the file and its size, with a way to change it or take
- * it out. Resetting the form empties it. The label is the field's, so it is named by it.
+ * it out. Resetting the form empties it. The label is the field's, so it is named by it. The box is
+ * positioned, so the hidden input is placed against it and never stretches the page.
  */
 export function FileInput({ className, onChange, disabled, ...props }: FileInputProps) {
   const t = useTranslations("ui.file");
@@ -78,7 +79,7 @@ export function FileInput({ className, onChange, disabled, ...props }: FileInput
         : t("sizeMb", { mb: Math.round((file.size / BYTES_PER_KB / KB_PER_MB) * 10) / 10 });
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div className={cn("relative flex flex-col", className)}>
       <input
         ref={input}
         type="file"

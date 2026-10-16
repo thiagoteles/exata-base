@@ -120,7 +120,15 @@ export async function HealthBoard({
 
   return (
     <div className="flex flex-col gap-10">
+      {/* The record's one stamp, whether the database answers, sits in its first cell. */}
       <RecordGrid aria-label={t("release")} className="md:grid-cols-2 xl:grid-cols-4">
+        <RecordCell
+          label={t("database")}
+          stamp={<Stamp tone="success">{t("databaseUp")}</Stamp>}
+          wide
+        >
+          {t("answered", { ms: database.latencyMs })}
+        </RecordCell>
         <RecordCell label={t("version")} wide>
           {release.commit === null ? (
             <span className="text-ink-muted">{t("unknownVersion")}</span>
@@ -132,13 +140,6 @@ export async function HealthBoard({
           <span className="mt-1 block text-body-small text-ink-muted">
             {t("service")} <span className="font-mono">{release.service}</span>
           </span>
-        </RecordCell>
-        <RecordCell
-          label={t("database")}
-          stamp={<Stamp tone="success">{t("databaseUp")}</Stamp>}
-          wide
-        >
-          {t("answered", { ms: database.latencyMs })}
         </RecordCell>
         <RecordCell label={t("postgres")}>
           <span className="font-mono text-data tabular-nums">{database.serverVersion}</span>

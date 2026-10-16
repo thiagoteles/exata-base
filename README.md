@@ -105,7 +105,7 @@ The image is built from the `Dockerfile` with no secret, and every value is read
 On Coolify:
 
 1. Create the database first: a **PostgreSQL** resource (version 18, the one development and the tests use) on the same server and destination the app will use. It lives apart from the app, so a deploy, a rollback or deleting the app never touches it. Turn on its **scheduled backup**, to an S3 bucket. Leave public access off. The product ships no backup script: the host owns backups.
-2. Create the app from this repository with `docker-compose.production.yml`, which holds only the app. In the app's settings, turn on **Connect to Predefined Network**, so the app reaches the database by its internal address. Set the variables below in the panel, with the database's **internal URL** as `DATABASE_URL`.
+2. Create the app from this repository with `docker-compose.production.yml`, which holds only the app. In the app's Advanced settings, under Docker compose, set **Predefined network** to the destination's network (not "Isolated network only"), so the app reaches the database by its internal address. Set the variables below in the panel, with the database's **internal URL** as `DATABASE_URL`.
 3. Add one **scheduled task** per cadence, running inside the app container. A product that only has daily operations needs only the first:
 
    ```sh

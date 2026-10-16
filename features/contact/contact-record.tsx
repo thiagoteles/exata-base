@@ -50,23 +50,26 @@ export async function ContactRecord({
         </RecordCell>
       </RecordGrid>
 
-      <PageSection title={t("replyTitle")}>
-        {answered && message.answeredAt !== null ? (
-          <div className="flex flex-col gap-3">
-            <p className="max-w-[68ch] whitespace-pre-wrap text-body text-ink">
-              {message.replyBody}
-            </p>
-            <p className="text-body-small text-ink-muted">
-              {t("answeredBy", {
-                name: message.answeredByEmail ?? t("unknownPerson"),
-                date: formatInstantDate(message.answeredAt, timeZone),
-              })}
-            </p>
-          </div>
-        ) : (
-          <p className="text-body text-ink-muted">{t("noReplyYet")}</p>
-        )}
-      </PageSection>
+      {/* The team answers in the section below; an empty answer above its own form would say nothing. */}
+      {canManage && !answered ? null : (
+        <PageSection title={t("replyTitle")}>
+          {answered && message.answeredAt !== null ? (
+            <div className="flex flex-col gap-3">
+              <p className="max-w-[68ch] whitespace-pre-wrap text-body text-ink">
+                {message.replyBody}
+              </p>
+              <p className="text-body-small text-ink-muted">
+                {t("answeredBy", {
+                  name: message.answeredByEmail ?? t("unknownPerson"),
+                  date: formatInstantDate(message.answeredAt, timeZone),
+                })}
+              </p>
+            </div>
+          ) : (
+            <p className="text-body text-ink-muted">{t("noReplyYet")}</p>
+          )}
+        </PageSection>
+      )}
 
       {canManage ? (
         <div className="print:hidden">

@@ -78,7 +78,11 @@ test.describe("the team works the message", () => {
     await expect(page.getByText(visitorText)).toBeVisible();
     // The previous page stays in the document, hidden, so a stamp is looked for inside the record.
     await expect(page.locator("dl").getByText("Nova", { exact: true })).toBeVisible();
-    await expect(page.getByText("Ainda sem resposta.")).toBeVisible();
+    // Unanswered, the team sees the form to answer, not an empty answer above it.
+    await expect(
+      page.getByRole("textbox", { name: "Escreva a resposta", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText("Ainda sem resposta.")).toHaveCount(0);
   });
 
   test("changing the situation shows on the record", async ({ page }) => {

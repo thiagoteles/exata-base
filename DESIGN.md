@@ -570,10 +570,11 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 
 **Page header.**
 - A 44px back button, square with radius 10 and a 2px border. On by default and can be turned off.
-- Title in `page-title`. General actions sit on the right, on the same baseline. The optional subtitle sits below, in 17px `ink-muted`.
+- Title in `page-title`. General actions sit on the right, on the same baseline, in one row that ends with the main action. The optional subtitle sits below, in 17px `ink-muted`.
+- The header decides by its own width (a container query), not the window's: from 896px it holds the title and the buttons side by side and the buttons never wrap; narrower, the buttons go under the title and wrap there.
 - 32px to the content, with no rule underneath.
 - The `<title>` comes from the same catalog text.
-- On narrow screens, actions move below the title, or into a menu when there are more than two.
+- On a phone, more than two plain actions fold into a menu; controls that open their own dialog stay as buttons.
 
 **List.**
 - Column headers in `label`, `ink-muted`, with a 1px rule below.

@@ -108,31 +108,36 @@ export function PageHeader({
   const t = useTranslations("patterns.header");
   const router = useRouter();
   return (
-    <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div className="flex items-start gap-4">
-        {showBack ? (
-          <button
-            type="button"
-            aria-label={t("back")}
-            onClick={() => router.back()}
-            className="inline-flex size-control shrink-0 print:hidden items-center justify-center rounded-control border-2 border-line-strong bg-surface text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            <IconArrowLeft className="size-5" aria-hidden="true" />
-          </button>
+    // The header decides by its own width, which the sidebar changes, not by the window's: wide
+    // enough, the title and the buttons share a row and the buttons never wrap; narrower, the
+    // buttons go under the title and wrap there.
+    <header className="@container mb-8">
+      <div className="flex flex-col gap-4 @4xl:flex-row @4xl:items-end @4xl:justify-between">
+        <div className="flex min-w-0 items-start gap-4">
+          {showBack ? (
+            <button
+              type="button"
+              aria-label={t("back")}
+              onClick={() => router.back()}
+              className="inline-flex size-control shrink-0 print:hidden items-center justify-center rounded-control border-2 border-line-strong bg-surface text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <IconArrowLeft className="size-5" aria-hidden="true" />
+            </button>
+          ) : null}
+          <div>
+            <h1 className="text-page-title text-ink">{title}</h1>
+            {subtitle === undefined ? null : (
+              <p className="mt-1 text-body text-ink-muted">{subtitle}</p>
+            )}
+          </div>
+        </div>
+        {actions.length > 0 || controls !== null ? (
+          <div className="flex flex-wrap items-center gap-3 @4xl:shrink-0 @4xl:flex-nowrap print:hidden">
+            {actions.length > 0 ? <HeaderActions actions={actions} /> : null}
+            {controls}
+          </div>
         ) : null}
-        <div>
-          <h1 className="text-page-title text-ink">{title}</h1>
-          {subtitle === undefined ? null : (
-            <p className="mt-1 text-body text-ink-muted">{subtitle}</p>
-          )}
-        </div>
       </div>
-      {actions.length > 0 || controls !== null ? (
-        <div className="flex flex-wrap items-center gap-3 print:hidden">
-          {actions.length > 0 ? <HeaderActions actions={actions} /> : null}
-          {controls}
-        </div>
-      ) : null}
     </header>
   );
 }

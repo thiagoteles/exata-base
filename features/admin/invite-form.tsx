@@ -34,7 +34,7 @@ export function InviteForm() {
     <form
       onSubmit={submit}
       noValidate
-      className="mb-8 grid gap-4 md:grid-cols-[1fr_16rem_auto] md:items-end"
+      className="mb-8 grid gap-4 md:grid-cols-[1fr_16rem_auto] md:items-start"
     >
       <FormTextField form={form} name="email" label={t("email")} type="email" autoComplete="off" />
       <Field label={t("role")}>
@@ -51,9 +51,13 @@ export function InviteForm() {
           />
         )}
       </Field>
-      <Button type="submit" loading={pending}>
-        {t("send")}
-      </Button>
+      {/* Level with the boxes, past the label's line and its gap, so an error under the e-mail
+          never moves the button. */}
+      <div className="flex min-h-field items-center md:mt-7">
+        <Button type="submit" loading={pending}>
+          {t("send")}
+        </Button>
+      </div>
     </form>
   );
 }

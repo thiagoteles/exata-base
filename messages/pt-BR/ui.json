@@ -15,5 +15,14 @@
     "done": "concluída",
     "current": "etapa atual",
     "upcoming": "a fazer"
+  },
+  "file": {
+    "choose": "Escolher arquivo",
+    "drop": "ou arraste para cá",
+    "selected": "Arquivo escolhido:",
+    "change": "Trocar",
+    "remove": "Tirar",
+    "sizeKb": "{kb, number} KB",
+    "sizeMb": "{mb, number} MB"
   }
 }

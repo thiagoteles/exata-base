@@ -524,6 +524,8 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 - Help: below, 15px, `ink-muted`, at most 52ch.
 - A submit error appears above the submit button, saying what to do next.
 
+**File.** `FileInput`, never the browser's own button. Empty, a dashed area at least a field tall that says "Escolher arquivo ou arraste para cá"; dragging over it turns it `brand-wash` with a `brand` border. With a file, a solid box with the name, the size in mono and "Trocar" and "Tirar". A real file input stays underneath, so forms send it as before.
+
 **Select, combobox, menu, popover, tooltip.** Radix with no theme. The trigger has the same anatomy as a field. The content is a layer with radius 10, 44px items, and the checked item has a `brand-wash` background. A tooltip is only an icon label, never necessary information.
 
 **Dialog.** Radix Dialog and AlertDialog. 520px wide, radius 18, 28px padding.

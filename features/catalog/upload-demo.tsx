@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { type SyntheticEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
+import { FileInput } from "@/components/ui/file-input";
 import type { ErrorBody } from "@/lib/errors";
 
 type UploadDemoProps = { maxMb: number; types: string };
@@ -44,7 +45,7 @@ export function UploadDemo({ maxMb, types }: UploadDemoProps) {
         help={t("limits", { maxMb, types })}
         {...(message?.ok === false ? { error: message.text } : {})}
       >
-        {(control) => <Input {...control} name="file" type="file" required />}
+        {(control) => <FileInput {...control} name="file" required />}
       </Field>
       <Button type="submit" loading={busy} className="self-start">
         {t("send")}

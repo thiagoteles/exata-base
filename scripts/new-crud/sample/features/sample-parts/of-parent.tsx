@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { PageSection } from "@/components/patterns/page-section";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
 import type { Scope, Viewer } from "@/lib/access/rules";
@@ -27,20 +28,19 @@ export async function SamplePartsOfSampleItem({
 }: SamplePartsOfSampleItemProps) {
   const t = await getTranslations("sampleParts");
   const rows = await samplePartsOfSampleItem(db, viewer, scope, sampleItemId);
-  const title = t("ofParent.title", { count: rows.length });
+  // The section is named for what it holds; how many there are is its line of help.
   return (
-    <section aria-label={title} className="mb-12 flex flex-col gap-4">
-      <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
-        <h2 className="text-section text-ink">{title}</h2>
-        {canManage ? (
-          <Link
-            href={newSamplePartHref(sampleItemId)}
-            className={`${buttonClasses("secondary")} print:hidden`}
-          >
+    <PageSection
+      title={t("title")}
+      help={t("ofParent.title", { count: rows.length })}
+      actions={
+        canManage ? (
+          <Link href={newSamplePartHref(sampleItemId)} className={buttonClasses("secondary")}>
             {t("ofParent.add")}
           </Link>
-        ) : null}
-      </div>
+        ) : undefined
+      }
+    >
       {rows.length === 0 ? (
         <p className="text-body text-ink-muted">{t("ofParent.empty")}</p>
       ) : (
@@ -58,6 +58,6 @@ export async function SamplePartsOfSampleItem({
           ))}
         </ul>
       )}
-    </section>
+    </PageSection>
   );
 }

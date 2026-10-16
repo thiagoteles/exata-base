@@ -4,24 +4,16 @@ import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Stamp } from "@/components/ui/stamp";
 import { formatInstantDate } from "@/lib/date";
 import type { SamplePartView } from "@/lib/sample-parts/records";
-import { DeleteSamplePart } from "./delete-record";
 import { samplePartParentHref, samplePartStatusTone, showDate } from "./presentation";
 
 type SamplePartRecordProps = {
   item: SamplePartView;
-  /** The owner changes the record; the team only reads it. */
-  canManage: boolean;
   timeZone: string;
   locale: string;
 };
 
 /** One record as a filled-in document. */
-export async function SamplePartRecord({
-  item,
-  canManage,
-  timeZone,
-  locale,
-}: SamplePartRecordProps) {
+export async function SamplePartRecord({ item, timeZone, locale }: SamplePartRecordProps) {
   const t = await getTranslations("sampleParts");
   const none = <span className="text-ink-muted">{t("record.none")}</span>;
   const mono = (value: string | null) =>
@@ -55,11 +47,6 @@ export async function SamplePartRecord({
           </RecordCell>
         )}
       </RecordGrid>
-      {canManage ? (
-        <div className="border-t border-line pt-6 print:hidden">
-          <DeleteSamplePart id={item.id} name={item.name} />
-        </div>
-      ) : null}
     </div>
   );
 }

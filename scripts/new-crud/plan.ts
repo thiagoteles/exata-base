@@ -140,17 +140,16 @@ export const childNavigation = {
 
 /**
  * What the parent's record page gets: the import of the child's section, and the section itself
- * right before the parent's record. The anchors are written with the first sample's names, which
+ * right after the parent's record, in the page anatomy's order. The anchors are written with the first sample's names, which
  * stand for the parent. The template of the first sample is kept without these lines.
  */
 export const parentPage = {
   file: "app/(app)/sample-items/[id]/page.tsx",
   importAnchor: 'import { SampleItemRecord } from "@/features/sample-items/record";',
   importLine: 'import { SamplePartsOfSampleItem } from "@/features/sample-parts/of-parent";',
-  sectionAnchor:
-    "      <SampleItemRecord item={item} canManage timeZone={timeZone} locale={locale} />",
+  sectionAnchor: "        <SampleItemRecord item={item} timeZone={timeZone} locale={locale} />",
   sectionLine:
-    '      <SamplePartsOfSampleItem viewer={user} scope="mine" sampleItemId={id} canManage />',
+    '        <SamplePartsOfSampleItem viewer={user} scope="mine" sampleItemId={id} canManage />',
 } as const;
 
 /** A file of the samples as the template keeps it: the parent's page without the child's lines. */

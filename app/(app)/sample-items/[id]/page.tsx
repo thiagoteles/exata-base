@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/patterns/page-header";
+import { buttonClasses } from "@/components/ui/styles";
+import { DeleteSampleItem } from "@/features/sample-items/delete-record";
 import { editSampleItemHref } from "@/features/sample-items/presentation";
 import { SampleItemRecord } from "@/features/sample-items/record";
 import { SamplePartsOfSampleItem } from "@/features/sample-parts/of-parent";
@@ -37,13 +40,23 @@ async function SampleItem({ params }: Pick<PageProps<"/sample-items/[id]">, "par
   const { timeZone, locale } = await readerOf(user);
   return (
     <>
+      {/* The page anatomy: the record's actions in the header (the dangerous one first), the record
+          right under it, then the records filed under it as a section. */}
       <PageHeader
         title={item.name}
-        subtitle={t("title")}
-        actions={[{ key: "edit", label: t("edit"), href: editSampleItemHref(id) }]}
+        controls={
+          <>
+            <DeleteSampleItem id={item.id} name={item.name} />
+            <Link href={editSampleItemHref(id)} className={buttonClasses("secondary")}>
+              {t("edit")}
+            </Link>
+          </>
+        }
       />
-      <SamplePartsOfSampleItem viewer={user} scope="mine" sampleItemId={id} canManage />
-      <SampleItemRecord item={item} canManage timeZone={timeZone} locale={locale} />
+      <div className="flex flex-col gap-10">
+        <SampleItemRecord item={item} timeZone={timeZone} locale={locale} />
+        <SamplePartsOfSampleItem viewer={user} scope="mine" sampleItemId={id} canManage />
+      </div>
     </>
   );
 }

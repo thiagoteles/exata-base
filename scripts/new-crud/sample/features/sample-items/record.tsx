@@ -3,24 +3,16 @@ import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Stamp } from "@/components/ui/stamp";
 import { formatInstantDate } from "@/lib/date";
 import type { SampleItemRow } from "@/lib/sample-items/records";
-import { DeleteSampleItem } from "./delete-record";
 import { sampleItemStatusTone, showDate } from "./presentation";
 
 type SampleItemRecordProps = {
   item: SampleItemRow;
-  /** The owner changes the record; the team only reads it. */
-  canManage: boolean;
   timeZone: string;
   locale: string;
 };
 
 /** One record as a filled-in document. */
-export async function SampleItemRecord({
-  item,
-  canManage,
-  timeZone,
-  locale,
-}: SampleItemRecordProps) {
+export async function SampleItemRecord({ item, timeZone, locale }: SampleItemRecordProps) {
   const t = await getTranslations("sampleItems");
   const none = <span className="text-ink-muted">{t("record.none")}</span>;
   const mono = (value: string | null) =>
@@ -46,11 +38,6 @@ export async function SampleItemRecord({
           </RecordCell>
         )}
       </RecordGrid>
-      {canManage ? (
-        <div className="border-t border-line pt-6 print:hidden">
-          <DeleteSampleItem id={item.id} name={item.name} />
-        </div>
-      ) : null}
     </div>
   );
 }

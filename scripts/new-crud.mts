@@ -20,7 +20,6 @@ import {
   childNavigation,
   childRegistrations,
   insertAfter,
-  insertBefore,
   navAnchor,
   parentPage,
   register,
@@ -225,7 +224,7 @@ function writeChild(names: AreaNames, parent: AreaNames): { files: string[]; man
   const sectionAnchor = asParent(parentPage.sectionAnchor);
   if (text.includes(importAnchor) && text.includes(sectionAnchor)) {
     text = insertAfter(text, importAnchor, [rename(parentPage.importLine)]);
-    text = insertBefore(text, sectionAnchor, [rename(parentPage.sectionLine)]);
+    text = insertAfter(text, sectionAnchor, [rename(parentPage.sectionLine)]);
     writeFileSync(page, text);
     files.push(page);
   } else {

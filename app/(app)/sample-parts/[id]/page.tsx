@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/patterns/page-header";
+import { buttonClasses } from "@/components/ui/styles";
+import { DeleteSamplePart } from "@/features/sample-parts/delete-record";
 import { editSamplePartHref } from "@/features/sample-parts/presentation";
 import { SamplePartRecord } from "@/features/sample-parts/record";
 import { db } from "@/lib/db/client";
@@ -38,10 +41,16 @@ async function SamplePart({ params }: Pick<PageProps<"/sample-parts/[id]">, "par
     <>
       <PageHeader
         title={item.name}
-        subtitle={t("title")}
-        actions={[{ key: "edit", label: t("edit"), href: editSamplePartHref(id) }]}
+        controls={
+          <>
+            <DeleteSamplePart id={item.id} name={item.name} />
+            <Link href={editSamplePartHref(id)} className={buttonClasses("secondary")}>
+              {t("edit")}
+            </Link>
+          </>
+        }
       />
-      <SamplePartRecord item={item} canManage timeZone={timeZone} locale={locale} />
+      <SamplePartRecord item={item} timeZone={timeZone} locale={locale} />
     </>
   );
 }

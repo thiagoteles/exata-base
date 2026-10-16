@@ -45,12 +45,13 @@ export async function SamplePartsOfSampleItem({
       {rows.length === 0 ? (
         <p className="text-body text-ink-muted">{t("ofParent.empty")}</p>
       ) : (
-        <ul className="grid gap-px overflow-hidden rounded-cell border border-line bg-line sm:grid-cols-2">
+        // One row per record, as every list: a grid would leave a gray hole beside an odd last one.
+        <ul className="flex flex-col border-t border-line">
           {rows.map((row) => (
-            <li key={row.id} className="bg-surface">
+            <li key={row.id} className="border-b border-line">
               <Link
                 href={samplePartHref(row.id)}
-                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-sunken focus-visible:bg-sunken"
+                className="flex min-h-row items-center justify-between gap-3 px-cell-x hover:bg-sunken focus-visible:bg-sunken focus-visible:outline-2 focus-visible:outline-focus"
               >
                 <span className="font-medium text-ink">{row.name}</span>
                 <Stamp tone={samplePartStatusTone[row.status]}>{t(`statuses.${row.status}`)}</Stamp>

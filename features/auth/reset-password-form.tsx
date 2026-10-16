@@ -32,7 +32,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   });
 
   return (
-    <AuthCard title={t("title")}>
+    <AuthCard title={t("title")} subtitle={t("subtitle")}>
       <form onSubmit={submit} noValidate className="flex flex-col gap-5">
         <FormTextField
           form={form}
@@ -54,6 +54,9 @@ export function ResetPasswordForm({ token }: { token: string }) {
           {t("submit")}
         </Button>
       </form>
+      <Link href="/sign-in" className="text-body-small text-brand-ink underline">
+        {t("back")}
+      </Link>
     </AuthCard>
   );
 }

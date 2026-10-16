@@ -490,6 +490,32 @@ The rest of this file describes the `instrument` values; the table below is what
 | `cell-x`, `cell-y` | `px-cell-x`, `py-cell-y` | 16px, 12px | record cells |
 | `dialog` (container) | `w-dialog` | 520px | dialog width |
 
+## Page anatomy
+
+Every signed-in page is built from the same levels, top to bottom. A new screen picks its levels from this list and never invents one; the visual review checks each page against it.
+
+| Level | What it is | Component | Type role |
+|---|---|---|---|
+| 1. Page header | Back, title, a subtitle about this record, the record's actions | `PageHeader` (`actions`, `controls`) | `page-title` 32px, subtitle body 17px muted |
+| 2. Record or list | The facts of the record, or the list with its controls | `RecordGrid` / `DataList` | values body 17px, labels 14px |
+| 3. Section | A titled part below: lines, payments, a form, a timeline | `PageSection` | `section` 22px, help 15px muted |
+| 4. Block | A named group inside a section, when the section holds more than one | an `h3` | `block-title` 18px |
+| 5. Field | Label, control, help or error | `Field` and the controls | `field-label` 15px |
+| 6. Meta | Column headers, a cell's label, a timestamp | the table or cell itself | `label` 14px, never a heading |
+
+**The rules that keep a page readable:**
+- **Each level is larger than the one inside it.** A section title (22px) sits above field labels (15px) and column headers (14px). The 14px label is never a heading: as a title it is smaller than the fields below it and the sections run into each other. `pnpm lint:tokens` refuses an `h1` to `h6` or a `caption` in `text-label`.
+- **Sections are told apart by a rule and space**, not by size alone: `PageSection` draws a line above its title with 32px under it, and the page puts 40px between sections. Every section of a page has the same treatment; none stands out with a rule the others lack.
+- **The record's actions live in the page header**, on the right of the title: send, download, void, edit. Never at the foot of a long page, where they are found only after scrolling. An action that opens its own confirmation goes in `controls`; a plain link or click goes in `actions`.
+- **The subtitle says something about this record** (the client and the total, the period), not the name of the area the page belongs to; the sidebar already says where the person is.
+- **One stamp per record**, in the corner of its first cell. A second state (a fiscal note, a delivery) is written as the cell's value, not as another stamp, and a value never repeats its own stamp.
+- **One figure per cell.** Money and dates in mono; a sentence that holds numbers (a conversion, a formula) stays in the text face, with the result alone in mono above it.
+- **A section's form lines up with itself:** rows of a form share one column grid (a field under a field), buttons beside fields sit level with the boxes, and a button that ends the form sits under it, on its left.
+- **Widths follow the content, not the page.** A segmented control or a short field is as wide as its choices, not the whole column.
+- **A table becomes blocks below `md`:** each row a two-line block (title on top, figures under it), never a table wider than the screen.
+- **Remove before adding.** A link that repeats the back button, a label that repeats the title, a stamp that repeats a value: take it out.
+- **A hidden input stays inside a positioned box.** Radix choice controls and the file field put a hidden input beside the control; their wrapper is `relative`, or the input stretches the page under a content area that scrolls on its own.
+
 ## Elevation & Depth
 
 Three levels and nothing else:

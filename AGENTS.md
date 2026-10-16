@@ -14,7 +14,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 **A product takes the base's updates by git.** The base is the remote `base`; `git fetch base && git merge base/main` brings what changed since the last merge (README, "Updates from the base"). A product never edits a file of the base: what it declares goes in the files named `*.product.*` beside them, and the files that are wholly the product's are listed in `.gitattributes` with `merge=ours`. A fix a product needs in a base file is made in the base and merged.
 
-A Next.js product with a typed, closed foundation: strict TypeScript, Biome with import boundaries, a closed design system, one text catalog, ports for everything that leaves the process. Read `DESIGN.md` before any visual work. If its Product block still says "TO FILL IN", run `pnpm setup:product` (it asks for the answers; to run it for the person, ask them first and pass the answers as flags with `--yes`) before any visual work.
+A Next.js product with a typed, closed foundation: strict TypeScript, Biome with import boundaries, a closed design system, one text catalog, ports for everything that leaves the process. Read `DESIGN.md` before any visual work, and build every signed-in page from its levels in "Page anatomy" (header with the record's actions, record or list, `PageSection`s, blocks, fields); a heading is never in the 14px label role. If its Product block still says "TO FILL IN", run `pnpm setup:product` (it asks for the answers; to run it for the person, ask them first and pass the answers as flags with `--yes`) before any visual work.
 
 ### What a product changes, and where
 

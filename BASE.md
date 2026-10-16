@@ -14,6 +14,7 @@ Um example público e completo do `create-next-app`, de onde nascem produtos web
 
 ## 2. Decisões
 
+- **Anatomia das páginas.** Toda página logada segue os níveis de "Page anatomy" no `DESIGN.md`: cabeçalho com as ações do registro (`PageHeader`, `actions` e `controls`), registro ou lista, `PageSection` (título em `section`, linha acima), blocos em `block-title`, campos. O `text-label` (14 px) nunca é título; `pnpm lint:tokens` recusa `h1`-`h6`/`caption` nele. Veio da revisão da página de fatura do Faturis, onde os títulos de seção em 14 px ficavam menores que os rótulos dos campos e as ações estavam no fim da página.
 - **Postgres e Drizzle.** Postgres 18 em todo lugar (desenvolvimento, testes, produção). Em produção o banco é um recurso PostgreSQL próprio do Coolify, fora da stack do app (`docker-compose.production.yml` só tem o app), no mesmo destino e sem porta pública; o app recebe a URL interna como `DATABASE_URL` e precisa de "Predefined network" ligado à rede do destino (Advanced, Docker compose; não "Isolated network only"). Deploy, rollback ou apagar o app não tocam no banco. O backup é o agendado do Coolify para esse recurso, para S3. Não há script de backup.
 - **Docker sem configuração.** `docker compose up` sobe app, Postgres e Mailpit sem `.env`. A imagem de produção é construída sem segredo; o único argumento é a chave publicável do Clerk, no modo Clerk.
 - **Dois modos de auth por uma flag** (`AUTH_PROVIDER`): `local` (better-auth, Google opcional) e `clerk` (padrão em produção). Páginas, ações e rotas só veem a porta de auth.

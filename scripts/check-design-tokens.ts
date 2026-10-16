@@ -5,8 +5,9 @@ import { isSerif, parseDesign } from "./tokens/preset";
 /*
  * Tailwind silently ignores a class that has no token behind it, so a stock class like
  * `bg-blue-500` would ship as a no-op. This check fails on the stock palette, the stock
- * size, radius and shadow scales, on colors written by hand outside the token file, and on
- * the heights that have a named size, which density changes in one place.
+ * size, radius and shadow scales, on colors written by hand outside the token file, on
+ * the heights that have a named size, which density changes in one place, and on a heading set in
+ * the label role.
  */
 
 const TOKEN_FILE = "styles/tokens.css";
@@ -79,6 +80,13 @@ const documentFaceRule = {
   reason: "only a sheet is set in the document face; give the Sheet the document face instead",
 };
 
+// A heading takes a heading's role. The 14px label is for column headers and meta: as a section's
+// title it is smaller than the field labels under it, and the sections run into each other.
+const headingAsLabel = {
+  pattern: /<(?:h[1-6]|caption)\b[^>]*?className=(?:"[^"]*|\{[^}]*)(?<![\w-])text-label(?![\w-])/g,
+  reason: "a heading in the label role; use page-title, section (PageSection) or block-title",
+};
+
 const handWrittenColor = /#[0-9a-fA-F]{3,8}\b|\b(?:oklch|oklab|rgba?|hsla?|hwb|lab|lch)\(/g;
 
 type Finding = { file: string; line: number; match: string; reason: string };
@@ -140,7 +148,10 @@ const findings = [
   ...sourceFiles.flatMap((file) => {
     const text = readFileSync(file, "utf8");
     const rules = file.startsWith(SHEET_FOLDER) ? classRules : [...classRules, documentFaceRule];
-    return scan(file, text, regions(text, stringLiteral), rules);
+    return [
+      ...scan(file, text, regions(text, stringLiteral), rules),
+      ...(file.endsWith(".tsx") ? scan(file, text, [{ start: 0, text }], [headingAsLabel]) : []),
+    ];
   }),
   ...cssFiles.flatMap((file) => {
     const text = readFileSync(file, "utf8");

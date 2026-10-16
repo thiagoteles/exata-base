@@ -26,8 +26,9 @@ type PageHeaderProps = {
   showBack?: boolean;
   actions?: readonly HeaderAction[];
   /**
-   * Controls of the screen's own beside the actions, for what a plain action cannot be: a button
-   * that opens its own confirmation dialog. They wrap with the actions on a narrow screen.
+   * Controls of the screen's own after the actions, for what a plain action cannot be: a button
+   * that opens its own confirmation dialog. They share one row with the actions and end with the
+   * screen's main action, on the right.
    */
   controls?: ReactNode;
 };
@@ -58,7 +59,11 @@ function HeaderActions({ actions }: { actions: readonly HeaderAction[] }) {
   const folds = actions.length > MENU_THRESHOLD;
   return (
     <>
-      <div className={`flex flex-wrap items-center gap-3 ${folds ? "max-sm:hidden" : ""}`}>
+      {/* From sm up the buttons join the header's one row beside the screen's own controls, so they
+          wrap together instead of as a separate block. */}
+      <div
+        className={`flex flex-wrap items-center gap-3 sm:contents ${folds ? "max-sm:hidden" : ""}`}
+      >
         {actions.map((action) => (
           <ActionButton key={action.key} action={action} />
         ))}
@@ -124,8 +129,8 @@ export function PageHeader({
       </div>
       {actions.length > 0 || controls !== null ? (
         <div className="flex flex-wrap items-center gap-3 print:hidden">
-          {controls}
           {actions.length > 0 ? <HeaderActions actions={actions} /> : null}
+          {controls}
         </div>
       ) : null}
     </header>

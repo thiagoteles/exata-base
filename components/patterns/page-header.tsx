@@ -25,6 +25,11 @@ type PageHeaderProps = {
   /** On by default; turn it off on screens that are a destination, like a home page. */
   showBack?: boolean;
   actions?: readonly HeaderAction[];
+  /**
+   * Controls of the screen's own beside the actions, for what a plain action cannot be: a button
+   * that opens its own confirmation dialog. They wrap with the actions on a narrow screen.
+   */
+  controls?: ReactNode;
 };
 
 const MENU_THRESHOLD = 2;
@@ -88,7 +93,13 @@ function HeaderActions({ actions }: { actions: readonly HeaderAction[] }) {
 }
 
 /** Title, optional subtitle, a back button and the screen's general actions, 32px above the content. */
-export function PageHeader({ title, subtitle, showBack = true, actions = [] }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  showBack = true,
+  actions = [],
+  controls = null,
+}: PageHeaderProps) {
   const t = useTranslations("patterns.header");
   const router = useRouter();
   return (
@@ -111,9 +122,10 @@ export function PageHeader({ title, subtitle, showBack = true, actions = [] }: P
           )}
         </div>
       </div>
-      {actions.length > 0 ? (
-        <div className="print:hidden">
-          <HeaderActions actions={actions} />
+      {actions.length > 0 || controls !== null ? (
+        <div className="flex flex-wrap items-center gap-3 print:hidden">
+          {controls}
+          {actions.length > 0 ? <HeaderActions actions={actions} /> : null}
         </div>
       ) : null}
     </header>

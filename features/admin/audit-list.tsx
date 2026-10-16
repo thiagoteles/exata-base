@@ -30,9 +30,12 @@ const validDay = (value: string | null) => (value !== null && day.test(value) ? 
 export async function AuditList({
   viewer,
   searchParams,
+  today,
 }: {
   viewer: AdminViewer;
   searchParams: Promise<SearchParams>;
+  /** Today in the product's zone, where the date filters open. */
+  today: string;
 }) {
   const t = await getTranslations("admin.audit");
   const params = await searchParamsCache.parse(searchParams);
@@ -63,7 +66,13 @@ export async function AuditList({
         return t.has(key) ? t(key) : row.action;
       },
     },
-    { key: "target", header: t("target"), numeric: true, cell: (row) => row.targetId ?? "" },
+    {
+      key: "target",
+      header: t("target"),
+      numeric: true,
+      width: "2.4fr",
+      cell: (row) => row.targetId ?? "",
+    },
   ];
 
   const filters: ActiveFilter[] = [
@@ -75,7 +84,7 @@ export async function AuditList({
     <div>
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
         <ListSearch label={t("searchLabel")} />
-        <DateRange />
+        <DateRange today={today} />
       </div>
       <ActiveFilters filters={filters} />
       <DataList

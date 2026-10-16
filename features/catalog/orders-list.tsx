@@ -75,7 +75,7 @@ export async function OrdersList({ searchParams }: { searchParams: Promise<Searc
 
   return (
     <div>
-      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end">
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
         <ListSearch label={t("list.searchLabel")} />
         <ListFilter
           param="status"

@@ -20,7 +20,7 @@ export function ListSearch({ label }: { label: string }) {
   const [{ q }, setParams] = useQueryStates(searchParsers, options);
   const [text, setText] = useState(q);
   return (
-    <div className="relative max-w-sm flex-1">
+    <div className="relative max-w-sm min-w-64 flex-1">
       <IconSearch
         className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-ink-muted"
         aria-hidden="true"
@@ -161,7 +161,7 @@ export function ListFilter({
   const chosen = values[param];
   const current = typeof chosen === "string" ? chosen : ALL;
   return (
-    <Field label={label} className="w-full md:w-56">
+    <Field label={label} className="w-full md:w-52">
       {(control) => (
         <Select
           {...control}
@@ -194,7 +194,7 @@ export function ListSort({
   );
   const [fallbackSort, fallbackDir] = fallback.split(":");
   return (
-    <Field label={label} className="w-full md:w-56">
+    <Field label={label} className="w-full md:w-52">
       {(control) => (
         <Select
           {...control}

@@ -37,12 +37,12 @@ type DataListProps<Row> = {
 };
 
 const cellKind = {
-  title: "max-md:min-w-0 max-md:flex-1 font-semibold",
-  status: "max-md:shrink-0",
-  detail: "max-md:text-body-small",
+  title: "@max-3xl:min-w-0 @max-3xl:flex-1 font-semibold",
+  status: "@max-3xl:shrink-0",
+  detail: "@max-3xl:text-body-small",
 } as const;
 
-const rowClasses = "md:grid md:grid-cols-(--columns) md:gap-4";
+const rowClasses = "@3xl:grid @3xl:grid-cols-(--columns) @3xl:gap-4";
 
 export function DataList<Row>({
   label,
@@ -57,71 +57,77 @@ export function DataList<Row>({
   } as CSSProperties;
   const firstDetail = columns.find((column) => (column.kind ?? "detail") === "detail");
   return (
-    <table aria-label={label} className="block w-full text-left">
-      <thead className="max-md:hidden md:block">
-        <tr style={style} className={cn(rowClasses, "border-b border-line pb-2")}>
-          {columns.map((column) => (
-            <th
-              key={column.key}
-              scope="col"
-              className={cn(
-                "text-label font-medium text-ink-muted",
-                column.numeric ? "text-end" : undefined,
-              )}
-            >
-              {column.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="block">
-        {rows.length === 0 ? (
-          <tr className="block">
-            <td className="block py-8" colSpan={columns.length}>
-              {emptyState}
-            </td>
+    // The list decides by its own width, which the sidebar changes, not by the window's: from 768px
+    // its rows are a grid of columns; narrower, each row is a block of two lines.
+    <div className="@container">
+      <table aria-label={label} className="block w-full text-left">
+        <thead className="@max-3xl:hidden @3xl:block">
+          <tr style={style} className={cn(rowClasses, "border-b border-line pb-2")}>
+            {columns.map((column) => (
+              <th
+                key={column.key}
+                scope="col"
+                className={cn(
+                  "text-label font-medium text-ink-muted",
+                  column.numeric ? "text-end" : undefined,
+                )}
+              >
+                {column.header}
+              </th>
+            ))}
           </tr>
-        ) : null}
-        {rows.map((row) => {
-          const href = rowHref?.(row);
-          return (
-            <tr
-              key={getKey(row)}
-              style={style}
-              className={cn(
-                rowClasses,
-                "relative flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line py-3 hover:bg-sunken md:min-h-row md:py-0",
-              )}
-            >
-              {columns.map((column) => {
-                const kind = column.kind ?? "detail";
-                const content = column.cell(row);
-                return (
-                  <td
-                    key={column.key}
-                    className={cn(
-                      cellKind[kind],
-                      column.numeric ? "font-mono text-data tabular-nums md:text-end" : undefined,
-                      column === firstDetail ? "max-md:basis-full" : undefined,
-                    )}
-                  >
-                    {kind === "title" && href !== undefined ? (
-                      <Link
-                        href={href}
-                        className="text-ink after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-focus"
-                      >
-                        {content}
-                      </Link>
-                    ) : (
-                      content
-                    )}
-                  </td>
-                );
-              })}
+        </thead>
+        <tbody className="block">
+          {rows.length === 0 ? (
+            <tr className="block">
+              <td className="block py-8" colSpan={columns.length}>
+                {emptyState}
+              </td>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ) : null}
+          {rows.map((row) => {
+            const href = rowHref?.(row);
+            return (
+              <tr
+                key={getKey(row)}
+                style={style}
+                className={cn(
+                  rowClasses,
+                  "relative flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line py-3 hover:bg-sunken @3xl:min-h-row @3xl:py-0",
+                )}
+              >
+                {columns.map((column) => {
+                  const kind = column.kind ?? "detail";
+                  const content = column.cell(row);
+                  return (
+                    <td
+                      key={column.key}
+                      className={cn(
+                        cellKind[kind],
+                        column.numeric
+                          ? "font-mono text-data tabular-nums @3xl:text-end"
+                          : undefined,
+                        column === firstDetail ? "@max-3xl:basis-full" : undefined,
+                      )}
+                    >
+                      {kind === "title" && href !== undefined ? (
+                        <Link
+                          href={href}
+                          className="text-ink after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-focus"
+                        >
+                          {content}
+                        </Link>
+                      ) : (
+                        content
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }

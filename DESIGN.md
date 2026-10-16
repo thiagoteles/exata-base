@@ -582,7 +582,8 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 - Money in mono on the right, dates in mono, and the state stamp in its own column.
 - Active filters are removable chips on a `sunken` strip, mirrored in the URL.
 - Pagination with "Anterior" (Previous), "Próxima" (Next) and the position in mono ("41 a 60 de 312").
-- On narrow screens each row becomes a two-line block: title and stamp on top, mono data below.
+- When the list itself is narrower than 768px (a container query: the sidebar changes it, the window does not tell), each row becomes a two-line block: title and stamp on top, mono data below.
+- The bar of search and filters wraps when it does not fit; the search keeps at least 256px and the filters are 208px each.
 - **Empty:** the same table, with a single row saying there is nothing yet and offering the real action. No illustration.
 - **Search with no results:** repeats the term ("Nada para "joana" com 2 filtros", nothing for "joana" with 2 filters) and offers "Limpar busca" (Clear search).
 - **Loading:** ghost rows of the same size, shown only after 180ms.

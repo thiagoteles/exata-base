@@ -61,7 +61,9 @@ export function DataList<Row>({
     // its rows are a grid of columns; narrower, each row is a block of two lines.
     <div className="@container">
       <table aria-label={label} className="block w-full text-left">
-        <thead className="@max-3xl:hidden @3xl:block">
+        {/* With no rows the column names name nothing, and would sit over the empty state's own
+            example rows, so the head shows only when there is something under it. */}
+        <thead className={rows.length === 0 ? "hidden" : "@max-3xl:hidden @3xl:block"}>
           <tr style={style} className={cn(rowClasses, "border-b border-line pb-2")}>
             {columns.map((column) => (
               <th

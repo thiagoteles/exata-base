@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { ListEmpty } from "@/components/patterns/list-states";
 import { RuntimeMarker } from "@/components/runtime-marker";
+import { buttonClasses } from "@/components/ui/styles";
 import { articles } from "@/lib/content/articles-index";
 import { formatDate, type IsoDate } from "@/lib/date";
 import { env } from "@/lib/env";
@@ -36,7 +38,20 @@ export default async function ArticlesPage() {
         <p className="text-body text-ink-muted">{t("subtitle")}</p>
       </header>
       {articles.length === 0 ? (
-        <p className="text-body text-ink-muted">{t("empty")}</p>
+        <ListEmpty
+          title={t("empty")}
+          body={t("emptyBody")}
+          action={
+            <Link href="/" className={buttonClasses("primary")}>
+              {t("emptyAction")}
+            </Link>
+          }
+          secondary={
+            <a href="/feed.xml" className={buttonClasses("secondary")}>
+              {t("emptyFeed")}
+            </a>
+          }
+        />
       ) : (
         <ol className="flex flex-col border-line border-t">
           {articles.map((article) => (

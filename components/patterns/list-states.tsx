@@ -58,6 +58,8 @@ export function ListEmpty({ title, body, action, secondary, preview }: ListEmpty
       {hasPreview ? (
         <div aria-hidden="true" className="pointer-events-none select-none">
           <p className="mb-2 text-label text-ink-muted">{t("example")}</p>
+          {/* Narrow, each example row is a block like the list's own: the title on its line, the
+              figures under it. */}
           <div className="flex flex-col border-t border-line">
             {preview.map((row, index) => (
               <div
@@ -67,7 +69,9 @@ export function ListEmpty({ title, body, action, secondary, preview }: ListEmpty
                   fades[Math.min(index, fades.length - 1)],
                 )}
               >
-                <span className="min-w-0 flex-1 truncate font-semibold text-ink">{row.title}</span>
+                <span className="min-w-0 basis-full truncate font-semibold text-ink @3xl:flex-1 @3xl:basis-auto">
+                  {row.title}
+                </span>
                 {row.details.map((detail) => (
                   <span key={detail} className="font-mono text-data text-ink-muted tabular-nums">
                     {detail}

@@ -68,7 +68,7 @@ export async function UserRecord({ record, now }: { record: Record; now: Date })
 
       <PageSection title={t("actions")}>
         <div className="flex flex-col gap-6">
-          <RoleControl id={user.id} role={user.role} />
+          <RoleControl id={user.id} role={user.role} name={user.name.trim() || user.email} />
           {paid ? null : <GrantCourtesy id={user.id} />}
         </div>
       </PageSection>

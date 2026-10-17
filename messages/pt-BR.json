@@ -169,7 +169,11 @@
       "failed": "Não foi possível concluir. Tente de novo.",
       "role": {
         "label": "Papel",
-        "saved": "Papel atualizado."
+        "saved": "Papel atualizado.",
+        "confirmTitle": "Trocar o papel?",
+        "confirmBody": "{name} passa de {from} para {to}. O que cada papel pode fazer muda na hora.",
+        "confirm": "Trocar o papel",
+        "cancel": "Voltar"
       },
       "courtesy": {
         "title": "Cortesia",

@@ -41,13 +41,22 @@ describe("list controls", () => {
       <ListNoResults term="joana" filters={filters} />,
     );
     expect(screen.getByText("Nada para “joana” com 2 filtros")).toBeTruthy();
-    await userEvent.click(screen.getByRole("button", { name: "Limpar busca" }));
+    expect(screen.getByText(/tire um filtro/)).toBeTruthy();
+    await userEvent.click(screen.getByRole("button", { name: "Limpar busca e filtros" }));
     expect(lastQuery()).toBe("");
   });
 
   it("says what was filtered when there is no search term", () => {
     inUrl("?status=new", <ListNoResults term="" filters={filters.slice(0, 1)} />);
     expect(screen.getByText("Nada com 1 filtro")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Tirar os filtros" })).toBeTruthy();
+  });
+
+  it("offers to clear only the search when nothing else narrows the list", () => {
+    inUrl("?q=zzzz", <ListNoResults term="zzzz" filters={[]} />);
+    expect(screen.getByText("Nada para “zzzz”")).toBeTruthy();
+    expect(screen.getByText(/Confira a grafia/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Limpar busca" })).toBeTruthy();
   });
 
   it("walks the pages, writes the position in mono and drops page 1 from the address", async () => {

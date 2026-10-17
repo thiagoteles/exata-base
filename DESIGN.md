@@ -587,7 +587,7 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 - When the list itself is narrower than 768px (a container query: the sidebar changes it, the window does not tell), each row becomes a two-line block: title and stamp on top, mono data below.
 - The bar of search and filters wraps when it does not fit; the search keeps at least 256px and the filters are 208px each.
 - **Empty:** `ListEmpty` in the list's place. One line of what is missing in the block title, a sentence of what the list is for and how it fills, the real first step as the primary button and, when there is one, a second way in (import). Beside it on a wide list, two or three made-up rows in the list's own columns, fading out and labelled "Exemplo", show what will be there: a piece of the product, never an illustration, hidden from assistive technology. An empty part of a page is `SectionEmpty`: a low dashed area with the sentence and the step that fills it. A search or filter with nothing is `ListNoResults`, which says what was asked and clears it, with no example rows. An empty list shows no column names: they would name nothing.
-- **Search with no results:** repeats the term ("Nada para "joana" com 2 filtros", nothing for "joana" with 2 filters) and offers "Limpar busca" (Clear search).
+- **Search with no results:** repeats the term in the block title ("Nada para "joana" com 2 filtros", nothing for "joana" with 2 filters), says what to try (the spelling, a shorter piece, one filter less) and offers one button named for what it undoes: "Limpar busca", "Tirar os filtros" or "Limpar busca e filtros".
 - **Loading:** ghost rows of the same size, shown only after 180ms.
 
 **Record (cells).**

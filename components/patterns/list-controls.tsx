@@ -93,19 +93,32 @@ export function ListNoResults({ term, filters }: NoResultsProps) {
     term === ""
       ? t("noResultsFilters", { filters: filters.length })
       : t("noResults", { term, filters: filters.length });
+  const [hint, clear] = noResultsWords(term !== "", filters.length > 0);
   return (
-    <div className="flex flex-col items-start gap-4">
-      <p className="text-body text-ink">{text}</p>
+    <div className="flex max-w-[60ch] flex-col items-start gap-3 py-4">
+      <p className="text-block-title text-ink">{text}</p>
+      <p className="text-body text-ink-muted">{t(hint)}</p>
       <Button
         variant="secondary"
+        className="mt-2"
         onClick={() =>
           setParams(Object.fromEntries(Object.keys(parsers).map((key) => [key, null])))
         }
       >
-        {t("clear")}
+        {t(clear)}
       </Button>
     </div>
   );
+}
+
+/** What to try and what the button undoes, by what narrowed the list: words, filters or both. */
+function noResultsWords(searched: boolean, filtered: boolean) {
+  if (searched && filtered) {
+    return ["noResultsHintBoth", "clearBoth"] as const;
+  }
+  return searched
+    ? (["noResultsHint", "clear"] as const)
+    : (["noResultsHintFilters", "clearFilters"] as const);
 }
 
 export function ListPagination({ window }: { window: PageWindow }) {

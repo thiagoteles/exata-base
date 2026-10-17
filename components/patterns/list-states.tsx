@@ -92,7 +92,8 @@ export function ListEmpty({ title, body, action, secondary, preview }: ListEmpty
 
 /**
  * An empty part of a page, inside its section: a low dashed area, like the file field's, that says
- * what is not there yet and, when there is one, the step that fills it.
+ * what is not there yet and, when there is one, the step that fills it. It measures its own width,
+ * so the step moves beside the words wherever it is placed.
  */
 export function SectionEmpty({
   title,
@@ -104,12 +105,14 @@ export function SectionEmpty({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-start gap-3 rounded-cell border border-dashed border-line-strong px-cell-x py-5 @2xl:flex-row @2xl:items-center @2xl:justify-between">
-      <div className="flex max-w-[60ch] flex-col gap-1">
-        <p className="text-body text-ink">{title}</p>
-        {body === undefined ? null : <p className="text-body-small text-ink-muted">{body}</p>}
+    <div className="@container">
+      <div className="flex flex-col items-start gap-3 rounded-cell border border-dashed border-line-strong px-cell-x py-5 @2xl:flex-row @2xl:items-center @2xl:justify-between">
+        <div className="flex max-w-[60ch] flex-col gap-1">
+          <p className="text-body text-ink">{title}</p>
+          {body === undefined ? null : <p className="text-body-small text-ink-muted">{body}</p>}
+        </div>
+        {action}
       </div>
-      {action}
     </div>
   );
 }

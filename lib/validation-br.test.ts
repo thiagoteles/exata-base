@@ -112,6 +112,16 @@ describe("an optional field", () => {
     expect(cpf.safeParse("111.111.111-11").success).toBe(false);
   });
 
+  it("says what is wrong with a typed value, as one plain issue on the field", () => {
+    const result = cpf.safeParse("111.111.111-11");
+    expect(result.success).toBe(false);
+    const issues = result.error?.issues ?? [];
+    expect(issues.map((issue) => issue.code)).toEqual(["custom"]);
+    expect(issues[0]?.message).toBe(
+      cpfSchema.safeParse("111.111.111-11").error?.issues[0]?.message,
+    );
+  });
+
   it("works with any schema, not only the Brazilian ones", () => {
     expect(optional(z.email()).parse(" ana@example.com ")).toBe("ana@example.com");
     expect(optional(dateSchema).parse("15/03/1985")).toBe("1985-03-15");

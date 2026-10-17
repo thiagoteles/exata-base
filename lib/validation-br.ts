@@ -63,8 +63,22 @@ export const moneySchema = z.string().transform((value, context) => {
  * the schema. `optional(cpfSchema)` is an optional CPF that still has to be a real one.
  */
 export function optional<Output>(schema: z.ZodType<Output, string>) {
+  // Not a union of "blank" and the schema: a form reads the first branch's complaint from a union,
+  // so a wrong value would be told to choose an option instead of what is wrong with it.
   return z
     .string()
     .trim()
-    .pipe(z.union([z.literal("").transform(() => null), schema]));
+    .transform((value, context): Output | null => {
+      if (value === "") {
+        return null;
+      }
+      const parsed = schema.safeParse(value);
+      if (parsed.success) {
+        return parsed.data;
+      }
+      for (const issue of parsed.error.issues) {
+        context.addIssue({ code: "custom", message: issue.message });
+      }
+      return z.NEVER;
+    });
 }

@@ -72,17 +72,22 @@ export async function InvitesList({
       ? []
       : [{ key: "status", name: t("statusFilter"), value: t(`statuses.${params.status}`) }];
 
+  // With nothing at all, there is nothing to search or filter yet.
+  const nothingYet = window.total === 0 && params.q === "" && filters.length === 0;
+
   return (
     <div>
-      <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
-        <ListSearch label={t("searchLabel")} />
-        <ListFilter
-          param="status"
-          label={t("statusFilter")}
-          allLabel={t("allStatuses")}
-          choices={inviteStatuses.map((value) => ({ value, label: t(`statuses.${value}`) }))}
-        />
-      </div>
+      {nothingYet ? null : (
+        <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
+          <ListSearch label={t("searchLabel")} />
+          <ListFilter
+            param="status"
+            label={t("statusFilter")}
+            allLabel={t("allStatuses")}
+            choices={inviteStatuses.map((value) => ({ value, label: t(`statuses.${value}`) }))}
+          />
+        </div>
+      )}
       <ActiveFilters filters={filters} />
       <DataList
         label={t("label")}

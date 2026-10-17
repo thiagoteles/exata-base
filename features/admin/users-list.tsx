@@ -89,31 +89,36 @@ export async function UsersList({
       : [{ key: "plan", name: t("planFilter"), value: plans(params.plan) }]),
   ];
 
+  // With nothing at all, there is nothing to search or filter yet.
+  const nothingYet = window.total === 0 && params.q === "" && filters.length === 0;
+
   return (
     <div>
-      <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
-        <ListSearch label={t("searchLabel")} />
-        <ListFilter
-          param="role"
-          label={t("roleFilter")}
-          allLabel={t("allRoles")}
-          choices={userRole.enumValues.map((value) => ({ value, label: roles(value) }))}
-        />
-        <ListFilter
-          param="plan"
-          label={t("planFilter")}
-          allLabel={t("allPlans")}
-          choices={tierNames.map((value) => ({ value, label: plans(value) }))}
-        />
-        <ListSort
-          label={t("sortBy")}
-          fallback="date:desc"
-          choices={sortChoices.map(([column, direction, key]) => ({
-            value: `${column}:${direction}`,
-            label: t(key),
-          }))}
-        />
-      </div>
+      {nothingYet ? null : (
+        <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
+          <ListSearch label={t("searchLabel")} />
+          <ListFilter
+            param="role"
+            label={t("roleFilter")}
+            allLabel={t("allRoles")}
+            choices={userRole.enumValues.map((value) => ({ value, label: roles(value) }))}
+          />
+          <ListFilter
+            param="plan"
+            label={t("planFilter")}
+            allLabel={t("allPlans")}
+            choices={tierNames.map((value) => ({ value, label: plans(value) }))}
+          />
+          <ListSort
+            label={t("sortBy")}
+            fallback="date:desc"
+            choices={sortChoices.map(([column, direction, key]) => ({
+              value: `${column}:${direction}`,
+              label: t(key),
+            }))}
+          />
+        </div>
+      )}
       <ActiveFilters filters={filters} />
       <DataList
         label={t("label")}

@@ -111,7 +111,7 @@ export function SectionEmpty({
           <p className="text-body text-ink">{title}</p>
           {body === undefined ? null : <p className="text-body-small text-ink-muted">{body}</p>}
         </div>
-        {action}
+        {action === undefined ? null : <div className="shrink-0">{action}</div>}
       </div>
     </div>
   );

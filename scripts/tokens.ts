@@ -1,5 +1,6 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import process from "node:process";
+import { writeWhole } from "./files/write-whole";
 import { generateAccent, parseAccents } from "./tokens/accent";
 import { generateDataPalette } from "./tokens/data";
 import { generateTheme, parseSeeds } from "./tokens/generate";
@@ -148,7 +149,7 @@ if (checkOnly) {
   }
 } else {
   for (const [file, content] of stale) {
-    writeFileSync(file, content);
+    writeWhole(file, content);
     process.stdout.write(`wrote ${file}\n`);
   }
 }

@@ -1,7 +1,8 @@
-import { existsSync, readdirSync, readFileSync, watch, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, watch } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { locales } from "../lib/i18n/locales";
+import { writeWhole } from "./files/write-whole";
 import { areaOf, joinAreas, overlay, overlayOf } from "./messages/join";
 
 /*
@@ -55,7 +56,7 @@ function write() {
   for (const locale of locales) {
     const text = joined(locale);
     if (text !== current(locale)) {
-      writeFileSync(target(locale), text);
+      writeWhole(target(locale), text);
       process.stdout.write(`wrote messages/${locale}.json\n`);
     }
   }

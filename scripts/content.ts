@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { createTranslator } from "next-intl";
@@ -13,6 +13,7 @@ import {
   type Translate,
 } from "../lib/content/problems";
 import messages from "../messages/pt-BR.json";
+import { writeWhole } from "./files/write-whole";
 
 /*
  * `pnpm content` reads every article, checks its frontmatter and its text, and writes the index the
@@ -127,6 +128,6 @@ if (process.argv.includes("--check")) {
     process.exit(1);
   }
 } else if (current !== content) {
-  writeFileSync(output, content);
+  writeWhole(output, content);
   process.stdout.write(`wrote ${path.relative(root, output)}\n`);
 }

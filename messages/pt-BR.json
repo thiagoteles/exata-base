@@ -1232,6 +1232,9 @@
     "print": {
       "back": "Voltar",
       "print": "Imprimir"
+    },
+    "empty": {
+      "example": "Exemplo"
     }
   },
   "plan": {

@@ -15,5 +15,12 @@
   "sortName": "Remetente, A a Z",
   "sortStatus": "Situação",
   "emptyTitle": "Nenhuma mensagem ainda.",
+  "emptyBody": "Quem escreve pelo formulário de contato do site, com conta ou sem, aparece aqui. Uma mensagem nova pede atenção; a resposta da equipe vai por e-mail e fica no histórico da mensagem.",
+  "emptyAction": "Ver o formulário",
+  "emptyPreview": {
+    "first": "Marina Duarte",
+    "second": "Rafael Nunes",
+    "third": "Júlia Prado"
+  },
   "loading": "Carregando mensagens"
 }

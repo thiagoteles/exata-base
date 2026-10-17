@@ -98,7 +98,7 @@ export async function ContactList({ viewer, scope, timeZone, searchParams }: Con
           },
         ];
 
-  const empty = mine ? <MyMessagesEmpty /> : <ListEmpty title={t("emptyTitle")} />;
+  const empty = mine ? <MyMessagesEmpty /> : <InboxEmpty />;
   const nothingYet = window.total === 0 && params.q === "" && filters.length === 0;
 
   return (
@@ -176,6 +176,34 @@ async function MyMessagesEmpty() {
         key: subject,
         title: tContact(`subjects.${subject}`),
         details: [formatDate(day as IsoDate)],
+        stamp: <Stamp tone={contactStatusTone[status]}>{tContact(`statuses.${status}`)}</Stamp>,
+      }))}
+    />
+  );
+}
+
+/** The team's inbox before the first message: who writes here and what the team does with it. */
+async function InboxEmpty() {
+  const [t, tContact] = await Promise.all([getTranslations("inbox"), getTranslations("contact")]);
+  return (
+    <ListEmpty
+      title={t("emptyTitle")}
+      body={t("emptyBody")}
+      action={
+        <Link href={publicHref("/contact")} className={buttonClasses("secondary")}>
+          {t("emptyAction")}
+        </Link>
+      }
+      preview={(
+        [
+          ["first", "support", "2026-10-14", "new"],
+          ["second", "billing", "2026-10-11", "in_progress"],
+          ["third", "general", "2026-10-02", "answered"],
+        ] as const
+      ).map(([key, subject, day, status]) => ({
+        key,
+        title: t(`emptyPreview.${key}`),
+        details: [tContact(`subjects.${subject}`), formatDate(day as IsoDate)],
         stamp: <Stamp tone={contactStatusTone[status]}>{tContact(`statuses.${status}`)}</Stamp>,
       }))}
     />

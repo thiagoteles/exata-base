@@ -5,13 +5,15 @@ import { cn } from "@/lib/cn";
  * A record looks like a carefully filled-in document: cells that share borders inside one rounded
  * outline, a label on top of each value, one figure, one stamp. Each cell draws its own rule into
  * the one-pixel gap, so the borders are shared and a row left short shows the surface, not a hole.
+ * Rows are ordered to close at three columns; at two a wide cell takes the whole row, so the grid
+ * fills each gap with the next narrow cell instead of leaving it beside a wide one.
  */
 
 export function RecordGrid({ children, className, ...props }: ComponentProps<"dl">) {
   return (
     <dl
       className={cn(
-        "grid gap-px overflow-hidden rounded-cell border border-line bg-surface md:grid-cols-2 xl:grid-cols-3",
+        "grid gap-px overflow-hidden rounded-cell border border-line bg-surface md:grid-flow-row-dense md:grid-cols-2 xl:grid-cols-3",
         className,
       )}
       {...props}

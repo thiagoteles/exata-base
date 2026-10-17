@@ -579,9 +579,10 @@ Only the layer has a shadow: `0 1px 0 var(--color-line), 0 16px 40px -16px` in t
 - On a phone, more than two plain actions fold into a menu; controls that open their own dialog stay as buttons.
 
 **List.**
-- Column headers in `label`, `ink-muted`, with a 1px rule below.
-- 56px rows separated by a thin rule, no boxes and no zebra striping. Hover gives a `sunken` background.
-- Money in mono on the right, dates in mono, and the state stamp in its own column.
+- The list sits on one `surface` with the record's outline (1px `line`, radius 10); the column headers sit on a `sunken` band inside it, in `label`, `ink-muted`.
+- 56px rows separated by a thin rule, with the cells' horizontal padding at both ends; no zebra striping. Hover gives a `sunken` background, and keyboard focus outlines the whole row.
+- The title column leads each row on the left, even when it is a code; when a record has a name and a code, the name is the title and the code sits under it in `label` mono.
+- Money in mono on the right, dates in mono, and the state stamp in its own column. What asks for nothing ("Nada a fazer") is `ink-muted`, so the rows that ask stand out.
 - Active filters are removable chips on a `sunken` strip, mirrored in the URL.
 - Pagination with "Anterior" (Previous), "Próxima" (Next) and the position in mono ("41 a 60 de 312"). A list that fits on one page shows only the position, with no buttons.
 - When the list itself is narrower than 768px (a container query: the sidebar changes it, the window does not tell), each row becomes a two-line block: title and stamp on top, mono data below.

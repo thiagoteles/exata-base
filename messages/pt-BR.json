@@ -722,6 +722,21 @@
       "panelHighlight": "Painel de destaque, um por tela",
       "panelDanger": "Zona de perigo"
     },
+    "empty": {
+      "title": "Estados vazios",
+      "listTitle": "Nenhum pedido ainda.",
+      "listBody": "Aqui ficam os pedidos, com o cliente, o valor, a data e a situação de cada um. Comece pelo primeiro, ou traga os que já existem em outra ferramenta.",
+      "listAction": "Novo pedido",
+      "listSecondary": "Importar",
+      "preview": {
+        "first": "Ana Souza",
+        "second": "Bruno Lima",
+        "third": "Camila Rocha"
+      },
+      "sectionTitle": "Nenhum pagamento registrado ainda.",
+      "sectionBody": "Cada valor que entrar aparece aqui, com a data e a forma.",
+      "sectionAction": "Registrar pagamento"
+    },
     "list": {
       "title": "Lista",
       "label": "Pedidos de exemplo",

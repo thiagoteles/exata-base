@@ -11,6 +11,7 @@ import { CatalogHeader } from "@/features/catalog/catalog-header";
 import { ChoicesDemo } from "@/features/catalog/choices-demo";
 import { CompositionDemo } from "@/features/catalog/composition-demo";
 import { DensityDemo } from "@/features/catalog/density-demo";
+import { EmptyDemo } from "@/features/catalog/empty-demo";
 import { FieldsDemo } from "@/features/catalog/fields-demo";
 import { FiguresDemo } from "@/features/catalog/figures-demo";
 import { FilesList } from "@/features/catalog/files-list";
@@ -112,6 +113,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection name="states" title={t("states.title")}>
           <StatesDemo />
+        </CatalogSection>
+        <CatalogSection name="empty" title={t("empty.title")}>
+          <EmptyDemo />
         </CatalogSection>
         <CatalogSection name="list" title={t("list.title")}>
           <Suspense fallback={<ListSkeleton label={t("list.loading")} />}>

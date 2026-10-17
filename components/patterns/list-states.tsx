@@ -36,53 +36,56 @@ const fades = ["opacity-75", "opacity-45", "opacity-20"] as const;
 export function ListEmpty({ title, body, action, secondary, preview }: ListEmptyProps) {
   const t = useTranslations("patterns.empty");
   const hasPreview = preview !== undefined && preview.length > 0;
+  // It measures its own width, so it lays out the same inside a list or alone on a page.
   return (
-    <div
-      className={cn(
-        "grid gap-8 py-4",
-        hasPreview
-          ? "@4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] @4xl:items-center"
-          : undefined,
-      )}
-    >
-      <div className="flex max-w-[60ch] flex-col items-start gap-3">
-        <p className="text-block-title text-ink">{title}</p>
-        {body === undefined ? null : <p className="text-body text-ink-muted">{body}</p>}
-        {action === undefined && secondary === undefined ? null : (
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            {action}
-            {secondary}
-          </div>
+    <div className="@container">
+      <div
+        className={cn(
+          "grid gap-8 py-4",
+          hasPreview
+            ? "@4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] @4xl:items-center"
+            : undefined,
         )}
-      </div>
-      {hasPreview ? (
-        <div aria-hidden="true" className="pointer-events-none select-none">
-          <p className="mb-2 text-label text-ink-muted">{t("example")}</p>
-          {/* Narrow, each example row is a block like the list's own: the title on its line, the
-              figures under it. */}
-          <div className="flex flex-col border-t border-line">
-            {preview.map((row, index) => (
-              <div
-                key={row.key}
-                className={cn(
-                  "flex min-h-row flex-wrap items-center gap-x-6 gap-y-1 border-b border-line py-3",
-                  fades[Math.min(index, fades.length - 1)],
-                )}
-              >
-                <span className="min-w-0 basis-full truncate font-semibold text-ink @3xl:flex-1 @3xl:basis-auto">
-                  {row.title}
-                </span>
-                {row.details.map((detail) => (
-                  <span key={detail} className="font-mono text-data text-ink-muted tabular-nums">
-                    {detail}
-                  </span>
-                ))}
-                {row.stamp}
-              </div>
-            ))}
-          </div>
+      >
+        <div className="flex max-w-[60ch] flex-col items-start gap-3">
+          <p className="text-block-title text-ink">{title}</p>
+          {body === undefined ? null : <p className="text-body text-ink-muted">{body}</p>}
+          {action === undefined && secondary === undefined ? null : (
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              {action}
+              {secondary}
+            </div>
+          )}
         </div>
-      ) : null}
+        {hasPreview ? (
+          <div aria-hidden="true" className="pointer-events-none select-none">
+            <p className="mb-2 text-label text-ink-muted">{t("example")}</p>
+            {/* Narrow, each example row is a block like the list's own: the title on its line, the
+              figures under it. */}
+            <div className="flex flex-col border-t border-line">
+              {preview.map((row, index) => (
+                <div
+                  key={row.key}
+                  className={cn(
+                    "flex min-h-row flex-wrap items-center gap-x-6 gap-y-1 border-b border-line py-3",
+                    fades[Math.min(index, fades.length - 1)],
+                  )}
+                >
+                  <span className="min-w-0 basis-full truncate font-semibold text-ink @3xl:flex-1 @3xl:basis-auto">
+                    {row.title}
+                  </span>
+                  {row.details.map((detail) => (
+                    <span key={detail} className="font-mono text-data text-ink-muted tabular-nums">
+                      {detail}
+                    </span>
+                  ))}
+                  {row.stamp}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

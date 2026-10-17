@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import type { NextRequest } from "next/server";
+import { connection, type NextRequest } from "next/server";
 import { cache } from "react";
 import { hasRole, type Role } from "@/lib/accounts/roles";
 import { db } from "@/lib/db/client";
@@ -100,7 +100,17 @@ async function privateCurrentUser(): Promise<CurrentUser | null> {
  * until `requireUser` stores the row. Read it only inside a <Suspense> boundary.
  */
 export const getCurrentUser: () => Promise<CurrentUser | null> =
-  env.NODE_ENV === "production" ? privateCurrentUser : cache(readCurrentUser);
+  env.NODE_ENV === "production" ? privateCurrentUser : cache(requestCurrentUser);
+
+/**
+ * The development read, marked as belonging to the request. Without the private cache around it,
+ * the dev server's prerender check of a record page reaches the session library's clock and reports
+ * it, though headers were already read.
+ */
+async function requestCurrentUser(): Promise<CurrentUser | null> {
+  await connection();
+  return await readCurrentUser();
+}
 
 /**
  * Who is signed in right now, read fresh and never cached. Actions and routes use it where a

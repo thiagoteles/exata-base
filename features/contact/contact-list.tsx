@@ -18,7 +18,7 @@ import { buttonClasses } from "@/components/ui/styles";
 import type { Scope, Viewer } from "@/lib/access/rules";
 import { contactStatuses } from "@/lib/contact/options";
 import { type ContactRow, type ContactStatus, queryContacts } from "@/lib/contact/service";
-import { formatInstantDate } from "@/lib/date";
+import { formatDate, formatInstantDate, type IsoDate } from "@/lib/date";
 import { db } from "@/lib/db/client";
 import { publicHref } from "@/lib/i18n/public-paths";
 import { listParsers } from "@/lib/list-params";
@@ -49,11 +49,7 @@ type ContactListProps = {
 
 /** The contact list for either audience: the same table, filtered by who is looking. */
 export async function ContactList({ viewer, scope, timeZone, searchParams }: ContactListProps) {
-  const [t, tContact, tMine] = await Promise.all([
-    getTranslations("inbox"),
-    getTranslations("contact"),
-    getTranslations("myMessages"),
-  ]);
+  const [t, tContact] = await Promise.all([getTranslations("inbox"), getTranslations("contact")]);
   const params = await searchParamsCache.parse(searchParams);
   const { rows, window } = await queryContacts(db, viewer, scope, params);
   const mine = scope === "mine";
@@ -102,34 +98,12 @@ export async function ContactList({ viewer, scope, timeZone, searchParams }: Con
           },
         ];
 
-  const emptyAction = mine ? (
-    <Link href={publicHref("/contact")} className={buttonClasses("primary")}>
-      {tMine("emptyAction")}
-    </Link>
-  ) : undefined;
+  const empty = mine ? <MyMessagesEmpty /> : <ListEmpty title={t("emptyTitle")} />;
+  const nothingYet = window.total === 0 && params.q === "" && filters.length === 0;
 
   return (
     <div>
-      <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
-        <ListSearch label={t("searchLabel")} />
-        <ListFilter
-          param="status"
-          label={t("statusFilter")}
-          allLabel={t("allStatuses")}
-          choices={contactStatuses.map((value) => ({
-            value,
-            label: tContact(`statuses.${value}`),
-          }))}
-        />
-        <ListSort
-          label={t("sortBy")}
-          fallback="date:desc"
-          choices={sortChoices.map(([column, direction, key]) => ({
-            value: `${column}:${direction}`,
-            label: t(key),
-          }))}
-        />
-      </div>
+      {nothingYet ? null : <ContactControls />}
       <ActiveFilters filters={filters} />
       <DataList
         label={t("label")}
@@ -139,10 +113,7 @@ export async function ContactList({ viewer, scope, timeZone, searchParams }: Con
         rowHref={(row): Route => recordHref(scope, row.id)}
         emptyState={
           params.q === "" && filters.length === 0 ? (
-            <ListEmpty
-              title={mine ? tMine("emptyTitle") : t("emptyTitle")}
-              {...(emptyAction === undefined ? {} : { action: emptyAction })}
-            />
+            empty
           ) : (
             <ListNoResults term={params.q} filters={filters} />
           )
@@ -150,5 +121,63 @@ export async function ContactList({ viewer, scope, timeZone, searchParams }: Con
       />
       <ListPagination window={window} />
     </div>
+  );
+}
+
+/** Search, the status filter and the order, once there is something to search. */
+async function ContactControls() {
+  const [t, tContact] = await Promise.all([getTranslations("inbox"), getTranslations("contact")]);
+  return (
+    <div className="mb-4 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
+      <ListSearch label={t("searchLabel")} />
+      <ListFilter
+        param="status"
+        label={t("statusFilter")}
+        allLabel={t("allStatuses")}
+        choices={contactStatuses.map((value) => ({
+          value,
+          label: tContact(`statuses.${value}`),
+        }))}
+      />
+      <ListSort
+        label={t("sortBy")}
+        fallback="date:desc"
+        choices={sortChoices.map(([column, direction, key]) => ({
+          value: `${column}:${direction}`,
+          label: t(key),
+        }))}
+      />
+    </div>
+  );
+}
+
+/** A person's own messages before the first: where they come from, with made-up ones beside it. */
+async function MyMessagesEmpty() {
+  const [t, tContact] = await Promise.all([
+    getTranslations("myMessages"),
+    getTranslations("contact"),
+  ]);
+  return (
+    <ListEmpty
+      title={t("emptyTitle")}
+      body={t("emptyBody")}
+      action={
+        <Link href={publicHref("/contact")} className={buttonClasses("primary")}>
+          {t("emptyAction")}
+        </Link>
+      }
+      preview={(
+        [
+          ["support", "2026-10-12", "answered"],
+          ["billing", "2026-09-28", "in_progress"],
+          ["general", "2026-09-03", "answered"],
+        ] as const
+      ).map(([subject, day, status]) => ({
+        key: subject,
+        title: tContact(`subjects.${subject}`),
+        details: [formatDate(day as IsoDate)],
+        stamp: <Stamp tone={contactStatusTone[status]}>{tContact(`statuses.${status}`)}</Stamp>,
+      }))}
+    />
   );
 }

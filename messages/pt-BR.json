@@ -1129,6 +1129,7 @@
     "title": "Minhas mensagens",
     "subtitle": "O que você enviou pelo formulário de contato e as respostas.",
     "emptyTitle": "Você ainda não enviou mensagens.",
+    "emptyBody": "O que você escrever pelo formulário de contato fica guardado aqui, com o assunto, a situação e a resposta da equipe, que também chega por e-mail.",
     "emptyAction": "Enviar mensagem"
   },
   "nav": {

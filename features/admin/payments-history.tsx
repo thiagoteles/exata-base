@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { SectionEmpty } from "@/components/patterns/list-states";
 import { PageSection } from "@/components/patterns/page-section";
 import { Stamp, type StampTone } from "@/components/ui/stamp";
 import { isWithinWithdrawal, withdrawalEndsAt } from "@/domain/billing/withdrawal";
@@ -36,7 +37,7 @@ export async function PaymentsHistory({ payments, now }: { payments: Payment[]; 
         </p>
       )}
       {payments.length === 0 ? (
-        <p className="text-body text-ink-muted">{t("empty")}</p>
+        <SectionEmpty title={t("empty")} body={t("emptyBody")} />
       ) : (
         <table className="w-full border-collapse text-left">
           <thead>

@@ -6,6 +6,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormTextField } from "@/components/patterns/form-text-field";
+import { SectionEmpty } from "@/components/patterns/list-states";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Segmented } from "@/components/ui/segmented";
@@ -110,7 +111,7 @@ export function ApiTokens({ rows }: { rows: TokenRow[] }) {
       )}
 
       {rows.length === 0 ? (
-        <p className="text-body-small text-ink-muted">{t("none")}</p>
+        <SectionEmpty title={t("none")} body={t("noneBody")} />
       ) : (
         <ul className="flex flex-col divide-y divide-line border-y border-line">
           {rows.map((row) => (

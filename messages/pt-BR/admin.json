@@ -30,6 +30,7 @@
     "sortEmail": "E-mail, A a Z",
     "sortRole": "Papel",
     "emptyTitle": "Nenhum usuário ainda.",
+    "emptyBody": "Cada pessoa que cria conta aparece aqui, com o papel, o plano e o dia do cadastro.",
     "noName": "Sem nome"
   },
   "user": {
@@ -83,6 +84,7 @@
     "payments": {
       "title": "Pagamentos",
       "empty": "Nenhum pagamento registrado.",
+      "emptyBody": "Quando esta pessoa assinar um plano, cada cobrança aparece aqui com a data, o valor, a forma e a situação.",
       "date": "Data",
       "amount": "Valor",
       "method": "Forma",
@@ -122,6 +124,7 @@
     "statusFilter": "Situação",
     "allStatuses": "Todas",
     "emptyTitle": "Nenhum convite enviado.",
+    "emptyBody": "Um convite leva alguém a criar conta já com o papel escolhido. Cada convite aparece aqui, com a situação: pendente, aceito, vencido ou revogado.",
     "form": {
       "title": "Convidar",
       "email": "E-mail de quem vai receber",
@@ -153,6 +156,7 @@
     "from": "De",
     "to": "Até",
     "emptyTitle": "Nada registrado ainda.",
+    "emptyBody": "O que a equipe e os administradores mudam em uma conta, como o papel, uma cortesia ou uma exclusão, fica registrado aqui com quem fez e quando.",
     "actions": {
       "user_role_change": "Mudou o papel",
       "user_delete": "Apagou a conta",

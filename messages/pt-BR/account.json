@@ -96,6 +96,7 @@
     "title": "Chaves de acesso à API",
     "help": "Uma chave deixa um programa seu ler a sua conta, sem a sua senha. Ela só aparece uma vez, quando é criada. Revogue a que não usa mais.",
     "none": "Você ainda não criou nenhuma chave.",
+    "noneBody": "Cada chave criada aparece aqui com o nome, o que ela pode fazer, a validade e o último uso.",
     "once": "Copie a chave agora. Depois que você sair desta página, ela não aparece mais.",
     "copy": "Copiar chave",
     "copied": "Chave copiada.",

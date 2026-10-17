@@ -91,7 +91,7 @@ export async function InvitesList({
         getKey={(row) => row.id}
         emptyState={
           params.q === "" && filters.length === 0 ? (
-            <ListEmpty title={t("emptyTitle")} />
+            <ListEmpty title={t("emptyTitle")} body={t("emptyBody")} />
           ) : (
             <ListNoResults term={params.q} filters={filters} />
           )

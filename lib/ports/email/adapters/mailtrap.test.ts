@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createMailtrapSender } from "./mailtrap";
 
-function recordingFetch(status = 200) {
+function recordingFetch(status = 200, body = "{}") {
   const calls: { url: string; init: RequestInit }[] = [];
   const fetch = (url: string | URL | Request, init?: RequestInit) => {
     calls.push({ url: String(url), init: init ?? {} });
-    return Promise.resolve(new Response("{}", { status }));
+    return Promise.resolve(new Response(body, { status }));
   };
   return { calls, fetch: fetch as typeof globalThis.fetch };
 }
@@ -87,5 +87,17 @@ describe("Mailtrap Email API", () => {
     await expect(
       createMailtrapSender({ token: "bad", from: "a@b.c", fetch }).send(message),
     ).rejects.toThrow("401");
+  });
+
+  it("says why Mailtrap refused, in the words of its answer", async () => {
+    const { fetch } = recordingFetch(
+      403,
+      '{"success":false,"errors":["Sending domain not verified"]}',
+    );
+    await expect(
+      createMailtrapSender({ token: "tok", from: "no-reply@app.test", fetch }).send(message),
+    ).rejects.toThrow(
+      'Mailtrap refused the message with status 403: {"success":false,"errors":["Sending domain not verified"]}',
+    );
   });
 });

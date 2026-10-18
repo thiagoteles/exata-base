@@ -13,7 +13,15 @@ type Options = {
 };
 
 const SEND_URL = "https://send.api.mailtrap.io/api/send";
+const MAX_REASON = 500;
 const sandboxUrl = (inbox: string) => `https://sandbox.api.mailtrap.io/api/send/${inbox}`;
+
+/** Mailtrap says why in the body (`{"errors": [...]}`): the log needs it to be read at all. */
+async function refusal(response: Response): Promise<Error> {
+  const reason = (await response.text().catch(() => "")).slice(0, MAX_REASON);
+  const said = reason === "" ? "" : `: ${reason}`;
+  return new Error(`Mailtrap refused the message with status ${response.status}${said}`);
+}
 
 export function createMailtrapSender({
   token,
@@ -52,7 +60,7 @@ export function createMailtrapSender({
         }),
       });
       if (!response.ok) {
-        throw new Error(`Mailtrap refused the message with status ${response.status}`);
+        throw await refusal(response);
       }
     },
   };

@@ -14,7 +14,7 @@ Open http://localhost:47300. Sign in as the seeded admin, `admin@app.local` with
 - **Memory.** The development server keeps every route it has compiled, and the compose gives it an 8 GB heap, which needs 12 GB for Docker (Docker Desktop, Settings, Resources). With Docker's default of 7.7 GB, lower `NODE_OPTIONS` in `docker-compose.yml` to `--max-old-space-size=4096`. Two composes at once want 16 GB.
 - **Packages** are installed in the image (`Dockerfile.dev`) and the code is mounted over it. After a change to `package.json` or the lockfile: `docker compose up --build --renew-anon-volumes`.
 - **Keys.** The compose mounts an empty file over `.env.local`, so the keys you keep there for running outside Docker never reach the container, and mail keeps going to the catcher. To try a provider (Stripe, Clerk, Google) in the compose, pass its keys with an extra file: `docker compose -f docker-compose.yml -f extra.yml up -d --force-recreate app`, where `extra.yml` sets `services.app.environment`.
-- Node 24 and pnpm are needed only outside Docker (`nvm use`, then `pnpm install`).
+- Node 26 and pnpm are needed only outside Docker (`nvm use`, then `pnpm install`).
 
 ## A new product
 

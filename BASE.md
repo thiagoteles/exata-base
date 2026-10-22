@@ -23,7 +23,7 @@ Um example público e completo do `create-next-app`, de onde nascem produtos web
 - **E-mail sai na hora,** sem fila nem nova tentativa. Produção: Email API do Mailtrap. Local: Mailpit.
 - **Agendamento é HTTP chamado de fora,** um endereço por cadência (`/events/daily`, `/events/hourly`, `/events/every-5-min`; `/events` responde como o `daily`), cada um com a sua tarefa agendada no Coolify e o `CRON_SECRET`. Sem fila, worker ou cron no container.
 - **Tudo que viaja é em inglês** (código, comentário, tabela, coluna, valor guardado, rota, env, README, AGENTS, DESIGN, skills), menos o endereço público, que vem do mapa `lib/i18n/public-paths.ts`, e o texto do catálogo (`messages/pt-BR/`), o único idioma. Valores do banco ficam em inglês e o catálogo os traduz.
-- **pnpm e Node 24.** Dependências em versão exata, com `minimumReleaseAge` de uma semana (o `next` é a exceção).
+- **pnpm e Node 26.** Dependências em versão exata, com `minimumReleaseAge` de uma semana (o `next` é a exceção).
 - **Qualidade estrita:** TypeScript estrito, Biome preset `all` com `--error-on-warnings` e fronteiras de import, knip para código morto, React Compiler, lefthook com `pnpm check` em todo commit. Sem ESLint.
 - **Webpack,** em desenvolvimento e no build (`next dev --webpack`, `next build --webpack`), com o Tailwind pelo PostCSS. Turbopack não é usado: entrava em laço de recarga no compose e segurava mais memória do que o compose tinha.
 - **Interação é Radix,** importado só em `components/ui`. O visual vem do `DESIGN.md`.
@@ -210,11 +210,11 @@ Um segundo idioma é opt-in (README): o catálogo, a lista em `lib/i18n/locales.
 - O preço aparece com espaço sem quebra (`R$ 29,00`).
 - O axe recusa região rolável sem foco: a `<main>` do shell tem `tabIndex={0}`.
 - A seta do `RadioGroup` do Radix só marca por foco em navegador de verdade; no happy-dom o teste confirma o foco e o Espaço.
-- O `wget` da imagem `node:24-alpine` é o do BusyBox, sem `--method`: `--post-data=''` faz o POST.
+- O `wget` da imagem `node:26-alpine` é o do BusyBox, sem `--method`: `--post-data=''` faz o POST.
 - Log pino: um campo `message` no objeto colide com o da linha; o relatório do navegador usa `errorMessage`.
 - `docker compose up --force-recreate` mantém os volumes anônimos, inclusive o `.next`; para compilação fria, `-V`. Um log do Playwright MCP gravado dentro do projeto faz o servidor recompilar em laço: apague `.playwright-mcp`.
 - Com Clerk ou Stripe ligados, o servidor de desenvolvimento loga erros do validador `instant` (`Could not validate instant ...`); as páginas respondem 200 e as suítes passam.
-- O hook de commit precisa de Node 24 no shell.
+- O hook de commit precisa de Node 26 no shell.
 - A numeração de página por CSS funciona no Chromium; Safari e Firefox não desenham caixas de margem. O que precisa de número em qualquer navegador é PDF.
 
 ## 6. Estado

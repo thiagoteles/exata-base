@@ -2,7 +2,7 @@
 # the image is built, not each time the container starts; the source is mounted over /app.
 # After a change to package.json or the lockfile: `docker compose up --build --renew-anon-volumes`.
 
-FROM node:24-alpine
+FROM node:26-alpine
 ENV PNPM_HOME=/pnpm COREPACK_ENABLE_DOWNLOAD_PROMPT=0 NEXT_TELEMETRY_DISABLED=1 CI=true LEFTHOOK=0
 RUN corepack enable
 WORKDIR /app

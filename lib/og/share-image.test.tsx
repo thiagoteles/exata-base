@@ -1,13 +1,8 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { shareImage } from "./share-image";
 
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
-
 describe("the share image", () => {
-  it("draws a page's title, alone or beside the product's picture, even when the fonts cannot be fetched", async () => {
-    vi.stubGlobal("fetch", () => Promise.reject(new Error("offline")));
+  it("draws a page's title, alone or beside the product's picture, from the font files on disk", async () => {
     const plain = await shareImage({ title: "Planos", subtitle: "Preços e o que cada um traz" });
     const beside = await shareImage({
       title: "Planos",

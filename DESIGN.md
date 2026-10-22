@@ -434,7 +434,7 @@ The rest of this file describes the `instrument` values; the table below is what
 
 ## Typography
 
-**Faces.** The typeface knob chooses them (see Preset); titles (`h1` to `h3`) use `font-heading`, text uses `font-sans`, numbers use `font-mono`. In `instrument`: Onest for everything that is text. JetBrains Mono for everything that is a number or code: dates, CPF, CNPJ, phone, CEP, ids, money, counts. Both load through `next/font/google`, as variable fonts with the Latin subset, with no font file in the repository and no secret at build time. Onest has a large x-height and a warm design, which carries a 17px body for a broad audience. JetBrains Mono has wide, clearly distinct digits (0 and O, 1 and l), which matters for CPF numbers and amounts.
+**Faces.** The typeface knob chooses them (see Preset); titles (`h1` to `h3`) use `font-heading`, text uses `font-sans`, numbers use `font-mono`. In `instrument`: Onest for everything that is text. JetBrains Mono for everything that is a number or code: dates, CPF, CNPJ, phone, CEP, ids, money, counts. Both load through `next/font/local` from TrueType files kept in the repository, so a build and a share image never call Google. Onest has a large x-height and a warm design, which carries a 17px body for a broad audience. JetBrains Mono has wide, clearly distinct digits (0 and O, 1 and l), which matters for CPF numbers and amounts.
 
 **Scale.** `html` stays at 16px. The body is 17px through a token, not through the root `font-size`, so Tailwind utilities keep their sizes.
 - Display (public site only): 40 to 56px, 700, -0.032em.

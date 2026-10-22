@@ -30,7 +30,9 @@ describe("presets", () => {
       const { preset, choices } = parseDesign({ preset: name });
       const fonts = renderFonts(choices);
       expect(fonts).toContain('variable: "--font-face-document"');
-      expect(fonts).toMatch(/Source_Serif_4\(\{[^}]*preload: false/);
+      expect(fonts).toContain('src: "../assets/fonts/faces/SourceSerif4.ttf"');
+      expect(fonts).toContain("preload: false");
+      expect(fonts).not.toContain("next/font/google");
       expect(fonts).toContain("document.variable");
       expect(renderPresetCss(preset, choices)).toContain("--font-document:");
     }

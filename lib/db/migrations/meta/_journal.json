@@ -176,6 +176,20 @@
       "when": 1792040003145,
       "tag": "0024_samples_leave_the_base_stream",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792702233621,
+      "tag": "0025_two_factor",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792702233993,
+      "tag": "0026_audit_append_only",
+      "breakpoints": true
     }
   ]
 }

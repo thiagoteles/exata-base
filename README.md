@@ -60,7 +60,7 @@ The product ships in Brazilian Portuguese only, and `messages/pt-BR.json` is the
 ## What is already built
 
 - **Accounts.** Sign-up, e-mail confirmation, password reset, roles `member`, `staff` and `admin`, profile, theme and appearance preferences, signed-in devices, personal API tokens, invitations by link, data export as a ZIP, and account deletion that removes what the person owns and keeps an audit trail.
-- **Auth mode.** `AUTH_PROVIDER=local` runs on the app's own tables (better-auth, optional Google). `AUTH_PROVIDER=clerk` (the default in production) uses Clerk and keeps the user row in sync by webhook. Pages, actions and routes see only the auth port.
+- **Auth mode.** `AUTH_PROVIDER` is the flag. `clerk` (the default, including production) uses Clerk and keeps the user row in sync by webhook. `local` runs on the app's own tables (better-auth, optional Google, an authenticator code, and a limit on sign-in attempts). Pages, actions and routes see only the auth port.
 - **Admin.** Users (role, courtesy plan, refund, delete), invites by e-mail, the audit log, the numbers page and the health panel.
 - **Billing.** Stripe checkout for monthly, yearly and lifetime plans, Pix, trial, customer portal, cancel at the end of the period, refunds, receipts as verifiable PDFs, and guards by feature and by limit. It stays off until the Stripe variables exist.
 - **Contact.** A public form, a staff inbox with search and filters, replies by e-mail, and the member's own messages.
@@ -128,7 +128,7 @@ The environment module `lib/env.ts` is the source of truth; production refuses t
 |---|---|---|
 | `APP_URL` | yes | Public address. Base of e-mail links, Open Graph and the Stripe return |
 | `DATABASE_URL` | yes | The internal URL of the PostgreSQL resource, as Coolify shows it (`postgres://user:password@<container>:5432/<database>`). The app migrates the database when it starts |
-| `AUTH_PROVIDER` | no | `clerk` (default) or `local` |
+| `AUTH_PROVIDER` | no | Flag: `clerk` (default) or `local` |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET` | with `clerk` | The publishable key is public and goes to the build (in Coolify, tick it as a build variable): the prerendered pages carry Clerk's provider, so the image is for one Clerk instance. The other two are read at runtime. Point the Clerk webhook at `/api/webhooks/clerk` |
 | `BETTER_AUTH_SECRET` | with `local` | At least 32 characters |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | no | Together; turns on Google in `local` mode |

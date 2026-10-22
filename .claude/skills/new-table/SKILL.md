@@ -18,9 +18,10 @@ Tables live in `lib/db/schema/`, one file per area. Read `lib/db/schema/contact.
 3. **Keys to a user.** Never call `.references(() => users.id)` directly. Use
    `lib/db/schema/user-references.ts`:
    - `ownedBy()` when the row belongs to the person and must disappear with their account.
-   - `authoredBy()` when the row is about someone else or the team and must stay. Add the
-     author's e-mail next to it, named after the key (`reviewedBy` and `reviewedByEmail`,
-     `actorId` and `actorEmail`), and always write both.
+   - `authoredBy()` when the row must outlive the account: an official record, or a fact about
+     someone else or the team. Add the author's e-mail next to it, named after the key
+     (`reviewedBy` and `reviewedByEmail`, `actorId` and `actorEmail`), and always write both at
+     the same time as the row.
 4. **Indexes.** Every foreign key gets `index().on(table.column)` unless it is already unique or
    the primary key. Add an index for the list's default filter and sort.
 5. **Rules in the database.** What must always be true goes in a `check(...)`, like the lowercase

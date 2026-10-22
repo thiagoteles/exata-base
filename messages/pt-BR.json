@@ -93,6 +93,18 @@
       "cancel": "Cancelar",
       "failed": "Não foi possível apagar a conta."
     },
+    "secondFactor": {
+      "title": "Verificação em duas etapas",
+      "help": "Um código do aplicativo autenticador, além da senha, para entrar.",
+      "password": "Senha atual",
+      "turnOn": "Ativar",
+      "turnOff": "Desativar",
+      "scan": "Aponte a câmera do aplicativo autenticador para o código, ou digite a chave abaixo.",
+      "qrAlt": "Código para configurar o autenticador",
+      "backupOnce": "Guarde estes códigos de reserva. Eles aparecem só agora, e cada um funciona uma vez.",
+      "code": "Código do aplicativo",
+      "confirm": "Confirmar e ativar"
+    },
     "apiTokens": {
       "title": "Chaves de acesso à API",
       "help": "Uma chave deixa um programa seu ler a sua conta, sem a sua senha. Ela só aparece uma vez, quando é criada. Revogue a que não usa mais.",
@@ -424,7 +436,17 @@
       "request": "Pedir novo link",
       "back": "Voltar para entrar"
     },
-    "signOut": "Sair"
+    "signOut": "Sair",
+    "secondFactor": {
+      "title": "Código do autenticador",
+      "help": "Abra o aplicativo autenticador e digite o código de 6 dígitos.",
+      "code": "Código",
+      "submit": "Confirmar",
+      "useBackup": "Usar um código de reserva",
+      "backup": "Código de reserva",
+      "backupHelp": "Digite um dos códigos de reserva que você guardou ao ativar.",
+      "useApp": "Usar o aplicativo autenticador"
+    }
   },
   "catalog": {
     "title": "Catálogo",
@@ -1000,6 +1022,7 @@
     "emailNotVerified": "Confirme seu e-mail antes de entrar. Enviamos o link de confirmação.",
     "emailTaken": "Já existe uma conta com esse e-mail.",
     "invalidResetToken": "O link para trocar a senha venceu ou já foi usado. Peça um novo.",
+    "invalidSecondFactor": "O código não confere. Tente de novo.",
     "billingOff": "A cobrança não está ativa neste ambiente.",
     "planUnavailable": "Esse plano não está à venda no momento.",
     "alreadyPaid": "Você já tem um plano pago. Para mudar, use o portal do cliente.",

@@ -3,15 +3,17 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { hashPassword } from "better-auth/crypto";
 import { nextCookies, toNextJsHandler } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { currentInstant } from "@/domain/clock";
 import { applyConfirmedEmail } from "@/lib/accounts/confirmation";
 import type { Database } from "@/lib/db/database";
-import { accounts, sessions, verifications } from "@/lib/db/schema/auth";
+import { accounts, sessions, twoFactors, verifications } from "@/lib/db/schema/auth";
 import { users } from "@/lib/db/schema/users";
 import { DomainError } from "@/lib/errors";
-import type { AuthAdapter, PasswordCredentials } from "../types";
+import { siteName } from "@/lib/site-name";
+import type { AuthAdapter, PasswordCredentials, SignInOutcome } from "../types";
 
 /*
  * Local mode: users live in Postgres and better-auth runs on the app's own tables. Sign-up is
@@ -40,10 +42,17 @@ export function createLocalAuth(options: LocalAuthOptions) {
     secret: options.secret,
     database: drizzleAdapter(db, {
       provider: "pg",
-      schema: { user: users, session: sessions, account: accounts, verification: verifications },
+      schema: {
+        user: users,
+        session: sessions,
+        account: accounts,
+        verification: verifications,
+        twoFactor: twoFactors,
+      },
     }),
     advanced: { database: { generateId: "uuid" } },
-    // The local mode is a fallback, not a second product to harden: there is no attempt limit.
+    // Attempts are counted in our own table, once per address and once per e-mail, including the
+    // HTTP API. The built-in limiter is memory only, so it would not hold across replicas.
     rateLimit: { enabled: false },
     emailAndPassword: {
       enabled: true,
@@ -75,7 +84,7 @@ export function createLocalAuth(options: LocalAuthOptions) {
         },
       },
     },
-    plugins: [nextCookies()],
+    plugins: [twoFactor({ issuer: siteName }), nextCookies()],
   });
 }
 
@@ -83,11 +92,21 @@ export type LocalAuth = ReturnType<typeof createLocalAuth>;
 
 type ErrorCode = ConstructorParameters<typeof DomainError>[1];
 
-const errorCodes: Readonly<Record<string, { status: 400 | 401 | 403 | 409; key: ErrorCode }>> = {
+const errorCodes: Readonly<
+  Record<string, { status: 400 | 401 | 403 | 409 | 429; key: ErrorCode }>
+> = {
   INVALID_EMAIL_OR_PASSWORD: { status: 401, key: "invalidCredentials" },
+  INVALID_PASSWORD: { status: 401, key: "invalidCredentials" },
   EMAIL_NOT_VERIFIED: { status: 403, key: "emailNotVerified" },
   USER_ALREADY_EXISTS: { status: 409, key: "emailTaken" },
   INVALID_TOKEN: { status: 400, key: "invalidResetToken" },
+  INVALID_CODE: { status: 400, key: "invalidSecondFactor" },
+  INVALID_BACKUP_CODE: { status: 400, key: "invalidSecondFactor" },
+  INVALID_TWO_FACTOR_COOKIE: { status: 400, key: "invalidSecondFactor" },
+  TOTP_NOT_ENABLED: { status: 400, key: "invalidSecondFactor" },
+  TOTP_ALREADY_ENABLED: { status: 409, key: "conflict" },
+  ACCOUNT_TEMPORARILY_LOCKED: { status: 429, key: "tooManyRequests" },
+  TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE: { status: 429, key: "tooManyRequests" },
 };
 
 function toDomainError(error: unknown): DomainError | null {
@@ -112,11 +131,48 @@ async function translated<T>(run: () => Promise<T>): Promise<T> {
 
 const AFTER_CONFIRMATION = `/auth/complete?next=${encodeURIComponent("/account")}`;
 
+function asksForSecondFactor(result: unknown): boolean {
+  return (
+    result !== null &&
+    typeof result === "object" &&
+    "twoFactorRedirect" in result &&
+    result.twoFactorRedirect === true
+  );
+}
+
 function passwordCredentials(auth: LocalAuth): PasswordCredentials {
   return {
     signIn: ({ email, password }) =>
+      translated(async (): Promise<SignInOutcome> => {
+        const result = await auth.api.signInEmail({
+          body: { email, password },
+          headers: await headers(),
+        });
+        return { twoFactor: asksForSecondFactor(result) };
+      }),
+    verifySecondFactor: ({ code, backup }) =>
       translated(async () => {
-        await auth.api.signInEmail({ body: { email, password }, headers: await headers() });
+        const requestHeaders = await headers();
+        if (backup) {
+          await auth.api.verifyBackupCode({ body: { code }, headers: requestHeaders });
+          return;
+        }
+        await auth.api.verifyTOTP({ body: { code }, headers: requestHeaders });
+      }),
+    enableSecondFactor: ({ password }) =>
+      translated(async () => {
+        const result = await auth.api.enableTwoFactor({
+          body: { password, method: "totp" },
+          headers: await headers(),
+        });
+        if (!("totpURI" in result && "backupCodes" in result)) {
+          throw new DomainError(400);
+        }
+        return { totpUri: result.totpURI, backupCodes: result.backupCodes };
+      }),
+    disableSecondFactor: ({ password }) =>
+      translated(async () => {
+        await auth.api.disableTwoFactor({ body: { password }, headers: await headers() });
       }),
     signUp: ({ name, email, password }) =>
       translated(async () => {

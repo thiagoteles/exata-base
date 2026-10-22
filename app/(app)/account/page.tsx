@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
@@ -17,10 +18,12 @@ import { Devices } from "@/features/account/devices";
 import { EmailPreferencesPanel } from "@/features/account/email-preferences";
 import { ReferralLink } from "@/features/account/referral-link";
 import { ThemePicker } from "@/features/account/theme-picker";
+import { SecondFactorPanel } from "@/features/account/two-factor";
 import { LanguageSwitcher } from "@/features/language/language-switcher";
 import { FirstSteps } from "@/features/onboarding/first-steps";
 import { listApiTokens } from "@/lib/api/tokens";
 import { db } from "@/lib/db/client";
+import { users } from "@/lib/db/schema/users";
 import { env } from "@/lib/env";
 import { isMultilingual } from "@/lib/i18n/locales";
 import { formatMoney, toCents } from "@/lib/money";
@@ -53,17 +56,24 @@ async function AccountContent() {
   const user = await requirePageRole("member", "/account");
   // Read fresh: the cached current user can be minutes behind a theme the person just chose.
   const access = await sessionAccess();
-  const [preferences, referral, earned, onboarding, steps, devices, tokens] = await Promise.all([
-    readPreferences(db, user.id),
-    referralSummary(db, user.id),
-    earnedCredit(db, user.id),
-    readOnboarding(db, user.id),
-    getTranslations("onboarding"),
-    access.kind === "own"
-      ? listDeviceSessions(db, user.id, access.currentId, currentInstant())
-      : Promise.resolve([]),
-    listApiTokens(db, user.id),
-  ]);
+  const [preferences, referral, earned, onboarding, steps, devices, tokens, factor] =
+    await Promise.all([
+      readPreferences(db, user.id),
+      referralSummary(db, user.id),
+      earnedCredit(db, user.id),
+      readOnboarding(db, user.id),
+      getTranslations("onboarding"),
+      access.kind === "own"
+        ? listDeviceSessions(db, user.id, access.currentId, currentInstant())
+        : Promise.resolve([]),
+      listApiTokens(db, user.id),
+      env.AUTH_PROVIDER === "local"
+        ? db
+            .select({ twoFactorEnabled: users.twoFactorEnabled })
+            .from(users)
+            .where(eq(users.id, user.id))
+        : Promise.resolve([]),
+    ]);
   return (
     <>
       <PageHeader title={t("title")} subtitle={t("subtitle")} showBack={false} />
@@ -116,6 +126,12 @@ async function AccountContent() {
         <PageSection title={t("email.title")}>
           <EmailPreferencesPanel initial={preferences.email} />
         </PageSection>
+
+        {env.AUTH_PROVIDER === "local" ? (
+          <PageSection title={t("secondFactor.title")} help={t("secondFactor.help")}>
+            <SecondFactorPanel enabled={factor[0]?.twoFactorEnabled === true} />
+          </PageSection>
+        ) : null}
 
         {access.kind === "own" || access.url !== null ? (
           <PageSection

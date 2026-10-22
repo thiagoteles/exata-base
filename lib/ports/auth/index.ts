@@ -6,7 +6,7 @@ import { db } from "@/lib/db/client";
 import { users } from "@/lib/db/schema/users";
 import { env } from "@/lib/env";
 import { DomainError } from "@/lib/errors";
-import type { AuthAdapter, CurrentUser, SessionIdentity } from "./types";
+import type { AuthAdapter, CurrentUser, SessionIdentity, SignInOutcome } from "./types";
 
 /*
  * The auth port. Pages, actions and routes see only this module: who is signed in, the role
@@ -157,8 +157,16 @@ async function passwordCredentials() {
   return credentials;
 }
 
-export const signInWithPassword = async (input: { email: string; password: string }) =>
-  (await passwordCredentials()).signIn(input);
+export const signInWithPassword = async (input: {
+  email: string;
+  password: string;
+}): Promise<SignInOutcome> => (await passwordCredentials()).signIn(input);
+export const verifySecondFactor = async (input: { code: string; backup: boolean }) =>
+  (await passwordCredentials()).verifySecondFactor(input);
+export const enableSecondFactor = async (input: { password: string }) =>
+  (await passwordCredentials()).enableSecondFactor(input);
+export const disableSecondFactor = async (input: { password: string }) =>
+  (await passwordCredentials()).disableSecondFactor(input);
 export const signUpWithPassword = async (input: {
   name: string;
   email: string;
@@ -179,6 +187,10 @@ export async function sessionAccess(): Promise<
 
 /** The auth API under /api/auth. Exists only in local mode; Clerk answers 404. */
 export async function handleAuthRequest(request: Request): Promise<Response> {
+  // Loaded here: the counter is only spent by a password or a second factor, and the session
+  // read that every page makes must not carry it.
+  const { limitCredentialRequest } = await import("@/lib/rate-limit/credentials");
+  await limitCredentialRequest(request);
   return (await authAdapter()).handleRequest(request);
 }
 

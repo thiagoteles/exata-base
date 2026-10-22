@@ -14,6 +14,7 @@
   "emailNotVerified": "Confirme seu e-mail antes de entrar. Enviamos o link de confirmação.",
   "emailTaken": "Já existe uma conta com esse e-mail.",
   "invalidResetToken": "O link para trocar a senha venceu ou já foi usado. Peça um novo.",
+  "invalidSecondFactor": "O código não confere. Tente de novo.",
   "billingOff": "A cobrança não está ativa neste ambiente.",
   "planUnavailable": "Esse plano não está à venda no momento.",
   "alreadyPaid": "Você já tem um plano pago. Para mudar, use o portal do cliente.",

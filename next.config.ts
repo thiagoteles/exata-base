@@ -100,9 +100,11 @@ const nextConfig: NextConfig = {
   ],
   headers: () => Promise.resolve([{ source: "/(.*)", headers: [...securityHeaders] }]),
   redirects: () => Promise.resolve(movedAddresses.map((moved) => ({ ...moved, permanent: true }))),
-  // Files read at run time through a path the tracer cannot follow: the face PDFs use, and the
-  // standard fonts pdfkit loads through its package's own import map, which the tracer skips.
+  // Files read at run time through a path the tracer cannot follow: the face PDFs use, the
+  // static faces the share image draws, and the standard fonts pdfkit loads through its package's
+  // own import map, which the tracer skips.
   outputFileTracingIncludes: {
+    "/opengraph-image": ["./assets/fonts/share/**/*"],
     "/account/receipts/*": [
       "./assets/fonts/**/*",
       "./node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/**/*",

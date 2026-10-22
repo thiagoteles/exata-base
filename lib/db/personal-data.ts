@@ -1,7 +1,7 @@
 import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
 import { productExportedData, productNotExportedData } from "./personal-data.product";
 import { apiTokens } from "./schema/api-tokens";
-import { accounts, sessions } from "./schema/auth";
+import { accounts, sessions, twoFactors } from "./schema/auth";
 import { checkoutSessions, payments, plans } from "./schema/billing";
 import { contactMessages } from "./schema/contact";
 import { files } from "./schema/files";
@@ -31,6 +31,7 @@ export const notExportedData: readonly NotExported[] = [
   ...productNotExportedData,
   { table: sessions, reason: "short-lived sign-in sessions, deleted with the account" },
   { table: accounts, reason: "credentials and provider tokens, never handed out" },
+  { table: twoFactors, reason: "authenticator secret and backup codes, never handed out" },
   {
     table: checkoutSessions,
     reason:

@@ -53,6 +53,7 @@ const gcpCredentials = z
 
 const server = {
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  // The sign-in flag. Clerk is the default. `local` uses the app's own tables instead.
   AUTH_PROVIDER: z.enum(["clerk", "local"]).default("clerk"),
   APP_URL: z.url().default(`http://localhost:${ports.app}`),
   DATABASE_URL: z.url().default(`postgres://app:app@localhost:${ports.database}/app`),

@@ -38,6 +38,27 @@ describe("database", () => {
     await expect(createUser("Ana@Example.com")).rejects.toThrow();
   });
 
+  it("refuses to change or remove an audit row", async () => {
+    const user = await createUser("ana@example.com");
+    const [row] = await db
+      .insert(staffAuditLog)
+      .values({
+        actorId: user.id,
+        actorEmail: user.email,
+        action: "test",
+        targetTable: "users",
+        targetId: user.id,
+      })
+      .returning({ id: staffAuditLog.id });
+    if (row === undefined) {
+      throw new Error("audit row was not written");
+    }
+    await expect(
+      db.update(staffAuditLog).set({ action: "changed" }).where(eq(staffAuditLog.id, row.id)),
+    ).rejects.toThrow();
+    await expect(db.delete(staffAuditLog).where(eq(staffAuditLog.id, row.id))).rejects.toThrow();
+  });
+
   it("refuses a free plan with a billing interval", async () => {
     const user = await createUser("ana@example.com");
     await expect(

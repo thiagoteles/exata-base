@@ -2,7 +2,7 @@ import { is } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { apiTokens } from "./schema/api-tokens";
 import { accountDeletions, deletionRequester, staffAuditLog } from "./schema/audit";
-import { accounts, clerkEvents, sessions, verifications } from "./schema/auth";
+import { accounts, clerkEvents, sessions, twoFactors, verifications } from "./schema/auth";
 import {
   billingInterval,
   checkoutSessions,
@@ -38,6 +38,7 @@ export const schema = {
   sessions,
   accounts,
   verifications,
+  twoFactors,
   clerkEvents,
   invites,
   apiTokens,

@@ -19,3 +19,7 @@ export const signUpSchema = z.object({
 });
 export const forgotPasswordSchema = z.object({ email });
 export const resetPasswordSchema = z.object({ token: z.string().min(1), password: newPassword });
+export const secondFactorSchema = z.object({
+  code: z.string().trim().min(1, required).max(32),
+  backup: z.boolean(),
+});

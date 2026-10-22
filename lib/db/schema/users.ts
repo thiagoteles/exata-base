@@ -22,6 +22,8 @@ export const users = pgTable(
     email: text().notNull().unique(),
     emailVerified: boolean().notNull().default(false),
     image: text(),
+    // Set by the local sign-in when an authenticator is confirmed. Clerk accounts stay false.
+    twoFactorEnabled: boolean().notNull().default(false),
     role: userRole().notNull().default("member"),
     options: jsonb().$type<UserOptions>().notNull().default({}),
     clerkId: text().unique(),

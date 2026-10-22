@@ -92,6 +92,18 @@
     "cancel": "Cancelar",
     "failed": "Não foi possível apagar a conta."
   },
+  "secondFactor": {
+    "title": "Verificação em duas etapas",
+    "help": "Um código do aplicativo autenticador, além da senha, para entrar.",
+    "password": "Senha atual",
+    "turnOn": "Ativar",
+    "turnOff": "Desativar",
+    "scan": "Aponte a câmera do aplicativo autenticador para o código, ou digite a chave abaixo.",
+    "qrAlt": "Código para configurar o autenticador",
+    "backupOnce": "Guarde estes códigos de reserva. Eles aparecem só agora, e cada um funciona uma vez.",
+    "code": "Código do aplicativo",
+    "confirm": "Confirmar e ativar"
+  },
   "apiTokens": {
     "title": "Chaves de acesso à API",
     "help": "Uma chave deixa um programa seu ler a sua conta, sem a sua senha. Ela só aparece uma vez, quando é criada. Revogue a que não usa mais.",

@@ -9,13 +9,26 @@ import {
   resetPassword,
   signInWithPassword,
   signUpWithPassword,
+  verifySecondFactor,
 } from "@/lib/ports/auth";
 import { logger } from "@/lib/ports/log";
+import {
+  passwordResetAttempts,
+  secondFactorAttempts,
+  signInAttempts,
+} from "@/lib/rate-limit/credential-rules";
+import { enforceCredentialAttempt } from "@/lib/rate-limit/credentials";
 import { REFERRAL_COOKIE } from "@/lib/referral/cookie";
 import { recordReferralForEmail } from "@/lib/referral/service";
 import { safeReturnPath } from "@/lib/routes";
 import { z } from "@/lib/validation";
-import { forgotPasswordSchema, resetPasswordSchema, signInSchema, signUpSchema } from "./schemas";
+import {
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  secondFactorSchema,
+  signInSchema,
+  signUpSchema,
+} from "./schemas";
 
 /* The actions behind the local sign-in screens. In Clerk mode the port refuses them with a 400. */
 
@@ -23,7 +36,23 @@ export const signIn = publicAction
   .inputSchema(signInSchema.extend({ next: z.string().optional() }))
   .metadata({ name: "signIn" })
   .action(async ({ parsedInput: { next, ...credentials } }) => {
-    await signInWithPassword(credentials);
+    await enforceCredentialAttempt(signInAttempts, credentials.email);
+    const outcome = await signInWithPassword(credentials);
+    if (outcome.twoFactor) {
+      return { twoFactor: true as const };
+    }
+    return {
+      twoFactor: false as const,
+      redirectTo: `/auth/complete?next=${encodeURIComponent(safeReturnPath(next))}`,
+    };
+  });
+
+export const confirmSecondFactor = publicAction
+  .inputSchema(secondFactorSchema.extend({ next: z.string().optional() }))
+  .metadata({ name: "confirmSecondFactor" })
+  .action(async ({ parsedInput: { next, code, backup } }) => {
+    await enforceCredentialAttempt(secondFactorAttempts, undefined);
+    await verifySecondFactor({ code, backup });
     return { redirectTo: `/auth/complete?next=${encodeURIComponent(safeReturnPath(next))}` };
   });
 
@@ -49,6 +78,7 @@ export const forgotPassword = publicAction
   .inputSchema(forgotPasswordSchema)
   .metadata({ name: "forgotPassword" })
   .action(async ({ parsedInput }) => {
+    await enforceCredentialAttempt(passwordResetAttempts, parsedInput.email);
     await requestPasswordReset(parsedInput);
     return { sent: true };
   });
@@ -57,6 +87,7 @@ export const choosePassword = publicAction
   .inputSchema(resetPasswordSchema)
   .metadata({ name: "choosePassword" })
   .action(async ({ parsedInput }) => {
+    await enforceCredentialAttempt(passwordResetAttempts, undefined);
     await resetPassword(parsedInput);
     return { done: true };
   });

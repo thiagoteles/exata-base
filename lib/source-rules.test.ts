@@ -66,7 +66,12 @@ describe("source rules", () => {
     // entry in `outputFileTracingIncludes`, so a file is never missing only in production.
     const reads = /\b(readFile|readFileSync|createReadStream|readdir|readdirSync)\s*\(/;
     // The migrator reads both journals, which the Dockerfile copies into the image whole.
-    const knownReaders = new Set(["lib/ports/storage/adapters/disk.ts", "lib/db/migrate.ts"]);
+    const knownReaders = new Set([
+      "lib/ports/storage/adapters/disk.ts",
+      "lib/db/migrate.ts",
+      // Static faces for the share image, traced on the opengraph route.
+      "lib/og/share-image.tsx",
+    ]);
     const appCode = /^(app|lib|features|components|domain)\/|^proxy\.ts$/;
     const offenders = trackedSources()
       .filter(

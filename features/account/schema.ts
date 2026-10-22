@@ -13,3 +13,11 @@ export const createTokenSchema = z.object({
 });
 
 export const revokeTokenSchema = z.object({ id: z.uuid() });
+
+export const secondFactorPasswordSchema = z.object({
+  password: z.string().min(1, required),
+});
+
+export const secondFactorCodeSchema = z.object({
+  code: z.string().trim().min(1, required).max(32),
+});

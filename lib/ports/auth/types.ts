@@ -15,12 +15,20 @@ export type SessionIdentity =
   | { kind: "local"; userId: string }
   | { kind: "clerk"; clerkId: string };
 
+/** What a password sign-in decided. A second factor still has to be typed when `twoFactor` is set. */
+export type SignInOutcome = { twoFactor: boolean };
+
 /** Sign-in with e-mail and password. Only the local mode has it; Clerk serves its own screens. */
 export type PasswordCredentials = {
-  signIn: (input: { email: string; password: string }) => Promise<void>;
+  signIn: (input: { email: string; password: string }) => Promise<SignInOutcome>;
   signUp: (input: { name: string; email: string; password: string }) => Promise<void>;
   requestReset: (input: { email: string }) => Promise<void>;
   resetPassword: (input: { token: string; password: string }) => Promise<void>;
+  verifySecondFactor: (input: { code: string; backup: boolean }) => Promise<void>;
+  enableSecondFactor: (input: {
+    password: string;
+  }) => Promise<{ totpUri: string; backupCodes: string[] }>;
+  disableSecondFactor: (input: { password: string }) => Promise<void>;
 };
 
 /**

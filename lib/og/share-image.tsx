@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import process from "node:process";
 import { ImageResponse } from "next/og";
 import type { ReactElement } from "react";
 import { emailPalette } from "@/emails/palette";
@@ -8,24 +11,21 @@ import { shareImageSize } from "./size";
 /*
  * The share image every page uses: the product name small, the page's title large in the
  * typeface's title face, and a line under it. Satori reads neither CSS variables nor oklch, so
- * colors come from the generated hex palette. The fonts are fetched once and kept; if they cannot
- * be fetched the image still renders, in the default face, so a share never breaks for a font.
+ * colors come from the generated hex palette. The fonts are the static files kept for this image,
+ * read once and kept. A missing file, or a face the renderer cannot read, still draws the image
+ * in the default face, so a share never breaks for a font.
  */
 
 type FontOption = NonNullable<ConstructorParameters<typeof ImageResponse>[1]>["fonts"];
 
 const HEADING_WEIGHT = 700;
 const TEXT_WEIGHT = 400;
-const truetype = /src: url\((.+?)\) format\(['"]truetype['"]\)/;
 
 async function fontFile(family: string, weight: number): Promise<ArrayBuffer> {
-  const query = `${family.replaceAll(" ", "+")}:wght@${weight}`;
-  const css = await (await fetch(`https://fonts.googleapis.com/css2?family=${query}`)).text();
-  const url = truetype.exec(css)?.[1];
-  if (url === undefined) {
-    throw new Error(`no TrueType file for ${family} ${weight}`);
-  }
-  return (await fetch(url)).arrayBuffer();
+  const bytes = await readFile(
+    join(process.cwd(), "assets/fonts/share", `${family.replaceAll(" ", "")}-${weight}.ttf`),
+  );
+  return Uint8Array.from(bytes).buffer;
 }
 
 // Kept in the module, not in "use cache": a module with a cached function is compiled into every
@@ -73,9 +73,10 @@ type ShareImageInput = {
   aside?: ReactElement;
 };
 
-/** The image for one page, with its title and one line under it, and the product's picture if any. */
-export async function shareImage({ title, subtitle, aside }: ShareImageInput) {
-  const fonts = await shareImageFonts();
+function drawShareImage(
+  { title, subtitle, aside }: ShareImageInput,
+  fonts: FontOption,
+): ImageResponse {
   const beside = aside !== undefined;
   return new ImageResponse(
     <div
@@ -130,4 +131,14 @@ export async function shareImage({ title, subtitle, aside }: ShareImageInput) {
     </div>,
     { ...shareImageSize, ...(fonts === undefined || fonts.length === 0 ? {} : { fonts }) },
   );
+}
+
+/** The image for one page, with its title and one line under it, and the product's picture if any. */
+export async function shareImage(input: ShareImageInput) {
+  const fonts = await shareImageFonts();
+  try {
+    return drawShareImage(input, fonts);
+  } catch {
+    return drawShareImage(input, []);
+  }
 }

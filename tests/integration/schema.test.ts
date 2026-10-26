@@ -56,6 +56,14 @@ describe("database", () => {
     await expect(
       db.update(staffAuditLog).set({ action: "changed" }).where(eq(staffAuditLog.id, row.id)),
     ).rejects.toThrow();
+    // The author may only go to null on its own, as deleting the account does; clearing it is no
+    // cover for rewriting the rest of the row.
+    await expect(
+      db
+        .update(staffAuditLog)
+        .set({ actorId: null, actorEmail: "someone@example.com" })
+        .where(eq(staffAuditLog.id, row.id)),
+    ).rejects.toThrow();
     await expect(db.delete(staffAuditLog).where(eq(staffAuditLog.id, row.id))).rejects.toThrow();
   });
 

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { entitlementsOf, firstPaidFeature, isPaidTier, type PlanState } from "./entitlements";
+import { twoTierCatalog } from "./catalog.fixture";
+import {
+  entitlementsOf,
+  entitlementsWith,
+  firstPaidFeature,
+  isPaidTier,
+  type PlanState,
+} from "./entitlements";
 
 const now = new Date("2026-06-01T12:00:00Z");
 const plan = (over: Partial<PlanState> = {}): PlanState => ({
@@ -61,6 +68,30 @@ describe("plan limits", () => {
 
   it("fall back to the free allowance when a plan no longer counts", () => {
     expect(entitlementsOf(plan({ status: "canceled" }), now).limits.exports?.limit).toBe(5);
+  });
+});
+
+describe("a catalog with two paid tiers", () => {
+  // Fails when a tier stops inheriting what the tier it extends grants, a path the product's own
+  // catalog never takes when it sells a single tier.
+  const {
+    entitlementsOf: of,
+    firstPaidFeature: first,
+    tierNames: names,
+  } = entitlementsWith(twoTierCatalog);
+
+  it("grants the higher tier what it extends, its own features and limits over the inherited", () => {
+    const team = of({ tier: "team", status: "active", currentPeriodEnd: null }, now);
+    expect([...team.features].sort()).toEqual(["history", "sharing"]);
+    expect(team.limits).toEqual({
+      exports: { limit: 50, windowSeconds: 86_400 },
+      seats: { limit: 10, windowSeconds: 86_400 },
+    });
+  });
+
+  it("reads the sold tier and the tier list from that catalog, not the product's", () => {
+    expect(first).toBe("history");
+    expect(names).toEqual(["free", "plus", "team"]);
   });
 });
 

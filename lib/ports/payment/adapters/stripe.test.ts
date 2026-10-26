@@ -37,6 +37,7 @@ const gateway = createStripeGateway({ secretKey: "sk_test_x", webhookSecret: "wh
 const base = {
   userId: "user-1",
   email: "ana@example.com",
+  tier: "plus",
   priceId: "price_1",
   successUrl: "https://app.example/ok",
   cancelUrl: "https://app.example/no",
@@ -60,7 +61,8 @@ describe("creating a checkout", () => {
       customer_creation: "always",
       customer_email: "ana@example.com",
       client_reference_id: "user-1",
-      metadata: { interval: "lifetime" },
+      // The webhook grants the tier the checkout carried, not the catalog's default.
+      metadata: { tier: "plus", interval: "lifetime" },
     });
   });
 

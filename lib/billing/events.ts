@@ -1,9 +1,12 @@
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
-import { catalog } from "@/domain/billing/catalog";
+import { priceKeyOfLookup, catalog as productCatalog } from "@/domain/billing/catalog";
+import type { CatalogShape } from "@/domain/billing/catalog-shape";
+import type { Tier } from "@/domain/billing/entitlements";
 import { isFixedTerm, oneYearAfter } from "@/domain/billing/term";
 import type { Database } from "@/lib/db/database";
 import { checkoutSessions, paymentEvents, plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
+import { logger } from "@/lib/ports/log";
 import type { PaymentEvent } from "@/lib/ports/payment/types";
 import {
   linkPayments,
@@ -23,6 +26,20 @@ import { type CancelSubscription, freePlan, noCourtesy } from "./service";
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
+/**
+ * The tier a checkout sold: the one it carried, or the default for a checkout opened before the tier
+ * travelled with it. A tier the catalog does not have fails the delivery, so the provider retries
+ * it and the error is seen, instead of a paid plan landing on the wrong tier.
+ */
+function soldTier(tier: string | null, catalog: CatalogShape): Tier {
+  const sold = tier ?? catalog.paidTier;
+  if (!(sold in catalog.tiers) || sold === "free") {
+    throw new Error(`a checkout sold the tier "${sold}", which the catalog does not sell`);
+  }
+  // The catalog given is the product's in the app; a test's own catalog names tiers of its own.
+  return sold as Tier;
+}
+
 /** When the paid period ends, if the purchase already says: the trial's end, or a year after a year bought once. */
 function periodEndOf(event: Extract<PaymentEvent, { kind: "checkout_paid" }>): Date | null {
   if (event.trialEndsAt !== null) {
@@ -35,7 +52,9 @@ async function applyCheckout(
   tx: Transaction,
   event: Extract<PaymentEvent, { kind: "checkout_paid" }>,
   cancel: CancelSubscription,
+  catalog: CatalogShape,
 ): Promise<void> {
+  const tier = soldTier(event.tier, catalog);
   const [current] = await tx
     .select()
     .from(plans)
@@ -49,11 +68,11 @@ async function applyCheckout(
   await tx
     .update(plans)
     .set({
-      tier: catalog.paidTier,
+      tier,
       status: trialing ? "trialing" : "active",
       billingInterval: event.interval,
       provider: event.provider,
-      priceKey: `${catalog.paidTier}.${event.interval}`,
+      priceKey: `${tier}.${event.interval}`,
       providerCustomerId: event.customerId ?? current.providerCustomerId,
       providerSubscriptionId: event.interval === "lifetime" ? null : event.subscriptionId,
       cancelAtPeriodEnd: false,
@@ -166,14 +185,42 @@ async function trialEndingOf(
   return person === undefined ? null : { ...person, endsAt: event.endsAt };
 }
 
+/**
+ * A subscription that now charges another price, switched in the provider's portal: the plan takes
+ * the tier and interval that price sells. Its status stays, since the invoices say whether it is paid.
+ */
+async function applySubscriptionChange(
+  tx: Transaction,
+  event: Extract<PaymentEvent, { kind: "subscription_changed" }>,
+  catalog: CatalogShape,
+): Promise<void> {
+  const sold = priceKeyOfLookup(catalog, event.lookupKey);
+  if (sold === null || sold.tier === "free" || !["monthly", "yearly"].includes(sold.interval)) {
+    logger.warn("billing: a subscription changed to a price the catalog does not sell", {
+      subscriptionId: event.subscriptionId,
+      lookupKey: event.lookupKey,
+    });
+    return;
+  }
+  await tx
+    .update(plans)
+    .set({
+      tier: sold.tier as Tier,
+      billingInterval: sold.interval as "monthly" | "yearly",
+      priceKey: `${sold.tier}.${sold.interval}`,
+    })
+    .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
+}
+
 async function applyEvent(
   tx: Transaction,
   event: PaymentEvent,
   cancel: CancelSubscription,
+  catalog: CatalogShape,
 ): Promise<Effects> {
   switch (event.kind) {
     case "checkout_paid":
-      await applyCheckout(tx, event, cancel);
+      await applyCheckout(tx, event, cancel, catalog);
       return {
         ...none,
         trialStarted:
@@ -188,7 +235,7 @@ async function applyEvent(
         .set({
           status: "pending",
           provider: event.provider,
-          priceKey: `${catalog.paidTier}.${event.interval}`,
+          priceKey: `${event.tier ?? catalog.paidTier}.${event.interval}`,
         })
         .where(and(eq(plans.userId, event.userId), eq(plans.tier, "free")));
       await moveTrail(tx, event.sessionId, "pending");
@@ -217,6 +264,9 @@ async function applyEvent(
         .update(plans)
         .set({ status: "past_due" })
         .where(and(eq(plans.providerSubscriptionId, event.subscriptionId), ne(plans.tier, "free")));
+      return none;
+    case "subscription_changed":
+      await applySubscriptionChange(tx, event, catalog);
       return none;
     case "subscription_deleted":
       // A subscription replaced by the lifetime plan no longer matches any row, so it is ignored.
@@ -248,12 +298,14 @@ async function applyEvent(
  * Applies one provider event. Inserting the event id is the replay lock: a delivery seen before
  * conflicts and does nothing. The lock and the change commit together, so a failed change leaves
  * the event unseen and the provider's retry applies it. A payment the event recorded for the first
- * time comes back with the outcome, so the caller can count it once it is committed.
+ * time comes back with the outcome, so the caller can count it once it is committed. The catalog
+ * is the product's; a test passes one of its own.
  */
 export function applyPaymentEvent(
   db: Database,
   event: PaymentEvent,
   cancel: CancelSubscription,
+  catalog: CatalogShape = productCatalog,
 ): Promise<{ status: "applied" | "duplicate"; newPayment: NewPayment | null; effects: Effects }> {
   return db.transaction(async (tx) => {
     const locked = await tx
@@ -264,7 +316,7 @@ export function applyPaymentEvent(
     if (locked.length === 0) {
       return { status: "duplicate", newPayment: null, effects: none };
     }
-    const effects = await applyEvent(tx, event, cancel);
+    const effects = await applyEvent(tx, event, cancel, catalog);
     return { status: "applied", newPayment: effects.newPayment, effects };
   });
 }

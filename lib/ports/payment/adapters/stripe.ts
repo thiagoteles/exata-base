@@ -6,8 +6,8 @@ import { toPaymentEvent } from "./stripe-events";
 
 /*
  * Stripe behind the payment port. Checkout is a one-off payment for a lifetime plan and a
- * subscription for a monthly or yearly one; the interval travels in the session's metadata, so the
- * webhook never has to guess it from a price.
+ * subscription for a monthly or yearly one; the tier and the interval travel in the session's
+ * metadata, so the webhook never has to guess them from a price.
  */
 
 type Options = { secretKey: string; webhookSecret: string };
@@ -29,6 +29,7 @@ function checkoutParams(request: CheckoutRequestShape) {
     ...(catalog.allowPromotionCodes ? { allow_promotion_codes: true } : {}),
     client_reference_id: request.userId,
     metadata: {
+      tier: request.tier,
       interval: request.interval,
       ...(trialDays > 0 ? { trial_days: String(trialDays) } : {}),
     },

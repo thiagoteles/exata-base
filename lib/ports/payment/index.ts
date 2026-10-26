@@ -42,11 +42,14 @@ export async function requireGateway(): Promise<PaymentGateway> {
 }
 
 /**
- * What each way of buying the sold tier costs, read from the provider by the lookup keys the plan
- * catalog declares, and kept for an hour. An interval whose key has no active price at the provider
- * is not in the answer, so it is not offered. The webhook expires this when a price changes.
+ * What each way of buying a tier costs (the catalog's default tier unless one is named), read from
+ * the provider by the lookup keys the plan catalog declares, and kept for an hour. An interval whose
+ * key has no active price at the provider is not in the answer, so it is not offered. The webhook
+ * expires this when a price changes.
  */
-export async function readPrices(): Promise<Partial<Record<Interval, PriceTag>>> {
+export async function readPrices(
+  tier: string = catalog.paidTier,
+): Promise<Partial<Record<Interval, PriceTag>>> {
   "use cache";
   cacheLife("hours");
   cacheTag(cacheTags.prices());
@@ -56,7 +59,7 @@ export async function readPrices(): Promise<Partial<Record<Interval, PriceTag>>>
   }
   const keys = Object.fromEntries(
     intervalOrder.flatMap((interval) => {
-      const key = lookupKeyOf(catalog.paidTier, interval);
+      const key = lookupKeyOf(tier, interval);
       return key === undefined ? [] : [[interval, key] as const];
     }),
   );
@@ -69,8 +72,8 @@ export async function readPrices(): Promise<Partial<Record<Interval, PriceTag>>>
   );
 }
 
-/** The ways of buying the sold tier that exist right now, in the order they are shown. */
-export async function offeredIntervals(): Promise<Interval[]> {
-  const prices = await readPrices();
+/** The ways of buying a tier that exist right now, in the order they are shown. */
+export async function offeredIntervals(tier: string = catalog.paidTier): Promise<Interval[]> {
+  const prices = await readPrices(tier);
   return intervalOrder.filter((interval) => prices[interval] !== undefined);
 }

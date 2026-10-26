@@ -35,6 +35,8 @@ export const checkoutCompleted = (
   session: {
     userId: string;
     interval: string;
+    /** The tier the checkout sold, as the app writes it; absent as in a checkout opened before it did. */
+    tier?: string;
     customer?: string;
     subscription?: string;
     paymentStatus?: string;
@@ -50,6 +52,7 @@ export const checkoutCompleted = (
     object: "checkout.session",
     client_reference_id: session.userId,
     metadata: {
+      ...(session.tier === undefined ? {} : { tier: session.tier }),
       interval: session.interval,
       ...(session.trialDays === undefined ? {} : { trial_days: String(session.trialDays) }),
     },
@@ -73,6 +76,17 @@ export const invoiceEvent = (
 
 export const subscriptionDeleted = (id: string, subscription: string) =>
   event(id, "customer.subscription.deleted", { id: subscription, object: "subscription" });
+
+/** The subscription now charges the price with this lookup key, as after a switch in the portal. */
+export const subscriptionUpdated = (id: string, subscription: string, lookupKey: string) =>
+  event(id, "customer.subscription.updated", {
+    id: subscription,
+    object: "subscription",
+    items: {
+      object: "list",
+      data: [{ id: `si_${id}`, price: { id: "price_x", lookup_key: lookupKey } }],
+    },
+  });
 
 export const chargeRefunded = (
   id: string,

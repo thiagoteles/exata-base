@@ -90,6 +90,8 @@ export const checkoutSessions = pgTable(
     userId: ownedBy().notNull(),
     provider: paymentProvider().notNull(),
     providerSessionId: text().notNull().unique(),
+    /* The tier the checkout sells; null for one opened before the tier was recorded. */
+    tier: text(),
     interval: billingInterval().notNull(),
     status: checkoutStatus().notNull().default("open"),
     source: text().notNull(),

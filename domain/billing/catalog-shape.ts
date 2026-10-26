@@ -19,5 +19,6 @@ export type CatalogShape = {
   trial: { days: number; intervals: readonly string[] };
   referralCredit: { cents: number };
   allowPromotionCodes: boolean;
+  /** The default tier: what a courtesy grants, and what the checkout sells when a purchase names none. */
   paidTier: string;
 };

@@ -1025,6 +1025,7 @@
     "invalidSecondFactor": "O código não confere. Tente de novo.",
     "billingOff": "A cobrança não está ativa neste ambiente.",
     "planUnavailable": "Esse plano não está à venda no momento.",
+    "tierNotSold": "Esse plano não é vendido nessa forma de pagamento.",
     "alreadyPaid": "Você já tem um plano pago. Para mudar, use o portal do cliente.",
     "noSubscription": "Você não tem uma assinatura ativa.",
     "noBillingAccount": "Você ainda não tem uma conta de cobrança.",

@@ -14,6 +14,8 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
       userId: string;
       customerId: string | null;
       subscriptionId: string | null;
+      /** The tier the checkout sold, or null for a checkout opened before the tier travelled with it. */
+      tier: string | null;
       interval: Interval;
       /** When the provider confirmed the checkout, which is when a fixed term starts. */
       paidAt: Date;
@@ -21,7 +23,13 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
       trialEndsAt: Date | null;
     }
   /** The checkout was completed but the money has not arrived (Pix, a bank slip): nothing is granted yet. */
-  | { kind: "checkout_pending"; sessionId: string; userId: string; interval: Interval }
+  | {
+      kind: "checkout_pending";
+      sessionId: string;
+      userId: string;
+      tier: string | null;
+      interval: Interval;
+    }
   /** A pending payment will not arrive: the code expired, or the bank refused it. */
   | { kind: "checkout_failed"; sessionId: string; userId: string; expired: boolean }
   /** The customer's bank questioned a charge: the money is held and a reply is owed to the provider. */
@@ -31,6 +39,8 @@ export type PaymentEvent = { id: string; type: string; provider: PaymentProvider
   | { kind: "invoice_paid"; subscriptionId: string; periodEnd: Date | null }
   | { kind: "invoice_failed"; subscriptionId: string }
   | { kind: "subscription_deleted"; subscriptionId: string }
+  /** The subscription now charges another price, as when the person switches plan in the portal. */
+  | { kind: "subscription_changed"; subscriptionId: string; lookupKey: string }
   | {
       kind: "payment_succeeded";
       paymentId: string;
@@ -57,6 +67,7 @@ type CheckoutRequest = {
   userId: string;
   email: string;
   customerId: string | null;
+  tier: string;
   interval: Interval;
   priceId: string;
   /** Free days before the first charge, for a subscription. Absent or zero means none. */

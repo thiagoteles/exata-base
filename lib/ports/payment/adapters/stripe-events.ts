@@ -27,6 +27,7 @@ function trialEndOf(session: Stripe.Checkout.Session, createdSeconds: number): D
 function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): PaymentEvent {
   const base = { id: event.id, type: event.type, provider: "stripe" as const };
   const interval = session.metadata?.["interval"];
+  const tier = session.metadata?.["tier"] ?? null;
   const userId = session.client_reference_id;
   if (userId === null || !isInterval(interval)) {
     return { ...base, kind: "ignored" };
@@ -34,7 +35,7 @@ function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): P
   // An asynchronous payment (Pix, a bank slip) completes the session before the money arrives. It is
   // recorded as waiting; the matching succeeded event is the one that grants the plan.
   if (session.payment_status === "unpaid") {
-    return { ...base, kind: "checkout_pending", sessionId: session.id, userId, interval };
+    return { ...base, kind: "checkout_pending", sessionId: session.id, userId, tier, interval };
   }
   return {
     ...base,
@@ -43,6 +44,7 @@ function checkoutEvent(event: Stripe.Event, session: Stripe.Checkout.Session): P
     userId,
     customerId: idOf(session.customer),
     subscriptionId: idOf(session.subscription),
+    tier,
     interval,
     paidAt: new Date(event.created * MS_PER_SECOND),
     trialEndsAt: trialEndOf(session, event.created),
@@ -136,6 +138,18 @@ export function toPaymentEvent(event: Stripe.Event): PaymentEvent {
       return chargeSucceeded(event, event.data.object);
     case "customer.subscription.deleted":
       return { ...base, kind: "subscription_deleted", subscriptionId: event.data.object.id };
+    case "customer.subscription.updated": {
+      // A subscription the app sells has one item; its price says which tier and interval it is now.
+      const lookupKey = event.data.object.items.data[0]?.price.lookup_key ?? null;
+      return lookupKey === null
+        ? { ...base, kind: "ignored" }
+        : {
+            ...base,
+            kind: "subscription_changed",
+            subscriptionId: event.data.object.id,
+            lookupKey,
+          };
+    }
     case "charge.refunded": {
       const customerId = idOf(event.data.object.customer);
       return customerId === null

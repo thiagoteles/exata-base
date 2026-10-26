@@ -4,7 +4,7 @@ import { catalog } from "@/domain/billing/catalog";
 import { chooseCurrency, currenciesToOffer } from "@/domain/billing/currency";
 import { trialDaysFor } from "@/domain/billing/trial";
 import { actionFor } from "@/lib/actions/client";
-import { canBuy, changeCancellation, readPlan } from "@/lib/billing/service";
+import { canBuy, changeCancellation, checkoutTier, readPlan } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
 import { checkoutSessions } from "@/lib/db/schema/billing";
 import { env } from "@/lib/env";
@@ -20,7 +20,8 @@ export const startCheckout = actionFor("member")
   .metadata({ name: "startCheckout" })
   .action(async ({ parsedInput, ctx }) => {
     const gateway = await requireGateway();
-    const prices = await readPrices();
+    const tier = checkoutTier(parsedInput.tier, parsedInput.interval);
+    const prices = await readPrices(tier);
     const price = prices[parsedInput.interval];
     if (price === undefined) {
       throw new DomainError(404, "planUnavailable");
@@ -45,6 +46,7 @@ export const startCheckout = actionFor("member")
       userId: ctx.user.id,
       email: ctx.user.email,
       customerId: plan?.providerCustomerId ?? null,
+      tier,
       interval: parsedInput.interval,
       priceId: price.priceId,
       ...(trialDays > 0 ? { trialDays } : {}),
@@ -56,6 +58,7 @@ export const startCheckout = actionFor("member")
       userId: ctx.user.id,
       provider: "stripe",
       providerSessionId: opened.sessionId,
+      tier,
       interval: parsedInput.interval,
       source: parsedInput.source,
       currency: currency ?? price.currency,

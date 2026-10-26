@@ -10,6 +10,11 @@ export const sourceOf = (value: string | string[] | undefined): string => {
 };
 
 export const checkoutSchema = z.object({
+  /** The tier to buy, when the product sells more than one. Absent means the catalog's default. */
+  tier: z
+    .string()
+    .regex(/^[a-z][a-z0-9_]{0,39}$/)
+    .optional(),
   interval: z.enum(billingInterval.enumValues),
   /** The currency the person was shown, checked against what the product offers before it is used. */
   currency: z

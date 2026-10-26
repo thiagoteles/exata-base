@@ -53,6 +53,10 @@ export const catalog = {
   referralCredit: { cents: 1000 },
   /** Lets a person type a promotion code (made in the provider's dashboard) at checkout. */
   allowPromotionCodes: true,
-  /** The tier the checkout sells and a courtesy grants, until prices name their own tier. */
+  /**
+   * The default tier: what a courtesy grants, and what the checkout sells when a purchase names no
+   * tier. A product that sells several tiers names each in `prices`; people move between them in the
+   * provider's customer portal.
+   */
   paidTier: "paid",
 } as const satisfies CatalogShape;

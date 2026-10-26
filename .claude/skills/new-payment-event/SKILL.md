@@ -13,7 +13,9 @@ provider's own type.
 What the base already handles, so a new event is not one of these: `checkout.session.completed` and
 `async_payment_succeeded` (`checkout_paid`, with the trial and the one-year term), a completed session
 still unpaid (`checkout_pending`), `async_payment_failed` and `expired` (`checkout_failed`),
-`invoice.payment_succeeded` and `payment_failed`, `customer.subscription.deleted` and `trial_will_end`,
+`invoice.payment_succeeded` and `payment_failed`, `customer.subscription.updated`
+(`subscription_changed`, a switch of tier or interval in the portal), `customer.subscription.deleted`
+and `trial_will_end`,
 `charge.succeeded`, `charge.refunded` and `charge.dispute.created`, and `price.created`, `updated` and
 `deleted` (`prices_changed`, which only expires the price cache).
 

@@ -1,4 +1,6 @@
 import { eq } from "drizzle-orm";
+import { lookupKeyOf, catalog as productCatalog } from "@/domain/billing/catalog";
+import type { CatalogShape } from "@/domain/billing/catalog-shape";
 import {
   type Entitlements,
   entitlementsOf,
@@ -55,6 +57,25 @@ export function canBuy(plan: Plan | null, interval: Interval): boolean {
     return true;
   }
   return interval === "lifetime" && plan.providerSubscriptionId !== null;
+}
+
+/**
+ * The tier a checkout sells: the one asked for, or the catalog's default. A tier asked for that is
+ * not sold that way is refused; the default tier with no such price is left to the prices to refuse,
+ * as it always was.
+ */
+export function checkoutTier(
+  requested: string | undefined,
+  interval: Interval,
+  catalog: CatalogShape = productCatalog,
+): string {
+  if (requested === undefined) {
+    return catalog.paidTier;
+  }
+  if (requested === "free" || lookupKeyOf(requested, interval, catalog) === undefined) {
+    throw new DomainError(400, "tierNotSold");
+  }
+  return requested;
 }
 
 export const noCourtesy = {

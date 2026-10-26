@@ -17,7 +17,7 @@ alarm. The address is `POST /api/ingest/<source>`.
 2. **Make `apply` idempotent.** A worker retries, so a delivery can arrive twice. Key what it writes
    by something in the payload (an id, a day) and use an upsert or `onConflictDoNothing`, the way
    the payment record does.
-3. **Register it** in `lib/ingest/sources.ts` under a name of lower-case letters, digits and hyphens.
+3. **Register it** in `lib/ingest/sources.product.ts` (the base's own sources are in `lib/ingest/sources.ts`) under a name of lower-case letters, digits and hyphens.
 4. **Give it a secret.** Add `name=secret` to `INGEST_SECRETS` (a pair per source, comma-separated,
    at least 32 characters each, one secret per source so a leak exposes one source). Without its
    secret a source answers 401, exactly like one that does not exist. Generate the secret with

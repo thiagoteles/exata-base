@@ -33,6 +33,7 @@ A product never edits a file of the base. What it declares goes in the `*.produc
 - What a route of its own needs traced into the build (a PDF's fonts): `next.config.product.ts`.
 - What activation is: `domain/onboarding/steps.product.ts`.
 - What programs may do: `domain/api/scopes.product.ts`, routes in `app/api/v1/`.
+- What a worker outside the server delivers: `lib/ingest/sources.product.ts`, with its secret in `INGEST_SECRETS`.
 - What is counted: `lib/analytics-events.product.ts`.
 - What each plan grants: `domain/billing/catalog.product.ts`.
 - Its own preferences: `lib/preferences/definitions.product.ts`.

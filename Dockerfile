@@ -5,7 +5,8 @@
 
 FROM node:26-alpine AS base
 ENV PNPM_HOME=/pnpm npm_config_store_dir=/pnpm/store COREPACK_ENABLE_DOWNLOAD_PROMPT=0 NEXT_TELEMETRY_DISABLED=1 CI=true LEFTHOOK=0
-RUN corepack enable
+# Node no longer ships corepack, which provides the pnpm that package.json pins.
+RUN npm install --global corepack@0.36.0 && corepack enable
 WORKDIR /app
 
 FROM base AS deps

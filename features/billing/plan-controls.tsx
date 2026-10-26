@@ -10,7 +10,8 @@ import { useErrorText } from "@/lib/use-error-text";
 import { openPortal, setCancellation } from "./actions";
 
 /** The provider's customer portal, where the card and the invoices live. */
-export function PortalButton() {
+/** The portal; where the product sells several tiers, it is also where a person changes tier. */
+export function PortalButton({ switchesTier = false }: { switchesTier?: boolean }) {
   const t = useTranslations("plan");
   const describe = useErrorText();
   const notify = useToast();
@@ -33,7 +34,7 @@ export function PortalButton() {
 
   return (
     <Button variant="secondary" loading={pending} onClick={open}>
-      {t("portal")}
+      {t(switchesTier ? "portalSwitch" : "portal")}
     </Button>
   );
 }

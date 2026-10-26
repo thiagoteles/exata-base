@@ -11,7 +11,7 @@ import { TrialNotice } from "@/components/patterns/trial-notice";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
-import { catalog } from "@/domain/billing/catalog";
+import { catalog, soldTiers } from "@/domain/billing/catalog";
 import { isPaidTier } from "@/domain/billing/entitlements";
 import { isFixedTerm } from "@/domain/billing/term";
 import { trialStanding } from "@/domain/billing/trial";
@@ -109,8 +109,11 @@ async function TrialSection({ endsAt }: { endsAt: Date }) {
   );
 }
 
+/** Whether the product sells several tiers, so a plan is named by its tier as well as its interval. */
+const severalTiers = soldTiers().length > 1;
+
 async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: string }) {
-  const t = await getTranslations("plan");
+  const [t, plans] = await Promise.all([getTranslations("plan"), getTranslations("plans")]);
   const state = planState(plan);
   const paid = plan !== null && isPaidTier(plan.tier);
   const cells = [
@@ -136,7 +139,12 @@ async function PlanRecord({ plan, timeZone }: { plan: Plan | null; timeZone: str
           ? {}
           : { stamp: <Stamp tone={planStateTone[state]}>{t(`statuses.${state}`)}</Stamp> })}
       >
-        {t(`names.${paid ? (plan.billingInterval ?? "free") : "free"}`)}
+        {paid && severalTiers
+          ? t("nameWithTier", {
+              tier: plans(`tiers.${plan.tier}`),
+              interval: t(`names.${plan.billingInterval ?? "free"}`),
+            })
+          : t(`names.${paid ? (plan.billingInterval ?? "free") : "free"}`)}
       </RecordCell>
       {paid ? (
         <RecordCell label={t("origin")}>
@@ -165,7 +173,9 @@ async function PlanActions({ plan }: { plan: Plan | null }) {
   return (
     <>
       {billingOn && subscribed ? <CancellationControl canceling={plan.cancelAtPeriodEnd} /> : null}
-      {billingOn && plan?.providerCustomerId ? <PortalButton /> : null}
+      {billingOn && plan?.providerCustomerId ? (
+        <PortalButton switchesTier={severalTiers && subscribed} />
+      ) : null}
       {plan !== null && isPaidTier(plan.tier) ? null : (
         <Link href={publicHref("/plans")} className={buttonClasses("primary")}>
           {t("seePlans")}

@@ -29,6 +29,8 @@
   "confirming": "Estamos confirmando seu pagamento. Atualize esta página em instantes.",
   "seePlans": "Ver planos",
   "portal": "Gerenciar pagamento",
+  "portalSwitch": "Trocar plano ou pagamento",
+  "nameWithTier": "{tier} · {interval}",
   "portalFailed": "Não foi possível abrir o portal de pagamento.",
   "cancel": {
     "title": "Cancelar no fim do período",

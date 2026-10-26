@@ -6,13 +6,14 @@ import { Suspense } from "react";
 import { JsonLd } from "@/components/json-ld";
 import { ContentSection } from "@/components/patterns/content-section";
 import { Faq } from "@/components/patterns/faq";
+import { PageSection } from "@/components/patterns/page-section";
 import { type PricingColumn, PricingTable } from "@/components/patterns/pricing-table";
 import { RuntimeMarker } from "@/components/runtime-marker";
 import { Stamp } from "@/components/ui/stamp";
 import { buttonClasses } from "@/components/ui/styles";
-import { catalog } from "@/domain/billing/catalog";
+import { catalog, soldTiers } from "@/domain/billing/catalog";
 import { chooseCurrency, currenciesToOffer, priceIn } from "@/domain/billing/currency";
-import { featuresOfTier, isPaidTier } from "@/domain/billing/entitlements";
+import { featuresOfTier, type Tier } from "@/domain/billing/entitlements";
 import { trialDaysFor } from "@/domain/billing/trial";
 import { BuyButton } from "@/features/billing/buy-button";
 import { CurrencySwitch } from "@/features/billing/currency-switch";
@@ -50,7 +51,8 @@ const unitKey = {
   lifetime: "once",
 } as const;
 const faqIds = ["cancel", "refund", "invoice"] as const;
-const features = [...featuresOfTier(catalog.paidTier)];
+/** The tiers on sale. With one, the page is a single table; with more, a section for each. */
+const tiers = soldTiers() as Tier[];
 
 export default async function PlansPage({
   searchParams,
@@ -70,7 +72,11 @@ export default async function PlansPage({
         <h1 className="text-page-title text-ink">{t("title")}</h1>
         <p className="mt-2 mb-10 max-w-[52ch] text-body text-ink-muted">{t("subtitle")}</p>
         <Suspense fallback={<div className="h-64 rounded-cell bg-sunken" />}>
-          <Offers searchParams={searchParams} />
+          {tiers.length > 1 ? (
+            <TierSections searchParams={searchParams} />
+          ) : (
+            <Offers tier={tiers[0] ?? (catalog.paidTier as Tier)} searchParams={searchParams} />
+          )}
         </Suspense>
       </section>
       <ContentSection marker="FAQ" title={t("faq.title")} intro={t("faq.intro")}>
@@ -86,6 +92,9 @@ const trialDaysOf = (plan: Awaited<ReturnType<typeof readPlan>>, interval: Inter
   trialDaysFor({ trial: catalog.trial, interval, trialUsedAt: plan?.trialUsedAt ?? null });
 
 type ActionContext = {
+  tier: Tier;
+  /** Whether the page sells several tiers, so the purchase names the one it is for. */
+  several: boolean;
   interval: Interval;
   user: Awaited<ReturnType<typeof getCurrentUser>>;
   plan: Awaited<ReturnType<typeof readPlan>>;
@@ -109,7 +118,16 @@ function noteFor(input: {
 }
 
 /** What a person can do about one way of buying: sign in, see it is theirs, wait for it, or buy it. */
-function intervalAction({ interval, user, plan, currency, source, t }: ActionContext) {
+function intervalAction({
+  tier,
+  several,
+  interval,
+  user,
+  plan,
+  currency,
+  source,
+  t,
+}: ActionContext) {
   const trialDays = trialDaysOf(plan, interval);
   if (user === null) {
     return (
@@ -121,10 +139,10 @@ function intervalAction({ interval, user, plan, currency, source, t }: ActionCon
       </Link>
     );
   }
-  if (plan !== null && isPaidTier(plan.tier) && plan.billingInterval === interval) {
+  if (plan !== null && plan.tier === tier && plan.billingInterval === interval) {
     return <Stamp tone="success">{t("current")}</Stamp>;
   }
-  if (plan?.status === "pending" && plan.priceKey === `${catalog.paidTier}.${interval}`) {
+  if (plan?.status === "pending" && plan.priceKey === `${tier}.${interval}`) {
     return <Stamp tone="info">{t("awaiting")}</Stamp>;
   }
   if (!canBuy(plan, interval)) {
@@ -132,6 +150,7 @@ function intervalAction({ interval, user, plan, currency, source, t }: ActionCon
   }
   return (
     <BuyButton
+      {...(several ? { tier } : {})}
       interval={interval}
       currency={currency}
       trialDays={trialDays}
@@ -141,12 +160,48 @@ function intervalAction({ interval, user, plan, currency, source, t }: ActionCon
   );
 }
 
-async function Offers({ searchParams }: { searchParams: Promise<{ source?: string | string[] }> }) {
+type Query = Promise<{ source?: string | string[] }>;
+
+/**
+ * A section for each tier with a price on sale right now, in the catalog's order, each with its own
+ * ways of buying. With none on sale the page says so once.
+ */
+async function TierSections({ searchParams }: { searchParams: Query }) {
+  const t = await getTranslations("plans");
+  const offered = await Promise.all(tiers.map(offeredIntervals));
+  const onSale = tiers.filter((_, index) => (offered[index]?.length ?? 0) > 0);
+  if (onSale.length === 0) {
+    return <p className="text-body text-ink-muted">{t("none")}</p>;
+  }
+  return (
+    <div className="flex flex-col gap-10">
+      {onSale.map((tier, index) => (
+        <PageSection key={tier} title={t(`tiers.${tier}`)}>
+          <Offers tier={tier} searchParams={searchParams} several first={index === 0} />
+        </PageSection>
+      ))}
+    </div>
+  );
+}
+
+async function Offers({
+  tier,
+  searchParams,
+  several = false,
+  first = true,
+}: {
+  tier: Tier;
+  searchParams: Query;
+  /** One of several tiers on the page. */
+  several?: boolean;
+  /** The first table on the page, the one that carries the free column and the currency choice. */
+  first?: boolean;
+}) {
   const t = await getTranslations("plans");
   const source = sourceOf((await searchParams).source);
   const [intervals, prices, user] = await Promise.all([
-    offeredIntervals(),
-    readPrices(),
+    offeredIntervals(tier),
+    readPrices(tier),
     getCurrentUser(),
   ]);
   if (intervals.length === 0) {
@@ -170,17 +225,22 @@ async function Offers({ searchParams }: { searchParams: Promise<{ source?: strin
   }
 
   const inCurrency = (price: PriceTag) => priceIn(price, currency);
+  const features = [...featuresOfTier(tier)];
   const freeHas = featuresOfTier("free");
-  const paidHas = featuresOfTier(catalog.paidTier);
+  const tierHas = featuresOfTier(tier);
   const highlighted = shown.includes("yearly") ? "yearly" : shown[0];
   const columns: PricingColumn[] = [
-    {
-      id: "free",
-      name: t("names.free"),
-      price: t("freePrice"),
-      unit: t("freeUnit"),
-      has: features.map((feature) => freeHas.has(feature)),
-    },
+    ...(first
+      ? [
+          {
+            id: "free",
+            name: t("names.free"),
+            price: t("freePrice"),
+            unit: t("freeUnit"),
+            has: features.map((feature) => freeHas.has(feature)),
+          },
+        ]
+      : []),
     ...shown.flatMap((interval) => {
       const price = prices[interval];
       if (price === undefined) {
@@ -190,14 +250,14 @@ async function Offers({ searchParams }: { searchParams: Promise<{ source?: strin
       const note = noteFor({ interval, plan, trialDays, t });
       return [
         {
-          id: interval,
+          id: several ? `${tier}-${interval}` : interval,
           name: t(`names.${interval}`),
           price: formatMoney(toCents(inCurrency(price).cents), inCurrency(price).currency),
           unit: t(unitKey[interval]),
           highlighted: interval === highlighted,
           ...(note === undefined ? {} : { note }),
-          has: features.map((feature) => paidHas.has(feature)),
-          action: intervalAction({ interval, user, plan, currency, source, t }),
+          has: features.map((feature) => tierHas.has(feature)),
+          action: intervalAction({ tier, several, interval, user, plan, currency, source, t }),
         },
       ];
     }),
@@ -205,13 +265,13 @@ async function Offers({ searchParams }: { searchParams: Promise<{ source?: strin
 
   return (
     <>
-      {offered.length > 1 ? (
+      {first && offered.length > 1 ? (
         <div className="mb-6">
           <CurrencySwitch current={currency} options={offered} />
         </div>
       ) : null}
       <PricingTable
-        caption={t("title")}
+        caption={several ? t(`tiers.${tier}`) : t("title")}
         featuresLabel={t("compare")}
         includedLabel={t("included")}
         excludedLabel={t("notIncluded")}

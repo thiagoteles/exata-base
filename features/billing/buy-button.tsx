@@ -10,6 +10,8 @@ import { useErrorText } from "@/lib/use-error-text";
 import { startCheckout } from "./actions";
 
 type Props = {
+  /** The tier to buy, when the product sells several; absent buys the catalog's default. */
+  tier?: string;
   interval: Interval;
   /** The currency the plans page showed, so the charge matches the price on screen. */
   currency?: string;
@@ -23,6 +25,7 @@ type Props = {
 
 /** Opens the provider's checkout. The browser leaves the site, so success is never shown here. */
 export function BuyButton({
+  tier,
   interval,
   currency,
   trialDays = 0,
@@ -46,6 +49,7 @@ export function BuyButton({
   const buy = async () => {
     setPending(true);
     const result = await startCheckout({
+      ...(tier === undefined ? {} : { tier }),
       interval,
       source,
       ...(currency === undefined ? {} : { currency }),

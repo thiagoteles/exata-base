@@ -1,11 +1,16 @@
 import { sql } from "drizzle-orm";
 import { boolean, check, index, integer, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
-import { tierNames } from "@/domain/billing/entitlements";
+import type { Tier } from "@/domain/billing/entitlements";
 import { createdAt, id, instant, updatedAt } from "../columns";
 import { authoredBy, ownedBy } from "./user-references";
 
-// The tiers come from the catalog, so the database refuses a tier the product does not sell.
-export const planTier = pgEnum("plan_tier", tierNames);
+/**
+ * The tiers the base's own migrations put in the database type. The type stays at these here, so the
+ * base's stream never changes with a product's catalog; the tiers a product sells besides these come
+ * in through its own migrations (`pnpm db:tiers`), and the server refuses to start without them.
+ */
+export const BASE_TIERS = ["free", "paid"] as const;
+export const planTier = pgEnum("plan_tier", BASE_TIERS);
 export const planStatus = pgEnum("plan_status", [
   "active",
   "canceled",
@@ -29,7 +34,7 @@ export const plans = pgTable(
   "plans",
   {
     userId: ownedBy().primaryKey(),
-    tier: planTier().notNull().default("free"),
+    tier: planTier().$type<Tier>().notNull().default("free"),
     status: planStatus().notNull().default("active"),
     billingInterval: billingInterval(),
     /* The provider that sells this plan; null for a free or courtesy plan. */

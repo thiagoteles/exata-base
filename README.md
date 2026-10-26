@@ -92,6 +92,7 @@ The product ships in Brazilian Portuguese only, and `messages/pt-BR.json` is the
 | `pnpm new:crud <area> --entity <Entity> --label "<Rótulos>"` | Writes a complete area of records (table, rules, list, record, form, pages, text, tests) from the living sample; `--parent <area>` files it under another area |
 | `pnpm db:generate --name <change>` | Writes a migration after a schema change |
 | `pnpm db:migrate` | Applies pending migrations to the compose's database, without restarting the app |
+| `pnpm db:tiers` | After a tier is added to the catalog, writes the migration that adds it to the database; the server refuses to start without it |
 | `pnpm catalog:presets` | Compares every preset with its catalog references; `--update` rewrites them |
 
 The Clerk suite needs a server started with `AUTH_PROVIDER=clerk` and these variables exported in the shell that runs it: `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` and `E2E_CLERK_USER_EMAIL`, the e-mail of a user that already exists in that development instance. Use keys from a development instance only.

@@ -4,7 +4,8 @@ import type { CatalogShape } from "./catalog-shape";
  * The plans the product sells, filled in by the product, which owns this file. Each tier names the
  * features it grants and its usage limits, and may extend another tier to inherit both. `free`
  * always exists: it is what anyone without a paid plan has. Tier names are stored in the database
- * as an enum built from this list, so renaming or removing a tier needs a migration. A product that
+ * as an enum: after adding a tier, `pnpm db:tiers` writes the migration that adds it, and renaming or
+ * removing one needs a migration written by hand. A product that
  * declares more than the shape asks for widens the `satisfies` below with its own fields.
  */
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { env, environmentIssues } from "./env";
+import { defaultAuthProvider, env, environmentIssues } from "./env";
 
 const local = { ...env, AUTH_PROVIDER: "local" as const };
 const clerk = { ...env, AUTH_PROVIDER: "clerk" as const };
@@ -132,5 +132,20 @@ describe("environment rules", () => {
     expect(environmentIssues({ ...stack, APP_URL: "https://a.b" }, raw, true)).toEqual([
       "LOCAL_STACK is for this machine only and needs APP_URL on localhost",
     ]);
+  });
+});
+
+// `pnpm dev` on the host, with no .env, crashed asking for Clerk keys: only the compose set the flag.
+describe("the sign-in mode when the flag is unset", () => {
+  it("is the app's own on a developer's machine with no Clerk key, and Clerk with one", () => {
+    expect(defaultAuthProvider("development", undefined)).toBe("local");
+    expect(defaultAuthProvider("development", " ")).toBe("local");
+    expect(defaultAuthProvider("development", "pk_test_x")).toBe("clerk");
+    expect(defaultAuthProvider(undefined, undefined)).toBe("local");
+  });
+
+  it("stays Clerk in production and in the build, key or not", () => {
+    expect(defaultAuthProvider("production", undefined)).toBe("clerk");
+    expect(defaultAuthProvider("production", "pk_live_x")).toBe("clerk");
   });
 });

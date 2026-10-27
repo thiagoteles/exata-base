@@ -51,10 +51,29 @@ const gcpCredentials = z
     }),
   );
 
+/**
+ * The sign-in mode when the flag is unset. Production and the build use Clerk. On a developer's
+ * machine with no Clerk key there is nothing Clerk could run with, so the app's own sign-in runs
+ * instead, the way `docker compose up` does: the development server starts with no configuration.
+ */
+export function defaultAuthProvider(
+  nodeEnv: string | undefined,
+  clerkPublishableKey: string | undefined,
+): "clerk" | "local" {
+  if (nodeEnv === "production") {
+    return "clerk";
+  }
+  return (clerkPublishableKey ?? "").trim().length > 0 ? "clerk" : "local";
+}
+
 const server = {
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  // The sign-in flag. Clerk is the default. `local` uses the app's own tables instead.
-  AUTH_PROVIDER: z.enum(["clerk", "local"]).default("clerk"),
+  // The sign-in flag: `clerk`, or `local`, which uses the app's own tables. Unset, see below.
+  AUTH_PROVIDER: z
+    .enum(["clerk", "local"])
+    .default(
+      defaultAuthProvider(process.env["NODE_ENV"], process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY),
+    ),
   APP_URL: z.url().default(`http://localhost:${ports.app}`),
   DATABASE_URL: z.url().default(`postgres://app:app@localhost:${ports.database}/app`),
   ADMIN_EMAILS: csv.pipe(z.array(z.email())).default([]),

@@ -10,13 +10,20 @@ import type { Palette, Theme } from "./generate";
  * A fixed accent is a color someone else owns (a brand, a team, a sector): its fill is exactly the
  * color given, in both themes, and only decorates. What is generated around it is what has to be
  * read: the ink and the wash are measured as for any accent, and the text on the fill is the neutral
- * end that reads best, or pure black or white when neither neutral reaches the minimum.
+ * end that reads best, or pure black or white when neither neutral reaches the minimum. When the
+ * owner also fixes the color of that text (a team's colors come as a pair), it is used as given and
+ * measured against the fill like any other pair.
  */
 
 export const accentTokenNames = ["accent", "accent-wash", "accent-ink", "on-accent"] as const;
 type AccentToken = (typeof accentTokenNames)[number];
 export type AccentPalette = Record<AccentToken, Oklch>;
-export type AccentSeed = { hue: number; chroma: number; fixed?: { lightness: number } };
+type FixedColor = { hue: number; chroma: number; lightness: number };
+export type AccentSeed = {
+  hue: number;
+  chroma: number;
+  fixed?: { lightness: number; onAccent?: FixedColor };
+};
 export type AccentReport = {
   theme: Theme;
   accent: string;
@@ -110,7 +117,11 @@ export function generateAccent(
       : toColor(seed.fixed.lightness * PERCENT, seed.chroma, seed.hue);
   const light = theme === "light" ? base.surface : base.ink;
   const dark = theme === "light" ? base.ink : base.background;
-  const onAccent = readableOn(fill, [light, dark, PURE_WHITE, PURE_BLACK]);
+  const given = seed.fixed?.onAccent;
+  const onAccent =
+    given === undefined
+      ? readableOn(fill, [light, dark, PURE_WHITE, PURE_BLACK])
+      : toColor(given.lightness * PERCENT, given.chroma, given.hue);
   let palette: AccentPalette = {
     accent: fill,
     "accent-wash": make("accent-wash"),
@@ -158,8 +169,32 @@ export function generateAccent(
   return { palette, report };
 }
 
+/** The color a fixed accent's owner gives for the text on it, read like the fill itself. */
+function parseOnAccent(name: string, value: unknown): FixedColor | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const { hue, chroma, lightness } = (value ?? {}) as Record<string, unknown>;
+  if (
+    typeof hue !== "number" ||
+    hue < 0 ||
+    hue >= 360 ||
+    typeof chroma !== "number" ||
+    chroma < 0 ||
+    chroma > MAX_FIXED_CHROMA ||
+    typeof lightness !== "number" ||
+    lightness < 0 ||
+    lightness > 1
+  ) {
+    throw new Error(
+      `accents.${name}.onAccent needs a hue from 0 up to 360, a chroma from 0 to ${MAX_FIXED_CHROMA} and a lightness from 0 to 1`,
+    );
+  }
+  return { hue, chroma, lightness };
+}
+
 function parseSeed(name: string, seed: Record<string, unknown>): AccentSeed {
-  const { hue, chroma, fixed, lightness } = seed;
+  const { hue, chroma, fixed, lightness, onAccent } = seed;
   if (typeof hue !== "number" || hue < 0 || hue >= 360) {
     throw new Error(`accents.${name}.hue must be a number from 0 up to 360`);
   }
@@ -170,10 +205,13 @@ function parseSeed(name: string, seed: Record<string, unknown>): AccentSeed {
     if (typeof chroma !== "number" || chroma < 0 || chroma > MAX_FIXED_CHROMA) {
       throw new Error(`accents.${name}.chroma must be a number from 0 to ${MAX_FIXED_CHROMA}`);
     }
-    return { hue, chroma, fixed: { lightness } };
+    const text = parseOnAccent(name, onAccent);
+    return { hue, chroma, fixed: { lightness, ...(text === undefined ? {} : { onAccent: text }) } };
   }
-  if (fixed !== undefined || lightness !== undefined) {
-    throw new Error(`accents.${name}: lightness belongs to a fixed accent, set "fixed": true`);
+  if (fixed !== undefined || lightness !== undefined || onAccent !== undefined) {
+    throw new Error(
+      `accents.${name}: lightness and onAccent belong to a fixed accent, set "fixed": true`,
+    );
   }
   if (typeof chroma !== "number" || chroma < 0.04 || chroma > 0.2) {
     throw new Error(`accents.${name}.chroma must be a number from 0.04 to 0.2`);

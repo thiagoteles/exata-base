@@ -74,6 +74,50 @@ describe("fixed accent", () => {
   });
 });
 
+describe("a fixed accent whose owner also fixes the text on it", () => {
+  const yellow = { hue: 100, chroma: 0.2, lightness: 0.93 };
+  const greenOn = (lightness: number) => ({
+    ...yellow,
+    fixed: { lightness: yellow.lightness, onAccent: { hue: 150, chroma: 0.13, lightness } },
+  });
+
+  // Fails when the owner's text color is replaced by the neutral the generator would pick.
+  it("uses the color given for the text, in both themes", () => {
+    for (const theme of ["light", "dark"] as const) {
+      const base = generateTheme(theme, DEFAULT_SEEDS).palette;
+      const { palette } = generateAccent(theme, "sun", greenOn(0.42), base);
+      expect(palette["on-accent"]).toMatchObject({ l: 0.42, h: 150 });
+    }
+  });
+
+  // Fails when a pair the owner chose is accepted although it cannot be read on the fill.
+  it("refuses, by name, a text color too light to read on the fill", () => {
+    const base = generateTheme("light", DEFAULT_SEEDS).palette;
+    expect(() => generateAccent("light", "sun", greenOn(0.7), base)).toThrow(
+      "accent sun: on-accent on accent",
+    );
+  });
+
+  it("is read from design.json only on a fixed accent", () => {
+    const onAccent = { hue: 150, chroma: 0.13, lightness: 0.42 };
+    expect(
+      parseAccents({
+        accents: { sun: { hue: 100, chroma: 0.2, fixed: true, lightness: 0.93, onAccent } },
+      }),
+    ).toEqual({ sun: { hue: 100, chroma: 0.2, fixed: { lightness: 0.93, onAccent } } });
+    expect(() => parseAccents({ accents: { sun: { hue: 100, chroma: 0.15, onAccent } } })).toThrow(
+      "fixed",
+    );
+    expect(() =>
+      parseAccents({
+        accents: {
+          sun: { hue: 100, chroma: 0.2, fixed: true, lightness: 0.93, onAccent: { hue: 150 } },
+        },
+      }),
+    ).toThrow("onAccent");
+  });
+});
+
 describe("reading accents from design.json", () => {
   it("takes a fixed accent with its lightness and refuses the half-declared ones", () => {
     expect(

@@ -10,6 +10,7 @@ describe("local ports", () => {
       app: 47_310,
       database: 47_450,
       mail: 47_040,
+      smtp: 47_041,
       image: 47_409,
     });
   });
@@ -34,5 +35,6 @@ describe("local ports", () => {
     expect(compose).toContain(`APP_URL: http://localhost:${current.app}`);
     expect(compose).toContain(`"${current.database}:5432"`);
     expect(compose).toContain(`"${current.mail}:8025"`);
+    expect(compose).toContain(`"${current.smtp}:1025"`);
   });
 });

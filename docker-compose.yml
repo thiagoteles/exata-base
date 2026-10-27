@@ -77,6 +77,8 @@ services:
     image: axllent/mailpit:v1.31
     ports:
       - "47030:8025"
+      # Its SMTP, for the development server run on the host (`pnpm dev`) to send to.
+      - "47031:1025"
 
 volumes:
   postgres18-data:

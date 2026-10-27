@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tsx scripts/messages.ts && next dev --webpack",
+    "dev": "tsx scripts/messages.ts && tsx scripts/dev.ts",
     "messages": "tsx scripts/messages.ts",
     "extract-text": "tsx scripts/extract-text.ts",
     "build": "next build --webpack",

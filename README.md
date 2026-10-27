@@ -10,7 +10,16 @@ docker compose up
 
 Open http://localhost:47300. Sign in as the seeded admin, `admin@app.local` with the password `admin-local`. Mail the app sends appears at http://localhost:47030. No `.env` file is needed: every local value is set in `docker-compose.yml`.
 
-- **Ports** live in `ports.json`, and every script and spec reads them from there. `pnpm setup:product --ports 47310` gives a product its own block (app 47310, Postgres 47450, mail 47040), so it runs beside the base or another product.
+Or run the development server on the host, with the compose's database and mail catcher:
+
+```sh
+docker compose up -d postgres mailpit
+pnpm dev
+```
+
+It is the same server at the same address, with the same admin and the same catcher, still with no `.env`: what the compose sets for the app is also the development server's own default, and a test (`lib/env.compose.test.ts`) keeps the two equal. Run one or the other, since both answer on the app port. A `.env.local` is read only on the host, and what it sets wins over those defaults.
+
+- **Ports** live in `ports.json`, and every script and spec reads them from there, `pnpm dev` too. `pnpm setup:product --ports 47310` gives a product its own block (app 47310, Postgres 47450, the mail catcher's page 47040 and its SMTP 47041), so it runs beside the base or another product.
 - **Memory.** The development server keeps every route it has compiled, and the compose gives it an 8 GB heap, which needs 12 GB for Docker (Docker Desktop, Settings, Resources). With Docker's default of 7.7 GB, lower `NODE_OPTIONS` in `docker-compose.yml` to `--max-old-space-size=4096`. Two composes at once want 16 GB.
 - **Packages** are installed in the image (`Dockerfile.dev`) and the code is mounted over it. After a change to `package.json` or the lockfile: `docker compose up --build --renew-anon-volumes`.
 - **Keys.** The compose mounts an empty file over `.env.local`, so the keys you keep there for running outside Docker never reach the container, and mail keeps going to the catcher. To try a provider (Stripe, Clerk, Google) in the compose, pass its keys with an extra file: `docker compose -f docker-compose.yml -f extra.yml up -d --force-recreate app`, where `extra.yml` sets `services.app.environment`.

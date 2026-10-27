@@ -52,6 +52,30 @@ const gcpCredentials = z
   );
 
 /**
+ * What the development server uses for what is not set: the values the compose sets, so `pnpm dev`
+ * on the host runs as `docker compose up` does, with no configuration. A test holds the two equal.
+ * Only the development server gets them; production and the tests keep their own defaults.
+ */
+export const developmentDefaults = {
+  // The admin the seed creates.
+  ADMIN_EMAILS: "admin@app.local",
+  CONTACT_EMAIL: "contato@app.local",
+  CRON_SECRET: "local-development-cron-secret-0123456789",
+  INGEST_SECRETS: "job-run=local-development-ingest-secret-0123456789",
+  SMTP_LOCAL_URL: `smtp://localhost:${ports.smtp}`,
+} as const;
+
+// Filled before the schema reads the environment, so every reader sees the same values. A value
+// set, even in a .env file, wins.
+if (process.env["NODE_ENV"] === "development" && !("window" in globalThis)) {
+  for (const [name, value] of Object.entries(developmentDefaults)) {
+    if ((process.env[name] ?? "").trim() === "") {
+      process.env[name] = value;
+    }
+  }
+}
+
+/**
  * The sign-in mode when the flag is unset. Production and the build use Clerk. On a developer's
  * machine with no Clerk key there is nothing Clerk could run with, so the app's own sign-in runs
  * instead, the way `docker compose up` does: the development server starts with no configuration.

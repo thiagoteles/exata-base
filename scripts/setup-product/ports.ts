@@ -1,14 +1,16 @@
 /*
- * The local ports of a product: the app, its Postgres, the mail catcher, and the production image
+ * The local ports of a product: the app, its Postgres, the mail catcher's page and its SMTP (which
+ * the development server on the host sends to), and the production image
  * that `pnpm verify` boots. They move together, by the app port, so two products (or a product and
  * the base) can run their composes at once. `ports.json` holds them for every script and spec that
  * can read it; the compose file and the documents that name a port are rewritten.
  */
 
-export type Ports = { app: number; database: number; mail: number; image: number };
+export type Ports = { app: number; database: number; mail: number; smtp: number; image: number };
 
 const DATABASE_OFFSET = 140;
 const MAIL_OFFSET = -270;
+const SMTP_OFFSET = -269;
 const IMAGE_OFFSET = 99;
 const STEP = 10;
 const LOWEST = 47_000;
@@ -18,6 +20,7 @@ export const portsFor = (app: number): Ports => ({
   app,
   database: app + DATABASE_OFFSET,
   mail: app + MAIL_OFFSET,
+  smtp: app + SMTP_OFFSET,
   image: app + IMAGE_OFFSET,
 });
 

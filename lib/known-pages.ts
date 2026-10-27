@@ -12,7 +12,7 @@ import { productDynamicRoutes } from "./known-pages.product";
  */
 const dynamicRoutes: readonly {
   route: string;
-  exists: (params: Record<string, string>) => boolean;
+  exists: (params: Record<string, string>) => boolean | Promise<boolean>;
 }[] = [
   { route: "/articles/[slug]", exists: ({ slug = "" }) => articleSlugs.has(slug) },
   // An address nobody signed is no page; whether the record behind a signed one still exists is the page's to say.
@@ -23,10 +23,17 @@ const dynamicRoutes: readonly {
   ...productDynamicRoutes,
 ];
 
-/** True when the route address fits a dynamic public route but names no page. */
-export function isMissingPage(pathname: string): boolean {
-  return dynamicRoutes.some(({ route, exists }) => {
+/**
+ * True when the route address fits a dynamic public route but names no page. Only the routes the
+ * address fits are asked, one at a time, so a check that reads the database runs only for its own
+ * addresses.
+ */
+export async function isMissingPage(pathname: string): Promise<boolean> {
+  for (const { route, exists } of dynamicRoutes) {
     const params = matchPath(route, pathname);
-    return params !== null && !exists(params);
-  });
+    if (params !== null && !(await exists(params))) {
+      return true;
+    }
+  }
+  return false;
 }

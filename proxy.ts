@@ -25,7 +25,7 @@ const reportOnlyPolicy = buildCsp(cspSources(), { development: env.NODE_ENV !== 
 // caller who sends the mark only skips the redirect and still gets the same page.
 const REWRITTEN_HEADER = "x-public-address";
 
-export function proxy(request: NextRequest, event: NextFetchEvent) {
+export async function proxy(request: NextRequest, event: NextFetchEvent) {
   const requestId = requestIdFrom(request.headers);
   // The second pass of a rewritten request is the same access, already recorded.
   if (env.ACCESS_LOG === "on" && !request.headers.has(REWRITTEN_HEADER)) {
@@ -63,7 +63,7 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   clean.pathname = address.route;
   // A dynamic page that does not exist is sent where no route matches, so Next answers its
   // not-found page with a real 404 instead of a 200 shell that later says "not found".
-  if (isMissingPage(clean.pathname)) {
+  if (await isMissingPage(clean.pathname)) {
     clean.pathname = MISSING_PAGE;
   }
   const rewritten = clean.pathname !== visible;

@@ -2,8 +2,10 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
+export type PublicHeaderProps = { actions: ReactNode };
+
 /** The actions slot holds whatever depends on the session, so the header itself stays static. */
-export function PublicHeader({ actions }: { actions: ReactNode }) {
+export function PublicHeader({ actions }: PublicHeaderProps) {
   const t = useTranslations();
   return (
     <header className="border-b border-line bg-surface print:hidden">

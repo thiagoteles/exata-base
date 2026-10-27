@@ -4,6 +4,12 @@ import type { ReactNode } from "react";
 import { productFooterLinks } from "@/lib/footer-links.product";
 import { publicHref } from "@/lib/i18n/public-paths";
 
+export type PublicFooterProps = {
+  showPlans: boolean;
+  themeSwitcher?: ReactNode;
+  languageSwitcher?: ReactNode;
+};
+
 /**
  * The product's own pages come first, then the base's. The plans link shows only when something is
  * on sale, and the language choice only when there is one to make. The theme choice is the
@@ -13,11 +19,7 @@ export function PublicFooter({
   showPlans,
   themeSwitcher = null,
   languageSwitcher = null,
-}: {
-  showPlans: boolean;
-  themeSwitcher?: ReactNode;
-  languageSwitcher?: ReactNode;
-}) {
+}: PublicFooterProps) {
   const t = useTranslations();
   return (
     <footer className="border-t border-line print:hidden">

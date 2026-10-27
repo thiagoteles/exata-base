@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
+import { productPublicFooter, productPublicHeader } from "@/components/shell/public-chrome.product";
 import { PublicFooter } from "@/components/shell/public-footer";
 import { PublicHeader } from "@/components/shell/public-header";
 import { ThemePicker } from "@/features/account/theme-picker";
@@ -9,10 +10,14 @@ import { isMultilingual } from "@/lib/i18n/locales";
 import { billingConfigured } from "@/lib/ports/payment/configured";
 import { HeaderActions, SignedOutActions } from "./header-actions";
 
+// A product that draws its own header or footer gets the same slots the base's are given.
+const Header = productPublicHeader ?? PublicHeader;
+const Footer = productPublicFooter ?? PublicFooter;
+
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <PublicHeader
+      <Header
         actions={
           <>
             <ThemeToggle />
@@ -23,7 +28,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         }
       />
       <div className="flex-1">{children}</div>
-      <PublicFooter
+      <Footer
         showPlans={billingConfigured()}
         themeSwitcher={<ThemePicker />}
         languageSwitcher={isMultilingual ? <LanguageSwitcher /> : null}

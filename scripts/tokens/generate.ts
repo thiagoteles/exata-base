@@ -10,7 +10,10 @@ import type { Temperature } from "./preset-options";
 
 export type Seeds = {
   brand: { hue: number; chroma: number };
-  neutral: { offset: number };
+  /** The neutrals follow the brand, turned by `offset`, or take a hue of their own. */
+  neutral: { offset: number; hue?: number };
+  /** The primary action: ink, the default, or the brand color for a product whose buttons wear it. */
+  action?: "ink" | "brand";
 };
 
 export type Theme = "light" | "dark";
@@ -78,22 +81,45 @@ export function parseSeeds(value: unknown): Seeds {
   const seeds = value as Partial<Seeds> | null;
   const hue = seeds?.brand?.hue;
   const chroma = seeds?.brand?.chroma;
-  const offset = seeds?.neutral?.offset ?? 0;
   if (typeof hue !== "number" || hue < 0 || hue >= FULL_TURN) {
     throw new Error("brand.hue must be a number from 0 up to 360");
   }
   if (typeof chroma !== "number" || chroma < 0.04 || chroma > 0.2) {
     throw new Error("brand.chroma must be a number from 0.04 to 0.2");
   }
-  if (typeof offset !== "number" || offset < 0 || offset > 30) {
-    throw new Error("neutral.offset must be a number from 0 to 30");
-  }
   if (hueDistance(hue, SUCCESS_HUE) < SUCCESS_CLEARANCE) {
     throw new Error(
       `brand.hue ${hue} is within ${SUCCESS_CLEARANCE} degrees of success (${SUCCESS_HUE}), so an action would look like a success`,
     );
   }
-  return { brand: { hue, chroma }, neutral: { offset } };
+  const action = parseAction(seeds?.action);
+  return {
+    brand: { hue, chroma },
+    neutral: parseNeutral(seeds?.neutral),
+    ...(action === "brand" ? { action } : {}),
+  };
+}
+
+function parseNeutral(seed: Partial<Seeds["neutral"]> | undefined): Seeds["neutral"] {
+  const offset = seed?.offset ?? 0;
+  if (typeof offset !== "number" || offset < 0 || offset > 30) {
+    throw new Error("neutral.offset must be a number from 0 to 30");
+  }
+  const hue = seed?.hue;
+  if (hue === undefined) {
+    return { offset };
+  }
+  if (typeof hue !== "number" || hue < 0 || hue >= FULL_TURN) {
+    throw new Error("neutral.hue must be a number from 0 up to 360");
+  }
+  return { offset, hue };
+}
+
+function parseAction(action: unknown): "ink" | "brand" {
+  if (action === undefined || action === "ink" || action === "brand") {
+    return action ?? "ink";
+  }
+  throw new Error('action must be "ink" or "brand"');
 }
 
 type Source = "neutral" | "brand" | { hue: number };
@@ -191,7 +217,10 @@ const toColor = (l: number, c: number, h: number): Oklch =>
 
 function build(theme: Theme, seeds: Seeds, look: Look): Palette {
   const { hue, chromaScale } = look.temperature;
-  const neutralHue = hue === "brand" ? (seeds.brand.hue + seeds.neutral.offset) % FULL_TURN : hue;
+  const neutralHue =
+    hue === "brand"
+      ? (seeds.neutral.hue ?? (seeds.brand.hue + seeds.neutral.offset) % FULL_TURN)
+      : hue;
   const make = ([name, spec]: [string, Spec]): [string, Oklch] => {
     if (spec.source === "neutral") {
       return [name, toColor(spec.l, spec.c * chromaScale, neutralHue)];
@@ -234,6 +263,27 @@ function adjust(theme: Theme, palette: Palette, constraint: Constraint): Palette
   return current;
 }
 
+const ACTION_START = { light: 50, dark: 74 } as const;
+const ACTION_RANGE = 20;
+
+/**
+ * The brand color as the primary action: as near the brand as the text on it allows, darker in the
+ * light theme and lighter in the dark one until that text reads at 4.5:1.
+ */
+function brandAction(theme: Theme, palette: Palette, seeds: Seeds): Oklch {
+  const step = theme === "light" ? -ADJUSTMENT_STEP : ADJUSTMENT_STEP;
+  let l: number = ACTION_START[theme];
+  let color = toColor(l, seeds.brand.chroma, seeds.brand.hue);
+  while (
+    wcagContrast(palette["on-action"], color) < READABLE &&
+    Math.abs(l - ACTION_START[theme]) < ACTION_RANGE
+  ) {
+    l += step;
+    color = toColor(l, seeds.brand.chroma, seeds.brand.hue);
+  }
+  return color;
+}
+
 /** Measures every pair of one palette. */
 export function measure(
   theme: Theme,
@@ -260,7 +310,11 @@ export function generateTheme(
   for (const constraint of constraintsFor(look.contrast)) {
     palette = adjust(theme, palette, constraint);
   }
-  palette = { ...palette, action: palette.ink, focus: palette.brand };
+  palette = {
+    ...palette,
+    action: seeds.action === "brand" ? brandAction(theme, palette, seeds) : palette.ink,
+    focus: palette.brand,
+  };
   const report = measure(theme, palette, look.contrast);
   const failure = report.find((pair) => pair.ratio < pair.minimum);
   if (failure !== undefined) {

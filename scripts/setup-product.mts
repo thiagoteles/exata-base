@@ -107,7 +107,7 @@ const run = (command: string, args: string[]) => execFileSync(command, args, { s
 const design = JSON.parse(read(files.design)) as Record<string, unknown> & {
   preset?: string;
   brand: { hue: number; chroma: number };
-  neutral: { offset: number };
+  neutral: { offset: number; hue?: number };
 };
 const currentPorts = JSON.parse(read(portsFile)) as Ports;
 const current = readCurrent(read(files.site), read(files.designDoc), read(files.readme));

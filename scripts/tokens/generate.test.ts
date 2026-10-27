@@ -65,4 +65,43 @@ describe("token generator", () => {
       expect(palette.focus).toEqual(palette.brand);
     }
   });
+
+  // Fails when a product that sets its own neutral hue still gets neutrals turned from the brand.
+  it("gives the neutrals a hue of their own when the product sets one", () => {
+    const seeds = parseSeeds({ brand: { hue: 175, chroma: 0.13 }, neutral: { hue: 260 } });
+    for (const theme of themes) {
+      const { palette } = generateTheme(theme, seeds);
+      expect(palette.background.h).toBeCloseTo(260, 0);
+      expect(palette.ink.h).toBeCloseTo(260, 0);
+      expect(palette.brand.h).toBeCloseTo(175, 0);
+    }
+    expect(() => parseSeeds({ brand: { hue: 175, chroma: 0.13 }, neutral: { hue: 400 } })).toThrow(
+      "neutral.hue",
+    );
+  });
+
+  // Fails when a brand-colored action leaves its own text below 4.5:1 for some brand.
+  it("puts the action in the brand color, readable in both themes, for any brand hue", () => {
+    for (let hue = 0; hue < 360; hue += 15) {
+      let seeds: ReturnType<typeof parseSeeds>;
+      try {
+        seeds = parseSeeds({
+          brand: { hue, chroma: 0.13 },
+          neutral: { offset: 0 },
+          action: "brand",
+        });
+      } catch {
+        // A hue too close to success is refused before any action is made.
+        continue;
+      }
+      for (const theme of themes) {
+        const { palette, report } = generateTheme(theme, seeds);
+        expect(palette.action.h).toBeCloseTo(hue, 0);
+        expect(report.filter((pair) => pair.ratio < pair.minimum)).toEqual([]);
+      }
+    }
+    expect(() =>
+      parseSeeds({ brand: { hue: 175, chroma: 0.13 }, neutral: { offset: 0 }, action: "gold" }),
+    ).toThrow("action");
+  });
 });

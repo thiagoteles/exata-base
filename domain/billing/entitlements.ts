@@ -29,7 +29,6 @@ type PlanStateFor<T extends string> = {
   status: "active" | "canceled" | "past_due" | "trialing" | "pending";
   currentPeriodEnd: Date | null;
 };
-export type PlanState = PlanStateFor<Tier>;
 
 type EntitlementsFor<C extends CatalogShape> = {
   tier: TierOf<C>;

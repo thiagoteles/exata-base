@@ -10,6 +10,11 @@ import { testDatabase } from "./database";
 import { createUser } from "./factories";
 import { checkoutCompleted, EVENT_CREATED_SECONDS } from "./stripe-events";
 
+// These mechanics depend on what a catalog sells, so they run on the base's sample catalog.
+vi.mock("@/domain/billing/catalog.product", async () => ({
+  catalog: (await import("@/domain/billing/catalog.fixture")).sampleCatalog,
+}));
+
 const sent = vi.hoisted(() => ({ to: [] as string[], fail: false }));
 vi.mock("@/lib/billing/mailer", () => ({
   sendPlanExpiring: (input: { to: string }) => {

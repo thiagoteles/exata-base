@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { firstPaidFeature } from "@/domain/billing/entitlements";
 import { entitlementsFor, readPlan } from "@/lib/billing/service";
 import { billingFixture } from "./billing-fixture";
@@ -12,6 +12,11 @@ import {
   invoiceEvent,
   trialWillEnd,
 } from "./stripe-events";
+
+// These mechanics depend on what a catalog sells, so they run on the base's sample catalog.
+vi.mock("@/domain/billing/catalog.product", async () => ({
+  catalog: (await import("@/domain/billing/catalog.fixture")).sampleCatalog,
+}));
 
 const db = testDatabase();
 const { deliver } = billingFixture(db);

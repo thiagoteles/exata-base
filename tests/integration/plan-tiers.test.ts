@@ -1,10 +1,15 @@
 import { eq, sql } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { catalog } from "@/domain/billing/catalog";
 import { addTierStatements, checkPlanTiers } from "@/lib/db/plan-tiers";
 import { plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
 import { testDatabase } from "./database";
+
+// These mechanics depend on what a catalog sells, so they run on the base's sample catalog.
+vi.mock("@/domain/billing/catalog.product", async () => ({
+  catalog: (await import("@/domain/billing/catalog.fixture")).sampleCatalog,
+}));
 
 const db = testDatabase();
 // Tiers no other file adds: the files share one database, and an added value stays in the type.

@@ -16,6 +16,11 @@ import {
   subscriptionDeleted,
 } from "./stripe-events";
 
+// These mechanics depend on what a catalog sells, so they run on the base's sample catalog.
+vi.mock("@/domain/billing/catalog.product", async () => ({
+  catalog: (await import("@/domain/billing/catalog.fixture")).sampleCatalog,
+}));
+
 const db = testDatabase();
 const paid = (features: ReadonlySet<string>) => [...features].includes(`${firstPaidFeature}`);
 const premium = async (userId: string) =>

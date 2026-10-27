@@ -32,3 +32,30 @@ export const twoTierCatalog = {
   allowPromotionCodes: false,
   paidTier: "plus",
 } as const satisfies CatalogShape;
+
+/*
+ * The base's own sample catalog, pinned for the tests of the billing mechanics that depend on what
+ * a catalog sells (a trial, a year bought once, a lifetime plan, the referral credit). A product
+ * sells something else, so those tests mock its catalog with this one instead of reading it.
+ */
+export const sampleCatalog = {
+  tiers: {
+    free: { features: [], limits: { exports: { limit: 5, per: "day" } } },
+    paid: {
+      extends: "free",
+      features: ["premium"],
+      limits: { exports: { limit: 50, per: "day" } },
+    },
+  },
+  prices: {
+    "paid.monthly": "paid_monthly",
+    "paid.yearly": "paid_yearly",
+    "paid.yearly_once": "paid_yearly_once",
+    "paid.lifetime": "paid_lifetime",
+  },
+  currencies: { default: "brl", offered: ["brl"] },
+  trial: { days: 14, intervals: ["monthly", "yearly"] },
+  referralCredit: { cents: 1000 },
+  allowPromotionCodes: true,
+  paidTier: "paid",
+} as const satisfies CatalogShape;

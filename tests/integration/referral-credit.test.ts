@@ -10,6 +10,11 @@ import { testDatabase } from "./database";
 import { createUser } from "./factories";
 import { chargeRefunded, chargeSucceeded } from "./stripe-events";
 
+// These mechanics depend on what a catalog sells, so they run on the base's sample catalog.
+vi.mock("@/domain/billing/catalog.product", async () => ({
+  catalog: (await import("@/domain/billing/catalog.fixture")).sampleCatalog,
+}));
+
 const db = testDatabase();
 const { deliver, subscriber } = billingFixture(db);
 const now = new Date();

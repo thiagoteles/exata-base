@@ -1,11 +1,16 @@
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { catalog } from "@/domain/billing/catalog";
 import { readBusinessNumbers } from "@/lib/admin/numbers";
 import { payments, plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
+
+// These mechanics depend on what a catalog sells, so they run on the base's sample catalog.
+vi.mock("@/domain/billing/catalog.product", async () => ({
+  catalog: (await import("@/domain/billing/catalog.fixture")).sampleCatalog,
+}));
 
 const db = testDatabase();
 // 01:30 in São Paulo on 10 June: the local day is 10 June, while UTC is already 10 June 04:30.

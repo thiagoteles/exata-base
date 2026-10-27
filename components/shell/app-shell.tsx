@@ -20,7 +20,7 @@ export function AppShell({ sidebar, bottomBar, userMenu, children }: AppShellPro
   const t = useTranslations();
   const contentId = useId();
   return (
-    <div className="flex h-dvh flex-col print:block print:h-auto">
+    <div data-base-shell={true} className="flex h-dvh flex-col print:block print:h-auto">
       <a
         href={`#${contentId}`}
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-action focus:px-4 focus:py-3 focus:text-on-action"

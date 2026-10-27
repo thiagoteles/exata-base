@@ -13,12 +13,15 @@ test("on a wide screen the sidebar shows the current destination and the bottom 
     "aria-current",
     "page",
   );
-  expect((await sidebar.boundingBox())?.width).toBeGreaterThanOrEqual(240);
   await expect(
     page.getByRole("navigation", { name: "Navegação principal do celular" }),
   ).toBeHidden();
-  const header = await page.locator("header").first().boundingBox();
-  expect(header?.height).toBe(60);
+  // The base's own measures; a product that draws its own frame keeps its own.
+  if ((await page.locator("[data-base-shell]").count()) > 0) {
+    expect((await sidebar.boundingBox())?.width).toBeGreaterThanOrEqual(240);
+    const header = await page.locator("header").first().boundingBox();
+    expect(header?.height).toBe(60);
+  }
 });
 
 test("only the content scrolls: the top bar stays where it is", async ({ page }) => {

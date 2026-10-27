@@ -14,6 +14,8 @@ export const referrals = pgTable(
     referredId: ownedBy().notNull().unique(),
     referrerId: authoredBy(),
     referrerEmail: text().notNull(),
+    /* Where the link was shared from, one of the places the product lists; null when it named none. */
+    source: text(),
     /* When the inviter was credited for this arrival, so it happens once; null until then. */
     rewardedAt: instant(),
     rewardCents: integer(),

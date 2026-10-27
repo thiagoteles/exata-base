@@ -34,6 +34,7 @@ A product never edits a file of the base. What it declares goes in the `*.produc
 - What activation is: `domain/onboarding/steps.product.ts`.
 - What programs may do: `domain/api/scopes.product.ts`, routes in `app/api/v1/`.
 - What a worker outside the server delivers: `lib/ingest/sources.product.ts`, with its secret in `INGEST_SECRETS`.
+- How invitations behave (how long a link is remembered, how soon a sign-in still counts, the places a link may say it came from with `?via=`): `domain/referral/settings.product.ts`.
 - What is counted: `lib/analytics-events.product.ts`.
 - What each plan grants: `domain/billing/catalog.product.ts`.
 - Its own preferences: `lib/preferences/definitions.product.ts`.

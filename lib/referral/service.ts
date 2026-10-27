@@ -1,5 +1,5 @@
 import { count, eq } from "drizzle-orm";
-import { type ReferralVerdict, readReferralCode, referralVerdict } from "@/domain/referral/rules";
+import { type ReferralVerdict, readReferralCookie, referralVerdict } from "@/domain/referral/rules";
 import type { Database } from "@/lib/db/database";
 import { referrals } from "@/lib/db/schema/referrals";
 import { users } from "@/lib/db/schema/users";
@@ -14,12 +14,19 @@ export type ReferralOutcome = ReferralVerdict | "no_code";
 
 export async function recordReferral(
   db: Database,
-  input: { referredId: string; rawCode: string | null | undefined; now: Date },
+  input: {
+    referredId: string;
+    rawCode: string | null | undefined;
+    now: Date;
+    /** The places a link may name; the product's own unless given. */
+    sources?: readonly string[];
+  },
 ): Promise<ReferralOutcome> {
-  const code = readReferralCode(input.rawCode);
-  if (code === null) {
+  const read = readReferralCookie(input.rawCode, input.sources);
+  if (read === null) {
     return "no_code";
   }
+  const { code, source } = read;
   const [referrer] = await db
     .select({ id: users.id, email: users.email })
     .from(users)
@@ -50,6 +57,7 @@ export async function recordReferral(
         referredId: input.referredId,
         referrerId: referrer.id,
         referrerEmail: referrer.email,
+        source,
       })
       .onConflictDoNothing({ target: referrals.referredId });
   }

@@ -131,6 +131,22 @@ describe("recording who invited whom", () => {
   });
 });
 
+describe("the place an invitation came from", () => {
+  // Fails when the place a link was shared from is lost between the cookie and the row.
+  it("is recorded when the product lists it, and left empty when it does not", async () => {
+    const ana = await createUser(db, "ana@example.com");
+    const bia = await createUser(db, "bia@example.com");
+    const cris = await createUser(db, "cris@example.com");
+    const code = await codeOf(ana.id);
+    const sources = ["newsletter"];
+    await recordReferral(db, { referredId: bia.id, rawCode: `${code}:newsletter`, now, sources });
+    await recordReferral(db, { referredId: cris.id, rawCode: `${code}:elsewhere`, now, sources });
+    const rows = await db.select().from(referrals);
+    expect(rows.find((row) => row.referredId === bia.id)?.source).toBe("newsletter");
+    expect(rows.find((row) => row.referredId === cris.id)?.source).toBeNull();
+  });
+});
+
 describe("when an account is deleted", () => {
   it("keeps the row, and the inviter's e-mail, when the inviter goes", async () => {
     const ana = await createUser(db, "ana@example.com");

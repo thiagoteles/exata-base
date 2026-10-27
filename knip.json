@@ -6,7 +6,8 @@
     "**/*.type-test.ts",
     "e2e/*.setup.ts",
     "e2e/clerk/*.ts",
-    "drizzle.base.config.ts"
+    "drizzle.base.config.ts",
+    "components/patterns/*.tsx"
   ],
   "project": ["**/*.{ts,tsx,mts,css}", "!tools/**", "!scripts/new-crud/sample/**"],
   "ignore": ["scripts/new-crud/sample/**"],

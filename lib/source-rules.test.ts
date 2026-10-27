@@ -62,9 +62,11 @@ describe("source rules", () => {
 
   it("reads files from disk only where the image is known to carry them", async () => {
     // A product whose build config predates the list declares no reader of its own.
-    const productBuild: { productDiskReaders?: readonly string[] } = await import(
-      "@/next.config.product"
-    );
+    const productBuild: Record<string, unknown> = await import("@/next.config.product");
+    const declared = productBuild["productDiskReaders"];
+    const productReaders = Array.isArray(declared)
+      ? declared.filter((file): file is string => typeof file === "string")
+      : [];
     // A file read at run time reaches the production image only if the build traces it. The disk
     // storage reads its own directory, outside the image; any other reader is listed here with its
     // entry in `outputFileTracingIncludes`, so a file is never missing only in production.
@@ -76,7 +78,7 @@ describe("source rules", () => {
       // Static faces for the share image, traced on the opengraph route.
       "lib/og/share-image.tsx",
       // The product's own, each traced in its build config.
-      ...(productBuild.productDiskReaders ?? []),
+      ...productReaders,
     ]);
     const appCode = /^(app|lib|features|components|domain)\/|^proxy\.ts$/;
     const offenders = trackedSources()

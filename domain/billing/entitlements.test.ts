@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { catalog } from "./catalog";
 import { twoTierCatalog } from "./catalog.fixture";
 import {
   entitlementsOf,
@@ -58,13 +59,17 @@ describe("featuresOfTier", () => {
 });
 
 describe("plan limits", () => {
+  // The allowances are the product's to set, so they are read from its catalog, not written here.
+  const free = catalog.tiers.free.limits.exports;
+  const paid = catalog.tiers.paid.limits.exports;
+
   it("give each tier its own allowance and window, the paid tier's over the one it extends", () => {
-    expect(entitlementsOf(null, now).limits.exports).toEqual({ limit: 5, per: "day" });
-    expect(entitlementsOf(plan(), now).limits.exports).toEqual({ limit: 50, per: "day" });
+    expect(entitlementsOf(null, now).limits.exports).toEqual(free);
+    expect(entitlementsOf(plan(), now).limits.exports).toEqual(paid);
   });
 
   it("fall back to the free allowance when a plan no longer counts", () => {
-    expect(entitlementsOf(plan({ status: "canceled" }), now).limits.exports?.limit).toBe(5);
+    expect(entitlementsOf(plan({ status: "canceled" }), now).limits.exports).toEqual(free);
   });
 });
 
@@ -94,7 +99,7 @@ describe("a catalog with two paid tiers", () => {
 
 describe("the lookup keys prices are found by", () => {
   it("name a price for each way of buying the sold tier, and none for what is not sold", async () => {
-    const { catalog, lookupKeyOf } = await import("./catalog");
+    const { lookupKeyOf } = await import("./catalog");
     for (const interval of ["monthly", "yearly", "lifetime"]) {
       expect(lookupKeyOf(catalog.paidTier, interval)).toBe(`${catalog.paidTier}_${interval}`);
     }

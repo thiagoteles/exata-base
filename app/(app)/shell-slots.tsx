@@ -1,8 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { IdentifyAccount } from "@/components/identify-account";
-import { BottomBar } from "@/components/shell/bottom-bar";
+import { productBottomBar, productSidebar } from "@/components/shell/app-chrome.product";
+import { BottomBar as BaseBottomBar } from "@/components/shell/bottom-bar";
 import type { ShellGroup, ShellItem } from "@/components/shell/nav-types";
-import { Sidebar } from "@/components/shell/sidebar";
+import { Sidebar as BaseSidebar } from "@/components/shell/sidebar";
 import { UserMenu } from "@/components/shell/user-menu";
 import { ClaimVisitorData } from "@/features/account/claim-visitor-data";
 import { ReportTimeZone } from "@/features/account/report-time-zone";
@@ -17,6 +18,10 @@ import { resolvePreferences } from "@/lib/preferences/resolve";
  * behind its own Suspense boundary and the frame around them stays in the static shell. Until the
  * row exists (a Clerk sign-in that beat the webhook) the shell shows the member destinations.
  */
+
+// A product that draws its own sidebar or bottom bar gets the destinations already resolved.
+const Sidebar = productSidebar ?? BaseSidebar;
+const BottomBar = productBottomBar ?? BaseBottomBar;
 
 async function destinations() {
   const t = await getTranslations("nav");

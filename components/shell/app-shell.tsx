@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { type ReactNode, useId } from "react";
 
-type AppShellProps = {
+export type AppShellProps = {
   /** The sidebar, drawn from `lg` up. */
   sidebar: ReactNode;
   /** The bottom bar, drawn below `lg`. */

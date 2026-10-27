@@ -9,7 +9,7 @@ import { isCurrent } from "./active-path";
 import { NavIcon } from "./nav-icon";
 import type { ShellItem } from "./nav-types";
 
-type BottomBarProps = {
+export type BottomBarProps = {
   items: readonly ShellItem[];
   more: readonly ShellItem[];
   label: string;

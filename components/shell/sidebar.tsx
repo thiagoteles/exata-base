@@ -7,11 +7,13 @@ import { isCurrent } from "./active-path";
 import { NavIcon } from "./nav-icon";
 import type { ShellGroup } from "./nav-types";
 
+export type SidebarProps = { groups: readonly ShellGroup[]; label: string };
+
 /**
  * From `lg` up: items of 40px in the smaller body size, one line each, 20px between groups. The
  * current item has the brand wash and a 3px bar.
  */
-export function Sidebar({ groups, label }: { groups: readonly ShellGroup[]; label: string }) {
+export function Sidebar({ groups, label }: SidebarProps) {
   const pathname = usePathname();
   return (
     <nav aria-label={label} className="flex flex-col gap-6 px-3 py-4">

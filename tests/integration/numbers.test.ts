@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
+import { catalog } from "@/domain/billing/catalog";
 import { readBusinessNumbers } from "@/lib/admin/numbers";
 import { payments, plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
@@ -106,7 +107,7 @@ describe("business numbers", () => {
       ["ana", "bia", "caio", "dani"].map((name) => createUser(db, `${name}@example.com`)),
     );
     const paid = {
-      tier: "paid" as const,
+      tier: catalog.paidTier,
       status: "active" as const,
       billingInterval: "monthly" as const,
     };
@@ -132,7 +133,7 @@ describe("business numbers", () => {
       .set({ ...paid, status: "canceled" })
       .where(eq(plans.userId, dani?.id ?? ""));
     const numbers = await readBusinessNumbers(db, viewer, 30, now);
-    expect(numbers.payersByTier).toEqual([{ tier: "paid", count: 2 }]);
+    expect(numbers.payersByTier).toEqual([{ tier: catalog.paidTier, count: 2 }]);
     expect(numbers.courtesies).toBe(1);
     expect(numbers.scheduledCancellations).toBe(1);
   });

@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
+import { catalog } from "@/domain/billing/catalog";
 import type { DeletionSteps } from "@/lib/accounts/delete";
 import {
   getUserRecord,
@@ -60,7 +61,7 @@ describe("the user list", () => {
 
     const staff = await queryUsers(db, viewer, { ...everyone, role: "staff" });
     expect(staff.rows.map((row) => row.email)).toEqual(["bia@example.com"]);
-    const paid = await queryUsers(db, viewer, { ...everyone, plan: "paid" });
+    const paid = await queryUsers(db, viewer, { ...everyone, plan: catalog.paidTier });
     expect(paid.rows).toMatchObject([{ email: "ana@example.com", courtesy: true }]);
     const byName = await queryUsers(db, viewer, { ...everyone, q: "souza" });
     expect(byName.rows.map((row) => row.email)).toEqual(["ana@example.com"]);
@@ -94,7 +95,7 @@ describe("courtesy", () => {
     const ana = await createUser(db, "ana@example.com");
     await grantCourtesy(db, actor, ana.id, "  partner  ");
     expect(await readPlan(db, ana.id)).toMatchObject({
-      tier: "paid",
+      tier: catalog.paidTier,
       status: "active",
       courtesyGrantedBy: actor.id,
       courtesyGrantedByEmail: actor.email,
@@ -137,7 +138,7 @@ describe("courtesy", () => {
     });
     await deliver(checkoutCompleted("evt_1", { userId: bia.id, interval: "lifetime" }));
     await expect(revokeCourtesy(db, actor, bia.id)).rejects.toMatchObject({ status: 409 });
-    expect((await readPlan(db, bia.id))?.tier).toBe("paid");
+    expect((await readPlan(db, bia.id))?.tier).toBe(catalog.paidTier);
   });
 });
 
@@ -155,7 +156,7 @@ describe("refunding the last payment", () => {
     expect(refund.mock.calls[0]).toEqual(refund.mock.calls[1]);
     expect(refund.mock.calls[0]?.[0]).toBe("cus_ana");
     // The plan is changed by the provider's refund event, not here.
-    expect((await readPlan(db, ana.id))?.tier).toBe("paid");
+    expect((await readPlan(db, ana.id))?.tier).toBe(catalog.paidTier);
   });
 
   it("refuses a free account and a courtesy, which have nothing to refund", async () => {
@@ -195,7 +196,7 @@ describe("deleting someone's account", () => {
         courtesyGrantedBy: actor.id,
         courtesyGrantedByEmail: actor.email,
         courtesyReason: "x",
-        tier: "paid",
+        tier: catalog.paidTier,
         billingInterval: "lifetime",
       })
       .where(eq(plans.userId, ana.id));

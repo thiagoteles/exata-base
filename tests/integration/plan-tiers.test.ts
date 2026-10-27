@@ -1,5 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
+import { catalog } from "@/domain/billing/catalog";
 import { addTierStatements, checkPlanTiers } from "@/lib/db/plan-tiers";
 import { plans } from "@/lib/db/schema/billing";
 import { users } from "@/lib/db/schema/users";
@@ -41,7 +42,7 @@ describe("the plan tiers the database holds", () => {
     if (user === undefined) {
       throw new Error("user was not created");
     }
-    await db.update(plans).set({ tier: "paid" }).where(eq(plans.userId, user.id));
+    await db.update(plans).set({ tier: catalog.paidTier }).where(eq(plans.userId, user.id));
     await expect(checkPlanTiers(db, ["free", "bronze"])).rejects.toThrow(
       "plans are on tiers the catalog no longer has: paid",
     );

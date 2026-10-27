@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
+import { catalog } from "@/domain/billing/catalog";
 import { migrateDatabase } from "@/lib/db/migrate";
 import { staffAuditLog } from "@/lib/db/schema/audit";
 import { accounts, sessions } from "@/lib/db/schema/auth";
@@ -125,7 +126,7 @@ describe("deleting an account", () => {
     await db
       .update(plans)
       .set({
-        tier: "paid",
+        tier: catalog.paidTier,
         courtesyGrantedBy: admin.id,
         courtesyGrantedByEmail: admin.email,
         courtesyReason: "parceria",
@@ -159,7 +160,7 @@ describe("deleting an account", () => {
 
     const [plan] = await db.select().from(plans).where(eq(plans.userId, member.id));
     expect(plan).toMatchObject({
-      tier: "paid",
+      tier: catalog.paidTier,
       courtesyGrantedBy: null,
       courtesyGrantedByEmail: admin.email,
     });

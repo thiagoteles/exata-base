@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
+import { catalog } from "@/domain/billing/catalog";
 import { firstPaidFeature } from "@/domain/billing/entitlements";
 import { entitlementsFor, readPlan } from "@/lib/billing/service";
 import { paymentEvents, plans } from "@/lib/db/schema/billing";
@@ -32,7 +33,7 @@ describe("a purchase", () => {
   it("makes a subscription checkout a paid plan with the customer and subscription kept", async () => {
     const user = await subscriber();
     expect(await readPlan(db, user.id)).toMatchObject({
-      tier: "paid",
+      tier: catalog.paidTier,
       status: "active",
       billingInterval: "monthly",
       providerCustomerId: `cus_${user.id}`,
@@ -45,7 +46,7 @@ describe("a purchase", () => {
     const user = await createUser(db, "ana@example.com");
     await deliver(checkoutCompleted("evt_1", { userId: user.id, interval: "lifetime" }));
     expect(await readPlan(db, user.id)).toMatchObject({
-      tier: "paid",
+      tier: catalog.paidTier,
       billingInterval: "lifetime",
       providerSubscriptionId: null,
     });
@@ -68,7 +69,7 @@ describe("a purchase", () => {
         "checkout.session.async_payment_succeeded",
       ),
     );
-    expect((await readPlan(db, user.id))?.tier).toBe("paid");
+    expect((await readPlan(db, user.id))?.tier).toBe(catalog.paidTier);
   });
 
   it("ignores a payment for a person who no longer exists", async () => {
@@ -135,7 +136,7 @@ describe("a payment that fails", () => {
     const user = await subscriber();
     await deliver(invoiceEvent("evt_f", "invoice.payment_failed", `sub_${user.id}`));
     const late = await readPlan(db, user.id);
-    expect(late).toMatchObject({ tier: "paid", status: "past_due" });
+    expect(late).toMatchObject({ tier: catalog.paidTier, status: "past_due" });
     expect(await premium(user.id)).toBe(true);
 
     await deliver(invoiceEvent("evt_ok", "invoice.payment_succeeded", `sub_${user.id}`));
@@ -157,7 +158,7 @@ describe("a payment that fails", () => {
     const user = await createUser(db, "ana@example.com");
     await deliver(checkoutCompleted("evt_1", { userId: user.id, interval: "lifetime" }));
     await deliver(invoiceEvent("evt_2", "invoice.payment_failed", "sub_old"));
-    expect(await readPlan(db, user.id)).toMatchObject({ tier: "paid", status: "active" });
+    expect(await readPlan(db, user.id)).toMatchObject({ tier: catalog.paidTier, status: "active" });
   });
 });
 
@@ -173,13 +174,13 @@ describe("the lifetime plan over a subscription", () => {
     );
     expect(cancel).toHaveBeenCalledExactlyOnceWith(`sub_${user.id}`);
     expect(await readPlan(db, user.id)).toMatchObject({
-      tier: "paid",
+      tier: catalog.paidTier,
       billingInterval: "lifetime",
       providerSubscriptionId: null,
     });
 
     await deliver(subscriptionDeleted("evt_gone", `sub_${user.id}`));
-    expect((await readPlan(db, user.id))?.tier).toBe("paid");
+    expect((await readPlan(db, user.id))?.tier).toBe(catalog.paidTier);
   });
 
   it("does not end anything when there was no subscription", async () => {
@@ -195,7 +196,7 @@ describe("the lifetime plan over a subscription", () => {
     await db
       .update(plans)
       .set({
-        tier: "paid",
+        tier: catalog.paidTier,
         billingInterval: "lifetime",
         courtesyGrantedByEmail: "admin@example.com",
         courtesyReason: "partner",
@@ -256,7 +257,7 @@ describe("a payment that has not arrived yet", () => {
       ),
     );
     expect(await readPlan(db, ana.id)).toMatchObject({
-      tier: "paid",
+      tier: catalog.paidTier,
       status: "active",
       billingInterval: "yearly_once",
     });
@@ -287,9 +288,15 @@ describe("a payment that has not arrived yet", () => {
         paymentStatus: "unpaid",
       }),
     );
-    expect(await readPlan(db, paying.id)).toMatchObject({ tier: "paid", status: "active" });
+    expect(await readPlan(db, paying.id)).toMatchObject({
+      tier: catalog.paidTier,
+      status: "active",
+    });
     await deliver(checkoutFailed("evt_fail_paid", paying.id));
-    expect(await readPlan(db, paying.id)).toMatchObject({ tier: "paid", status: "active" });
+    expect(await readPlan(db, paying.id)).toMatchObject({
+      tier: catalog.paidTier,
+      status: "active",
+    });
   });
 
   it("is told only once when the same failure is delivered twice", async () => {

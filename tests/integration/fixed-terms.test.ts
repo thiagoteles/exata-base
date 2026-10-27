@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { catalog } from "@/domain/billing/catalog";
 import { oneYearAfter } from "@/domain/billing/term";
 import { entitlementsFor, readPlan } from "@/lib/billing/service";
 import { plans } from "@/lib/db/schema/billing";
@@ -46,7 +47,7 @@ describe("a year bought once", () => {
     const ana = await buyYear("ana@example.com");
     const plan = await readPlan(db, ana.id);
     expect(plan).toMatchObject({
-      tier: "paid",
+      tier: catalog.paidTier,
       billingInterval: "yearly_once",
       providerSubscriptionId: null,
       priceKey: "paid.yearly_once",
@@ -57,7 +58,7 @@ describe("a year bought once", () => {
   it("grants the paid tier until the last instant, and the free tier from then on", async () => {
     const ana = await buyYear("ana@example.com");
     const holder = { kind: "user", id: ana.id } as const;
-    expect((await entitlementsFor(db, holder, at(-1))).tier).toBe("paid");
+    expect((await entitlementsFor(db, holder, at(-1))).tier).toBe(catalog.paidTier);
     expect((await entitlementsFor(db, holder, end)).tier).toBe("free");
     expect((await entitlementsFor(db, holder, at(30))).tier).toBe("free");
   });
@@ -84,7 +85,7 @@ describe("the daily call that ends a year", () => {
       .set({ currentPeriodEnd: at(-100) })
       .where(eq(plans.userId, subscribed.id));
     expect(await expireFixedTerms.run({ db, now: at(1) })).toEqual({ expired: 0 });
-    expect((await readPlan(db, subscribed.id))?.tier).toBe("paid");
+    expect((await readPlan(db, subscribed.id))?.tier).toBe(catalog.paidTier);
   });
 });
 

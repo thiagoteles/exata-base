@@ -6,6 +6,7 @@
 *.product.ts merge=ours
 *.product.tsx merge=ours
 *.product.json merge=ours
+*.product.css merge=ours
 *.product.env merge=ours
 
 # The product's stream of migrations and the ones it adopted from before the streams were apart.

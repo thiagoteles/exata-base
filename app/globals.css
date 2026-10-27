@@ -2,6 +2,7 @@
 @import "../styles/tokens.css";
 @import "../styles/preset.css";
 @import "../styles/print.css";
+@import "../styles/global.product.css";
 
 /*
  * `dark:` follows the page's theme, not only the system: the attribute a person chose wins, and

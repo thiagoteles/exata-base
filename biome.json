@@ -164,6 +164,16 @@
   },
   "overrides": [
     {
+      "includes": ["styles/global.product.css"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noEmptySource": { "level": "error", "options": { "allowComments": true } }
+          }
+        }
+      }
+    },
+    {
       "includes": [
         "app/**",
         "domain/**",

@@ -1,0 +1,5 @@
+/*
+ * The product's own styles, for what a class over the tokens cannot say (a texture, a mask). Colors
+ * come from the tokens only; `pnpm lint:tokens` refuses one written by hand. The product owns this
+ * file; the base ships it empty.
+ */

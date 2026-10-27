@@ -165,6 +165,24 @@
     "caption": "Uso do mês",
     "summary": "Uso do mês: {value, number} de {max, number}"
   },
+  "charts": {
+    "title": "Gráficos",
+    "help": "Uma linha mostra como uma medida anda ao longo de uma ordem (meses, edições). Um mapa de calor mostra quanto cada item de um conjunto aconteceu, com o tom crescendo com o valor. Cada ponto e cada célula mostram o valor ao passar o mouse ou chegar pelo teclado, e a tabela traz os mesmos números.",
+    "line": {
+      "title": "Cadastros por mês",
+      "table": "Ver os valores",
+      "label": "Mês",
+      "value": "Cadastros"
+    },
+    "heat": {
+      "title": "Quantas vezes cada item saiu",
+      "table": "Ver os valores",
+      "label": "Item",
+      "value": "Vezes",
+      "less": "Menos",
+      "more": "Mais"
+    }
+  },
   "paidPatterns": {
     "title": "Teste, passos e conquistas",
     "trial": {

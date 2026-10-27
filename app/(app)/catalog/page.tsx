@@ -8,6 +8,7 @@ import { currentInstant } from "@/domain/clock";
 import { AccentDemo } from "@/features/catalog/accent-demo";
 import { ButtonsDemo } from "@/features/catalog/buttons-demo";
 import { CatalogHeader } from "@/features/catalog/catalog-header";
+import { ChartsDemo } from "@/features/catalog/charts-demo";
 import { ChoicesDemo } from "@/features/catalog/choices-demo";
 import { CompositionDemo } from "@/features/catalog/composition-demo";
 import { DensityDemo } from "@/features/catalog/density-demo";
@@ -130,6 +131,9 @@ async function CatalogContent({ searchParams }: { searchParams: Promise<SearchPa
         </CatalogSection>
         <CatalogSection name="wizard" title={t("wizard.title")}>
           <Wizard />
+        </CatalogSection>
+        <CatalogSection name="charts" title={t("charts.title")}>
+          <ChartsDemo />
         </CatalogSection>
         <CatalogSection name="paid" snapshot={false} title={t("paid.title")}>
           <Suspense>

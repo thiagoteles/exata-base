@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { niceTicks } from "@/domain/charts/scale";
 import { formatBRL, toCents } from "@/lib/money";
+import { useFrameWidth } from "./frame-width";
 
 type Column = { key: string; tick: string; label: string; value: number; valueText: string };
 
@@ -17,8 +18,6 @@ type ColumnChartProps = {
 };
 
 const HEIGHT = 220;
-const DEFAULT_WIDTH = 960;
-const MIN_WIDTH = 280;
 const AXIS_WIDTH = 72;
 const TOP = 8;
 const BOTTOM = 28;
@@ -45,22 +44,7 @@ const axisText = (axis: ColumnChartProps["axis"], value: number) =>
 
 export function ColumnChart({ title, columns, axis, tableLabel, headers }: ColumnChartProps) {
   const [active, setActive] = useState<number | null>(null);
-  // Drawn at the container's real width, so axis text keeps its token size instead of scaling.
-  const frame = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(DEFAULT_WIDTH);
-  useEffect(() => {
-    const element = frame.current;
-    if (element === null) {
-      return;
-    }
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry !== undefined) {
-        setWidth(Math.max(entry.contentRect.width, MIN_WIDTH));
-      }
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
+  const [frame, width] = useFrameWidth();
   const ticks = niceTicks(Math.max(...columns.map((column) => column.value), 0), {
     integer: axis === "count",
   });

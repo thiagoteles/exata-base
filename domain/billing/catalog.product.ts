@@ -9,18 +9,17 @@ import type { CatalogShape } from "./catalog-shape";
  * declares more than the shape asks for widens the `satisfies` below with its own fields.
  */
 
-const DAY = 86_400;
-
 export const catalog = {
   tiers: {
     // `exports` is the neutral example: how many times a day a person may download their data. A
     // product replaces it with what it meters (reports, messages, jobs); a tier that does not name a
-    // limit inherits the one it extends, and a limit no tier names is unlimited.
-    free: { features: [], limits: { exports: { limit: 5, windowSeconds: DAY } } },
+    // limit inherits the one it extends, and a limit no tier names is unlimited. `per: "day"` starts
+    // again at midnight in the product's time zone; `windowSeconds` counts fixed windows instead.
+    free: { features: [], limits: { exports: { limit: 5, per: "day" } } },
     paid: {
       extends: "free",
       features: ["premium"],
-      limits: { exports: { limit: 50, windowSeconds: DAY } },
+      limits: { exports: { limit: 50, per: "day" } },
     },
   },
   /**

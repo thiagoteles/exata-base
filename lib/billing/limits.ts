@@ -29,10 +29,5 @@ export async function consumeLimit(
   if (rule === undefined) {
     return UNLIMITED;
   }
-  return consume(
-    db,
-    { name: `plan:${name}`, limit: rule.limit, windowSeconds: rule.windowSeconds },
-    `user:${holder.id}`,
-    now,
-  );
+  return consume(db, { name: `plan:${name}`, ...rule }, `user:${holder.id}`, now);
 }

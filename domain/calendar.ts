@@ -37,3 +37,52 @@ export function isTimeZone(value: string): boolean {
     return false;
   }
 }
+
+const clocks = new Map<string, Intl.DateTimeFormat>();
+
+/** How far the zone's wall clock is ahead of UTC at an instant, in milliseconds. */
+function offsetAt(instant: number, timeZone: string): number {
+  let clock = clocks.get(timeZone);
+  if (clock === undefined) {
+    clock = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      hourCycle: "h23",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    });
+    clocks.set(timeZone, clock);
+  }
+  const part = Object.fromEntries(
+    clock.formatToParts(new Date(instant)).map(({ type, value }) => [type, Number(value)]),
+  ) as Partial<Record<Intl.DateTimeFormatPartTypes, number>>;
+  const wall = Date.UTC(
+    part.year ?? 0,
+    (part.month ?? 1) - 1,
+    part.day ?? 1,
+    part.hour ?? 0,
+    part.minute ?? 0,
+    part.second ?? 0,
+  );
+  return wall - Math.floor(instant / 1000) * 1000;
+}
+
+/**
+ * The first instant of a calendar date in a time zone: its midnight, or the moment the day starts
+ * when the clock jumps over midnight for summer time.
+ */
+export function startOfDayIn(date: string, timeZone: string): Date {
+  const [year = 0, month = 1, day = 1] = date.split("-").map(Number);
+  const wall = Date.UTC(year, month - 1, day);
+  const first = wall - offsetAt(wall, timeZone);
+  const second = wall - offsetAt(first, timeZone);
+  // Around a change of offset one of the two guesses lands on the day before; the earliest that is
+  // on the date is where it starts.
+  const onDate = [first, second].filter(
+    (instant) => dateInZone(new Date(instant), timeZone) === date,
+  );
+  return new Date(Math.min(...(onDate.length > 0 ? onDate : [first])));
+}

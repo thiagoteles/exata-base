@@ -3,8 +3,11 @@
  * catalog file; this is what that file must say.
  */
 
-/** How much of one thing a tier allows in a window of time, such as five exports a day. */
-export type LimitRule = { limit: number; windowSeconds: number };
+/**
+ * How much of one thing a tier allows in a window of time, such as five exports a day: a window of
+ * so many seconds, or a day of the product's time zone, which starts again at its midnight.
+ */
+export type LimitRule = { limit: number; windowSeconds: number } | { limit: number; per: "day" };
 
 type TierDefinition = {
   extends?: string;

@@ -21,6 +21,9 @@ const failing: ScheduledOperation = {
   run: () => Promise.reject(new Error("boom")),
 };
 
+/** The daily job's line of the panel, wherever a product's own alarms put it in the list. */
+const dailyOf = <T extends { name: string }>(jobs: T[]) => jobs.find((job) => job.name === "daily");
+
 async function admin() {
   const user = await createUser(db, "admin@example.com", "admin");
   return { id: user.id, role: user.role };
@@ -36,25 +39,28 @@ describe("the health panel", () => {
 
   it("lists the daily job before it ever ran, then with its last run", async () => {
     const viewer = await admin();
-    expect((await readHealth(db, viewer, now)).jobs).toEqual([
-      { name: "daily", windowMs: 88_200_000, state: "never", run: null },
-    ]);
+    expect(dailyOf((await readHealth(db, viewer, now)).jobs)).toEqual({
+      name: "daily",
+      windowMs: 88_200_000,
+      state: "never",
+      run: null,
+    });
 
     await runScheduledOperations("daily", [passing, failing], { db, now }, recordingLogger());
-    const [daily] = (await readHealth(db, viewer, new Date(now.getTime() + HOUR))).jobs;
+    const daily = dailyOf((await readHealth(db, viewer, new Date(now.getTime() + HOUR))).jobs);
     expect(daily).toMatchObject({ state: "failing", run: { ranAt: now, failed: 1 } });
 
     // The next run overwrites the row, so the panel shows the latest one only.
     const later = new Date(now.getTime() + 2 * HOUR);
     await runScheduledOperations("daily", [passing], { db, now: later }, recordingLogger());
-    const [again] = (await readHealth(db, viewer, later)).jobs;
+    const again = dailyOf((await readHealth(db, viewer, later)).jobs);
     expect(again).toMatchObject({ state: "ok", run: { ranAt: later, failed: 0 } });
   });
 
   it("calls the job late once its alarm window has passed", async () => {
     const viewer = await admin();
     await runScheduledOperations("daily", [passing], { db, now }, recordingLogger());
-    const [daily] = (await readHealth(db, viewer, new Date(now.getTime() + 25 * HOUR))).jobs;
+    const daily = dailyOf((await readHealth(db, viewer, new Date(now.getTime() + 25 * HOUR))).jobs);
     expect(daily?.state).toBe("late");
   });
 

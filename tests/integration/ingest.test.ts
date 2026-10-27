@@ -4,6 +4,7 @@ import { jobRuns } from "@/lib/db/schema/operations";
 import { DomainError } from "@/lib/errors";
 import { handleIngest } from "@/lib/ingest/handle";
 import { ingestSources } from "@/lib/ingest/sources";
+import heartbeats from "@/ops/gcp/heartbeats.json";
 import { testDatabase } from "./database";
 import { createUser } from "./factories";
 
@@ -63,11 +64,11 @@ describe("the job-run source", () => {
   });
 
   it("shows up in the health panel once the job has its alarm line", async () => {
-    // The panel lists the jobs that have an alarm; this one has none in the base, so it is stored
-    // for the day a product adds its line, and the panel's own list is unchanged.
+    // The panel lists the jobs that have an alarm line; this one has none, so it is stored for the
+    // day a product adds its line, and the panel's list stays the alarms' own.
     await deliver({ job: "price-collector", failed: 0, ms: 5 });
     const admin = await createUser(db, "admin@example.com", "admin");
     const { jobs } = await readHealth(db, { id: admin.id, role: admin.role }, now);
-    expect(jobs.map((job) => job.name)).toEqual(["daily"]);
+    expect(jobs.map((job) => job.name)).toEqual(heartbeats.map((entry) => entry.job));
   });
 });

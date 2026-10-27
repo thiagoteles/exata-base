@@ -9,9 +9,10 @@ import { productPublicPaths } from "./public-paths.product";
  * English; the proxy serves each public address from its route and answers the English address
  * with a permanent redirect to the public one, so search engines index one address. The signed-in
  * area and the sign-in screens keep their route addresses. The product's pages come from its own
- * file.
+ * file, which may also give one of these pages another address; an entry keeps its place in the
+ * order, which matters because the first entry that fits an address serves it.
  */
-export const publicPaths = {
+const basePublicPaths = {
   "/plans": "/planos",
   "/contact": "/contato",
   "/privacy": "/privacidade",
@@ -20,8 +21,9 @@ export const publicPaths = {
   "/articles": "/artigos",
   "/articles/[slug]": "/artigos/[slug]",
   "/verify/[slug]": "/verificar/[slug]",
-  ...productPublicPaths,
 } as const;
+
+export const publicPaths = { ...basePublicPaths, ...productPublicPaths } as const;
 
 type MappedRoute = keyof typeof publicPaths;
 

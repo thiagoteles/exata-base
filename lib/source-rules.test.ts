@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { productDiskReaders } from "@/next.config.product";
 import { publicPaths } from "./i18n/public-paths";
 
 /*
@@ -71,6 +72,8 @@ describe("source rules", () => {
       "lib/db/migrate.ts",
       // Static faces for the share image, traced on the opengraph route.
       "lib/og/share-image.tsx",
+      // The product's own, each traced in its build config.
+      ...productDiskReaders,
     ]);
     const appCode = /^(app|lib|features|components|domain)\/|^proxy\.ts$/;
     const offenders = trackedSources()

@@ -250,7 +250,7 @@
     "creditOff": "Sem crédito",
     "creditOffNote": "Este produto não dá crédito por convite.",
     "awaitingTotal": "Crédito pendente",
-    "awaitingNote": "Indicados que já pagaram e cujo crédito ainda não saiu. Deve voltar a zero sozinho; se ficar, veja o provedor de pagamento.",
+    "awaitingNote": "Já pagaram e o crédito de quem convidou não saiu. Se não zerar sozinho, veja o provedor de pagamento.",
     "top": "Quem mais indicou",
     "topHelp": "Os 10 que mais trouxeram pessoas. Clique no e-mail para ver a conta.",
     "referrer": "Quem convidou",

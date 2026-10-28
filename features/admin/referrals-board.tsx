@@ -133,7 +133,7 @@ async function TopReferrers({
         ) : (
           <Link
             href={userHref(row.referrerId)}
-            className="text-link underline-offset-4 hover:underline"
+            className="text-brand-ink underline underline-offset-4"
           >
             {row.email}
           </Link>

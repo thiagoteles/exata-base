@@ -3,9 +3,9 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { applyPageAttribute } from "@/lib/page-attribute";
 import { rememberOption } from "@/lib/preferences/actions";
 import { isTheme, type Theme, type ThemeChoice } from "@/lib/theme";
-import { applyPageAttribute } from "./page-attribute";
 
 /** The theme on screen: the one chosen, or the system's when nothing was. */
 function themeOnScreen(): Theme {

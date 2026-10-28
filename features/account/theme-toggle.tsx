@@ -1,7 +1,7 @@
 "use client";
 
 import { IconMoon, IconSun } from "@tabler/icons-react";
-import { useThemeToggle } from "./use-theme-toggle";
+import { useThemeToggle } from "@/components/shell/use-theme-toggle";
 
 /*
  * One button in the top bar that turns the dark theme on or off. The icon follows the theme in CSS,

@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 /**
  * What a product's own user area is given: the person already resolved (null while a Clerk sign-in
  * waits for its row), the labels, where the account lives and the sign-out control of the auth
- * mode. It draws the whole end of the top bar, the theme switch included (`useThemeToggle`).
+ * mode. It draws the whole end of the top bar, the theme switch included (`useThemeToggle`, in components/shell).
  */
 export type UserAreaProps = {
   user: { name: string; email: string; image: string | null; roleLabel: string } | null;

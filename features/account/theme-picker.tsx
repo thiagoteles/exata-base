@@ -4,9 +4,9 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Segmented } from "@/components/ui/segmented";
 import { useToast } from "@/components/ui/use-toast";
+import { applyPageAttribute } from "@/lib/page-attribute";
 import { rememberOption } from "@/lib/preferences/actions";
 import { isTheme, type ThemeChoice } from "@/lib/theme";
-import { applyPageAttribute } from "./page-attribute";
 
 const SYSTEM = "system";
 

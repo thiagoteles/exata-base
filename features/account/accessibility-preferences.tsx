@@ -5,9 +5,9 @@ import { useState } from "react";
 import { Segmented } from "@/components/ui/segmented";
 import { useToast } from "@/components/ui/use-toast";
 import { strongerContrastAvailable } from "@/lib/contrast-choice";
+import { applyPageAttribute } from "@/lib/page-attribute";
 import { rememberOption } from "@/lib/preferences/actions";
 import type { Preferences } from "@/lib/preferences/definitions";
-import { applyPageAttribute } from "./page-attribute";
 
 type Choices = Pick<Preferences, "fontScale" | "motion" | "contrast">;
 type Key = keyof Choices;

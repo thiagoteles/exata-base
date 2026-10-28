@@ -2,6 +2,9 @@ import type { ComponentType } from "react";
 import type { PublicFooterProps } from "./public-footer";
 import type { PublicHeaderProps } from "./public-header";
 
+/** What the header's right end knows: whether someone is signed in. */
+export type HeaderActionsProps = { signedIn: boolean };
+
 /*
  * The product's own header and footer for the public pages, in place of the base's. Each receives
  * what the base's receives: the session's actions, the theme and language choices, whether plans
@@ -11,3 +14,9 @@ import type { PublicHeaderProps } from "./public-header";
 export const productPublicHeader: ComponentType<PublicHeaderProps> | null = null;
 
 export const productPublicFooter: ComponentType<PublicFooterProps> | null = null;
+
+/**
+ * The header's right end, drawn by the product: the theme switch and the buttons for the session.
+ * Given while the session is read as signed out, then again with the session.
+ */
+export const productHeaderActions: ComponentType<HeaderActionsProps> | null = null;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { productHeaderActions } from "@/components/shell/public-chrome.product";
 import { buttonClasses } from "@/components/ui/styles";
 import { getCurrentUser } from "@/lib/ports/auth";
 
@@ -28,5 +29,10 @@ function AccountLink() {
 
 /** Reads the session, so it streams in behind a Suspense boundary and the rest of the header stays static. */
 export async function HeaderActions() {
-  return (await getCurrentUser()) === null ? <SignedOutActions /> : <AccountLink />;
+  const signedIn = (await getCurrentUser()) !== null;
+  if (productHeaderActions !== null) {
+    const Actions = productHeaderActions;
+    return <Actions signedIn={signedIn} />;
+  }
+  return signedIn ? <AccountLink /> : <SignedOutActions />;
 }

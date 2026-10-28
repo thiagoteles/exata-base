@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { currentEpochMs, currentInstant } from "@/domain/clock";
+import { readTextCapped } from "@/lib/body-limit";
 import { clientAddress } from "@/lib/client-address";
 import {
   browserKey,
@@ -20,12 +21,8 @@ const reportsPerAddress = { name: "client-errors", limit: 30, windowSeconds: 60 
 
 /** Errors that happened in a person's browser, written to the log as errors so the alert sees them. */
 export const POST = timedRoute("/api/client-errors", async (request: NextRequest) => {
-  const declared = Number(request.headers.get("content-length") ?? "0");
-  if (declared > MAX_REPORT_BYTES) {
-    return new Response(null, { status: 413 });
-  }
-  const body = await request.text();
-  if (new TextEncoder().encode(body).length > MAX_REPORT_BYTES) {
+  const body = await readTextCapped(request, MAX_REPORT_BYTES);
+  if (body === null) {
     return new Response(null, { status: 413 });
   }
   let json: unknown;

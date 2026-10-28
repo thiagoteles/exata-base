@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { currentInstant } from "@/domain/clock";
+import { readTextCapped } from "@/lib/body-limit";
 import { clientAddress } from "@/lib/client-address";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
@@ -14,11 +15,8 @@ const reportsPerAddress = { name: "csp-reports", limit: 30, windowSeconds: 60 };
 
 /** Where browsers send Content Security Policy violations. They are logged as warnings. */
 export const POST = timedRoute("/api/csp-report", async (request: NextRequest) => {
-  if (Number(request.headers.get("content-length") ?? "0") > MAX_BYTES) {
-    return new Response(null, { status: 413 });
-  }
-  const body = await request.text();
-  if (new TextEncoder().encode(body).length > MAX_BYTES) {
+  const body = await readTextCapped(request, MAX_BYTES);
+  if (body === null) {
     return new Response(null, { status: 413 });
   }
   const address = clientAddress(request.headers, env.TRUSTED_PROXY) ?? "unknown";

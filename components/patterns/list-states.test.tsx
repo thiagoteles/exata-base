@@ -1,8 +1,15 @@
 // @vitest-environment happy-dom
 import { screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithIntl } from "@/tests/render";
 import { ListEmpty, SectionEmpty } from "./list-states";
+
+// These are the base's own empty states; a product that draws its own keeps them out of the way.
+vi.mock("./states.product", () => ({
+  productListEmpty: null,
+  productSectionEmpty: null,
+  productNoResults: null,
+}));
 
 describe("an empty list", () => {
   it("says what is missing, what the list is for and the first step", () => {

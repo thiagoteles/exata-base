@@ -12,10 +12,18 @@ import { appOrigin } from "./origin";
 const themes = ["light", "dark"] as const;
 const CRON_SECRET = "local-development-cron-secret-0123456789";
 
-async function open(page: Page, path: string, theme: (typeof themes)[number], heading: string) {
+// A null heading is a screen whose title a product may rename (the hub): any page title will do.
+async function open(
+  page: Page,
+  path: string,
+  theme: (typeof themes)[number],
+  heading: string | null,
+) {
   await page.context().addCookies([{ name: "theme", value: theme, url: appOrigin }]);
   await page.goto(path);
-  await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+  await expect(
+    page.getByRole("heading", heading === null ? { level: 1 } : { level: 1, name: heading }),
+  ).toBeVisible();
   await page.waitForLoadState("networkidle");
 }
 
@@ -24,7 +32,7 @@ for (const theme of themes) {
     page,
   }) => {
     const screens = [
-      ["/admin", "Administração"],
+      ["/admin", null],
       ["/admin/numbers", "Números"],
       ["/admin/health", "Saúde"],
       ["/admin/users", "Usuários"],

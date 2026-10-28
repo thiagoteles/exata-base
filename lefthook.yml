@@ -4,8 +4,10 @@ pre-commit:
       run: pnpm check
 
 # With no CI, the push is the last barrier before the deploy that watches main: the production
-# build must pass, and every page must still leave it prerendered.
+# build must pass, and every page must still leave it prerendered. It builds against a database
+# that does not answer, as the image is built on the host: a page that reads the database while
+# prerendering fails here, not in the deploy.
 pre-push:
   jobs:
     - name: build
-      run: pnpm build && pnpm check:prerender
+      run: DATABASE_URL=postgres://build:build@127.0.0.1:9/none pnpm build && pnpm check:prerender

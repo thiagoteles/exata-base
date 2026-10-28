@@ -43,7 +43,8 @@ for (const theme of themes) {
   test(`the plans page and the account plan have no accessibility violations in the ${theme} theme`, async ({
     page,
   }) => {
-    await open(page, "/planos", theme, "Planos");
+    // Any title: a product may draw its own plans page.
+    await open(page, "/planos", theme, null);
     expect(await violations(page)).toEqual([]);
     await open(page, "/account/plan", theme, null);
     expect(await violations(page)).toEqual([]);
@@ -55,8 +56,11 @@ test("with billing off the plans page says nothing is on sale and the footer hid
   request,
 }) => {
   test.skip(!(await billingIsOff(request)), BILLING_ON);
-  await open(page, "/planos", "light", "Planos");
-  await expect(page.getByText("Os planos ainda não estão à venda.")).toBeVisible();
+  await open(page, "/planos", "light", null);
+  // A product's own page says it in its own words; the base's says this.
+  if (!(await productOffer(page))) {
+    await expect(page.getByText("Os planos ainda não estão à venda.")).toBeVisible();
+  }
   await expect(page.getByRole("button", { name: "Assinar" })).toHaveCount(0);
   await expect(page.getByRole("navigation", { name: "Rodapé" }).getByText("Planos")).toHaveCount(0);
 });
@@ -116,6 +120,6 @@ test.describe("without a session", () => {
     await page.goto("/account/plan");
     expect(new URL(page.url()).pathname).toBe("/sign-in");
     await page.goto("/planos");
-    await expect(page.getByRole("heading", { level: 1, name: "Planos" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   });
 });

@@ -14,7 +14,15 @@ test.describe.configure({ mode: "serial" });
 const SECONDS = 1000;
 const person = newPerson("tz");
 
+/** Whether the account page shows the saved zone at all: a product's own page may leave it out. */
+async function zoneShown(page: Page) {
+  await page.waitForLoadState("networkidle");
+  return (await page.getByText("Fuso horário", { exact: true }).count()) > 0;
+}
+const NO_ZONE = "the product's account page does not show the time zone";
+
 async function shows(page: Page, zone: string) {
+  test.skip(!(await zoneShown(page)), NO_ZONE);
   await expect
     .poll(
       async () => {

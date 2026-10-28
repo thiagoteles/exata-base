@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import type { PageWindow } from "@/lib/list-params";
+import { productNoResults } from "./states.product";
 
 /* The controls write to the address; the server page reads it back. `shallow: false` re-renders it. */
 const options = { shallow: false } as const;
@@ -80,6 +81,14 @@ export function ActiveFilters({ filters }: { filters: readonly ActiveFilter[] })
 
 type NoResultsProps = { term: string; filters: readonly ActiveFilter[] };
 
+/** What a product's no-results state draws: the sentence, the hint, and the button that clears. */
+export type NoResultsViewProps = {
+  title: string;
+  hint: string;
+  clearLabel: string;
+  onClear: () => void;
+};
+
 /** The same table with one row that repeats what was searched and offers to clear it. */
 export function ListNoResults({ term, filters }: NoResultsProps) {
   const t = useTranslations("patterns.list");
@@ -94,17 +103,17 @@ export function ListNoResults({ term, filters }: NoResultsProps) {
       ? t("noResultsFilters", { filters: filters.length })
       : t("noResults", { term, filters: filters.length });
   const [hint, clear] = noResultsWords(term !== "", filters.length > 0);
+  const onClear = () =>
+    setParams(Object.fromEntries(Object.keys(parsers).map((key) => [key, null])));
+  if (productNoResults !== null) {
+    const Product = productNoResults;
+    return <Product title={text} hint={t(hint)} clearLabel={t(clear)} onClear={onClear} />;
+  }
   return (
     <div className="flex max-w-[60ch] flex-col items-start gap-3 py-4">
       <p className="text-block-title text-ink">{text}</p>
       <p className="text-body text-ink-muted">{t(hint)}</p>
-      <Button
-        variant="secondary"
-        className="mt-2"
-        onClick={() =>
-          setParams(Object.fromEntries(Object.keys(parsers).map((key) => [key, null])))
-        }
-      >
+      <Button variant="secondary" className="mt-2" onClick={onClear}>
         {t(clear)}
       </Button>
     </div>

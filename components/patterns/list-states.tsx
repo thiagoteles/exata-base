@@ -1,9 +1,10 @@
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { productListEmpty, productSectionEmpty } from "./states.product";
 
 /** One made-up row of the list to come: what it would hold, in the list's own shape. */
-type EmptyPreviewRow = {
+export type EmptyPreviewRow = {
   key: string;
   title: string;
   /** Numbers, dates and codes, set in mono like the list sets them. */
@@ -11,7 +12,7 @@ type EmptyPreviewRow = {
   stamp?: ReactNode;
 };
 
-type ListEmptyProps = {
+export type ListEmptyProps = {
   /** What is missing, in one line: "Nenhuma recorrência ainda." */
   title: string;
   /** What the screen will hold and how it gets there, in a sentence or two. */
@@ -22,6 +23,8 @@ type ListEmptyProps = {
   secondary?: ReactNode;
   /** Two or three made-up rows in the list's shape, so the empty screen shows what it will be. */
   preview?: readonly EmptyPreviewRow[];
+  /** The screen's icon, for a product whose empty states carry one; the base's draw none. */
+  icon?: ReactNode;
 };
 
 // The example rows fade out downward, so they read as a glimpse and never as real records.
@@ -33,7 +36,12 @@ const fades = ["opacity-75", "opacity-45", "opacity-20"] as const;
  * an illustration. The rows are decoration, hidden from assistive technology, and labelled
  * "Exemplo" on screen so nobody takes them for records.
  */
-export function ListEmpty({ title, body, action, secondary, preview }: ListEmptyProps) {
+export function ListEmpty(props: ListEmptyProps) {
+  const Product = productListEmpty;
+  return Product === null ? <BaseListEmpty {...props} /> : <Product {...props} />;
+}
+
+function BaseListEmpty({ title, body, action, secondary, preview }: ListEmptyProps) {
   const t = useTranslations("patterns.empty");
   const hasPreview = preview !== undefined && preview.length > 0;
   // It measures its own width, so it lays out the same inside a list or alone on a page.
@@ -95,15 +103,20 @@ export function ListEmpty({ title, body, action, secondary, preview }: ListEmpty
  * what is not there yet and, when there is one, the step that fills it. It measures its own width,
  * so the step moves beside the words wherever it is placed.
  */
-export function SectionEmpty({
-  title,
-  body,
-  action,
-}: {
+export type SectionEmptyProps = {
   title: string;
   body?: string | undefined;
   action?: ReactNode;
-}) {
+  /** The screen's icon, for a product whose empty states carry one; the base's draw none. */
+  icon?: ReactNode;
+};
+
+export function SectionEmpty(props: SectionEmptyProps) {
+  const Product = productSectionEmpty;
+  return Product === null ? <BaseSectionEmpty {...props} /> : <Product {...props} />;
+}
+
+function BaseSectionEmpty({ title, body, action }: SectionEmptyProps) {
   return (
     <div className="@container">
       <div className="flex flex-col items-start gap-3 rounded-cell border border-dashed border-line-strong px-cell-x py-5 @2xl:flex-row @2xl:items-center @2xl:justify-between">

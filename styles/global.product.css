@@ -1,5 +1,6 @@
 /*
- * The product's own styles, for what a class over the tokens cannot say (a texture, a mask). Colors
- * come from the tokens only; `pnpm lint:tokens` refuses one written by hand. The product owns this
- * file; the base ships it empty.
+ * The product's own styles, for what a class over the tokens cannot say (a texture, a mask), and its
+ * own type: a role's size, weight, line height and letter spacing are tokens, redefined here in an
+ * `@theme` block, which loads after the preset. Colors come from the tokens only; `pnpm lint:tokens`
+ * refuses one written by hand. The product owns this file; the base ships it empty.
  */

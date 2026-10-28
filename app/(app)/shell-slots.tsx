@@ -1,6 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import { IdentifyAccount } from "@/components/identify-account";
-import { productBottomBar, productSidebar } from "@/components/shell/app-chrome.product";
+import {
+  productBottomBar,
+  productSidebar,
+  productUserArea,
+} from "@/components/shell/app-chrome.product";
 import { BottomBar as BaseBottomBar } from "@/components/shell/bottom-bar";
 import type { ShellGroup, ShellItem } from "@/components/shell/nav-types";
 import { Sidebar as BaseSidebar } from "@/components/shell/sidebar";
@@ -66,27 +70,66 @@ export async function BottomBarSlot() {
 const signOutClasses =
   "flex h-control w-full items-center rounded-cell px-3 text-left text-body text-ink hover:bg-sunken focus-visible:outline-2 focus-visible:outline-focus";
 
+/** What the session needs on every page: the time zone report, the visitor data claim, analytics. */
+function SessionTrackers({
+  user,
+}: {
+  user: { id: string; options: Parameters<typeof resolvePreferences>[0] };
+}) {
+  return (
+    <>
+      <ReportTimeZone saved={resolvePreferences(user.options).timeZone} />
+      <ClaimVisitorData />
+      {env.UMAMI_WEBSITE_ID === undefined ? null : <IdentifyAccount accountId={user.id} />}
+    </>
+  );
+}
+
 export async function UserMenuSlot() {
   const [nav, account, user] = await Promise.all([
     getTranslations("nav"),
     getTranslations("account"),
     getCurrentUser(),
   ]);
+  const signOut = <SignOutControl className={signOutClasses} />;
+  if (productUserArea !== null) {
+    const Area = productUserArea;
+    return (
+      <>
+        {user === null ? null : <SessionTrackers user={user} />}
+        <Area
+          user={
+            user === null
+              ? null
+              : {
+                  name: user.name,
+                  email: user.email,
+                  image: user.image,
+                  roleLabel: account(`roles.${user.role}`),
+                }
+          }
+          menuLabel={nav("userMenu")}
+          accountLabel={nav("items.account")}
+          accountHref="/account"
+          signOut={signOut}
+        />
+      </>
+    );
+  }
   if (user === null) {
     return null;
   }
   return (
     <>
-      <ReportTimeZone saved={resolvePreferences(user.options).timeZone} />
-      <ClaimVisitorData />
-      {env.UMAMI_WEBSITE_ID === undefined ? null : <IdentifyAccount accountId={user.id} />}
+      <SessionTrackers user={user} />
       <UserMenu
         name={user.name}
         email={user.email}
+        image={user.image}
         roleLabel={account(`roles.${user.role}`)}
         menuLabel={nav("userMenu")}
         accountLabel={nav("items.account")}
-        signOut={<SignOutControl className={signOutClasses} />}
+        signOut={signOut}
       />
     </>
   );

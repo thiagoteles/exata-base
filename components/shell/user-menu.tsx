@@ -1,12 +1,28 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+/**
+ * What a product's own user area is given: the person already resolved (null while a Clerk sign-in
+ * waits for its row), the labels, where the account lives and the sign-out control of the auth
+ * mode. It draws the whole end of the top bar, the theme switch included (`useThemeToggle`).
+ */
+export type UserAreaProps = {
+  user: { name: string; email: string; image: string | null; roleLabel: string } | null;
+  menuLabel: string;
+  accountLabel: string;
+  accountHref: Route;
+  signOut: ReactNode;
+};
+
 type UserMenuProps = {
   name: string;
   email: string;
+  /** The provider's picture, shown in place of the initial when there is one. */
+  image: string | null;
   roleLabel: string;
   menuLabel: string;
   accountLabel: string;
@@ -18,6 +34,7 @@ type UserMenuProps = {
 export function UserMenu({
   name,
   email,
+  image,
   roleLabel,
   menuLabel,
   accountLabel,
@@ -30,9 +47,14 @@ export function UserMenu({
         <button
           type="button"
           aria-label={menuLabel}
-          className="inline-flex size-control items-center justify-center rounded-control border-2 border-line-strong bg-surface font-semibold text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="inline-flex size-control items-center justify-center overflow-hidden rounded-control border-2 border-line-strong bg-surface font-semibold text-ink hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
-          {initial}
+          {image === null ? (
+            initial
+          ) : (
+            // biome-ignore lint/performance/noImgElement: a provider's avatar URL, outside the image optimizer's allowed hosts
+            <img src={image} alt="" className="size-full object-cover" />
+          )}
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 p-2">

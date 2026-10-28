@@ -79,6 +79,7 @@ async function readUser(identity: SessionIdentity): Promise<CurrentUser | null> 
       name: users.name,
       role: users.role,
       options: users.options,
+      image: users.image,
     })
     .from(users)
     .where(where);

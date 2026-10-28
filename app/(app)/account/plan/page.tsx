@@ -3,10 +3,10 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { productPlanPage } from "@/components/pages.product";
 import { ListSkeleton } from "@/components/patterns/list-states";
-import { PageHeader } from "@/components/patterns/page-header";
-import { PageSection } from "@/components/patterns/page-section";
 import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
+import { type PageSectionEntry, SectionedPage } from "@/components/patterns/sectioned-page";
 import { TrialNotice } from "@/components/patterns/trial-notice";
 import { Panel } from "@/components/ui/panel";
 import { Stamp } from "@/components/ui/stamp";
@@ -46,44 +46,91 @@ export default function PlanPage({ searchParams }: Props) {
 }
 
 async function PlanContent({ searchParams }: Props) {
-  const [t, query] = await Promise.all([getTranslations("plan"), searchParams]);
+  const [t, receipts, query] = await Promise.all([
+    getTranslations("plan"),
+    getTranslations("plan.receipts"),
+    searchParams,
+  ]);
   const user = await requirePageRole("member", "/account/plan");
   // Read fresh: the plan changes by webhook, away from this person's session.
-  const plan = await readPlan(db, user.id);
+  const [plan, history] = await Promise.all([readPlan(db, user.id), paymentsOf(db, user.id)]);
+  const { timeZone } = resolvePreferences(user.options);
+  const settled = history.filter((payment) => payment.status === "paid");
+  const sections: PageSectionEntry[] = [
+    ...notices(plan, query.checkout === "success", t),
+    { key: "plan", title: null, content: <PlanRecord plan={plan} timeZone={timeZone} /> },
+    ...(settled.length === 0
+      ? []
+      : [
+          {
+            key: "receipts",
+            title: receipts("title"),
+            help: receipts("help"),
+            content: <Receipts settled={settled} timeZone={timeZone} />,
+          },
+        ]),
+  ];
+  const Page = productPlanPage ?? SectionedPage;
+  return (
+    <Page
+      title={t("title")}
+      subtitle={t("subtitle")}
+      controls={<PlanActions plan={plan} />}
+      sections={sections}
+    />
+  );
+}
+
+/** What the person should know first: a payment being confirmed, a trial, a pending or late plan. */
+function notices(
+  plan: Plan | null,
+  justPaid: boolean,
+  t: Awaited<ReturnType<typeof getTranslations<"plan">>>,
+): PageSectionEntry[] {
   const state = planState(plan);
   const paid = plan !== null && isPaidTier(plan.tier);
-  return (
-    <>
-      <PageHeader
-        title={t("title")}
-        subtitle={t("subtitle")}
-        showBack={false}
-        controls={<PlanActions plan={plan} />}
-      />
-      <div className="flex flex-col gap-10">
-        {query.checkout === "success" && !paid ? (
-          <Panel tone="info" role="status">
-            <p className="text-body text-ink">{t("confirming")}</p>
-          </Panel>
-        ) : null}
-        {state === "trialing" && plan?.currentPeriodEnd ? (
-          <TrialSection endsAt={plan.currentPeriodEnd} />
-        ) : null}
-        {state === "pending" ? (
-          <Panel tone="info" role="status">
-            <p className="max-w-[60ch] text-body text-ink">{t("pending")}</p>
-          </Panel>
-        ) : null}
-        {state === "pastDue" ? (
-          <Panel role="alert" className="border-warning-ink">
-            <p className="max-w-[60ch] text-body text-ink">{t("pastDue")}</p>
-          </Panel>
-        ) : null}
-        <PlanRecord plan={plan} timeZone={resolvePreferences(user.options).timeZone} />
-        <Receipts userId={user.id} timeZone={resolvePreferences(user.options).timeZone} />
-      </div>
-    </>
-  );
+  const entries: PageSectionEntry[] = [];
+  if (justPaid && !paid) {
+    entries.push({
+      key: "confirming",
+      title: null,
+      content: (
+        <Panel tone="info" role="status">
+          <p className="text-body text-ink">{t("confirming")}</p>
+        </Panel>
+      ),
+    });
+  }
+  if (state === "trialing" && plan?.currentPeriodEnd) {
+    entries.push({
+      key: "trial",
+      title: null,
+      content: <TrialSection endsAt={plan.currentPeriodEnd} />,
+    });
+  }
+  if (state === "pending") {
+    entries.push({
+      key: "pending",
+      title: null,
+      content: (
+        <Panel tone="info" role="status">
+          <p className="max-w-[60ch] text-body text-ink">{t("pending")}</p>
+        </Panel>
+      ),
+    });
+  }
+  if (state === "pastDue") {
+    entries.push({
+      key: "pastDue",
+      title: null,
+      content: (
+        <Panel role="alert" className="border-warning-ink">
+          <p className="max-w-[60ch] text-body text-ink">{t("pastDue")}</p>
+        </Panel>
+      ),
+    });
+  }
+  return entries;
 }
 
 /** What the date says: where a plan ends or renews. A year bought once has no renewal, only a last day. */
@@ -186,41 +233,38 @@ async function PlanActions({ plan }: { plan: Plan | null }) {
 }
 
 /** A receipt for each settled payment, set as a ledger: when and how much in large type, one plain link per row. */
-async function Receipts({ userId, timeZone }: { userId: string; timeZone: string }) {
-  const [t, history] = await Promise.all([
-    getTranslations("plan.receipts"),
-    paymentsOf(db, userId),
-  ]);
-  const settled = history.filter((payment) => payment.status === "paid");
-  if (settled.length === 0) {
-    return null;
-  }
+async function Receipts({
+  settled,
+  timeZone,
+}: {
+  settled: Awaited<ReturnType<typeof paymentsOf>>;
+  timeZone: string;
+}) {
+  const t = await getTranslations("plan.receipts");
   return (
-    <PageSection title={t("title")} help={t("help")}>
-      <ul className="flex flex-col divide-y divide-line border-b border-line">
-        {settled.map((payment) => (
-          <li
-            key={payment.id}
-            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3"
+    <ul className="flex flex-col divide-y divide-line border-b border-line">
+      {settled.map((payment) => (
+        <li
+          key={payment.id}
+          className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3"
+        >
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <p className="text-field-label text-ink">
+              {formatMoney(toCents(payment.amountCents), payment.currency)}
+            </p>
+            <p className="text-body-small text-ink-muted">
+              {t("paidOn", { date: formatInstantDate(payment.paidAt, timeZone) })}
+            </p>
+          </div>
+          <a
+            href={`/account/receipts/${payment.id}`}
+            download
+            className={buttonClasses("secondary")}
           >
-            <div className="flex min-w-0 flex-col gap-0.5">
-              <p className="text-field-label text-ink">
-                {formatMoney(toCents(payment.amountCents), payment.currency)}
-              </p>
-              <p className="text-body-small text-ink-muted">
-                {t("paidOn", { date: formatInstantDate(payment.paidAt, timeZone) })}
-              </p>
-            </div>
-            <a
-              href={`/account/receipts/${payment.id}`}
-              download
-              className={buttonClasses("secondary")}
-            >
-              {t("download")}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </PageSection>
+            {t("download")}
+          </a>
+        </li>
+      ))}
+    </ul>
   );
 }

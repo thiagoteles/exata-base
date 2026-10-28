@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { productAuthScreen } from "@/components/pages.product";
 import { SignInForm } from "@/features/auth/sign-in-form";
 import { env } from "@/lib/env";
 import { getCurrentUser } from "@/lib/ports/auth";
@@ -40,7 +41,8 @@ async function SignInScreen({ searchParams }: Params) {
     redirect(next as never);
   }
   if (env.AUTH_PROVIDER === "clerk") {
-    return <HostedAuthScreen screen="sign-in" next={next} />;
+    const Screen = productAuthScreen ?? HostedAuthScreen;
+    return <Screen screen="sign-in" next={next} />;
   }
   return <SignInForm next={next} notice={noticeFrom(query)} />;
 }

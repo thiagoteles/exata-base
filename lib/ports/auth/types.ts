@@ -8,6 +8,8 @@ export type CurrentUser = {
   name: string;
   role: Role;
   options: UserOptions;
+  /** The picture the sign-in provider holds for the person, when it has one. */
+  image: string | null;
 };
 
 /** Who the session says is signed in, before the user row is read. */

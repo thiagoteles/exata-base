@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { productAuthScreen } from "@/components/pages.product";
 import { currentInstant } from "@/domain/clock";
 import { SignUpForm } from "@/features/auth/sign-up-form";
 import { findPendingInvite } from "@/lib/accounts/invites";
@@ -39,7 +40,8 @@ async function SignUpScreen({ searchParams }: Params) {
   await connection();
   const invite = token === undefined ? null : await findPendingInvite(db, token, currentInstant());
   if (env.AUTH_PROVIDER === "clerk") {
-    return <HostedAuthScreen screen="sign-up" next="/account" email={invite?.email} />;
+    const Screen = productAuthScreen ?? HostedAuthScreen;
+    return <Screen screen="sign-up" next="/account" email={invite?.email} />;
   }
   return <SignUpForm invitedEmail={invite?.email} />;
 }

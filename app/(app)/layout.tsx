@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import { productAppShell } from "@/components/shell/app-chrome.product";
+import { productAppShell, productUserArea } from "@/components/shell/app-chrome.product";
 import { AppShell } from "@/components/shell/app-shell";
 import { ThemeToggle } from "@/features/account/theme-toggle";
 import { BottomBarSlot, SidebarSlot, UserMenuSlot } from "./shell-slots";
@@ -22,12 +22,19 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </Suspense>
       }
       userMenu={
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
+        // A product's user area draws the theme switch itself.
+        productUserArea === null ? (
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Suspense>
+              <UserMenuSlot />
+            </Suspense>
+          </div>
+        ) : (
           <Suspense>
             <UserMenuSlot />
           </Suspense>
-        </div>
+        )
       }
     >
       {children}

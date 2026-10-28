@@ -17,6 +17,7 @@ import { featuresOfTier, type Tier } from "@/domain/billing/entitlements";
 import { trialDaysFor } from "@/domain/billing/trial";
 import { BuyButton } from "@/features/billing/buy-button";
 import { CurrencySwitch } from "@/features/billing/currency-switch";
+import { productPlansPage as ProductPlansPage } from "@/features/billing/plans-page.product";
 import { sourceOf } from "@/features/billing/schema";
 import { canBuy, readPlan, subscriptionOf } from "@/lib/billing/service";
 import { db } from "@/lib/db/client";
@@ -59,6 +60,9 @@ export default async function PlansPage({
 }: {
   searchParams: Promise<{ source?: string | string[] }>;
 }) {
+  if (ProductPlansPage !== null) {
+    return <ProductPlansPage searchParams={searchParams} />;
+  }
   const t = await getTranslations("plans");
   const faq = faqIds.map((id) => ({
     id,

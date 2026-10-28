@@ -22,6 +22,7 @@ const navIconNames = [
   "chart",
   "pulse",
   "folder",
+  "gift",
 ] as const;
 export type NavIcon = (typeof navIconNames)[number] | (typeof productNavIconNames)[number];
 
@@ -44,6 +45,7 @@ const navItems: readonly NavItem[] = [
   { key: "numbers", href: "/admin/numbers", group: "admin", minimum: "admin", icon: "chart" },
   { key: "health", href: "/admin/health", group: "admin", minimum: "admin", icon: "pulse" },
   { key: "users", href: "/admin/users", group: "admin", minimum: "admin", icon: "users" },
+  { key: "referrals", href: "/admin/referrals", group: "admin", minimum: "admin", icon: "gift" },
   { key: "invites", href: "/admin/invites", group: "admin", minimum: "admin", icon: "send" },
   { key: "audit", href: "/admin/audit", group: "admin", minimum: "admin", icon: "history" },
 ];

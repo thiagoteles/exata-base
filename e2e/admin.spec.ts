@@ -27,6 +27,7 @@ for (const theme of themes) {
       ["/admin/numbers", "Números"],
       ["/admin/health", "Saúde"],
       ["/admin/users", "Usuários"],
+      ["/admin/referrals", "Indicações"],
       ["/admin/invites", "Convites"],
       ["/admin/audit", "Auditoria"],
     ] as const;

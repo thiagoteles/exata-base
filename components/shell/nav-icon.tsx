@@ -3,6 +3,7 @@ import {
   IconChartBar,
   IconCreditCard,
   IconFolder,
+  IconGift,
   IconHistory,
   IconInbox,
   IconMail,
@@ -26,6 +27,7 @@ const icons: Readonly<Record<NavIconName, typeof IconUser>> = {
   chart: IconChartBar,
   pulse: IconActivityHeartbeat,
   folder: IconFolder,
+  gift: IconGift,
 };
 
 export function NavIcon({ name }: { name: ShellItem["icon"] }) {

@@ -236,5 +236,45 @@
       "payments": "Pagamentos",
       "accounts": "Contas"
     }
+  },
+  "referrals": {
+    "title": "Indicações",
+    "subtitle": "Quem chegou por um link de convite, quantos viraram pagantes e o crédito dado a quem convidou.",
+    "summary": "Resumo do programa",
+    "arrivalsTotal": "Chegaram por convite",
+    "arrivalsNote": "Contas criadas pelo link de alguém, desde o início.",
+    "payingTotal": "Viraram pagantes",
+    "payingNote": "{share}% de quem chegou por convite já pagou.",
+    "creditTotal": "Crédito dado",
+    "creditNote": "{count, plural, =0 {Ninguém foi creditado ainda.} one {Em # convite, abatido da fatura de quem convidou.} other {Em # convites, abatido da fatura de quem convidou.}}",
+    "creditOff": "Sem crédito",
+    "creditOffNote": "Este produto não dá crédito por convite.",
+    "awaitingTotal": "Crédito pendente",
+    "awaitingNote": "Indicados que já pagaram e cujo crédito ainda não saiu. Deve voltar a zero sozinho; se ficar, veja o provedor de pagamento.",
+    "top": "Quem mais indicou",
+    "topHelp": "Os 10 que mais trouxeram pessoas. Clique no e-mail para ver a conta.",
+    "referrer": "Quem convidou",
+    "arrivals": "Chegaram",
+    "paying": "Pagantes",
+    "credit": "Crédito",
+    "gone": "{email} (conta apagada)",
+    "sources": "De onde vieram",
+    "sourcesHelp": "O lugar onde o link foi compartilhado, quando o link diz.",
+    "noSource": "Sem origem",
+    "recent": "Indicações recentes",
+    "recentHelp": "As 20 mais recentes. Clique numa linha para ver a conta de quem chegou.",
+    "referred": "Quem chegou",
+    "invitedBy": "Convidado por",
+    "source": "Origem",
+    "date": "Chegou em",
+    "situation": "Situação",
+    "situations": {
+      "rewarded": "Crédito dado",
+      "awaitingCredit": "Crédito pendente",
+      "paying": "Pagou",
+      "notPaying": "Ainda não pagou"
+    },
+    "empty": "Ninguém chegou por convite ainda",
+    "emptyBody": "Quando alguém criar uma conta pelo link de convite de outra pessoa, a indicação aparece aqui."
   }
 }

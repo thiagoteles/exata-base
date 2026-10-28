@@ -29,9 +29,17 @@ type DialogContentProps = {
   description?: string;
   children?: ReactNode;
   className?: string;
+  /** Extra classes for the title, for a product that draws its dialogs its own way. */
+  titleClassName?: string;
 };
 
-export function DialogContent({ title, description, children, className }: DialogContentProps) {
+export function DialogContent({
+  title,
+  description,
+  children,
+  className,
+  titleClassName,
+}: DialogContentProps) {
   const t = useTranslations("ui");
   return (
     <Primitive.Portal>
@@ -40,7 +48,7 @@ export function DialogContent({ title, description, children, className }: Dialo
         className={cn(dialogContentClasses, className)}
         {...(description === undefined ? { "aria-describedby": undefined } : {})}
       >
-        <Primitive.Title className="text-section">{title}</Primitive.Title>
+        <Primitive.Title className={cn("text-section", titleClassName)}>{title}</Primitive.Title>
         {description === undefined ? null : (
           <Primitive.Description className="text-body">{description}</Primitive.Description>
         )}

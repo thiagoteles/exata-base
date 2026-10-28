@@ -16,6 +16,7 @@ import { isPaidTier } from "@/domain/billing/entitlements";
 import { isFixedTerm } from "@/domain/billing/term";
 import { trialStanding } from "@/domain/billing/trial";
 import { currentInstant } from "@/domain/clock";
+import { productPlanOffers } from "@/features/billing/offers.product";
 import { CancellationControl, PortalButton } from "@/features/billing/plan-controls";
 import { planState, planStateTone } from "@/features/billing/presentation";
 import { paymentsOf } from "@/lib/billing/payments";
@@ -56,8 +57,12 @@ async function PlanContent({ searchParams }: Props) {
   const [plan, history] = await Promise.all([readPlan(db, user.id), paymentsOf(db, user.id)]);
   const { timeZone } = resolvePreferences(user.options);
   const settled = history.filter((payment) => payment.status === "paid");
+  const Offers = productPlanOffers;
   const sections: PageSectionEntry[] = [
     ...notices(plan, query.checkout === "success", t),
+    ...(Offers === null
+      ? []
+      : [{ key: "offers", title: null, content: <Offers plan={plan} userId={user.id} /> }]),
     { key: "plan", title: null, content: <PlanRecord plan={plan} timeZone={timeZone} /> },
     ...(settled.length === 0
       ? []
@@ -223,7 +228,7 @@ async function PlanActions({ plan }: { plan: Plan | null }) {
       {billingOn && plan?.providerCustomerId ? (
         <PortalButton switchesTier={severalTiers && subscribed} />
       ) : null}
-      {plan !== null && isPaidTier(plan.tier) ? null : (
+      {(plan !== null && isPaidTier(plan.tier)) || productPlanOffers !== null ? null : (
         <Link href={publicHref("/plans")} className={buttonClasses("primary")}>
           {t("seePlans")}
         </Link>

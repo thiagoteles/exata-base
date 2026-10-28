@@ -8,7 +8,7 @@ import { UserMenu } from "@/components/shell/user-menu";
 import { ClaimVisitorData } from "@/features/account/claim-visitor-data";
 import { ReportTimeZone } from "@/features/account/report-time-zone";
 import { env } from "@/lib/env";
-import { groupNav, type NavItem, splitForBar, visibleNav } from "@/lib/navigation";
+import { type NavItem, navBar, navSections } from "@/lib/navigation";
 import { getCurrentUser } from "@/lib/ports/auth";
 import { SignOutControl } from "@/lib/ports/auth/screens";
 import { resolvePreferences } from "@/lib/preferences/resolve";
@@ -26,7 +26,7 @@ const BottomBar = productBottomBar ?? BaseBottomBar;
 async function destinations() {
   const t = await getTranslations("nav");
   const user = await getCurrentUser();
-  const items = visibleNav(user?.role ?? "member");
+  const role = user?.role ?? "member";
   const label = (item: NavItem): ShellItem => ({
     key: item.key,
     href: item.href,
@@ -34,24 +34,24 @@ async function destinations() {
     label: t(`items.${item.key}` as never),
     ...(item.exact === undefined ? {} : { exact: item.exact }),
   });
-  return { t, items, label };
+  return { t, role, label };
 }
 
 export async function SidebarSlot() {
-  const { t, items, label } = await destinations();
-  const groups = groupNav(items);
-  const shown: ShellGroup[] = groups.map(({ group, items: entries }) => ({
-    key: group,
-    // A lone group needs no heading: "General" above a single link only adds noise.
-    label: groups.length > 1 ? t(`groups.${group}`) : null,
-    items: entries.map(label),
+  const { t, role, label } = await destinations();
+  const sections = navSections(role);
+  const shown: ShellGroup[] = sections.map((section) => ({
+    key: section.key,
+    // A lone section needs no heading: "General" above a single link only adds noise.
+    label: section.labelled && sections.length > 1 ? t(`groups.${section.key}` as never) : null,
+    items: section.items.map(label),
   }));
   return <Sidebar groups={shown} label={t("side")} />;
 }
 
 export async function BottomBarSlot() {
-  const { t, items, label } = await destinations();
-  const { bar, more } = splitForBar(items);
+  const { t, role, label } = await destinations();
+  const { bar, more } = navBar(role);
   return (
     <BottomBar
       items={bar.map(label)}

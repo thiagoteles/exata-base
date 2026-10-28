@@ -24,6 +24,7 @@ for (const theme of themes) {
     page,
   }) => {
     const screens = [
+      ["/admin", "Administração"],
       ["/admin/numbers", "Números"],
       ["/admin/health", "Saúde"],
       ["/admin/users", "Usuários"],

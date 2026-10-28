@@ -8,6 +8,7 @@ import {
   IconInbox,
   IconMail,
   IconSend,
+  IconShield,
   IconUser,
   IconUsers,
 } from "@tabler/icons-react";
@@ -27,6 +28,7 @@ const icons: Readonly<Record<NavIconName, typeof IconUser>> = {
   chart: IconChartBar,
   pulse: IconActivityHeartbeat,
   folder: IconFolder,
+  shield: IconShield,
   gift: IconGift,
 };
 

@@ -412,6 +412,19 @@
       },
       "empty": "Ninguém chegou por convite ainda",
       "emptyBody": "Quando alguém criar uma conta pelo link de convite de outra pessoa, a indicação aparece aqui."
+    },
+    "hub": {
+      "title": "Administração",
+      "subtitle": "As telas da equipe e da administração, num só lugar.",
+      "about": {
+        "contacts": "Mensagens enviadas pelo formulário de contato.",
+        "numbers": "Cadastros, pagantes e receita, lidos direto do banco.",
+        "health": "Processos agendados, entregas de fora e erros recentes.",
+        "users": "Contas, papéis, planos e cortesias.",
+        "referrals": "Quem chegou por convite e o crédito dado a quem convidou.",
+        "invites": "Convites por e-mail para criar conta.",
+        "audit": "Tudo o que a equipe alterou, com quem e quando."
+      }
     }
   },
   "articles": {
@@ -1275,6 +1288,7 @@
       "numbers": "Números",
       "health": "Saúde",
       "referrals": "Indicações",
+      "admin": "Administração",
       "sampleItems": "Amostras",
       "sampleParts": "Peças"
     },

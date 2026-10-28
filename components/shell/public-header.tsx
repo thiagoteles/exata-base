@@ -4,6 +4,9 @@ import type { ReactNode } from "react";
 
 export type PublicHeaderProps = { actions: ReactNode };
 
+/** What the header's right end knows, when a product draws it: whether someone is signed in. */
+export type HeaderActionsProps = { signedIn: boolean };
+
 /** The actions slot holds whatever depends on the session, so the header itself stays static. */
 export function PublicHeader({ actions }: PublicHeaderProps) {
   const t = useTranslations();

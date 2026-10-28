@@ -1,9 +1,6 @@
 import type { ComponentType } from "react";
 import type { PublicFooterProps } from "./public-footer";
-import type { PublicHeaderProps } from "./public-header";
-
-/** What the header's right end knows: whether someone is signed in. */
-export type HeaderActionsProps = { signedIn: boolean };
+import type { HeaderActionsProps, PublicHeaderProps } from "./public-header";
 
 /*
  * The product's own header and footer for the public pages, in place of the base's. Each receives

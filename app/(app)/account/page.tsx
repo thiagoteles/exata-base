@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function AccountPage() {
   return (
-    <div className="mx-auto w-full max-w-270">
+    <div className={productAccountPage === null ? "mx-auto w-full max-w-270" : undefined}>
       <Suspense fallback={<ListSkeleton label="" rows={4} />}>
         <AccountContent />
       </Suspense>

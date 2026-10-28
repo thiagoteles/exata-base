@@ -19,7 +19,8 @@ export async function billingIsOff(request: APIRequestContext) {
 /** True while the signed-in account has no paid plan and no courtesy. */
 export async function accountIsFree(page: Page) {
   await page.goto("/account/plan");
-  await expect(page.getByRole("heading", { level: 1, name: "Meu plano" })).toBeVisible();
+  // Any title: a product may draw the plan page under its own.
+  await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   return (await page.getByText("Gratuito", { exact: true }).count()) > 0;
 }
 

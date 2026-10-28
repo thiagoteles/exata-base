@@ -11,12 +11,23 @@ import { appOrigin } from "./origin";
 
 const themes = ["light", "dark"] as const;
 
-async function open(page: Page, path: string, theme: (typeof themes)[number], heading: string) {
+/** Opens a page and waits for its title; a null heading takes any, for a page a product draws. */
+async function open(
+  page: Page,
+  path: string,
+  theme: (typeof themes)[number],
+  heading: string | null,
+) {
   await page.context().addCookies([{ name: "theme", value: theme, url: appOrigin }]);
   await page.goto(path);
-  await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, ...(heading === null ? {} : { name: heading }) }).first(),
+  ).toBeVisible();
   await page.waitForLoadState("networkidle");
 }
+
+/** Whether the plan page carries a product's own offer in place of the base's record and link. */
+const productOffer = async (page: Page) => (await page.locator("[data-plan-offers]").count()) > 0;
 
 async function violations(page: Page) {
   const results = await new AxeBuilder({ page })
@@ -34,7 +45,7 @@ for (const theme of themes) {
   }) => {
     await open(page, "/planos", theme, "Planos");
     expect(await violations(page)).toEqual([]);
-    await open(page, "/account/plan", theme, "Meu plano");
+    await open(page, "/account/plan", theme, null);
     expect(await violations(page)).toEqual([]);
   });
 }
@@ -54,17 +65,20 @@ test("a free account sees its plan, and no portal or cancellation without a subs
   page,
 }) => {
   test.skip(!(await accountIsFree(page)), PLAN_PAID);
-  await open(page, "/account/plan", "light", "Meu plano");
-  const record = page.getByRole("term").filter({ hasText: "Plano" }).first();
-  await expect(record).toBeVisible();
+  await open(page, "/account/plan", "light", null);
   await expect(page.getByText("Gratuito", { exact: true }).first()).toBeVisible();
-  await expect(page.getByRole("link", { name: "Ver planos" })).toBeVisible();
+  if (!(await productOffer(page))) {
+    const record = page.getByRole("term").filter({ hasText: "Plano" }).first();
+    await expect(record).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver planos" })).toBeVisible();
+  }
   await expect(page.getByRole("button", { name: "Gerenciar pagamento" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Cancelar no fim do período" })).toHaveCount(0);
+  // By its address: a product may name the menu item its own way.
   await expect(
-    page.getByRole("navigation", { name: "Navegação da área logada" }).getByRole("link", {
-      name: "Meu plano",
-    }),
+    page
+      .getByRole("navigation", { name: "Navegação da área logada" })
+      .locator('a[href="/account/plan"]'),
   ).toBeVisible();
 });
 

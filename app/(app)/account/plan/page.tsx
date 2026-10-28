@@ -63,7 +63,18 @@ async function PlanContent({ searchParams }: Props) {
     ...notices(plan, query.checkout === "success", t),
     ...(Offers === null
       ? []
-      : [{ key: "offers", title: null, content: <Offers plan={plan} userId={user.id} /> }]),
+      : [
+          {
+            key: "offers",
+            title: null,
+            // Marks the product's offer, so the base's tests know the page is the product's.
+            content: (
+              <div data-plan-offers="">
+                <Offers plan={plan} userId={user.id} />
+              </div>
+            ),
+          },
+        ]),
     // The product's offer already shows the free plan; the record is kept for a paid one.
     ...(Offers !== null && (plan === null || !isPaidTier(plan.tier))
       ? []

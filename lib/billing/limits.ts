@@ -1,6 +1,6 @@
 import type { Holder, LimitName } from "@/domain/billing/entitlements";
 import type { Database } from "@/lib/db/database";
-import { consume, type RateDecision } from "@/lib/rate-limit/service";
+import { consume, type RateDecision, spent } from "@/lib/rate-limit/service";
 import { entitlementsFor } from "./service";
 
 /*
@@ -30,4 +30,25 @@ export async function consumeLimit(
     return UNLIMITED;
   }
   return consume(db, { name: `plan:${name}`, ...rule }, `user:${holder.id}`, now);
+}
+
+/**
+ * How much of a limit a holder has spent in the current window, for a page that says "2 of 3 used
+ * today" before the person spends one. Null when their plan does not limit it.
+ *
+ * @public for products: the base meters limits but has no page that counts one down.
+ */
+export async function limitUsage(
+  db: Database,
+  holder: Holder,
+  name: LimitName,
+  now: Date,
+): Promise<{ used: number; limit: number } | null> {
+  const { limits } = await entitlementsFor(db, holder, now);
+  const rule = limits[name];
+  if (rule === undefined) {
+    return null;
+  }
+  const used = await spent(db, { name: `plan:${name}`, ...rule }, `user:${holder.id}`, now);
+  return { used: Math.min(used, rule.limit), limit: rule.limit };
 }

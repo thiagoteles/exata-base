@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { rateLimits } from "@/lib/db/schema/rate-limits";
-import { consume } from "@/lib/rate-limit/service";
+import { consume, spent } from "@/lib/rate-limit/service";
 import { purgeRateLimits } from "@/lib/scheduled/purge-rate-limits";
 import { testDatabase } from "./database";
 
@@ -29,6 +29,15 @@ describe("rate limit", () => {
       allowed: true,
       remaining: 4,
     });
+  });
+
+  it("reads what a window has spent without spending, and starts the next window at zero", async () => {
+    await consume(db, rule, "user:a", now);
+    await consume(db, rule, "user:a", now);
+    expect(await spent(db, rule, "user:a", now)).toBe(2);
+    expect(await spent(db, rule, "user:a", now)).toBe(2);
+    expect(await spent(db, rule, "user:b", now)).toBe(0);
+    expect(await spent(db, rule, "user:a", new Date(now.getTime() + 60_000))).toBe(0);
   });
 
   it("never stores the subject itself", async () => {

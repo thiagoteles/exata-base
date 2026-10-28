@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { dateInZone, startOfDayIn } from "@/domain/calendar";
 import type { Database } from "@/lib/db/database";
 import { rateLimits } from "@/lib/db/schema/rate-limits";
@@ -64,4 +64,19 @@ export async function consume(
     remaining: Math.max(0, rule.limit - hits),
     retryAfterSeconds: Math.ceil((expiresAt.getTime() - now.getTime()) / MS),
   };
+}
+
+/** How many hits the window `now` falls in has spent so far, without spending one. */
+export async function spent(
+  db: Database,
+  rule: RateLimit,
+  subject: string,
+  now: Date,
+): Promise<number> {
+  const { start } = windowOf(rule, now);
+  const [row] = await db
+    .select({ hits: rateLimits.hits })
+    .from(rateLimits)
+    .where(eq(rateLimits.key, keyOf(rule.name, subject, start)));
+  return row?.hits ?? 0;
 }

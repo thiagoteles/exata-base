@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+import { expectAccountPage } from "./environment";
 
 /*
  * A personal API token, as a person uses it: make one on the account page, call the API with it,
@@ -6,8 +7,18 @@ import { expect, test } from "@playwright/test";
  * visitor can and cannot do with a document address, since both are doors for programs and printouts.
  */
 
+const NO_TOKENS = "the product's account page has no API keys";
+
+/** True when the account page, drawn by the product, leaves the API keys out. */
+async function hasNoTokens(page: Page) {
+  await expectAccountPage(page);
+  await page.waitForLoadState("networkidle");
+  return (await page.getByRole("textbox", { name: "Nome da chave", exact: true }).count()) === 0;
+}
+
 test("a token opens the API until it is revoked", async ({ page, request }) => {
   await page.goto("/account");
+  test.skip(await hasNoTokens(page), NO_TOKENS);
   await page.getByRole("textbox", { name: "Nome da chave", exact: true }).fill("Planilha");
   await page.getByRole("button", { name: "Criar chave" }).click();
   const shown = page.getByText(/^exb_[A-Za-z0-9_-]{30,}$/);
@@ -46,6 +57,8 @@ test("a token writes only with the scope that allows it, and only a valid body",
   page,
   request,
 }) => {
+  await page.goto("/account");
+  test.skip(await hasNoTokens(page), NO_TOKENS);
   const make = async (name: string, write: boolean) => {
     await page.goto("/account");
     await page.getByRole("textbox", { name: "Nome da chave", exact: true }).fill(name);

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { expectAccountPage } from "./environment";
 import { appOrigin } from "./origin";
 
 const themes = ["light", "dark"] as const;
@@ -46,7 +47,7 @@ for (const theme of themes) {
   }) => {
     await page.context().addCookies([{ name: "theme", value: theme, url: appOrigin }]);
     await page.goto("/account");
-    await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+    await expectAccountPage(page);
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
       .analyze();

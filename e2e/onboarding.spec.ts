@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { OnboardingStep } from "../domain/onboarding/step";
 import { onboardingSteps } from "../domain/onboarding/steps";
+import { expectAccountPage } from "./environment";
 import { newPerson, signUpAndConfirm } from "./person";
 
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -38,6 +39,6 @@ test("the first steps fill in one by one and leave the account page when done", 
   await page.reload();
   await expect(panel).toBeHidden();
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Minha conta", level: 1 })).toBeVisible();
+  await expectAccountPage(page);
   await expect(panel).toBeHidden();
 });

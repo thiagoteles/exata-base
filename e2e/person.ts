@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test";
+import { expectAccountPage } from "./environment";
 import { linkSentTo } from "./mail";
 
 /*
@@ -28,7 +29,7 @@ export async function signUpAndConfirm(page: Page, person: Person): Promise<void
     page.getByText(`Enviamos um link de confirmação para ${person.email}`),
   ).toBeVisible();
   await page.goto(await linkSentTo(person.email));
-  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await expectAccountPage(page);
 }
 
 export async function signInAs(page: Page, person: Person): Promise<void> {
@@ -41,6 +42,6 @@ export async function signInAs(page: Page, person: Person): Promise<void> {
     .and(page.locator(":visible"))
     .fill(person.password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await expectAccountPage(page);
   await page.waitForLoadState("networkidle");
 }

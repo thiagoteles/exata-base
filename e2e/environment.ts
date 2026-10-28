@@ -24,5 +24,11 @@ export async function accountIsFree(page: Page) {
   return (await page.getByText("Gratuito", { exact: true }).count()) > 0;
 }
 
+/** The account page is open: under the base's title, or under the product's own when it draws the page. */
+export async function expectAccountPage(page: Page) {
+  await expect(page).toHaveURL(/\/account(\?|$)/);
+  await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+}
+
 export const BILLING_ON = "billing is on, the test is for a product without a payment provider";
 export const PLAN_PAID = "the account has a plan, the test is for the free plan";

@@ -2,6 +2,7 @@ import { type Browser, type BrowserContext, expect, type Page, test } from "@pla
 import { unzipSync } from "fflate";
 import { SIGNED_IN_HOME } from "../lib/routes";
 import { signUnsubscribe } from "../lib/unsubscribe/token";
+import { expectAccountPage } from "./environment";
 import { linkSentTo } from "./mail";
 import { appHost, appOrigin } from "./origin";
 
@@ -38,7 +39,7 @@ async function openAccount(browser: Browser): Promise<Page> {
   contexts.push(context);
   const page = await context.newPage();
   await page.goto("/account");
-  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await expectAccountPage(page);
   await settled(page);
   return page;
 }
@@ -61,7 +62,7 @@ test("sign up asks for the e-mail to be confirmed, and the link signs the person
   await expect(page.getByText("Confirme seu e-mail antes de entrar.")).toBeVisible();
 
   await page.goto(await linkSentTo(email));
-  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await expectAccountPage(page);
   await expect(page.getByText(email, { exact: true }).first()).toBeVisible();
   session = await page.context().storageState();
 });
@@ -264,7 +265,7 @@ test("deleting the account asks first, signs the person out and closes the door 
   const dialog = page.getByRole("alertdialog", { name: "Apagar sua conta?" });
   await expect(dialog).toBeVisible();
   await dialog.getByRole("button", { name: "Cancelar" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await expectAccountPage(page);
 
   await page.getByRole("button", { name: "Apagar minha conta" }).click();
   await page.getByRole("alertdialog").getByRole("button", { name: "Apagar minha conta" }).click();
@@ -307,6 +308,6 @@ async function signIn(page: Page) {
   await page.getByRole("textbox", { name: "E-mail", exact: true }).fill(email);
   await page.getByLabel("Senha").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await expectAccountPage(page);
   await settled(page);
 }

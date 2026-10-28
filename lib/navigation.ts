@@ -66,7 +66,7 @@ const hubItem: NavItem = {
 /**
  * A product that arranges the menu itself: its sections in order, each naming the destinations it
  * holds by key (the product's and the base's alike, and `admin` for the hub), and the destinations
- * the bottom bar always shows. A destination no section names is not in the menu. Without a layout
+ * the bottom bar always shows, which may include one the sidebar leaves out. A destination no section names is not in the menu. Without a layout
  * the menu is the base's: the groups below, and the bar filled in order.
  */
 export type NavLayout = {
@@ -128,8 +128,11 @@ export function navBar(
   if (layout === null) {
     return splitForBar(visibleNav(role));
   }
+  // The bar may keep a destination the sidebar leaves out (a phone's own shortcut); More holds the
+  // sidebar's destinations the bar does not show.
+  const reachable = [...visibleNav(role), hubItem].filter((item) => hasRole(role, item.minimum));
+  const bar = layout.bar.flatMap((key) => reachable.find((item) => item.key === key) ?? []);
   const all = navSections(role, layout).flatMap((section) => section.items);
-  const bar = layout.bar.flatMap((key) => all.find((item) => item.key === key) ?? []);
   return { bar, more: all.filter((item) => !bar.includes(item)) };
 }
 

@@ -84,6 +84,12 @@ describe("a product's layout", () => {
     expect(more.map((entry) => entry.key)).toEqual(["admin", "numbers"]);
   });
 
+  it("may keep in the bar a destination the sidebar leaves out", () => {
+    const { bar, more } = navBar("admin", { ...layout, bar: ["messages", "plan"] });
+    expect(bar.map((entry) => entry.key)).toEqual(["messages", "plan"]);
+    expect(more.map((entry) => entry.key)).toEqual(["account", "admin", "numbers"]);
+  });
+
   // A misspelt key would hide a destination without a word; this names it instead.
   it("names only destinations that exist", () => {
     const named = [

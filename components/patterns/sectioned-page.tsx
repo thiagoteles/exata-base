@@ -8,6 +8,8 @@ export type PageSectionEntry = {
   title: string | null;
   help?: string | undefined;
   content: ReactNode;
+  /** The section's pieces by name, for a product that shows only some of them. */
+  parts?: Readonly<Record<string, ReactNode>>;
 };
 
 /** A base screen as a product receives it: the page's title and its sections in the base's order. */

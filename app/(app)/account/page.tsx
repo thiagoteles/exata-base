@@ -119,6 +119,12 @@ function profileSections(
     {
       key: "profile",
       title: null,
+      parts: {
+        name: user.name.trim() || t("profile.noName"),
+        email: user.email,
+        role: t(`roles.${user.role}`),
+        timeZone: preferences.timeZone,
+      },
       content: (
         // Four cells fill two columns exactly; three columns would leave a gap in the second row.
         <RecordGrid className="md:grid-cols-2 xl:grid-cols-2">
@@ -244,6 +250,11 @@ function securitySections(
 
 /** The keys for the API, the person's data to download, and the way to delete the account. */
 function dataSections({ tokens }: AccountData, t: AccountTranslator): PageSectionEntry[] {
+  const exportLink = (
+    <a href="/account/export" download className={`${buttonClasses("secondary")} self-start`}>
+      {t("data.download")}
+    </a>
+  );
   return [
     {
       key: "apiTokens",
@@ -262,18 +273,18 @@ function dataSections({ tokens }: AccountData, t: AccountTranslator): PageSectio
     {
       key: "data",
       title: t("data.title"),
+      parts: { body: t("data.body"), action: exportLink },
       content: (
         <>
           <p className="max-w-[52ch] text-body text-ink">{t("data.body")}</p>
-          <a href="/account/export" download className={`${buttonClasses("secondary")} self-start`}>
-            {t("data.download")}
-          </a>
+          {exportLink}
         </>
       ),
     },
     {
       key: "delete",
       title: t("delete.title"),
+      parts: { body: t("delete.body"), action: <DeleteAccount /> },
       content: (
         <Panel tone="danger" className="flex flex-col gap-4">
           <p className="max-w-[52ch] text-body text-ink">{t("delete.body")}</p>

@@ -14,6 +14,12 @@ export type Seeds = {
   neutral: { offset: number; hue?: number };
   /** The primary action: ink, the default, or the brand color for a product whose buttons wear it. */
   action?: "ink" | "brand";
+  /**
+   * Exact colors for some roles, per theme, for a product that keeps an existing palette. A pinned
+   * role is never moved in the standard palette (a pin that fails a contrast pair is refused); in the
+   * reinforced one it is only where the adjustment starts, because that person asked for more.
+   */
+  pins?: Partial<Record<Theme, Partial<Record<TokenName, Oklch>>>>;
 };
 
 export type Theme = "light" | "dark";
@@ -93,11 +99,50 @@ export function parseSeeds(value: unknown): Seeds {
     );
   }
   const action = parseAction(seeds?.action);
+  const pins = parsePins((value as { pins?: unknown } | null)?.pins);
   return {
     brand: { hue, chroma },
     neutral: parseNeutral(seeds?.neutral),
     ...(action === "brand" ? { action } : {}),
+    ...(pins === undefined ? {} : { pins }),
   };
+}
+
+const PIN = /^oklch\(\s*([\d.]+)%\s+([\d.]+)\s+([\d.]+)\s*\)$/;
+
+/** `{ "light": { "ink": "oklch(20% 0.02 260)" }, "dark": {...} }`, every name a role. */
+function parsePins(value: unknown): Seeds["pins"] {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof value !== "object" || value === null) {
+    throw new Error('pins must be an object of "light" and "dark"');
+  }
+  const pins: NonNullable<Seeds["pins"]> = {};
+  for (const [theme, roles] of Object.entries(value)) {
+    if (theme !== "light" && theme !== "dark") {
+      throw new Error(`pins.${theme} is not a theme; the themes are light and dark`);
+    }
+    pins[theme] = Object.fromEntries(
+      Object.entries(roles as Record<string, unknown>).map(([role, color]) => {
+        if (!(tokenNames as readonly string[]).includes(role)) {
+          throw new Error(
+            `pins.${theme}.${role} is not a role; the roles are ${tokenNames.join(", ")}`,
+          );
+        }
+        const match = typeof color === "string" ? PIN.exec(color) : null;
+        if (match === null) {
+          throw new Error(`pins.${theme}.${role} must be written as oklch(L% C H)`);
+        }
+        const [, l, c, h] = match.map(Number);
+        // Written as given, never pulled into sRGB here: the browser maps it as it maps the
+        // palette the product is keeping, so both land on the same pixel.
+        const exact: Oklch = { mode: "oklch", l: (l ?? 0) / PERCENT, c: c ?? 0, h: h ?? 0 };
+        return [role, exact];
+      }),
+    );
+  }
+  return pins;
 }
 
 function parseNeutral(seed: Partial<Seeds["neutral"]> | undefined): Seeds["neutral"] {
@@ -306,14 +351,20 @@ export function generateTheme(
   seeds: Seeds,
   look: Look = DEFAULT_LOOK,
 ): { palette: Palette; report: PairReport[] } {
-  let palette = build(theme, seeds, look);
+  const pinned = seeds.pins?.[theme] ?? {};
+  let palette: Palette = { ...build(theme, seeds, look), ...pinned };
   for (const constraint of constraintsFor(look.contrast)) {
-    palette = adjust(theme, palette, constraint);
+    // A pin is exact unless the person asked for more contrast.
+    if (look.contrast === "reinforced" || !(constraint.foreground in pinned)) {
+      palette = adjust(theme, palette, constraint);
+    }
   }
   palette = {
     ...palette,
-    action: seeds.action === "brand" ? brandAction(theme, palette, seeds) : palette.ink,
-    focus: palette.brand,
+    action:
+      pinned.action ??
+      (seeds.action === "brand" ? brandAction(theme, palette, seeds) : palette.ink),
+    focus: pinned.focus ?? palette.brand,
   };
   const report = measure(theme, palette, look.contrast);
   const failure = report.find((pair) => pair.ratio < pair.minimum);

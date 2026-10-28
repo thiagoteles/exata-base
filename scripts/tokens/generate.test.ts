@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SEEDS, generateTheme, measure, parseSeeds, type Seeds } from "./generate";
+import { css, DEFAULT_SEEDS, generateTheme, measure, parseSeeds, type Seeds } from "./generate";
 
 const themes = ["light", "dark"] as const;
 const failingPair = / on /;
@@ -103,5 +103,47 @@ describe("token generator", () => {
     expect(() =>
       parseSeeds({ brand: { hue: 175, chroma: 0.13 }, neutral: { offset: 0 }, action: "gold" }),
     ).toThrow("action");
+  });
+});
+
+// A product that keeps the palette it already had pins its roles; the old LotoExata is the example.
+describe("pinned colors", () => {
+  const seeds = (pins: unknown) =>
+    parseSeeds({ brand: { hue: 175, chroma: 0.13 }, neutral: { offset: 0, hue: 260 }, pins });
+  const pinned = seeds({
+    light: {
+      background: "oklch(98% 0.01 260)",
+      ink: "oklch(20% 0.02 260)",
+      "line-strong": "oklch(64% 0.02 260)",
+      action: "oklch(48% 0.13 175)",
+    },
+  });
+
+  it("keeps a pinned role exactly as written in the standard palette, the action included", () => {
+    const { palette } = generateTheme("light", pinned);
+    expect(css(palette.background)).toBe("oklch(98% 0.01 260)");
+    expect(css(palette.ink)).toBe("oklch(20% 0.02 260)");
+    expect(css(palette["line-strong"])).toBe("oklch(64% 0.02 260)");
+    expect(css(palette.action)).toBe("oklch(48% 0.13 175)");
+  });
+
+  it("moves a pinned role when the person asked for more contrast", () => {
+    const { palette } = generateTheme("light", pinned, {
+      temperature: { hue: "brand", chromaScale: 1 },
+      contrast: "reinforced",
+    });
+    expect(palette["line-strong"].l).toBeLessThan(0.64);
+  });
+
+  it("refuses a pin that fails its contrast pair, and names the pair", () => {
+    expect(() => generateTheme("light", seeds({ light: { ink: "oklch(80% 0.02 260)" } }))).toThrow(
+      /ink on/,
+    );
+  });
+
+  it("refuses a role that does not exist and a color not written as oklch", () => {
+    expect(() => seeds({ light: { text: "oklch(20% 0.02 260)" } })).toThrow(/not a role/);
+    expect(() => seeds({ light: { ink: "#11161f" } })).toThrow(/oklch\(L% C H\)/);
+    expect(() => seeds({ dusk: {} })).toThrow(/not a theme/);
   });
 });

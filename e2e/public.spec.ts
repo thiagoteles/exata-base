@@ -192,7 +192,8 @@ test("the home page describes the organization and its questions to search engin
   };
   expect(faq.mainEntity.length).toBeGreaterThan(0);
   for (const question of faq.mainEntity) {
-    const trigger = page.getByRole("button", { name: question.name });
+    // By its words: a product may draw each question as a native disclosure instead of a button.
+    const trigger = page.getByText(question.name, { exact: true });
     await expect(trigger).toBeVisible();
     await trigger.click();
     await expect(page.getByText(question.acceptedAnswer.text)).toBeVisible();

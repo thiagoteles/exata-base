@@ -80,7 +80,8 @@ test("an unknown address gets the not-found page with a way home", async ({ page
   const response = await page.goto("/nao-existe-mesmo");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "Página não encontrada" })).toBeVisible();
-  await page.getByRole("link", { name: "Ir para o início" }).click();
+  // Any words that lead home: a product may draw its own page, "Voltar para o início".
+  await page.getByRole("link", { name: /para o início/ }).click();
   await expect(page).toHaveURL("/");
 });
 

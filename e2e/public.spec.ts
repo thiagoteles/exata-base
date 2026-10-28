@@ -149,11 +149,12 @@ test("the sign-in form says which field is missing, and what is wrong with an e-
 test("a public page answers at its Portuguese address and the route address moves there", async ({
   request,
 }) => {
-  const page = await request.get("/planos");
+  const plans = publicPathOf("/plans") ?? "/plans";
+  const page = await request.get(plans);
   expect(page.status()).toBe(200);
   const moved = await request.get("/plans?ref=x", { maxRedirects: 0 });
   expect(moved.status()).toBe(301);
-  expect(new URL(moved.headers()["location"] ?? "").pathname).toBe("/planos");
+  expect(new URL(moved.headers()["location"] ?? "").pathname).toBe(plans);
   expect(new URL(moved.headers()["location"] ?? "").search).toBe("?ref=x");
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/contato</loc>");
@@ -209,7 +210,7 @@ const articleAt = (slug: string) => publicPathOf(`/articles/${slug}`) ?? `/artic
 
 test("a plans page declares its questions, and an article its trail", async ({ page }) => {
   test.skip(newest === undefined, "the product has no article yet");
-  await page.goto("/planos");
+  await page.goto(publicPathOf("/plans") ?? "/plans");
   expect((await structuredData(page)).map((item) => item["@type"])).toContain("FAQPage");
   await page.goto(articleAt(newest?.slug ?? ""));
   const kinds = (await structuredData(page)).map((item) => item["@type"]);

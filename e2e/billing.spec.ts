@@ -1,7 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
+import { publicPathOf } from "../lib/i18n/public-paths";
 import { accountIsFree, BILLING_ON, billingIsOff, PLAN_PAID } from "./environment";
 import { appOrigin } from "./origin";
+
+// The plans page by its public address: a product may give it its own.
+const PLANS = publicPathOf("/plans") ?? "/plans";
 
 /*
  * The compose runs with billing off, which is the state of a fresh product: no price on sale, no
@@ -44,7 +48,7 @@ for (const theme of themes) {
     page,
   }) => {
     // Any title: a product may draw its own plans page.
-    await open(page, "/planos", theme, null);
+    await open(page, PLANS, theme, null);
     expect(await violations(page)).toEqual([]);
     await open(page, "/account/plan", theme, null);
     expect(await violations(page)).toEqual([]);
@@ -56,7 +60,7 @@ test("with billing off the plans page says nothing is on sale and the footer hid
   request,
 }) => {
   test.skip(!(await billingIsOff(request)), BILLING_ON);
-  await open(page, "/planos", "light", null);
+  await open(page, PLANS, "light", null);
   // A product's own page says it in its own words; the base's says this.
   if (!(await productOffer(page))) {
     await expect(page.getByText("Os planos ainda não estão à venda.")).toBeVisible();
@@ -98,7 +102,7 @@ test("the catalog's paid block stays shut for the free plan and points to the pl
   // The link says where the offer was seen, so the purchase can be traced back to it.
   await expect(block.getByRole("link", { name: "Ver planos" })).toHaveAttribute(
     "href",
-    "/planos?source=catalog",
+    `${PLANS}?source=catalog`,
   );
 });
 
@@ -119,7 +123,7 @@ test.describe("without a session", () => {
   }) => {
     await page.goto("/account/plan");
     expect(new URL(page.url()).pathname).toBe("/sign-in");
-    await page.goto("/planos");
+    await page.goto(PLANS);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   });
 });

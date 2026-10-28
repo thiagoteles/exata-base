@@ -13,9 +13,10 @@ describe("social metadata", () => {
     const metadata = await buildSocialMetadata({
       title: "Planos",
       description: "Preços",
-      path: "/plans",
+      // An address no product moves: a product may give the plans another one.
+      path: "/verify/um-codigo",
     });
-    expect(metadata.alternates?.canonical).toBe("https://exemplo.com.br/planos");
+    expect(metadata.alternates?.canonical).toBe("https://exemplo.com.br/verificar/um-codigo");
     expect(metadata.openGraph?.images).toEqual([{ url: "https://exemplo.com.br/opengraph-image" }]);
     expect(metadata.twitter?.images).toEqual(["https://exemplo.com.br/opengraph-image"]);
     expect(metadata.openGraph).toMatchObject({ type: "website", locale: "pt_BR" });

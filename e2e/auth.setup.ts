@@ -1,4 +1,5 @@
 import { expect, test as setup } from "@playwright/test";
+import { publicPathOf } from "../lib/i18n/public-paths";
 import { appOrigin } from "./origin";
 
 const SESSION_FILE = "e2e/.auth/admin.json";
@@ -9,7 +10,7 @@ const WARM_UP_TOTAL_MS = 600_000;
 // for, and a test waits for the app, not for the compiler.
 const PAGES = [
   "/",
-  "/planos",
+  publicPathOf("/plans") ?? "/plans",
   "/contato",
   "/privacidade",
   "/termos",

@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { publicPathOf } from "../lib/i18n/public-paths";
 import { messageSentTo } from "./mail";
 import { appOrigin } from "./origin";
+
+// The plans page by its public address: a product may give it its own.
+const PLANS = publicPathOf("/plans") ?? "/plans";
 
 /*
  * The language choice, proved only when the product has more than one language. The product ships
@@ -19,7 +23,7 @@ test.describe("a visitor", () => {
   test("sees Portuguese at the clean address and English under /en, with the document language to match", async ({
     page,
   }) => {
-    await page.goto("/planos");
+    await page.goto(PLANS);
     await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
     await expect(page.getByRole("heading", { level: 1, name: "Planos" })).toBeVisible();
 
@@ -36,15 +40,15 @@ test.describe("a visitor", () => {
       locale: "en-GB",
     });
     const page = await context.newPage();
-    await page.goto("/planos");
+    await page.goto(PLANS);
     expect(new URL(page.url()).pathname).toBe("/en/plans");
 
     // Choosing Portuguese in the footer saves the choice, and the browser's preference no longer decides.
     await page.getByRole("combobox", { name: /Idioma/ }).click();
     await page.getByRole("option", { name: /português/i }).click();
-    await page.waitForURL((url) => url.pathname === "/planos");
-    await page.goto("/planos");
-    expect(new URL(page.url()).pathname).toBe("/planos");
+    await page.waitForURL((url) => url.pathname === PLANS);
+    await page.goto(PLANS);
+    expect(new URL(page.url()).pathname).toBe(PLANS);
     await context.close();
   });
 

@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { AdminHubProps } from "@/components/patterns/admin-hub";
 import type { AuthLayoutProps, AuthScreenProps } from "@/components/patterns/auth-frame";
 import type { SectionedPageProps } from "@/components/patterns/sectioned-page";
 
@@ -20,3 +21,6 @@ export const productAuthLayout: ComponentType<AuthLayoutProps> | null = null;
 
 /** The sign-in or sign-up screen itself in Clerk mode, in place of the hosted one. */
 export const productAuthScreen: ComponentType<AuthScreenProps> | null = null;
+
+/** The hub of the staff and admin screens, given each one already named and described. */
+export const productAdminHub: ComponentType<AdminHubProps> | null = null;

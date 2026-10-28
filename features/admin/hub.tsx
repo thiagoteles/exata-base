@@ -1,16 +1,15 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import type { AdminHubProps } from "@/components/patterns/admin-hub";
+import { PageHeader } from "@/components/patterns/page-header";
 import { NavIcon } from "@/components/shell/nav-icon";
-import type { NavItem } from "@/lib/navigation";
 
-/** One card per screen: its icon, its name as the menu says it, and what it is for when known. */
-export async function AdminHub({ destinations }: { destinations: readonly NavItem[] }) {
-  const [nav, t] = await Promise.all([getTranslations("nav"), getTranslations("admin.hub")]);
+/** The base's hub: one card per screen, its icon, its name as the menu says it, and what it is for. */
+export function AdminHub({ title, subtitle, destinations }: AdminHubProps) {
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {destinations.map((item) => {
-        const about = `about.${item.key}`;
-        return (
+    <>
+      <PageHeader title={title} subtitle={subtitle} showBack={false} />
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {destinations.map((item) => (
           <li key={item.key}>
             <Link
               href={item.href}
@@ -20,17 +19,15 @@ export async function AdminHub({ destinations }: { destinations: readonly NavIte
                 <NavIcon name={item.icon} />
               </span>
               <span className="flex min-w-0 flex-col gap-1">
-                <span className="text-block-title font-bold text-ink">
-                  {nav(`items.${item.key}` as never)}
-                </span>
-                {t.has(about as never) ? (
-                  <span className="text-body-small text-ink-muted">{t(about as never)}</span>
-                ) : null}
+                <span className="text-block-title font-bold text-ink">{item.label}</span>
+                {item.about === null ? null : (
+                  <span className="text-body-small text-ink-muted">{item.about}</span>
+                )}
               </span>
             </Link>
           </li>
-        );
-      })}
-    </ul>
+        ))}
+      </ul>
+    </>
   );
 }

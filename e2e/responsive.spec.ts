@@ -20,20 +20,26 @@ test("on a phone the header folds three actions into one menu", async ({ page })
   await expect(page.getByRole("menuitem")).toHaveCount(3);
 });
 
-test("on a phone the sidebar becomes a bottom bar of 64px with the destinations as large targets", async ({
+test("on a phone the sidebar becomes a bottom bar with the destinations as large targets", async ({
   page,
 }) => {
   await page.goto("/account");
-  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   const bar = page.getByRole("navigation", { name: "Navegação principal do celular" });
   await expect(bar).toBeVisible();
-  // The bar's destinations are the product's first ones, whatever they are: each is a 64px target.
+  // The bar's destinations are the product's first ones, whatever they are. The base's bar makes
+  // each a 64px target; a product's own bar keeps its own height, never under the 44px minimum.
   const links = bar.getByRole("link");
   expect(await links.count()).toBeGreaterThan(0);
+  const baseBar = (await page.locator("[data-base-bar]").count()) > 0;
   for (const box of await links.evaluateAll((all) =>
     all.map((link) => link.getBoundingClientRect().height),
   )) {
-    expect(box).toBe(64);
+    if (baseBar) {
+      expect(box).toBe(64);
+    } else {
+      expect(box).toBeGreaterThanOrEqual(44);
+    }
   }
   await expect(page.getByRole("navigation", { name: "Navegação da área logada" })).toBeHidden();
   const overflow = await page.evaluate(

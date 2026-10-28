@@ -28,6 +28,7 @@ export function BottomBar({ items, more, label, moreLabel, moreTitle }: BottomBa
   const pathname = usePathname();
   return (
     <nav
+      data-base-bar={true}
       aria-label={label}
       className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >

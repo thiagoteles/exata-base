@@ -9,10 +9,8 @@ test("on a wide screen the sidebar shows the current destination and the bottom 
 }) => {
   await page.goto("/account");
   const sidebar = page.getByRole("navigation", { name: "Navegação da área logada" });
-  await expect(sidebar.getByRole("link", { name: "Minha conta" })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
+  // Found by its address: a product may call the account by another name.
+  await expect(sidebar.locator('a[href="/account"]')).toHaveAttribute("aria-current", "page");
   await expect(
     page.getByRole("navigation", { name: "Navegação principal do celular" }),
   ).toBeHidden();

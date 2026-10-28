@@ -31,9 +31,13 @@ test("text size, motion and contrast apply at once, are kept on reload, and can 
     page.waitForResponse(
       (response) => response.request().method() === "POST" && response.url().endsWith("/account"),
     );
+  // The colors the stronger contrast may move: a product that pins its palette can already have
+  // one of them strong enough, so it is the pair that has to change, not each color.
   const mutedInk = () =>
     page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue("--color-ink-muted").trim(),
+      ["--color-ink-muted", "--color-line-strong"]
+        .map((name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim())
+        .join(" "),
     );
   const rootSize = () =>
     page.evaluate(() => Number.parseFloat(getComputedStyle(document.documentElement).fontSize));

@@ -1,5 +1,6 @@
 import type { MDXComponents } from "mdx/types";
 import type { ComponentPropsWithoutRef } from "react";
+import { productMdxComponents } from "@/components/article.product";
 
 /*
  * Markdown elements in the reading layout of the design system: the body size, generous rhythm
@@ -34,6 +35,9 @@ const components: MDXComponents = {
   ),
 };
 
+// A product's elements win over the base's, element by element.
+const merged: MDXComponents = { ...components, ...productMdxComponents };
+
 export function useMDXComponents(): MDXComponents {
-  return components;
+  return merged;
 }

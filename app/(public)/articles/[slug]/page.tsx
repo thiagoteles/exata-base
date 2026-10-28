@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { productArticlePage } from "@/components/article.product";
 import { JsonLd } from "@/components/json-ld";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { findArticle } from "@/lib/content/articles";
@@ -71,39 +72,63 @@ async function Article({ params }: { params: PageProps<"/articles/[slug]">["para
     load(slug),
     getTranslations("articles"),
   ]);
+  const meta = [
+    t("by", { author: frontmatter.author }),
+    t("published", { date: formatDate(frontmatter.publishedAt as IsoDate) }),
+    ...(frontmatter.updatedAt === undefined
+      ? []
+      : [t("updated", { date: formatDate(frontmatter.updatedAt as IsoDate) })]),
+  ];
+  const trail = {
+    label: t("trail"),
+    items: [
+      { label: t("home"), href: "/" as const },
+      { label: t("title"), href: publicHref("/articles") },
+      { label: frontmatter.title },
+    ],
+  };
+  const data = (
+    <Suspense>
+      <ArticleData slug={slug} />
+    </Suspense>
+  );
+  if (productArticlePage !== null) {
+    const Page = productArticlePage;
+    return (
+      <>
+        <Page
+          title={frontmatter.title}
+          description={frontmatter.description}
+          meta={meta}
+          trail={trail}
+          slug={slug}
+        >
+          <Content />
+        </Page>
+        {data}
+      </>
+    );
+  }
   return (
     <main className="mx-auto flex w-full max-w-170 flex-col gap-8 px-4 py-12 md:py-18">
-      <Breadcrumb
-        label={t("trail")}
-        items={[
-          { label: t("home"), href: "/" },
-          { label: t("title"), href: publicHref("/articles") },
-          { label: frontmatter.title },
-        ]}
-      />
+      <Breadcrumb label={trail.label} items={trail.items} />
       <article className="flex flex-col gap-8">
         <header className="flex flex-col gap-3">
           <h1 className="text-page-title text-ink">{frontmatter.title}</h1>
           <p className="text-body text-ink-muted">{frontmatter.description}</p>
           <p className="flex flex-wrap gap-x-4 gap-y-1 text-body-small text-ink-muted">
-            <span>{t("by", { author: frontmatter.author })}</span>
-            <span className="tabular-nums">
-              {t("published", { date: formatDate(frontmatter.publishedAt as IsoDate) })}
-            </span>
-            {frontmatter.updatedAt === undefined ? null : (
-              <span className="tabular-nums">
-                {t("updated", { date: formatDate(frontmatter.updatedAt as IsoDate) })}
+            {meta.map((line) => (
+              <span key={line} className="tabular-nums">
+                {line}
               </span>
-            )}
+            ))}
           </p>
         </header>
         <div className="flex flex-col gap-5">
           <Content />
         </div>
       </article>
-      <Suspense>
-        <ArticleData slug={slug} />
-      </Suspense>
+      {data}
     </main>
   );
 }

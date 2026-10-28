@@ -55,3 +55,36 @@ describe("the development server on the host and in the compose", () => {
     expect(developmentDefaults.ADMIN_EMAILS).toBe(SEED_ADMIN_EMAIL);
   });
 });
+
+/*
+ * The production compose hands the container only the variables it names, so one the app reads but
+ * the compose leaves out never arrives, whatever the panel holds: INGEST_SECRETS once did, and the
+ * workers' deliveries were refused. Every variable of the environment module is passed, or listed
+ * here with why the production container must not get it.
+ */
+const notInProduction: Record<string, string> = {
+  NODE_ENV: "the image sets it",
+  SMTP_LOCAL_URL: "the local mail catcher; production refuses to boot with it",
+  LOCAL_STACK: "the build run on this machine only; production refuses to boot with it",
+};
+
+// The names the environment module declares, read from its source: two-space keys of its objects.
+const declaredNames = (file: string): string[] =>
+  [...readFileSync(file, "utf8").matchAll(/^ {2}([A-Z][A-Z0-9_]+):/gm)].map(
+    (match) => match[1] ?? "",
+  );
+
+describe("the production compose", () => {
+  it("passes every variable the app reads to the container", () => {
+    const production = parse(readFileSync("docker-compose.production.yml", "utf8")) as {
+      services: Partial<Record<string, Service>>;
+    };
+    const passed = Object.keys(production.services["app"]?.environment ?? {});
+    const missing = [
+      ...new Set([...declaredNames("lib/env.ts"), ...declaredNames("lib/env.product.ts")]),
+    ]
+      .filter((name) => !(name in notInProduction))
+      .filter((name) => !passed.includes(name));
+    expect(missing).toEqual([]);
+  });
+});

@@ -33,6 +33,9 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-}
       CONTACT_EMAIL: ${CONTACT_EMAIL:-}
       CRON_SECRET: ${CRON_SECRET:-}
+      # source=secret pairs for the workers outside the server (POST /api/ingest/<source>).
+      INGEST_SECRETS: ${INGEST_SECRETS:-}
+      API_ALLOWED_ORIGINS: ${API_ALLOWED_ORIGINS:-}
       UNSUBSCRIBE_SECRET: ${UNSUBSCRIBE_SECRET:-}
       DOCUMENT_SECRET: ${DOCUMENT_SECRET:-}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
@@ -49,6 +52,7 @@ services:
       STORAGE_DIR: /data/files
       FILE_URL_SECRET: ${FILE_URL_SECRET:-}
       UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-10}
+      UPLOAD_TYPES: ${UPLOAD_TYPES:-}
       EMAIL_ATTACHMENTS_MAX_MB: ${EMAIL_ATTACHMENTS_MAX_MB:-10}
     volumes:
       # Files live here when there is no Cloud Storage bucket.

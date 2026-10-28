@@ -5,9 +5,15 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { layerClasses } from "./styles";
 
-type MenuProps = { trigger: ReactNode; children: ReactNode; align?: "start" | "end" };
+type MenuProps = {
+  trigger: ReactNode;
+  children: ReactNode;
+  align?: "start" | "end";
+  /** Extra classes for the floating list, for a product that draws its menus its own way. */
+  className?: string;
+};
 
-export function Menu({ trigger, children, align = "end" }: MenuProps) {
+export function Menu({ trigger, children, align = "end", className }: MenuProps) {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild={true}>{trigger}</DropdownMenu.Trigger>
@@ -15,7 +21,7 @@ export function Menu({ trigger, children, align = "end" }: MenuProps) {
         <DropdownMenu.Content
           align={align}
           sideOffset={8}
-          className={cn(layerClasses, "min-w-56 p-1")}
+          className={cn(layerClasses, "min-w-56 p-1", className)}
         >
           {children}
         </DropdownMenu.Content>
@@ -29,15 +35,27 @@ type MenuItemProps = {
   onSelect?: () => void;
   icon?: ReactNode;
   destructive?: boolean;
+  disabled?: boolean;
+  /** Extra classes for the item, for a product that draws its menus its own way. */
+  className?: string;
 };
 
-export function MenuItem({ children, onSelect, icon, destructive = false }: MenuItemProps) {
+export function MenuItem({
+  children,
+  onSelect,
+  icon,
+  destructive = false,
+  disabled = false,
+  className,
+}: MenuItemProps) {
   return (
     <DropdownMenu.Item
       {...(onSelect === undefined ? {} : { onSelect })}
+      disabled={disabled}
       className={cn(
-        "flex h-control cursor-default items-center gap-2 rounded-cell px-3 text-body outline-none data-[highlighted]:bg-sunken",
+        "flex h-control cursor-default items-center gap-2 rounded-cell px-3 text-body outline-none data-[disabled]:opacity-50 data-[highlighted]:bg-sunken",
         destructive ? "text-danger-ink" : "text-ink",
+        className,
       )}
     >
       {icon}

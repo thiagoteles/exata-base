@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import type { PageWindow } from "@/lib/list-params";
-import { productNoResults } from "./states.product";
+// Imported under a capitalized name: the React Compiler folds a local alias back into the JSX tag,
+// and a lowercase tag renders as an unknown HTML element instead of the component.
+import { productNoResults as ProductNoResults } from "./states.product";
 
 /* The controls write to the address; the server page reads it back. `shallow: false` re-renders it. */
 const options = { shallow: false } as const;
@@ -105,9 +107,8 @@ export function ListNoResults({ term, filters }: NoResultsProps) {
   const [hint, clear] = noResultsWords(term !== "", filters.length > 0);
   const onClear = () =>
     setParams(Object.fromEntries(Object.keys(parsers).map((key) => [key, null])));
-  if (productNoResults !== null) {
-    const Product = productNoResults;
-    return <Product title={text} hint={t(hint)} clearLabel={t(clear)} onClear={onClear} />;
+  if (ProductNoResults !== null) {
+    return <ProductNoResults title={text} hint={t(hint)} clearLabel={t(clear)} onClear={onClear} />;
   }
   return (
     <div className="flex max-w-[60ch] flex-col items-start gap-3 py-4">

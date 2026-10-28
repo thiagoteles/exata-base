@@ -23,6 +23,19 @@ function trackedSources(): string[] {
 }
 
 describe("source rules", () => {
+  // The React Compiler folds a local alias back into the JSX tag, so a slot imported lowercase and
+  // renamed in the body renders as an unknown HTML element (it did: the panel's "no results" card).
+  it("imports a product slot under a capitalized name in a client component", () => {
+    const lowercaseSlot = /import\s*\{[^}]*\bproduct[A-Z]\w*\s*(,|\})[^;]*from\s*"[^"]*\.product"/;
+    const offenders = trackedSources()
+      .filter((file) => file.endsWith(".tsx"))
+      .filter((file) => {
+        const source = readFileSync(file, "utf8");
+        return source.startsWith('"use client"') && lowercaseSlot.test(source);
+      });
+    expect(offenders).toEqual([]);
+  });
+
   it("never silences the clock and randomness plugin", () => {
     const offenders = trackedSources().filter((file) =>
       pluginSuppression.test(readFileSync(file, "utf8")),

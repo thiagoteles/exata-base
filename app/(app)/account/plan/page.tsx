@@ -63,7 +63,10 @@ async function PlanContent({ searchParams }: Props) {
     ...(Offers === null
       ? []
       : [{ key: "offers", title: null, content: <Offers plan={plan} userId={user.id} /> }]),
-    { key: "plan", title: null, content: <PlanRecord plan={plan} timeZone={timeZone} /> },
+    // The product's offer already shows the free plan; the record is kept for a paid one.
+    ...(Offers !== null && (plan === null || !isPaidTier(plan.tier))
+      ? []
+      : [{ key: "plan", title: null, content: <PlanRecord plan={plan} timeZone={timeZone} /> }]),
     ...(settled.length === 0
       ? []
       : [

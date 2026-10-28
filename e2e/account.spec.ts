@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { type Browser, type BrowserContext, expect, type Page, test } from "@playwright/test";
 import { unzipSync } from "fflate";
 import { SIGNED_IN_HOME } from "../lib/routes";
 import { signUnsubscribe } from "../lib/unsubscribe/token";
@@ -18,6 +18,30 @@ test.describe.configure({ mode: "serial" });
 const UNSUBSCRIBE_SECRET = "local-development-unsubscribe-secret";
 const email = `ana-${Date.now()}@example.com`;
 const password = "uma-senha-bem-longa";
+
+/*
+ * The sign-in limit counts every password check by address and by e-mail, 10 in 15 minutes, and
+ * the story is one person on one machine. So the password is typed only where signing in is what a
+ * step proves; the other steps open the account with the session a step already made.
+ */
+type Session = Awaited<ReturnType<BrowserContext["storageState"]>>;
+let session: Session | undefined;
+const contexts: BrowserContext[] = [];
+
+test.afterEach(async () => {
+  await Promise.all(contexts.splice(0).map((context) => context.close()));
+});
+
+/** The account page in a browser that already holds the person's session. */
+async function openAccount(browser: Browser): Promise<Page> {
+  const context = await browser.newContext(session === undefined ? {} : { storageState: session });
+  contexts.push(context);
+  const page = await context.newPage();
+  await page.goto("/account");
+  await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
+  await settled(page);
+  return page;
+}
 
 test("sign up asks for the e-mail to be confirmed, and the link signs the person in", async ({
   page,
@@ -39,6 +63,7 @@ test("sign up asks for the e-mail to be confirmed, and the link signs the person
   await page.goto(await linkSentTo(email));
   await expect(page.getByRole("heading", { level: 1, name: "Minha conta" })).toBeVisible();
   await expect(page.getByText(email, { exact: true }).first()).toBeVisible();
+  session = await page.context().storageState();
 });
 
 test("a theme chosen as a visitor is kept, and signing in saves it to the account", async ({
@@ -73,8 +98,10 @@ test("a theme chosen as a visitor is kept, and signing in saves it to the accoun
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.+/);
 });
 
-test("the theme is applied at once, kept on reload, and saved in the account", async ({ page }) => {
-  await signIn(page);
+test("the theme is applied at once, kept on reload, and saved in the account", async ({
+  browser,
+}) => {
+  const page = await openAccount(browser);
   // The theme is applied in the browser at once and saved by an action; reloading before the
   // action answers would cancel the save, so the test waits for the answer.
   const saved = page.waitForResponse(
@@ -101,8 +128,8 @@ test("the theme is applied at once, kept on reload, and saved in the account", a
   await forgotten;
 });
 
-test("e-mail choices start at reminders on and news off, and are kept", async ({ page }) => {
-  await signIn(page);
+test("e-mail choices start at reminders on and news off, and are kept", async ({ browser }) => {
+  const page = await openAccount(browser);
   const reminders = page.getByRole("switch", { name: "Lembretes" });
   const news = page.getByRole("switch", { name: "Novidades" });
   await expect(reminders).toBeChecked();
@@ -136,6 +163,7 @@ test("e-mail choices start at reminders on and news off, and are kept", async ({
 test("the unsubscribe link asks once, and the mail client's own button needs no screen", async ({
   page,
   request,
+  browser,
 }) => {
   const token = (category: "reminder" | "news") =>
     encodeURIComponent(signUnsubscribe(UNSUBSCRIBE_SECRET, { address: email, category }));
@@ -166,13 +194,13 @@ test("the unsubscribe link asks once, and the mail client's own button needs no 
   expect(opened.headers()["location"]).toContain("/descadastrar?token=");
 
   // Both are off in the account, and the person can turn either back on there.
-  await signIn(page);
-  await expect(page.getByRole("switch", { name: "Novidades" })).not.toBeChecked();
-  await expect(page.getByRole("switch", { name: "Lembretes" })).not.toBeChecked();
+  const account = await openAccount(browser);
+  await expect(account.getByRole("switch", { name: "Novidades" })).not.toBeChecked();
+  await expect(account.getByRole("switch", { name: "Lembretes" })).not.toBeChecked();
 });
 
-test("the data export is a ZIP with the person's own data", async ({ page }) => {
-  await signIn(page);
+test("the data export is a ZIP with the person's own data", async ({ browser }) => {
+  const page = await openAccount(browser);
   const download = page.waitForEvent("download");
   await page.getByRole("link", { name: "Baixar meus dados" }).click();
   const file = await download;
@@ -190,8 +218,8 @@ test("the data export is a ZIP with the person's own data", async ({ page }) => 
   expect(data.user.map((row) => row.email)).toEqual([email]);
 });
 
-test("a free plan allows five exports a day, and the next one is refused", async ({ page }) => {
-  await signIn(page);
+test("a free plan allows five exports a day, and the next one is refused", async ({ browser }) => {
+  const page = await openAccount(browser);
   // One went above; four are left.
   for (let use = 0; use < 4; use += 1) {
     expect((await page.request.get("/account/export")).status()).toBe(200);
@@ -201,9 +229,9 @@ test("a free plan allows five exports a day, and the next one is refused", async
 });
 
 test("signing out ends the session, and a wrong password is refused with a clear message", async ({
-  page,
+  browser,
 }) => {
-  await signIn(page);
+  const page = await openAccount(browser);
   await page.getByRole("button", { name: "Menu da conta" }).click();
   await page.getByRole("button", { name: "Sair" }).click();
   await expect(page).toHaveURL("/");
@@ -224,12 +252,14 @@ test("a way back that leaves the site is ignored after signing in", async ({ pag
   await page.getByRole("button", { name: "Entrar" }).click();
   await page.waitForURL((url) => url.origin === appOrigin && url.pathname === SIGNED_IN_HOME);
   expect(new URL(page.url()).host).toBe(appHost);
+  // Signing out above ended the earlier session; this one carries the story to its end.
+  session = await page.context().storageState();
 });
 
 test("deleting the account asks first, signs the person out and closes the door for good", async ({
-  page,
+  browser,
 }) => {
-  await signIn(page);
+  const page = await openAccount(browser);
   await page.getByRole("button", { name: "Apagar minha conta" }).click();
   const dialog = page.getByRole("alertdialog", { name: "Apagar sua conta?" });
   await expect(dialog).toBeVisible();

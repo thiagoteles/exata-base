@@ -38,7 +38,8 @@ type Props = { searchParams: Promise<{ checkout?: string | string[] }> };
 
 export default function PlanPage({ searchParams }: Props) {
   return (
-    <div className="mx-auto w-full max-w-270">
+    // A product that draws the page sets its own width.
+    <div className={productPlanPage === null ? "mx-auto w-full max-w-270" : undefined}>
       <Suspense fallback={<ListSkeleton label="" rows={3} />}>
         <PlanContent searchParams={searchParams} />
       </Suspense>

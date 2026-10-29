@@ -19,6 +19,7 @@ const deduper = createDeduper();
 // A browser stuck in an error loop is cut off here, before its reports fill the log.
 const reportsPerAddress = { name: "client-errors", limit: 30, windowSeconds: 60 };
 
+// Open to anyone: any visitor's browser reports its errors; the body is capped and each address rate limited.
 /** Errors that happened in a person's browser, written to the log as errors so the alert sees them. */
 export const POST = timedRoute("/api/client-errors", async (request: NextRequest) => {
   const body = await readTextCapped(request, MAX_REPORT_BYTES);

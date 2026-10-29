@@ -13,6 +13,7 @@ const MAX_BYTES = 16_384;
 // A page in a loop can report on every frame; past this, an address is dropped for the minute.
 const reportsPerAddress = { name: "csp-reports", limit: 30, windowSeconds: 60 };
 
+// Open to anyone: browsers send policy violations without a session; the body is capped and each address rate limited.
 /** Where browsers send Content Security Policy violations. They are logged as warnings. */
 export const POST = timedRoute("/api/csp-report", async (request: NextRequest) => {
   const body = await readTextCapped(request, MAX_BYTES);

@@ -3,6 +3,7 @@ import { readLocalFile } from "@/lib/ports/storage";
 import { attachmentDisposition } from "@/lib/ports/storage/attachment";
 import { timedRoute } from "@/lib/timed-route";
 
+// Open to anyone: the HMAC-signed, expiring URL is the proof; readLocalFile refuses any other.
 /** Serves a file from the local disk to whoever holds a valid signed URL. */
 export const GET = timedRoute(
   "/storage/[...key]",

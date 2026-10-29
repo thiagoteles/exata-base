@@ -9,6 +9,7 @@ import { readClerkWebhookRequest } from "@/lib/ports/auth";
 import { logger } from "@/lib/ports/log";
 import { timedRoute } from "@/lib/timed-route";
 
+// Open to anyone: Clerk calls without a session; readClerkWebhookRequest checks its signature before anything is read.
 /** Clerk's user events. The signature is checked before anything is read or written. */
 export const POST = timedRoute("/api/webhooks/clerk", async (request: NextRequest) => {
   let event: Awaited<ReturnType<typeof readClerkWebhookRequest>>;

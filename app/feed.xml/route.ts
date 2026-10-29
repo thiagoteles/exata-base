@@ -6,6 +6,7 @@ import { renderFeed } from "@/lib/feed";
 import { publicPathOf } from "@/lib/i18n/public-paths";
 import { timedRoute } from "@/lib/timed-route";
 
+// Open to anyone: the public articles as RSS, nothing a visitor cannot already read.
 /** The articles as RSS, newest first, with the runtime address. */
 export const GET = timedRoute("/feed.xml", async () => {
   await connection();

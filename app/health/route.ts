@@ -5,6 +5,7 @@ import { logger } from "@/lib/ports/log";
 
 const TIMEOUT_MS = 2000;
 
+// Open to anyone: the uptime check answers only ok or unavailable.
 /** 200 when the app can reach Postgres, 503 when it cannot. Never cached, never prerendered. */
 export async function GET() {
   await connection();

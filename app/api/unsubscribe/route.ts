@@ -12,6 +12,7 @@ import { readUnsubscribe } from "@/lib/unsubscribe/token";
 const LIMIT_PER_HOUR = 60;
 const WINDOW_SECONDS = 3600;
 
+// Open to anyone: the link in an e-mail works signed out; the signed token is the proof, and each address is rate limited.
 /**
  * The address a mail client calls from its own "unsubscribe" button: a POST with the token in the
  * query and no screen in between (RFC 8058). The statement is signed, so the call needs no session.

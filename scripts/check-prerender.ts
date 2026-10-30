@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { inflateSync } from "node:zlib";
+import { cacheTags } from "../lib/cache-tags";
 import { locales } from "../lib/i18n/locales";
 
 /*
@@ -49,6 +51,27 @@ for (const page of pages) {
     if (!existsSync(html)) {
       problems.push(`${page}: prerendered, but its HTML is not in the standalone output`);
     }
+  }
+}
+
+/*
+ * A shell with streamed parts carries, after its postponed state, the cache entries its prerender
+ * filled ("<length>:<state><entries>", the entries zlib in base64, or "null"). The build has no
+ * provider key, so a price kept there says "nothing on sale" to every visit until the next deploy.
+ */
+const pricesTag = `"${cacheTags.prices()}"`;
+const keptEntries = (postponed: string) => {
+  const colon = postponed.indexOf(":");
+  const rest = postponed.slice(colon + 1 + Number(postponed.slice(0, colon)));
+  return rest === "null" ? "" : inflateSync(Buffer.from(rest, "base64")).toString("utf8");
+};
+for (const page of pages) {
+  const meta = path.join(build, "server", "app", page === "/" ? "index.meta" : `${page}.meta`);
+  const postponed = existsSync(meta)
+    ? (JSON.parse(readFileSync(meta, "utf8")) as { postponed?: string }).postponed
+    : undefined;
+  if (postponed !== undefined && keptEntries(postponed).includes(pricesTag)) {
+    problems.push(`${page}: the prerendered page keeps the prices it read while building`);
   }
 }
 

@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { connection } from "next/server";
 import { catalog, lookupKeyOf } from "@/domain/billing/catalog";
 import { cacheTags } from "@/lib/cache-tags";
 import { env } from "@/lib/env";
@@ -46,10 +47,19 @@ export async function requireGateway(): Promise<PaymentGateway> {
  * the provider by the lookup keys the plan catalog declares, and kept for an hour. An interval whose
  * key has no active price at the provider is not in the answer, so it is not offered. The webhook
  * expires this when a price changes.
+ *
+ * Only a request reads prices. The image is built with no provider key, and a read made while
+ * prerendering is kept inside the page: every visit would resume from "nothing on sale" until the
+ * next deploy, whatever the provider says.
  */
 export async function readPrices(
   tier: string = catalog.paidTier,
 ): Promise<Partial<Record<Interval, PriceTag>>> {
+  await connection();
+  return providerPrices(tier);
+}
+
+async function providerPrices(tier: string): Promise<Partial<Record<Interval, PriceTag>>> {
   "use cache";
   cacheLife("hours");
   cacheTag(cacheTags.prices());

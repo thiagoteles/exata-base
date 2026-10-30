@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 import {
@@ -40,11 +41,29 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         }
       />
       <div className="flex-1">{children}</div>
-      <Footer
-        showPlans={billingConfigured()}
-        themeSwitcher={<ThemePicker />}
-        languageSwitcher={isMultilingual ? <LanguageSwitcher /> : null}
-      />
+      <Suspense fallback={<PlainFooter showPlans={false} />}>
+        <RuntimeFooter />
+      </Suspense>
     </div>
   );
+}
+
+function PlainFooter({ showPlans }: { showPlans: boolean }) {
+  return (
+    <Footer
+      showPlans={showPlans}
+      themeSwitcher={<ThemePicker />}
+      languageSwitcher={isMultilingual ? <LanguageSwitcher /> : null}
+    />
+  );
+}
+
+/**
+ * Whether plans are on sale is the running server's to say: the image is built with no provider
+ * key, and a footer decided while prerendering would lack the link the browser then draws, which
+ * makes React throw the page away and draw it again.
+ */
+async function RuntimeFooter() {
+  await connection();
+  return <PlainFooter showPlans={billingConfigured()} />;
 }

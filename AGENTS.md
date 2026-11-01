@@ -23,6 +23,7 @@ A product never edits a file of the base. What it declares goes in the `*.produc
 - Its name, sentence, tone, preset, color, backup days and ports: `pnpm setup:product`.
 - The home page and its copy, terms and privacy: `app/(public)/page.tsx`, `messages/pt-BR/home.json`, `terms.json`, `privacy.json`, all the product's. The home keeps the base's public patterns and replaces the sample pictures with real pieces of the product (DESIGN.md, Public site).
 - Its share image: an `aside` for `shareImage` in `app/opengraph-image.tsx`.
+- Its icon in the browser tab and on a phone's home screen: `components/brand-icon.product.tsx`.
 - Its areas of records: `pnpm new:crud`, and `--parent <area>` for one filed under another, then the fields (the `new-crud` skill). The first one removes the base's samples. An area registers itself in the product's files: `lib/db/schema.product.ts`, `lib/db/personal-data.product.ts`, `lib/navigation.product.ts` and the catalog overlays.
 - Its sentences in an area of the base (a navigation label, an error): `messages/pt-BR/<area>.product.json`, laid over the base's area key by key. Its English documents: `messages/documents.en.product.json`.
 - Its tables: `lib/db/schema.product.ts` and what of them belongs to a person, `lib/db/personal-data.product.ts`.

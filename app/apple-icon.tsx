@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { productIcon } from "@/components/brand-icon.product";
 import { emailPalette } from "@/emails/palette";
 import { siteName } from "@/lib/site-name";
 
@@ -7,23 +8,28 @@ export const contentType = "image/png";
 
 const INITIAL_SIZE = 110;
 
+/** The icon on a phone's home screen, square: the system rounds its corners itself. */
 export default function AppleIcon() {
   return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: emailPalette.ink,
-        color: emailPalette.onAction,
-        fontSize: INITIAL_SIZE,
-        fontWeight: 700,
-      }}
-    >
-      {siteName.charAt(0)}
-    </div>,
+    productIcon === null ? (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: emailPalette.ink,
+          color: emailPalette.onAction,
+          fontSize: INITIAL_SIZE,
+          fontWeight: 700,
+        }}
+      >
+        {siteName.charAt(0)}
+      </div>
+    ) : (
+      productIcon({ size: size.width, corner: 0 })
+    ),
     size,
   );
 }

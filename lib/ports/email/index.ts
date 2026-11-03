@@ -9,19 +9,25 @@ import { withUnsubscribe } from "./unsubscribe";
 
 /*
  * The e-mail port. A message is sent at once, inside the action: there is no outbox and no retry.
- * With MAILTRAP_TOKEN it goes to the Mailtrap Email API; otherwise, in the compose, to Mailpit.
+ * With SMTP_HOST it goes through that SMTP server; otherwise, in the compose, to Mailpit.
  * A failure is logged as an error and reported to the caller, which decides what to tell the person.
  * A message of a kind the person turned off is not sent and is reported as declined, which is not
  * an error.
  */
 
 async function loadSender(): Promise<EmailSender | null> {
-  if (env.MAILTRAP_TOKEN !== undefined) {
-    const { createMailtrapSender } = await import("./adapters/mailtrap");
-    return createMailtrapSender({
-      token: env.MAILTRAP_TOKEN,
+  if (
+    env.SMTP_HOST !== undefined &&
+    env.SMTP_USER !== undefined &&
+    env.SMTP_PASSWORD !== undefined
+  ) {
+    const { createSmtpServerSender } = await import("./adapters/smtp");
+    return createSmtpServerSender({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      user: env.SMTP_USER,
+      password: env.SMTP_PASSWORD,
       from: env.EMAIL_FROM,
-      inbox: env.MAILTRAP_INBOX,
     });
   }
   if (env.SMTP_LOCAL_URL !== undefined) {

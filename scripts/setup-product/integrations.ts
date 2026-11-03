@@ -85,10 +85,22 @@ export const integrations: readonly Integration[] = [
   },
   {
     id: "email",
-    question: "E-mail sending through Mailtrap",
+    question: "E-mail sending through an SMTP server (the Google Workspace relay, Amazon SES...)",
+    note: "For the Google Workspace relay: host smtp-relay.gmail.com, a user of the Workspace and an app password made in that account, with 2-Step Verification on. The sender must be on one of the Workspace's domains.",
     fields: [
-      { name: "MAILTRAP_TOKEN", label: "Mailtrap API token", check: nonEmpty },
-      { name: "MAILTRAP_INBOX", label: "Mailtrap inbox id (digits)", check: digits },
+      { name: "SMTP_HOST", label: "SMTP server host", check: nonEmpty },
+      {
+        name: "SMTP_PORT",
+        label: "SMTP port (587 upgrades to TLS, 465 is TLS from the start)",
+        check: digits,
+        optional: true,
+      },
+      { name: "SMTP_USER", label: "SMTP user", check: nonEmpty },
+      {
+        name: "SMTP_PASSWORD",
+        label: "SMTP password (an app password for Google)",
+        check: nonEmpty,
+      },
       { name: "EMAIL_FROM", label: "Sender address", check: email },
     ],
   },

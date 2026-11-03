@@ -61,14 +61,16 @@ describe("validating the integrations", () => {
       ADMIN_EMAILS: "ok@example.com, nope",
       UMAMI_WEBSITE_ID: "not-a-uuid",
       UMAMI_SCRIPT_URL: "https://stats.example.com/script.js",
-      MAILTRAP_TOKEN: "t",
-      MAILTRAP_INBOX: "12a",
+      SMTP_HOST: "smtp-relay.gmail.com",
+      SMTP_PORT: "58a",
+      SMTP_USER: "envios@example.com",
+      SMTP_PASSWORD: "p",
       EMAIL_FROM: "no-reply@example.com",
     });
     expect(problems).toHaveLength(3);
     expect(problems).toEqual(
       expect.arrayContaining([
-        "MAILTRAP_INBOX must be only digits",
+        "SMTP_PORT must be only digits",
         "UMAMI_WEBSITE_ID must be a UUID",
         "ADMIN_EMAILS must be a comma list of e-mail addresses",
       ]),

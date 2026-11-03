@@ -112,8 +112,13 @@ const server = {
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
 
   SMTP_LOCAL_URL: z.url().optional(),
-  MAILTRAP_TOKEN: z.string().min(1).optional(),
-  MAILTRAP_INBOX: z.string().regex(/^\d+$/).optional(),
+  // The SMTP server production sends through (the Google Workspace relay, Amazon SES, any other),
+  // signed in with its user and password. 587 upgrades to TLS and refuses a server that cannot;
+  // 465 speaks TLS from the start.
+  SMTP_HOST: z.string().min(1).optional(),
+  SMTP_PORT: z.coerce.number().int().positive().max(65_535).default(587),
+  SMTP_USER: z.string().min(1).optional(),
+  SMTP_PASSWORD: z.string().min(1).optional(),
   EMAIL_FROM: z.email().default("no-reply@app.local"),
   CONTACT_EMAIL: csv.pipe(z.array(z.email())).default([]),
 
@@ -180,6 +185,7 @@ const groups: ReadonlyArray<ReadonlyArray<keyof ServerShape>> = [
   ["UMAMI_WEBSITE_ID", "UMAMI_SCRIPT_URL"],
   ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"],
   ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
+  ["SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD"],
 ];
 
 const localHosts = new Set(["localhost", "127.0.0.1"]);
@@ -216,9 +222,14 @@ export function environmentIssues(
   } else {
     required.push("CLERK_SECRET_KEY", "CLERK_WEBHOOK_SECRET");
   }
-  if (isSet(raw, "MAILTRAP_TOKEN")) {
+  if (isSet(raw, "SMTP_HOST")) {
     // Real mail means reminders and news can exist, and each carries a link only this secret signs.
     required.push("EMAIL_FROM", "UNSUBSCRIBE_SECRET");
+  } else if (isSet(raw, "MAILTRAP_TOKEN")) {
+    // Mail went through Mailtrap before; booting as if nothing changed would stop every e-mail.
+    issues.push(
+      "MAILTRAP_TOKEN is no longer read: e-mail goes through SMTP_HOST, SMTP_USER and SMTP_PASSWORD",
+    );
   }
   // With payments on, a receipt carries a QR code only this secret can sign.
   if (isSet(raw, "STRIPE_SECRET_KEY")) {

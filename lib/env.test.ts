@@ -78,7 +78,9 @@ describe("environment rules", () => {
       APP_URL: "https://a.b",
       DATABASE_URL: "postgres://x",
       BETTER_AUTH_SECRET: "s",
-      MAILTRAP_TOKEN: "t",
+      SMTP_HOST: "smtp-relay.gmail.com",
+      SMTP_USER: "envios@a.b",
+      SMTP_PASSWORD: "p",
       FILE_URL_SECRET: "f",
       UNSUBSCRIBE_SECRET: "u",
       SMTP_LOCAL_URL: "smtp://mailpit:1025",
@@ -109,7 +111,9 @@ describe("environment rules", () => {
       APP_URL: "https://a.b",
       DATABASE_URL: "postgres://x",
       BETTER_AUTH_SECRET: "s",
-      MAILTRAP_TOKEN: "t",
+      SMTP_HOST: "smtp-relay.gmail.com",
+      SMTP_USER: "envios@a.b",
+      SMTP_PASSWORD: "p",
       EMAIL_FROM: "no-reply@a.b",
       FILE_URL_SECRET: "f",
     };
@@ -117,6 +121,26 @@ describe("environment rules", () => {
       "UNSUBSCRIBE_SECRET is required in production",
     ]);
     expect(environmentIssues(local, { ...raw, UNSUBSCRIBE_SECRET: "u" }, true)).toEqual([]);
+  });
+
+  it("ask for the SMTP server's user and password with its host", () => {
+    const raw = { SMTP_HOST: "smtp-relay.gmail.com", SMTP_USER: "envios@a.b" };
+    expect(environmentIssues(local, raw, false)).toEqual([
+      "SMTP_PASSWORD must be set together with SMTP_HOST, SMTP_USER",
+    ]);
+  });
+
+  it("refuse to boot on a Mailtrap token alone, which would stop every e-mail", () => {
+    const raw = {
+      APP_URL: "https://a.b",
+      DATABASE_URL: "postgres://x",
+      BETTER_AUTH_SECRET: "s",
+      FILE_URL_SECRET: "f",
+      MAILTRAP_TOKEN: "t",
+    };
+    expect(environmentIssues(local, raw, true)).toEqual([
+      "MAILTRAP_TOKEN is no longer read: e-mail goes through SMTP_HOST, SMTP_USER and SMTP_PASSWORD",
+    ]);
   });
 
   it("let the local stack send to the mail catcher, and only on this machine", () => {

@@ -74,5 +74,12 @@
       "staff": "equipe",
       "admin": "administrador"
     }
+  },
+  "test": {
+    "subject": "E-mail de teste ({sentAt})",
+    "preview": "Se você recebeu esta mensagem, o envio de e-mails funciona.",
+    "heading": "O envio de e-mails funciona",
+    "body": "Esta mensagem saiu de {sender} por {destination}, pedida no painel de saúde do admin.",
+    "sentAt": "Enviada em {sentAt}."
   }
 }

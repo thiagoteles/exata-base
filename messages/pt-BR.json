@@ -333,7 +333,7 @@
     },
     "health": {
       "title": "Saúde",
-      "subtitle": "Os trabalhos agendados, os webhooks e o banco, como estão agora.",
+      "subtitle": "Os trabalhos agendados, os webhooks, o e-mail e o banco, como estão agora.",
       "release": "No ar",
       "service": "Serviço",
       "version": "Versão",
@@ -371,6 +371,24 @@
       "sources": {
         "payments": "Pagamentos",
         "accounts": "Contas"
+      },
+      "email": {
+        "title": "E-mail",
+        "note": "Por onde o sistema envia e-mails. O teste vai só para o seu endereço, {to}, pelo mesmo caminho que os e-mails do produto usam.",
+        "destination": "Servidor de envio",
+        "sender": "Remetente",
+        "kinds": {
+          "smtp": "SMTP",
+          "local": "Local",
+          "none": "Sem envio"
+        },
+        "where": {
+          "local": "O Mailpit desta máquina, que guarda os e-mails sem enviá-los a ninguém.",
+          "none": "Nenhum servidor configurado. Os e-mails não são enviados."
+        },
+        "send": "Enviar e-mail de teste",
+        "sent": "Enviado para {to}. Confira a caixa de entrada e a pasta de spam.",
+        "failed": "O envio falhou"
       }
     },
     "referrals": {
@@ -1068,6 +1086,13 @@
         "staff": "equipe",
         "admin": "administrador"
       }
+    },
+    "test": {
+      "subject": "E-mail de teste ({sentAt})",
+      "preview": "Se você recebeu esta mensagem, o envio de e-mails funciona.",
+      "heading": "O envio de e-mails funciona",
+      "body": "Esta mensagem saiu de {sender} por {destination}, pedida no painel de saúde do admin.",
+      "sentAt": "Enviada em {sentAt}."
     }
   },
   "errorPage": {

@@ -5,6 +5,7 @@ import { RecordCell, RecordGrid } from "@/components/patterns/record-grid";
 import { Stamp, type StampTone } from "@/components/ui/stamp";
 import type { JobState } from "@/domain/operations/job-health";
 import type { Health, JobHealth, WebhookHealth } from "@/lib/admin/health";
+import { EmailSection, type EmailSetup } from "./email-section";
 
 const stateTone: Record<JobState, StampTone> = {
   ok: "success",
@@ -21,15 +22,20 @@ const COMMIT_LENGTH = 12;
 
 type Release = { service: string; commit: string | null };
 
-/** What is running, then the scheduled jobs, then the webhooks: the order an outage is chased in. */
+/**
+ * What is running, then where e-mail goes, then the scheduled jobs, then the webhooks: the order an
+ * outage is chased in.
+ */
 export async function HealthBoard({
   health,
   now,
   release,
+  email,
 }: {
   health: Health;
   now: Date;
   release: Release;
+  email: EmailSetup;
 }) {
   const [t, format] = await Promise.all([getTranslations("admin.health"), getFormatter()]);
   const when = (instant: Date) => (
@@ -162,6 +168,8 @@ export async function HealthBoard({
           )}
         </RecordCell>
       </RecordGrid>
+
+      <EmailSection {...email} />
 
       <PageSection title={t("jobs")} help={t("jobsNote")}>
         <DataList

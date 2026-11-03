@@ -10,6 +10,7 @@ import { sendInvite } from "@/lib/admin/invite-mailer";
 import { inviteByEmail } from "@/lib/admin/invites";
 import { grantCourtesy, refundLastPayment, removeUser, revokeCourtesy } from "@/lib/admin/users";
 import { db } from "@/lib/db/client";
+import { timeZone } from "@/lib/i18n/locales";
 import { requestLocale } from "@/lib/ports/email/locale";
 import { requireGateway } from "@/lib/ports/payment";
 import { courtesySchema, inviteSchema, roleChangeSchema, userIdSchema } from "./schema";
@@ -86,4 +87,24 @@ export const withdrawInvite = actionFor("admin")
   .action(async ({ parsedInput, ctx }) => {
     await revokeInvite(db, actorOf(ctx.user), parsedInput.id, currentInstant());
     return { revoked: true };
+  });
+
+/**
+ * Sends a test e-mail to the signed-in admin, through the destination production uses, and says
+ * what the server answered when it refused.
+ */
+export const sendTestEmailToMe = actionFor("admin")
+  .metadata({ name: "sendTestEmailToMe" })
+  .action(async ({ ctx }) => {
+    const [{ sendTestEmail }, locale] = await Promise.all([
+      import("@/lib/admin/email-test"),
+      requestLocale(),
+    ]);
+    const sentAt = new Intl.DateTimeFormat(locale, {
+      dateStyle: "short",
+      timeStyle: "medium",
+      timeZone,
+    }).format(currentInstant());
+    const result = await sendTestEmail({ to: ctx.user.email, locale, sentAt });
+    return { to: ctx.user.email, ...result };
   });

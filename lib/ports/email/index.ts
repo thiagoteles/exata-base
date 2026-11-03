@@ -83,3 +83,47 @@ export async function sendEmail(input: EmailMessage): Promise<SendResult> {
     return "failed";
   }
 }
+
+/** Where mail goes, as the admin's health page shows it. Never the user or the password. */
+export type EmailDestination =
+  | { kind: "smtp"; host: string; port: number }
+  | { kind: "local" }
+  | { kind: "none" };
+
+export function emailDestination(): EmailDestination {
+  if (
+    env.SMTP_HOST !== undefined &&
+    env.SMTP_USER !== undefined &&
+    env.SMTP_PASSWORD !== undefined
+  ) {
+    return { kind: "smtp", host: env.SMTP_HOST, port: env.SMTP_PORT };
+  }
+  return env.SMTP_LOCAL_URL === undefined ? { kind: "none" } : { kind: "local" };
+}
+
+/** A server's refusal can be long; the screen needs the code and the first lines. */
+const MAX_REASON = 600;
+
+/**
+ * Sends one message straight to the destination, past the consent filter, and answers with the
+ * server's own words when it is refused: the admin's test, where "failed" alone says nothing about
+ * a wrong password, a sender the relay refuses or a server out of reach.
+ */
+export async function probeEmail(
+  message: EmailMessage,
+): Promise<{ ok: true } | { ok: false; reason: string | null }> {
+  sender ??= loadSender();
+  const destination = await sender;
+  if (destination === null) {
+    // Nothing to quote: the screen says in its own words that no server is configured.
+    return { ok: false, reason: null };
+  }
+  try {
+    await destination.send(message);
+    return { ok: true };
+  } catch (error) {
+    logger.error("test email not sent", { subject: message.subject, error });
+    const reason = error instanceof Error ? error.message : String(error);
+    return { ok: false, reason: reason.slice(0, MAX_REASON) };
+  }
+}

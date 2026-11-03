@@ -10,6 +10,7 @@ import { readHealth } from "@/lib/admin/health";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { requirePageRole } from "@/lib/page-guard";
+import { emailDestination } from "@/lib/ports/email";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("admin.health");
@@ -40,6 +41,7 @@ async function Health() {
         health={health}
         now={now}
         release={{ service: env.SERVICE_NAME, commit: env.SOURCE_COMMIT ?? null }}
+        email={{ destination: emailDestination(), from: env.EMAIL_FROM, to: viewer.email }}
       />
     </>
   );

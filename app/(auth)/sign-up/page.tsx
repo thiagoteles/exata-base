@@ -11,6 +11,7 @@ import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { getCurrentUser } from "@/lib/ports/auth";
 import { HostedAuthScreen } from "@/lib/ports/auth/screens";
+import { afterSignUp } from "@/lib/routes";
 import { firstParam } from "@/lib/search-param";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -30,8 +31,9 @@ export default function SignUpPage({ searchParams }: Params) {
 
 async function SignUpScreen({ searchParams }: Params) {
   const query = await searchParams;
+  const next = afterSignUp(firstParam(query["next"]));
   if ((await getCurrentUser()) !== null) {
-    redirect("/account");
+    redirect(next as never);
   }
   // An invite link carries a token. The token only fills in the e-mail it was sent to; the role
   // is applied when that e-mail is confirmed, so a forged token gains nothing.
@@ -41,7 +43,7 @@ async function SignUpScreen({ searchParams }: Params) {
   const invite = token === undefined ? null : await findPendingInvite(db, token, currentInstant());
   if (env.AUTH_PROVIDER === "clerk") {
     const Screen = productAuthScreen ?? HostedAuthScreen;
-    return <Screen screen="sign-up" next="/account" email={invite?.email} />;
+    return <Screen screen="sign-up" next={next} email={invite?.email} />;
   }
   return <SignUpForm invitedEmail={invite?.email} />;
 }

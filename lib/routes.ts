@@ -34,6 +34,22 @@ export function safeReturnPath(value: string | null | undefined): string {
     : "/";
 }
 
+/**
+ * Where a new account lands: where the person was headed, or else the product's own first screen.
+ * A product that has none (its signed-in home is the public home page) sends them to the account
+ * page, which holds the first steps.
+ */
+export function afterSignUp(
+  next: string | null | undefined,
+  home: string = SIGNED_IN_HOME,
+): string {
+  const back = safeReturnPath(next);
+  if (back !== "/") {
+    return back;
+  }
+  return home === "/" ? "/account" : home;
+}
+
 export function signInRedirect(pathname: string, search: string): string {
   return `${SIGN_IN_PATH}?next=${encodeURIComponent(`${pathname}${search}`)}`;
 }

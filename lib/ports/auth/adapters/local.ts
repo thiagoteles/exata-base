@@ -12,6 +12,7 @@ import type { Database } from "@/lib/db/database";
 import { accounts, sessions, twoFactors, verifications } from "@/lib/db/schema/auth";
 import { users } from "@/lib/db/schema/users";
 import { DomainError } from "@/lib/errors";
+import { afterSignUp } from "@/lib/routes";
 import { siteName } from "@/lib/site-name";
 import type { AuthAdapter, PasswordCredentials, SignInOutcome } from "../types";
 
@@ -129,7 +130,7 @@ async function translated<T>(run: () => Promise<T>): Promise<T> {
   }
 }
 
-const AFTER_CONFIRMATION = `/auth/complete?next=${encodeURIComponent("/account")}`;
+const AFTER_CONFIRMATION = `/auth/complete?next=${encodeURIComponent(afterSignUp(null))}`;
 
 function asksForSecondFactor(result: unknown): boolean {
   return (

@@ -154,8 +154,11 @@ test("a public page answers at its Portuguese address and the route address move
   expect(page.status()).toBe(200);
   const moved = await request.get("/plans?ref=x", { maxRedirects: 0 });
   expect(moved.status()).toBe(301);
-  expect(new URL(moved.headers()["location"] ?? "").pathname).toBe(plans);
-  expect(new URL(moved.headers()["location"] ?? "").search).toBe("?ref=x");
+  // Next writes a same-site redirect as a path, so it is read against the app's own origin.
+  const target = new URL(moved.headers()["location"] ?? "", appOrigin);
+  expect(target.origin).toBe(new URL(appOrigin).origin);
+  expect(target.pathname).toBe(plans);
+  expect(target.search).toBe("?ref=x");
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/contato</loc>");
   expect(sitemap).not.toContain("/contact</loc>");

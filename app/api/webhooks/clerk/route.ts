@@ -4,8 +4,8 @@ import { processClerkEvent } from "@/lib/accounts/clerk-webhook";
 import { accountDeletionSteps } from "@/lib/accounts/deletion-steps";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
-import { sendEvent } from "@/lib/ports/analytics";
 import { readClerkWebhookRequest } from "@/lib/ports/auth";
+import { signedUp } from "@/lib/ports/auth/account-hooks";
 import { logger } from "@/lib/ports/log";
 import { timedRoute } from "@/lib/timed-route";
 
@@ -27,7 +27,7 @@ export const POST = timedRoute("/api/webhooks/clerk", async (request: NextReques
     adminEmails: env.ADMIN_EMAILS,
     deletion: accountDeletionSteps,
     now: currentInstant(),
-    onSignedUp: (accountId) => sendEvent({ name: "signup_completed", accountId, data: {} }),
+    onSignedUp: signedUp,
   });
   return Response.json({ result });
 });

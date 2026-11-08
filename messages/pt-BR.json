@@ -1093,6 +1093,14 @@
       "heading": "O envio de e-mails funciona",
       "body": "Esta mensagem saiu de {sender} por {destination}, pedida no painel de saúde do admin.",
       "sentAt": "Enviada em {sentAt}."
+    },
+    "signUpNotice": {
+      "subject": "Novo cadastro: {email}",
+      "preview": "{email} acabou de criar uma conta.",
+      "heading": "Novo cadastro",
+      "body": "{who} criou uma conta em {date} às {time}. {total, plural, one {É a primeira conta.} other {Agora são # contas.}}",
+      "action": "Abrir a conta no admin",
+      "why": "Você recebe este aviso porque o seu e-mail está na lista de administradores."
     }
   },
   "errorPage": {

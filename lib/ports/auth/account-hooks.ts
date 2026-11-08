@@ -1,12 +1,14 @@
 import type { ReactElement } from "react";
 import { currentInstant } from "@/domain/clock";
 import { type ClerkProfile, upsertClerkUser } from "@/lib/accounts/clerk-sync";
+import { notifyAdminsOfSignUp } from "@/lib/accounts/sign-up-notice";
 import { db } from "@/lib/db/client";
 import { env } from "@/lib/env";
 import { sendEvent } from "@/lib/ports/analytics";
 import { sendEmail } from "@/lib/ports/email";
 import { chooseLocale, requestLocale } from "@/lib/ports/email/locale";
 import { type EmailTranslator, emailTranslatorFor, renderEmail } from "@/lib/ports/email/render";
+import { logger } from "@/lib/ports/log";
 import { savedLocaleOfEmail } from "@/lib/preferences/service";
 
 /*
@@ -34,8 +36,21 @@ export async function sendAccountEmail(
   }
 }
 
+/**
+ * An account was just made, by any path (a confirmed e-mail, Google, Clerk's sign-in or its
+ * webhook): counts it and tells the admins. The notice is not awaited, so a slow mail server never
+ * holds the person on the sign-up screen; a failure is only logged.
+ */
 export function signedUp(accountId: string): void {
   sendEvent({ name: "signup_completed", accountId, data: {} });
+  notifyAdminsOfSignUp(db, accountId).then(
+    (result) => {
+      if (result === "failed") {
+        logger.warn("sign-up notice not sent", { accountId });
+      }
+    },
+    (error: unknown) => logger.error("sign-up notice failed", { accountId, error }),
+  );
 }
 
 /** Stores the Clerk user that just signed in, and counts the sign-up when the row is new. */

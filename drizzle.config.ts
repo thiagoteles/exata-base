@@ -14,7 +14,10 @@ const productFiles = readdirSync("./lib/db/schema")
 
 export default defineConfig({
   dialect: "postgresql",
-  schema: productFiles,
+  // A product that took the samples out before making an area of its own has no file here yet,
+  // and drizzle-kit refuses an empty list; the product's registry then declares no table, and
+  // standing in for the files it lets the migration that drops the samples be written.
+  schema: productFiles.length > 0 ? productFiles : ["./lib/db/schema.product.ts"],
   out: "./lib/db/product-migrations",
   casing: "snake_case",
   strict: true,

@@ -18,8 +18,14 @@ import { breadcrumbData, structuredArticle } from "@/lib/structured-data";
 import { z } from "@/lib/validation";
 
 // Every article in the index is prerendered; the proxy answers any other slug with a real 404.
+// With Cache Components the list may not be empty, so a product with no article yet prerenders an
+// address no article can have (an underscore never passes the slug check), which is a 404.
+const noArticleYet = "_none";
+
 export function generateStaticParams() {
-  return articles.map((article) => ({ slug: article.slug }));
+  return articles.length === 0
+    ? [{ slug: noArticleYet }]
+    : articles.map((article) => ({ slug: article.slug }));
 }
 
 const moduleSchema = z.object({

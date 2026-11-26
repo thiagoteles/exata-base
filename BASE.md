@@ -188,10 +188,12 @@ Um segundo idioma é opt-in (README): o catálogo, a lista em `lib/i18n/locales.
 - Os SDKs do Google leem os próprios arquivos em tempo de execução: ficam em `serverExternalPackages`.
 - O build confere o segundo argumento de cada handler de rota contra o `RouteContext`: contexto opcional reprova. Rota sem parte dinâmica recebe `params` indefinido.
 - MDX precisa de `mdx` em `pageExtensions`, senão o artigo carrega o runtime de JSX errado.
+- Com Cache Components, `generateStaticParams` vazio derruba o build (`empty-generate-static-params`). Um produto sem artigo nenhum quebrava o push; a rota de artigo devolve então o slug `_none`, que nenhum arquivo pode ter (o `pnpm content` só aceita minúsculas, números e hífens) e que responde 404.
 - O pdfkit carrega as fontes padrão pelo mapa `imports` do próprio `package.json`, que o rastreador do standalone não segue: a rota de recibo lista a pasta em `outputFileTracingIncludes`.
 - As faces Atkinson Hyperlegible (preset `accessible`) não estão na tabela de métricas do `next/font`: o `pnpm tokens` as gera com `adjustFontFallback: false`.
 
 **Drizzle e Postgres**
+- `drizzle-kit generate` recusa uma lista vazia de schemas ("No schema files found"). Um produto que roda `pnpm new:crud --remove-sample` antes da primeira área fica sem arquivo no seu fluxo; o `drizzle.config.ts` usa então o `lib/db/schema.product.ts`, que não declara tabela, e a migração que apaga as amostras sai.
 - `drizzle-kit generate` pergunta "criada ou renomeada?" quando a mesma migração acrescenta e tira colunas, enums ou tabelas; sem terminal, imprime o erro e sai com sucesso, sem migração. Troque campos em duas migrações (acrescentar, depois tirar). Quem roda o gerador de um script confere que o arquivo apareceu (o `new:crud` faz isso). Os snapshots saem sem formatação, e o lint os lê.
 - O drizzle-kit escreve uma chave estrangeira nova antes de uma unicidade nova na mesma migração, e o Postgres recusa: a unicidade vem numa migração anterior.
 - Numa subquery em `sql\`...\``, o Drizzle deixa a coluna sem o nome da tabela e o Postgres a resolve na tabela de dentro: escreva a correlação com nomes completos.

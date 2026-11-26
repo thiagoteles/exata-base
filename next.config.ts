@@ -72,6 +72,8 @@ const nextConfig: NextConfig = {
     // The app builds and develops with webpack for now, the more settled of the two bundlers here.
     // This trades a little compile time for a lower peak.
     webpackMemoryOptimizations: true,
+    // Upgrades of Next are taken for security advisories, and the tooling knows to propose them.
+    agentUpgrade: "security",
   },
   // The image ships only the traced server, not the whole node_modules.
   output: "standalone",
